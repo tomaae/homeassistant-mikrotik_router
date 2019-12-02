@@ -63,7 +63,7 @@ class MikrotikAPI:
 			librouteros.exceptions.FatalError
 		) as api_error:
 			_LOGGER.error("Mikrotik %s: %s", self._host, api_error)
-			self.errorToStrings("%s" % api_error)
+			self.error_to_strings("%s" % api_error)
 			self._connection = None
 			return False
 		else:
@@ -73,9 +73,9 @@ class MikrotikAPI:
 		return self._connected
 	
 	# ---------------------------
-	#   errorToStrings
+	#   error_to_strings
 	# ---------------------------
-	def errorToStrings(self, error):
+	def error_to_strings(self, error):
 		self.error = "cannot_connect"
 		if error == "invalid user name or password (6)":
 			self.error = "wrong_login"
