@@ -23,9 +23,10 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Software (please complete the following information):**
- - OS: [e.g. Windows 10]
- - Streaming software [e.g. OBS, SLOBS, XSplit]
- - Streaming software Version [e.g. 22.0.2 64-bit]
+ - Hass.io / Home Assistant version: [e.g. Hassio v192/ HA v0.102.3]
+ - Mikrotik Router version: [e.g. v1.0.0]
+ - Mikrotik Hardware: [e.g. RB4011iGS+]
+ - Mikrotik Software version: [e.g. v6.45]
 
 **Additional context**
 Add any other context about the problem here.
