@@ -63,7 +63,12 @@ class MikrotikControllerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "name_exists"
             
             # Test connection
-            api = MikrotikAPI(host=user_input["host"], username=user_input["username"], password=user_input["password"], port=user_input["port"], use_ssl=user_input["ssl"])
+            api = MikrotikAPI(host=user_input["host"],
+                              username=user_input["username"],
+                              password=user_input["password"],
+                              port=user_input["port"],
+                              use_ssl=user_input["ssl"]
+                              )
             if not api.connect():
                 errors[CONF_HOST] = api.error
             
@@ -74,7 +79,14 @@ class MikrotikControllerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     data=user_input
                 )
             
-            return self._show_config_form(host=user_input["host"], username=user_input["username"], password=user_input["password"], port=user_input["port"], name=user_input["name"], use_ssl=user_input["ssl"], errors=errors)
+            return self._show_config_form(host=user_input["host"],
+                                          username=user_input["username"],
+                                          password=user_input["password"],
+                                          port=user_input["port"],
+                                          name=user_input["name"],
+                                          use_ssl=user_input["ssl"],
+                                          errors=errors
+                                          )
         
         return self._show_config_form(errors=errors)
     

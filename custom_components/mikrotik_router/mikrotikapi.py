@@ -56,11 +56,11 @@ class MikrotikAPI:
         try:
             self._connection = librouteros.connect(self._host, self._username, self._password, **kwargs)
         except (
-            librouteros.exceptions.TrapError,
-            librouteros.exceptions.MultiTrapError,
-            librouteros.exceptions.ConnectionClosed,
-            librouteros.exceptions.ProtocolError,
-            librouteros.exceptions.FatalError
+                librouteros.exceptions.TrapError,
+                librouteros.exceptions.MultiTrapError,
+                librouteros.exceptions.ConnectionClosed,
+                librouteros.exceptions.ProtocolError,
+                librouteros.exceptions.FatalError
         ) as api_error:
             _LOGGER.error("Mikrotik %s: %s", self._host, api_error)
             self.error_to_strings("%s" % api_error)
@@ -107,10 +107,10 @@ class MikrotikAPI:
             self._connection = None
             return None
         except (
-            librouteros.exceptions.TrapError,
-            librouteros.exceptions.MultiTrapError,
-            librouteros.exceptions.ProtocolError,
-            librouteros.exceptions.FatalError
+                librouteros.exceptions.TrapError,
+                librouteros.exceptions.MultiTrapError,
+                librouteros.exceptions.ProtocolError,
+                librouteros.exceptions.FatalError
         ) as api_error:
             _LOGGER.error("Mikrotik %s connection error %s", self._host, api_error)
             return None
