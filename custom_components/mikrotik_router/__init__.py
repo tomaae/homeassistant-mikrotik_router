@@ -21,9 +21,9 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 
-#---------------------------
+# ---------------------------
 #   async_setup
-#---------------------------
+# ---------------------------
 async def async_setup(hass, config):
 	"""Set up configured Mikrotik Controller."""
 	hass.data[DOMAIN] = {}
@@ -31,9 +31,9 @@ async def async_setup(hass, config):
 	return True
 
 
-#---------------------------
+# ---------------------------
 #   async_setup_entry
-#---------------------------
+# ---------------------------
 async def async_setup_entry(hass, config_entry):
 	"""Set up Mikrotik Router as config entry."""
 	name = config_entry.data[CONF_NAME]
@@ -52,9 +52,9 @@ async def async_setup_entry(hass, config_entry):
 	
 	hass.data[DOMAIN][DATA_CLIENT][config_entry.entry_id] = mikrotik_controller
 	
-	#hass.async_create_task(
-	#	hass.config_entries.async_forward_entry_setup(config_entry, "sensor")
-	#)
+	# hass.async_create_task(
+	# 	hass.config_entries.async_forward_entry_setup(config_entry, "sensor")
+	# )
 	
 	hass.async_create_task(
 		hass.config_entries.async_forward_entry_setup(config_entry, "device_tracker")
@@ -72,9 +72,9 @@ async def async_setup_entry(hass, config_entry):
 	return True
 
 
-#---------------------------
+# ---------------------------
 #   async_unload_entry
-#---------------------------
+# ---------------------------
 async def async_unload_entry(hass, config_entry):
 	"""Unload a config entry."""
 	mikrotik_controller = hass.data[DOMAIN][DATA_CLIENT][config_entry.entry_id]

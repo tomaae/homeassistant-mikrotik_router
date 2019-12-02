@@ -35,9 +35,9 @@ DEVICE_ATTRIBUTES = [
 ]
 
 
-#---------------------------
+# ---------------------------
 #   async_setup_entry
-#---------------------------
+# ---------------------------
 async def async_setup_entry(hass, config_entry, async_add_entities):
 	"""Set up device tracker for Mikrotik Router component."""
 	name = config_entry.data[CONF_NAME]
@@ -49,7 +49,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 		"""Update the values of the controller."""
 		update_items(name, mikrotik_controller, async_add_entities, tracked)
 	
-	
 	mikrotik_controller.listeners.append(
 		async_dispatcher_connect(hass, mikrotik_controller.signal_update, update_controller)
 	)
@@ -58,9 +57,9 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 	return
 
 
-#---------------------------
+# ---------------------------
 #   update_items
-#---------------------------
+# ---------------------------
 @callback
 def update_items(name, mikrotik_controller, async_add_entities, tracked):
 	"""Update tracked device state from the controller."""
@@ -83,9 +82,9 @@ def update_items(name, mikrotik_controller, async_add_entities, tracked):
 	return
 
 
-#---------------------------
+# ---------------------------
 #   MikrotikControllerPortDeviceTracker
-#---------------------------
+# ---------------------------
 class MikrotikControllerPortDeviceTracker(ScannerEntity):
 	"""Representation of a network port."""
 	
@@ -111,7 +110,7 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
 	
 	async def async_update(self):
 		"""Synchronize state with controller."""
-		#await self.mikrotik_controller.async_update()
+		# await self.mikrotik_controller.async_update()
 		return
 	
 	@property

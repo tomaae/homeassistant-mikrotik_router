@@ -1,8 +1,6 @@
 """Config flow to configure Mikrotik Router."""
 
 import logging
-_LOGGER = logging.getLogger(__name__)
-
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
@@ -25,9 +23,11 @@ from .const import (
 
 from .mikrotikapi import MikrotikAPI
 
-#---------------------------
+_LOGGER = logging.getLogger(__name__)
+
+# ---------------------------
 #   configured_instances
-#---------------------------
+# ---------------------------
 @callback
 def configured_instances(hass):
 	"""Return a set of configured instances."""
@@ -36,9 +36,9 @@ def configured_instances(hass):
 	)
 
 
-#---------------------------
+# ---------------------------
 #   MikrotikControllerConfigFlow
-#---------------------------
+# ---------------------------
 class MikrotikControllerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 	def __init__(self):
 		"""Initialize."""
@@ -58,16 +58,16 @@ class MikrotikControllerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 		"""Handle a flow initialized by the user."""
 		errors = {}
 		if user_input is not None:
-			## Check if instance with this name already exists
+			# Check if instance with this name already exists
 			if user_input[CONF_NAME] in configured_instances(self.hass):
 				errors["base"] = "name_exists"
 			
-			## Test connection
+			# Test connection
 			api = MikrotikAPI(host=user_input["host"], username=user_input["username"], password=user_input["password"], port=user_input["port"], use_ssl=user_input["ssl"])
 			if not api.connect():
 				errors[CONF_HOST] = api.error
 			
-			## Save instance
+			# Save instance
 			if not errors:
 				return self.async_create_entry(
 					title=user_input[CONF_NAME],
@@ -78,9 +78,9 @@ class MikrotikControllerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 		
 		return self._show_config_form(errors=errors)
 	
-	#---------------------------
+	# ---------------------------
 	#   _show_config_form
-	#---------------------------
+	# ---------------------------
 	def _show_config_form(self, host='10.0.0.1', username='admin', password='admin', port=0, name='Mikrotik', use_ssl=False, errors=None):
 		"""Show the configuration form to edit data."""
 		return self.async_show_form(
@@ -97,9 +97,9 @@ class MikrotikControllerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 		)
 
 
-#---------------------------
+# ---------------------------
 #   MikrotikControllerOptionsFlowHandler
-#---------------------------
+# ---------------------------
 class MikrotikControllerOptionsFlowHandler(config_entries.OptionsFlow):
 	"""Handle options."""
 	

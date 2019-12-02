@@ -6,9 +6,9 @@ import librouteros
 _LOGGER = logging.getLogger(__name__)
 
 
-#---------------------------
+# ---------------------------
 #   MikrotikAPI
-#---------------------------
+# ---------------------------
 class MikrotikAPI:
 	"""Handle all communication with the Mikrotik API."""
 
@@ -27,13 +27,13 @@ class MikrotikAPI:
 		self._connected = False
 		self.error = ""
 		
-		## Default ports
+		# Default ports
 		if not self._port:
 			self._port = 8729 if self._use_ssl else 8728
 	
-	#---------------------------
+	# ---------------------------
 	#   connect
-	#---------------------------
+	# ---------------------------
 	def connect(self):
 		"""Connect to Mikrotik device."""
 		self.error = ""
@@ -72,9 +72,9 @@ class MikrotikAPI:
 		
 		return self._connected
 	
-	#---------------------------
+	# ---------------------------
 	#   errorToStrings
-	#---------------------------
+	# ---------------------------
 	def errorToStrings(self, error):
 		self.error = "cannot_connect"
 		if error == "invalid user name or password (6)":
@@ -82,16 +82,16 @@ class MikrotikAPI:
 		
 		return
 	
-	#---------------------------
+	# ---------------------------
 	#   connected
-	#---------------------------
+	# ---------------------------
 	def connected(self):
 		"""Return connected boolean."""
 		return self._connected
 	
-	#---------------------------
+	# ---------------------------
 	#   path
-	#---------------------------
+	# ---------------------------
 	def path(self, path):
 		"""Retrieve data from Mikrotik API."""
 		if not self._connected or not self._connection:
