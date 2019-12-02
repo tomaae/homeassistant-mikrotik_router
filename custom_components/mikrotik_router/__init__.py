@@ -272,7 +272,7 @@ class MikrotikControllerData():
 				self.data['arp'][uid]['address'] = entry['address'] if 'address' in entry else ""
 		
 		if bridge_used:
-			self.update_bridge_hosts()
+			self.update_bridge_hosts(mac2ip)
 		
 		## Map ARP to ifaces
 		for uid in self.data['interface']:
@@ -284,7 +284,7 @@ class MikrotikControllerData():
 	#---------------------------
 	#   update_bridge_hosts
 	#---------------------------
-	def update_bridge_hosts(self):
+	def update_bridge_hosts(self, mac2ip):
 		data = self.api.path("/interface/bridge/host")
 		for entry in data:
 			## Ignore port MAC
