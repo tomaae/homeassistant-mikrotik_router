@@ -1,7 +1,5 @@
 """Mikrotik Router integration."""
 
-from .mikrotikapi import MikrotikAPI
-
 from datetime import timedelta
 import logging
 from homeassistant.exceptions import ConfigEntryNotReady
@@ -19,7 +17,7 @@ from .const import (
 )
 
 _LOGGER = logging.getLogger(__name__)
-
+from .mikrotikapi import MikrotikAPI
 #DEFAULT_SCAN_INTERVAL = timedelta(seconds=DEFAULT_SCAN_INTERVAL)
 
 
@@ -274,42 +272,50 @@ class MikrotikControllerData():
 				self.data['arp'][uid]['address'] = entry['address'] if 'address' in entry else ""
 		
 		if bridge_used:
-			data = self.api.path("/interface/bridge/host")
-			for entry in data:
-				## Ignore port MAC
-				if entry['local']:
-					continue
-				
-				## Get iface default-name from custom name
-				uid = None
-				for ifacename in self.data['interface']:
-					if self.data['interface'][ifacename]['name'] == entry['interface']:
-						uid = self.data['interface'][ifacename]['default-name']
-						break
-				
-				if not uid:
-					continue
-				
-				## Create uid arp dict
-				if uid not in self.data['arp']:
-					self.data['arp'][uid] = {}
-				
-				## Add data
-				self.data['arp'][uid]['interface'] = uid
-				if 'mac-address' in self.data['arp'][uid]:
-					self.data['arp'][uid]['mac-address'] = "multiple"
-					self.data['arp'][uid]['address'] = "multiple"
-				else:
-					self.data['arp'][uid]['mac-address'] = entry['mac-address'] if 'mac-address' in entry else ""
-					self.data['arp'][uid]['address'] = ""
-				
-				if self.data['arp'][uid]['address'] == "" and self.data['arp'][uid]['mac-address'] in mac2ip:
-					self.data['arp'][uid]['address'] = mac2ip[self.data['arp'][uid]['mac-address']]
+			self.update_bridge_hosts()
 		
 		## Map ARP to ifaces
 		for uid in self.data['interface']:
 			self.data['interface'][uid]['client-ip-address'] = self.data['arp'][uid]['address'] if uid in self.data['arp'] and 'address' in self.data['arp'][uid] else ""
 			self.data['interface'][uid]['client-mac-address'] = self.data['arp'][uid]['mac-address'] if uid in self.data['arp'] and 'mac-address' in self.data['arp'][uid] else ""
+		
+		return
+	
+	#---------------------------
+	#   update_bridge_hosts
+	#---------------------------
+	def update_bridge_hosts(self):
+		data = self.api.path("/interface/bridge/host")
+		for entry in data:
+			## Ignore port MAC
+			if entry['local']:
+				continue
+			
+			## Get iface default-name from custom name
+			uid = None
+			for ifacename in self.data['interface']:
+				if self.data['interface'][ifacename]['name'] == entry['interface']:
+					uid = self.data['interface'][ifacename]['default-name']
+					break
+			
+			if not uid:
+				continue
+			
+			## Create uid arp dict
+			if uid not in self.data['arp']:
+				self.data['arp'][uid] = {}
+			
+			## Add data
+			self.data['arp'][uid]['interface'] = uid
+			if 'mac-address' in self.data['arp'][uid]:
+				self.data['arp'][uid]['mac-address'] = "multiple"
+				self.data['arp'][uid]['address'] = "multiple"
+			else:
+				self.data['arp'][uid]['mac-address'] = entry['mac-address'] if 'mac-address' in entry else ""
+				self.data['arp'][uid]['address'] = ""
+			
+			if self.data['arp'][uid]['address'] == "" and self.data['arp'][uid]['mac-address'] in mac2ip:
+				self.data['arp'][uid]['address'] = mac2ip[self.data['arp'][uid]['mac-address']]
 		
 		return
 	
