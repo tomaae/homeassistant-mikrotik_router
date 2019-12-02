@@ -42,11 +42,13 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 	"""Set up device tracker for Mikrotik Router component."""
 	name = config_entry.data[CONF_NAME]
 	mikrotik_controller = hass.data[DOMAIN][DATA_CLIENT][config_entry.entry_id]
+	tracked = {}
 	
 	@callback
 	def update_controller():
 		"""Update the values of the controller."""
-		update_items(name, mikrotik_controller, async_add_entities)
+		update_items(name, mikrotik_controller, async_add_entities, tracked)
+	
 	
 	mikrotik_controller.listeners.append(
 		async_dispatcher_connect(hass, mikrotik_controller.signal_update, update_controller)
@@ -60,9 +62,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 #   update_items
 #---------------------------
 @callback
-def update_items(name, mikrotik_controller, async_add_entities):
+def update_items(name, mikrotik_controller, async_add_entities, tracked):
 	"""Update tracked device state from the controller."""
-	tracked = {}
 	new_tracked = []
 	
 	for uid in mikrotik_controller.data['interface']:
