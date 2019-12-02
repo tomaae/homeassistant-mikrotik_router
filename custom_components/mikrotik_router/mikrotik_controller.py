@@ -46,6 +46,9 @@ class MikrotikControllerData():
         
         return
     
+    # ---------------------------
+    #   force_update
+    # ---------------------------
     async def force_update(self, now=None):
         """Periodic update."""
         await self.async_update()
@@ -181,12 +184,7 @@ class MikrotikControllerData():
                 continue
             
             # Get iface default-name from custom name
-            uid = None
-            for ifacename in self.data['interface']:
-                if self.data['interface'][ifacename]['name'] == entry['interface']:
-                    uid = self.data['interface'][ifacename]['default-name']
-                    break
-            
+            uid = self.get_iface_name(entry)
             if not uid:
                 continue
             
@@ -196,15 +194,8 @@ class MikrotikControllerData():
             
             # Add data
             self.data['arp'][uid]['interface'] = uid
-            if 'mac-address' in self.data['arp'][uid]:
-                self.data['arp'][uid]['mac-address'] = "multiple"
-            else:
-                self.data['arp'][uid]['mac-address'] = entry['mac-address'] if 'mac-address' in entry else ""
-            
-            if 'address' in self.data['arp'][uid]:
-                self.data['arp'][uid]['address'] = "multiple"
-            else:
-                self.data['arp'][uid]['address'] = entry['address'] if 'address' in entry else ""
+            self.data['arp'][uid]['mac-address'] = "multiple" if 'mac-address' in self.data['arp'][uid] else entry['mac-address']
+            self.data['arp'][uid]['address'] = "multiple" if 'address' in self.data['arp'][uid] else entry['address']
         
         if bridge_used:
             self.update_bridge_hosts(mac2ip)
@@ -227,12 +218,7 @@ class MikrotikControllerData():
                 continue
             
             # Get iface default-name from custom name
-            uid = None
-            for ifacename in self.data['interface']:
-                if self.data['interface'][ifacename]['name'] == entry['interface']:
-                    uid = self.data['interface'][ifacename]['default-name']
-                    break
-            
+            uid = self.get_iface_name(entry)
             if not uid:
                 continue
             
@@ -246,13 +232,25 @@ class MikrotikControllerData():
                 self.data['arp'][uid]['mac-address'] = "multiple"
                 self.data['arp'][uid]['address'] = "multiple"
             else:
-                self.data['arp'][uid]['mac-address'] = entry['mac-address'] if 'mac-address' in entry else ""
+                self.data['arp'][uid]['mac-address'] = entry['mac-address']
                 self.data['arp'][uid]['address'] = ""
             
             if self.data['arp'][uid]['address'] == "" and self.data['arp'][uid]['mac-address'] in mac2ip:
                 self.data['arp'][uid]['address'] = mac2ip[self.data['arp'][uid]['mac-address']]
         
         return
+    
+    # ---------------------------
+    #   get_iface_name
+    # ---------------------------
+    def get_iface_name(self, entry):
+        uid = None
+        for ifacename in self.data['interface']:
+            if self.data['interface'][ifacename]['name'] == entry['interface']:
+                uid = self.data['interface'][ifacename]['default-name']
+                break
+        
+        return uid
     
     # ---------------------------
     #   get_system_routerboard
