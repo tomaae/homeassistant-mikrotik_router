@@ -2,21 +2,22 @@
 
 import logging
 from homeassistant.core import callback
-from homeassistant.helpers import entity_registry
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
-from homeassistant.components.device_tracker import DOMAIN as DEVICE_TRACKER_DOMAIN
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
 from homeassistant.components.device_tracker.const import SOURCE_TYPE_ROUTER
-from .const import DEFAULT_NAME, DOMAIN, DATA_CLIENT, ATTRIBUTION
+from .const import (
+	DOMAIN,
+	DATA_CLIENT,
+	ATTRIBUTION,
+)
+
 from homeassistant.const import (
 	CONF_NAME,
 	ATTR_ATTRIBUTION,
 )
 
 _LOGGER = logging.getLogger(__name__)
-
-ATTRIBUTION = "Data provided by Mikrotik"
 
 DEVICE_ATTRIBUTES = [
 	"running",
@@ -34,6 +35,7 @@ DEVICE_ATTRIBUTES = [
 	"default-name",
 ]
 
+
 #---------------------------
 #   async_setup_entry
 #---------------------------
@@ -41,16 +43,11 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 	"""Set up device tracker for Mikrotik Router component."""
 	name = config_entry.data[CONF_NAME]
 	mikrotik_controller = hass.data[DOMAIN][DATA_CLIENT][config_entry.entry_id]
-	tracked = {}
-	
-	registry = await entity_registry.async_get_registry(hass)
-	
 	
 	@callback
 	def update_controller():
 		"""Update the values of the controller."""
-		update_items(name, mikrotik_controller, async_add_entities, tracked)
-	
+		update_items(name, mikrotik_controller, async_add_entities)
 	
 	mikrotik_controller.listeners.append(
 		async_dispatcher_connect(hass, mikrotik_controller.signal_update, update_controller)
@@ -59,15 +56,16 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 	update_controller()
 	return
 
+
 #---------------------------
 #   update_items
 #---------------------------
 @callback
-def update_items(name, mikrotik_controller, async_add_entities, tracked):
+def update_items(name, mikrotik_controller, async_add_entities):
 	"""Update tracked device state from the controller."""
+	tracked = {}
 	new_tracked = []
 	
-	sensors = []
 	for uid in mikrotik_controller.data['interface']:
 		if mikrotik_controller.data['interface'][uid]['type'] == "ether":
 			item_id = name + "-" + mikrotik_controller.data['interface'][uid]['default-name']
@@ -83,6 +81,7 @@ def update_items(name, mikrotik_controller, async_add_entities, tracked):
 		async_add_entities(new_tracked)
 	
 	return
+
 
 #---------------------------
 #   MikrotikControllerPortDeviceTracker
@@ -114,7 +113,6 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
 		"""Synchronize state with controller."""
 		#await self.mikrotik_controller.async_update()
 		return
-		
 	
 	@property
 	def is_connected(self):
@@ -158,7 +156,7 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
 			"connections": {(CONNECTION_NETWORK_MAC, self.mikrotik_controller.data['interface'][self._uid]['port-mac-address'])},
 			"manufacturer": self.mikrotik_controller.data['resource']['platform'],
 			"model": "Port",
-			"name": self.mikrotik_controller.data['interface'][self._uid]['default-name'] ,
+			"name": self.mikrotik_controller.data['interface'][self._uid]['default-name'],
 		}
 		return info
 	

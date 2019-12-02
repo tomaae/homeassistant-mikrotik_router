@@ -5,13 +5,14 @@ import librouteros
 import logging
 _LOGGER = logging.getLogger(__name__)
 
+
 #---------------------------
 #   MikrotikAPI
 #---------------------------
 class MikrotikAPI:
 	"""Handle all communication with the Mikrotik API."""
 
-	def __init__(self, host, username, password, port = 0, use_ssl = True, login_method = "plain", encoding = "utf-8"):
+	def __init__(self, host, username, password, port=0, use_ssl=True, login_method="plain", encoding="utf-8"):
 		"""Initialize the Mikrotik Client."""
 		self._host = host
 		self._use_ssl = use_ssl

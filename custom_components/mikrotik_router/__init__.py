@@ -4,24 +4,24 @@ from .mikrotikapi import MikrotikAPI
 
 from datetime import timedelta
 import logging
+from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.dispatcher import async_dispatcher_send
-from homeassistant.helpers.event import async_track_time_interval, async_track_time_change
-from homeassistant import config_entries
-from homeassistant.util import Throttle
+from homeassistant.helpers.event import async_track_time_interval
+#from homeassistant.util import Throttle
 from homeassistant.const import CONF_NAME, CONF_HOST, CONF_PORT, CONF_USERNAME, CONF_PASSWORD, CONF_SSL
 from .const import (
-		DEFAULT_NAME,
-		DOMAIN,
-		DATA_CLIENT,
-		CONF_TRACK_ARP,
-		DEFAULT_TRACK_ARP,
-		CONF_SCAN_INTERVAL,
-		DEFAULT_SCAN_INTERVAL,
+	DOMAIN,
+	DATA_CLIENT,
+	CONF_TRACK_ARP,
+	DEFAULT_TRACK_ARP,
+	CONF_SCAN_INTERVAL,
+	DEFAULT_SCAN_INTERVAL,
 )
 
 _LOGGER = logging.getLogger(__name__)
 
 #DEFAULT_SCAN_INTERVAL = timedelta(seconds=DEFAULT_SCAN_INTERVAL)
+
 
 #---------------------------
 #   async_setup
@@ -31,6 +31,7 @@ async def async_setup(hass, config):
 	hass.data[DOMAIN] = {}
 	hass.data[DOMAIN][DATA_CLIENT] = {}
 	return True
+
 
 #---------------------------
 #   async_setup_entry
@@ -72,6 +73,7 @@ async def async_setup_entry(hass, config_entry):
 	
 	return True
 
+
 #---------------------------
 #   async_unload_entry
 #---------------------------
@@ -83,6 +85,7 @@ async def async_unload_entry(hass, config_entry):
 	await mikrotik_controller.async_reset()
 	hass.data[DOMAIN][DATA_CLIENT].pop(config_entry.entry_id)
 	return True
+
 
 #---------------------------
 #   MikrotikControllerData
@@ -113,7 +116,6 @@ class MikrotikControllerData():
 	async def force_update(self, now=None):
 		"""Periodic update."""
 		await self.async_update()
-		#async_track_time_change(self.hass, self.force_update, self.option_scan_interval)
 		return
 	
 	#---------------------------
@@ -197,8 +199,8 @@ class MikrotikControllerData():
 			self.data['interface'][uid]['default-name'] = iface['default-name']
 			self.data['interface'][uid]['name'] = iface['name'] if 'name' in iface else iface['default-name']
 			self.data['interface'][uid]['type'] = iface['type'] if 'type' in iface else "unknown"
-			self.data['interface'][uid]['running'] = True if iface['running'] == True else False
-			self.data['interface'][uid]['enabled'] = True if iface['disabled'] == False else False
+			self.data['interface'][uid]['running'] = True if iface['running'] else False
+			self.data['interface'][uid]['enabled'] = True if not iface['disabled'] else False
 			self.data['interface'][uid]['port-mac-address'] = iface['mac-address'] if 'mac-address' in iface else ""
 			self.data['interface'][uid]['comment'] = iface['comment'] if 'comment' in iface else ""
 			self.data['interface'][uid]['last-link-down-time'] = iface['last-link-down-time'] if 'last-link-down-time' in iface else ""
@@ -317,7 +319,7 @@ class MikrotikControllerData():
 	def get_system_routerboard(self):
 		data = self.api.path("/system/routerboard")
 		for entry in data:
-			self.data['routerboard']['routerboard'] = True if entry['routerboard'] == True else False
+			self.data['routerboard']['routerboard'] = True if entry['routerboard'] else False
 			self.data['routerboard']['model'] = entry['model'] if 'model' in entry else "unknown"
 			self.data['routerboard']['serial-number'] = entry['serial-number'] if 'serial-number' in entry else "unknown"
 			self.data['routerboard']['firmware'] = entry['current-firmware'] if 'current-firmware' in entry else "unknown"
