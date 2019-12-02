@@ -1,8 +1,8 @@
 """Mikrotik API for Mikrotik Router."""
 
 import ssl
-import librouteros
 import logging
+import librouteros
 _LOGGER = logging.getLogger(__name__)
 
 

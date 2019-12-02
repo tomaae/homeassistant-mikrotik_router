@@ -6,15 +6,14 @@ from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
 from homeassistant.components.device_tracker.const import SOURCE_TYPE_ROUTER
+from homeassistant.const import (
+	CONF_NAME,
+	ATTR_ATTRIBUTION,
+)
 from .const import (
 	DOMAIN,
 	DATA_CLIENT,
 	ATTRIBUTION,
-)
-
-from homeassistant.const import (
-	CONF_NAME,
-	ATTR_ATTRIBUTION,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -144,6 +143,7 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
 		"""Return the icon."""
 		if not self.mikrotik_controller.data['interface'][self._uid]['enabled']:
 			return 'mdi:lan-disconnect'
+		
 		if self.mikrotik_controller.data['interface'][self._uid]['running']:
 			return 'mdi:lan-connect'
 		else:

@@ -1,7 +1,5 @@
 """Config flow to configure Mikrotik Router."""
 
-from .mikrotikapi import MikrotikAPI
-
 import logging
 _LOGGER = logging.getLogger(__name__)
 
@@ -25,6 +23,7 @@ from const import (
 	DEFAULT_SCAN_INTERVAL,
 )
 
+from .mikrotikapi import MikrotikAPI
 
 #---------------------------
 #   configured_instances
@@ -111,7 +110,7 @@ class MikrotikControllerOptionsFlowHandler(config_entries.OptionsFlow):
 	
 	async def async_step_init(self, user_input=None):
 		"""Manage the options."""
-		return await self.async_step_device_tracker()
+		return await self.async_step_device_tracker(user_input)
 	
 	async def async_step_device_tracker(self, user_input=None):
 		"""Manage the device tracker options."""
