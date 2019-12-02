@@ -11,7 +11,7 @@ from homeassistant.const import (
 	CONF_SSL,
 )
 
-from mikrotik_controller import MikrotikControllerData
+from .mikrotik_controller import MikrotikControllerData
 
 from .const import (
 	DOMAIN,

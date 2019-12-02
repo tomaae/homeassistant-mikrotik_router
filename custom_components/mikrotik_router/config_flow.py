@@ -15,7 +15,7 @@ from homeassistant.const import (
 	CONF_SSL,
 )
 
-from const import (
+from .const import (
 	DOMAIN,
 	CONF_TRACK_ARP,
 	DEFAULT_TRACK_ARP,
