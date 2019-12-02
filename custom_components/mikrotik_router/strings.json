@@ -29,7 +29,7 @@
 			},
 			"device_tracker": {
 				"data": {
-					"scan_interval": "Scan interval",
+					"scan_interval": "Scan interval (requires HA restart)",
 					"track_arp": "Show client MAC and IP on interfaces"
 				}
 			}
