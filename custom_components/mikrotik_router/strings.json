@@ -1,0 +1,38 @@
+{
+	"config": {
+		"title": "Mikrotik Router",
+		"step": {
+			"user": {
+				"title": "Mikrotik Router",
+				"description": "Set up Mikrotik Router integration.",
+				"data": {
+					"name": "Name of the integration",
+					"host": "Host",
+					"port": "Port",
+					"username": "Username",
+					"password": "Password",
+					"ssl": "Use SSL"
+				}
+			}
+		},
+		"error": {
+			"name_exists": "Name already exists.",
+			"cannot_connect": "Cannot connect to Mikrotik.",
+			"wrong_login": "Invalid user name or password.",
+			"routeros_api_missing": "Python module routeros_api not installed."
+		}
+	},
+	"options": {
+		"step": {
+			"init": {
+					"data": {}
+			},
+			"device_tracker": {
+				"data": {
+					"scan_interval": "Scan interval",
+					"track_arp": "Show client MAC and IP on interfaces"
+				}
+			}
+		}
+	}
+}
