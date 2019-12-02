@@ -19,6 +19,7 @@ from .mikrotikapi import MikrotikAPI
 
 #DEFAULT_SCAN_INTERVAL = timedelta(seconds=DEFAULT_SCAN_INTERVAL)
 
+
 #---------------------------
 #   MikrotikControllerData
 #---------------------------

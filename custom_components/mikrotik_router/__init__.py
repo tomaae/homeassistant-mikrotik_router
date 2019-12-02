@@ -1,11 +1,7 @@
 """Mikrotik Router integration."""
 
-from datetime import timedelta
 import logging
 from homeassistant.exceptions import ConfigEntryNotReady
-from homeassistant.helpers.dispatcher import async_dispatcher_send
-from homeassistant.helpers.event import async_track_time_interval
-#from homeassistant.util import Throttle
 from homeassistant.const import (
 	CONF_NAME,
 	CONF_HOST,
@@ -20,15 +16,9 @@ from mikrotik_controller import MikrotikControllerData
 from .const import (
 	DOMAIN,
 	DATA_CLIENT,
-	CONF_TRACK_ARP,
-	DEFAULT_TRACK_ARP,
-	CONF_SCAN_INTERVAL,
-	DEFAULT_SCAN_INTERVAL,
 )
 
 _LOGGER = logging.getLogger(__name__)
-from .mikrotikapi import MikrotikAPI
-#DEFAULT_SCAN_INTERVAL = timedelta(seconds=DEFAULT_SCAN_INTERVAL)
 
 
 #---------------------------
