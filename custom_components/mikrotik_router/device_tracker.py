@@ -141,11 +141,13 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
     @property
     def icon(self):
         """Return the icon."""
-        icon = 'mdi:lan-disconnect'
         if self.mikrotik_controller.data['interface'][self._uid]['running']:
             icon = 'mdi:lan-connect'
         else:
             icon = 'mdi:lan-pending'
+        
+        if not self.mikrotik_controller.data['interface'][self._uid]['enabled']:
+            icon = 'mdi:lan-disconnect'
         
         return icon
     
