@@ -21,6 +21,7 @@ Interface tracker:
 
 Features:
  * Interface device tracker
+ * Enable/disable interface switches
 
 ## Add integration
 You can add this integration to Home Assistant via `Configuration -> Integrations -> Add -> Mikrotik Router`. You can add this integration several times for different routers.
