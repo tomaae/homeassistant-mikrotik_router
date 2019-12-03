@@ -2,6 +2,6 @@
     "name": "Mikrotik Router",
     "homeassistant": "0.102.0",
     "iot_class": "local_poll",
-    "domains": ["device_tracker"],
+    "domains": ["device_tracker", "switch"],
     "render_readme": true
 }
