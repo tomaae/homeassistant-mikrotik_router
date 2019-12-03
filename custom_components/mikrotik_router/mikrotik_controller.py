@@ -35,6 +35,7 @@ class MikrotikControllerData():
         self.data['resource'] = {}
         self.data['interface'] = {}
         self.data['arp'] = {}
+        self.data['nat'] = {}
         
         self.listeners = []
         
@@ -104,6 +105,7 @@ class MikrotikControllerData():
         
         self.get_interfaces()
         self.get_arp()
+        self.get_nat()
         self.get_system_resource()
         
         async_dispatcher_send(self.hass, self.signal_update)
@@ -258,6 +260,32 @@ class MikrotikControllerData():
                 break
         
         return uid
+    
+    # ---------------------------
+    #   get_nat
+    # ---------------------------
+    def get_nat(self):
+        data = self.api.path("/ip/firewall/nat")
+        for entry in data:
+            if entry['action'] != 'dst-nat':
+                continue
+            
+            uid = entry['.id']
+            if uid not in self.data['nat']:
+                self.data['nat'][uid] = {}
+            
+            self.data['nat'][uid]['name'] = entry['protocol'] + ':' + str(entry['dst-port'])
+            self.data['nat'][uid]['protocol'] = entry['protocol'] if 'protocol' in entry else ""
+            self.data['nat'][uid]['dst-port'] = entry['dst-port'] if 'dst-port' in entry else ""
+            self.data['nat'][uid]['in-interface'] = entry['in-interface'] if 'in-interface' in entry else "any"
+            self.data['nat'][uid]['to-addresses'] = entry['to-addresses'] if 'to-addresses' in entry else ""
+            self.data['nat'][uid]['to-ports'] = entry['to-ports'] if 'to-ports' in entry else ""
+            self.data['nat'][uid]['comment'] = entry['comment'] if 'comment' in entry else ""
+            self.data['nat'][uid]['enabled'] = True
+            if 'disabled' in entry and entry['disabled']:
+                self.data['nat'][uid]['enabled'] = False
+        
+        return
     
     # ---------------------------
     #   get_system_routerboard
