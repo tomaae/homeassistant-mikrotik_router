@@ -84,6 +84,7 @@ async def async_unload_entry(hass, config_entry):
     mikrotik_controller = hass.data[DOMAIN][DATA_CLIENT][config_entry.entry_id]
     await hass.config_entries.async_forward_entry_unload(config_entry, "sensor")
     await hass.config_entries.async_forward_entry_unload(config_entry, "device_tracker")
+    await hass.config_entries.async_forward_entry_unload(config_entry, "switch")
     await mikrotik_controller.async_reset()
     hass.data[DOMAIN][DATA_CLIENT].pop(config_entry.entry_id)
     return True
