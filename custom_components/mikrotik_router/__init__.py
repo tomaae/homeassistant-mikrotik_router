@@ -60,6 +60,10 @@ async def async_setup_entry(hass, config_entry):
         hass.config_entries.async_forward_entry_setup(config_entry, "device_tracker")
     )
     
+    hass.async_create_task(
+        hass.config_entries.async_forward_entry_setup(config_entry, "switch")
+    )
+    
     device_registry = await hass.helpers.device_registry.async_get_registry()
     device_registry.async_get_or_create(
         config_entry_id=config_entry.entry_id,
