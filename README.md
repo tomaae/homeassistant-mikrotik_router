@@ -19,9 +19,15 @@ Interface tracker:
 
 ![Interface Info](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/interface.png)
 
+
+System sensors:
+
+![Interface Info](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/system_sensors.png)
+
 Features:
  * Interface device tracker
  * Enable/disable interface switches
+ * System sensors (CPU, Memory, HDD)
 
 ## Add integration
 You can add this integration to Home Assistant via `Configuration -> Integrations -> Add -> Mikrotik Router`. You can add this integration several times for different routers.
