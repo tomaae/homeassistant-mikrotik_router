@@ -108,7 +108,6 @@ class MikrotikControllerSensor(Entity):
     def __init__(self, mikrotik_controller, name, kind, uid=''):
         """Initialize."""
         self.mikrotik_controller = mikrotik_controller
-        self.data = mikrotik_controller.data
         self._name = name
         self.kind = kind
         self.uid = uid
@@ -172,9 +171,9 @@ class MikrotikControllerSensor(Entity):
     def device_info(self):
         """Return a port description for device registry."""
         info = {
-            "identifiers": {(DOMAIN, "serial-number", self.data['routerboard']['serial-number'])},
+            "identifiers": {(DOMAIN, "serial-number", self.mikrotik_controller.data['routerboard']['serial-number'], "switch", "PORT")},
             "manufacturer": self.mikrotik_controller.data['resource']['platform'],
-            "model": SENSOR_TYPES[self.kind]['group'],
+            "model": self.mikrotik_controller.data['resource']['board-name'],
             "name": SENSOR_TYPES[self.kind]['group'],
         }
         return info

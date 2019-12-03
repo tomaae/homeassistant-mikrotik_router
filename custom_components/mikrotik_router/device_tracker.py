@@ -126,7 +126,7 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
     @property
     def name(self) -> str:
         """Return the name of the port."""
-        return self.mikrotik_controller.data['interface'][self._uid]['default-name']
+        return f"{self._name} {self.mikrotik_controller.data['interface'][self._uid]['default-name']}"
     
     @property
     def unique_id(self) -> str:
@@ -157,7 +157,7 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
         info = {
             "connections": {(CONNECTION_NETWORK_MAC, self.mikrotik_controller.data['interface'][self._uid]['port-mac-address'])},
             "manufacturer": self.mikrotik_controller.data['resource']['platform'],
-            "model": "Port",
+            "model": self.mikrotik_controller.data['resource']['board-name'],
             "name": self.mikrotik_controller.data['interface'][self._uid]['default-name'],
         }
         return info
