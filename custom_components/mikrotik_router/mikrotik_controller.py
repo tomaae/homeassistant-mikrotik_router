@@ -104,6 +104,7 @@ class MikrotikControllerData():
         
         self.get_interfaces()
         self.get_arp()
+        self.get_system_resource()
         
         async_dispatcher_send(self.hass, self.signal_update)
         return
@@ -280,5 +281,16 @@ class MikrotikControllerData():
             self.data['resource']['platform'] = entry['platform'] if 'platform' in entry else "unknown"
             self.data['resource']['board-name'] = entry['board-name'] if 'board-name' in entry else "unknown"
             self.data['resource']['version'] = entry['version'] if 'version' in entry else "unknown"
+            self.data['resource']['uptime'] = entry['uptime'] if 'uptime' in entry else "unknown"
+            self.data['resource']['cpu-load'] = entry['cpu-load'] if 'cpu-load' in entry else "unknown"
+            if 'free-memory' in entry and 'total-memory' in entry:
+                self.data['resource']['memory-usage'] = round(((entry['total-memory'] - entry['free-memory']) / entry['total-memory']) * 100)
+            else:
+                self.data['resource']['memory-usage'] = "unknown"
+            
+            if 'free-hdd-space' in entry and 'total-hdd-space' in entry:
+                self.data['resource']['hdd-usage'] = round(((entry['total-hdd-space'] - entry['free-hdd-space']) / entry['total-hdd-space']) * 100)
+            else:
+                self.data['resource']['hdd-usage'] = "unknown"
         
         return
