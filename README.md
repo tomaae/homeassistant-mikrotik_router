@@ -15,14 +15,12 @@
 Monitor and control your Mikrotik Device from Home Assistant.
 ![Device Tracker](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/device_tracker.png)
 
+![Interface Info](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/system_sensors.png)
+
 Interface tracker:
 
 ![Interface Info](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/interface.png)
 
-
-System sensors:
-
-![Interface Info](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/system_sensors.png)
 
 Features:
  * Interface device tracker
