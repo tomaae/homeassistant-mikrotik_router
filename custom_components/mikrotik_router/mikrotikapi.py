@@ -116,3 +116,25 @@ class MikrotikAPI:
             return None
         
         return response if response else None
+    
+    # ---------------------------
+    #   update
+    # ---------------------------
+    def update(self, path, param, value, mod_param, mod_value):
+        response = self.path(path)
+        if response is None:
+            return False
+        
+        for tmp in response:
+            if param not in tmp:
+                continue
+            
+            if tmp[param] != value:
+                continue
+            
+            params = {
+                '.id': tmp['.id'],
+                mod_param: mod_value
+            }
+            
+        return response.update(**params)

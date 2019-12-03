@@ -122,6 +122,12 @@ class MikrotikControllerData():
     # ---------------------------
     #   get_interfaces
     # ---------------------------
+    def set_value(self, path, param, value, mod_param, mod_value):
+        return self.api.update(path, param, value, mod_param, mod_value)
+    
+    # ---------------------------
+    #   get_interfaces
+    # ---------------------------
     def get_interfaces(self):
         ifaces = self.api.path("/interface")
         for iface in ifaces:
