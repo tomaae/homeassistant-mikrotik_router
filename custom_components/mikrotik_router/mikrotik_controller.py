@@ -36,6 +36,7 @@ class MikrotikControllerData():
         self.data['interface'] = {}
         self.data['arp'] = {}
         self.data['nat'] = {}
+        self.data['fw-update'] = {}
         
         self.listeners = []
         
@@ -44,6 +45,7 @@ class MikrotikControllerData():
             self.api = None
         
         async_track_time_interval(self.hass, self.force_update, self.option_scan_interval)
+        async_track_time_interval(self.hass, self.async_fwupdate_check, timedelta(hours=1))
         
         return
     
@@ -97,11 +99,25 @@ class MikrotikControllerData():
         return
     
     # ---------------------------
+    #   async_fwupdate_check
+    # ---------------------------
+    async def async_fwupdate_check(self):
+        """Update Mikrotik Controller data."""
+        
+        self.get_firmare_update()
+        
+        async_dispatcher_send(self.hass, self.signal_update)
+        return
+    
+    # ---------------------------
     #   async_update
     # ---------------------------
     # @Throttle(DEFAULT_SCAN_INTERVAL)
     async def async_update(self):
         """Update Mikrotik Controller data."""
+        
+        if 'available' not in self.data['fw-update']:
+            await self.async_fwupdate_check()
         
         self.get_interfaces()
         self.get_arp()
@@ -320,5 +336,18 @@ class MikrotikControllerData():
                 self.data['resource']['hdd-usage'] = round(((entry['total-hdd-space'] - entry['free-hdd-space']) / entry['total-hdd-space']) * 100)
             else:
                 self.data['resource']['hdd-usage'] = "unknown"
+        
+        return
+    
+    # ---------------------------
+    #   get_system_routerboard
+    # ---------------------------
+    def get_firmare_update(self):
+        data = self.api.path("/system/package/update")
+        for entry in data:
+            self.data['fw-update']['available'] = True if entry['status'] == "New version is available" else False
+            self.data['fw-update']['channel'] = entry['channel'] if 'channel' in entry else "unknown"
+            self.data['fw-update']['installed-version'] = entry['installed-version'] if 'installed-version' in entry else "unknown"
+            self.data['fw-update']['latest-version'] = entry['latest-version'] if 'latest-version' in entry else "unknown"
         
         return

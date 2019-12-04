@@ -57,6 +57,10 @@ async def async_setup_entry(hass, config_entry):
     )
     
     hass.async_create_task(
+        hass.config_entries.async_forward_entry_setup(config_entry, "binary_sensor")
+    )
+    
+    hass.async_create_task(
         hass.config_entries.async_forward_entry_setup(config_entry, "device_tracker")
     )
     
@@ -83,6 +87,7 @@ async def async_unload_entry(hass, config_entry):
     """Unload a config entry."""
     mikrotik_controller = hass.data[DOMAIN][DATA_CLIENT][config_entry.entry_id]
     await hass.config_entries.async_forward_entry_unload(config_entry, "sensor")
+    await hass.config_entries.async_forward_entry_unload(config_entry, "binary_sensor")
     await hass.config_entries.async_forward_entry_unload(config_entry, "device_tracker")
     await hass.config_entries.async_forward_entry_unload(config_entry, "switch")
     await mikrotik_controller.async_reset()
