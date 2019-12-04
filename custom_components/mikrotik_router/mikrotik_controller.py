@@ -37,6 +37,7 @@ class MikrotikControllerData():
         self.data['arp'] = {}
         self.data['nat'] = {}
         self.data['fw-update'] = {}
+        self.data['script'] = {}
         
         self.listeners = []
         
@@ -60,7 +61,7 @@ class MikrotikControllerData():
     # ---------------------------
     #   force_fwupdate_check
     # ---------------------------
-    async def force_update(self, now=None):
+    async def force_fwupdate_check(self, now=None):
         """Periodic update."""
         await self.async_fwupdate_check()
         return
@@ -131,6 +132,7 @@ class MikrotikControllerData():
         self.get_arp()
         self.get_nat()
         self.get_system_resource()
+        self.get_script()
         
         async_dispatcher_send(self.hass, self.signal_update)
         return
@@ -147,10 +149,16 @@ class MikrotikControllerData():
         return True
     
     # ---------------------------
-    #   get_interfaces
+    #   set_value
     # ---------------------------
     def set_value(self, path, param, value, mod_param, mod_value):
         return self.api.update(path, param, value, mod_param, mod_value)
+    
+    # ---------------------------
+    #   run_script
+    # ---------------------------
+    def run_script(self, name):
+        return self.api.run_script(name)
     
     # ---------------------------
     #   get_interfaces
@@ -358,4 +366,23 @@ class MikrotikControllerData():
             self.data['fw-update']['installed-version'] = entry['installed-version'] if 'installed-version' in entry else "unknown"
             self.data['fw-update']['latest-version'] = entry['latest-version'] if 'latest-version' in entry else "unknown"
         
+        return
+    
+    # ---------------------------
+    #   get_script
+    # ---------------------------
+    def get_script(self):
+        data = self.api.path("/system/script")
+        for entry in data:
+            if 'name' not in entry:
+                continue
+            
+            uid = entry['name']
+            if uid not in self.data['script']:
+                self.data['script'][uid] = {}
+            
+            self.data['script'][uid]['name'] = entry['name']
+            self.data['script'][uid]['last-started'] = entry['last-started'] if 'last-started' in entry else "unknown"
+            self.data['script'][uid]['run-count'] = entry['run-count'] if 'run-count' in entry else "unknown"
+            
         return

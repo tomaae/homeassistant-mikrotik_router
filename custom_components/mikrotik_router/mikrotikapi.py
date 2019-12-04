@@ -137,4 +137,26 @@ class MikrotikAPI:
                 mod_param: mod_value
             }
             
-        return response.update(**params)
+            response.update(**params)
+            
+        return True
+    
+    # ---------------------------
+    #   run_script
+    # ---------------------------
+    def run_script(self, name):
+        response = self.path('/system/script')
+        if response is None:
+            return False
+        
+        for tmp in response:
+            if 'name' not in tmp:
+                continue
+            
+            if tmp['name'] != name:
+                continue
+            
+            run = response('run', **{'.id': tmp['.id']})
+            tuple(run)
+        
+        return True

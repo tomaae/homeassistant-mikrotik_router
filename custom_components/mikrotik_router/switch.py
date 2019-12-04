@@ -44,6 +44,11 @@ DEVICE_ATTRIBUTES_NAT = [
     "comment",
 ]
 
+DEVICE_ATTRIBUTES_SCRIPT = [
+    "last-started",
+    "run-count",
+]
+
 
 # ---------------------------
 #   async_setup_entry
@@ -75,6 +80,7 @@ def update_items(name, mikrotik_controller, async_add_entities, switches):
     """Update device switch state from the controller."""
     new_switches = []
     
+    # Add interface switches
     for uid in mikrotik_controller.data['interface']:
         if mikrotik_controller.data['interface'][uid]['type'] == "ether":
             item_id = name + "-iface-" + mikrotik_controller.data['interface'][uid]['default-name']
@@ -86,6 +92,7 @@ def update_items(name, mikrotik_controller, async_add_entities, switches):
             switches[item_id] = MikrotikControllerPortSwitch(name, uid, mikrotik_controller)
             new_switches.append(switches[item_id])
     
+    # Add NAT switches
     for uid in mikrotik_controller.data['nat']:
         item_id = name + "-nat-" + mikrotik_controller.data['nat'][uid]['name']
         if item_id in switches:
@@ -94,6 +101,17 @@ def update_items(name, mikrotik_controller, async_add_entities, switches):
             continue
         
         switches[item_id] = MikrotikControllerNATSwitch(name, uid, mikrotik_controller)
+        new_switches.append(switches[item_id])
+    
+    # Add script switches
+    for uid in mikrotik_controller.data['script']:
+        item_id = name + "-script-" + mikrotik_controller.data['script'][uid]['name']
+        if item_id in switches:
+            if switches[item_id].enabled:
+                switches[item_id].async_schedule_update_ha_state()
+            continue
+        
+        switches[item_id] = MikrotikControllerScriptSwitch(name, uid, mikrotik_controller)
         new_switches.append(switches[item_id])
     
     if new_switches:
@@ -309,3 +327,75 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
     def is_on(self):
         """Return true if device is on."""
         return self.mikrotik_controller.data['nat'][self._uid]['enabled']
+
+
+# ---------------------------
+#   MikrotikControllerScriptSwitch
+# ---------------------------
+class MikrotikControllerScriptSwitch(MikrotikControllerSwitch):
+    """Representation of a script switch."""
+    
+    def __init__(self, name, uid, mikrotik_controller):
+        """Set up script switch."""
+        super().__init__(name, uid, mikrotik_controller)
+        
+        self._attrs = {
+            ATTR_ATTRIBUTION: ATTRIBUTION,
+        }
+    
+    async def async_added_to_hass(self):
+        """Script switch entity created."""
+        _LOGGER.debug("New script switch %s (%s)", self._name, self.mikrotik_controller.data['script'][self._uid]['name'])
+        return
+    
+    @property
+    def name(self) -> str:
+        """Return the name of the script switch."""
+        return f"{self._name} script {self.mikrotik_controller.data['script'][self._uid]['name']}"
+    
+    @property
+    def unique_id(self) -> str:
+        """Return a unique identifier for this script switch."""
+        return f"{self._name.lower()}-script_switch-{self.mikrotik_controller.data['script'][self._uid]['name']}"
+    
+    @property
+    def icon(self):
+        """Return the icon."""
+        return 'mdi:script-text-outline'
+    
+    @property
+    def device_info(self):
+        """Return a script switch description for device registry."""
+        info = {
+            "identifiers": {(DOMAIN, "serial-number", self.mikrotik_controller.data['routerboard']['serial-number'], "switch", "Scripts")},
+            "manufacturer": self.mikrotik_controller.data['resource']['platform'],
+            "model": self.mikrotik_controller.data['resource']['board-name'],
+            "name": "Scripts",
+        }
+        return info
+    
+    @property
+    def device_state_attributes(self):
+        """Return the script switch state attributes."""
+        attributes = self._attrs
+        
+        for variable in DEVICE_ATTRIBUTES_SCRIPT:
+            if variable in self.mikrotik_controller.data['script'][self._uid]:
+                attributes[variable] = self.mikrotik_controller.data['script'][self._uid][variable]
+        
+        return attributes
+
+    async def async_turn_on(self):
+        """Turn on the switch."""
+        self.mikrotik_controller.run_script(self.mikrotik_controller.data['script'][self._uid]['name'])
+        await self.mikrotik_controller.force_update()
+        return
+
+    async def async_turn_off(self):
+        """Turn off the switch."""
+        return
+
+    @property
+    def is_on(self):
+        """Return true if device is on."""
+        return False
