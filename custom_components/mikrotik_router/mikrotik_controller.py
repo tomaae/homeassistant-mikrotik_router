@@ -45,7 +45,7 @@ class MikrotikControllerData():
             self.api = None
         
         async_track_time_interval(self.hass, self.force_update, self.option_scan_interval)
-        async_track_time_interval(self.hass, self.async_fwupdate_check, timedelta(hours=1))
+        async_track_time_interval(self.hass, self.force_fwupdate_check, timedelta(hours=1))
         
         return
     
@@ -55,6 +55,14 @@ class MikrotikControllerData():
     async def force_update(self, now=None):
         """Periodic update."""
         await self.async_update()
+        return
+    
+    # ---------------------------
+    #   force_fwupdate_check
+    # ---------------------------
+    async def force_update(self, now=None):
+        """Periodic update."""
+        await self.async_fwupdate_check()
         return
     
     # ---------------------------
