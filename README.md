@@ -16,9 +16,10 @@ Monitor and control your Mikrotik Device from Home Assistant.
 ![Device Tracker](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/device_tracker.png)
 
 
-Interface tracker:
+Interface:
 
 ![Interface Info](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/interface.png)
+![Interface Switch](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/interface_switch.png)
 
 
 NAT switch:
@@ -31,6 +32,7 @@ Features:
  * Enable/disable interface switches
  * Enable/disable NAT rule switches
  * System sensors (CPU, Memory, HDD)
+ * Firmware update binary sensor
 
 ## Add integration
 You can add this integration to Home Assistant via `Configuration -> Integrations -> Add -> Mikrotik Router`. You can add this integration several times for different routers.
