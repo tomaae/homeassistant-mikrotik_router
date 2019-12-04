@@ -21,6 +21,9 @@ _LOGGER = logging.getLogger(__name__)
 ATTR_ICON = "icon"
 ATTR_LABEL = "label"
 ATTR_UNIT = "unit"
+ATTR_GROUP = "group"
+ATTR_PATH = "data_path"
+ATTR_ATTR = "data_attr"
 
 SENSOR_TYPES = {
     'system_cpu-load': {
@@ -28,27 +31,27 @@ SENSOR_TYPES = {
         ATTR_ICON: "mdi:speedometer",
         ATTR_LABEL: 'CPU load',
         ATTR_UNIT: "%",
-        'group': "System",
-        'data_path': "resource",
-        'data_attr': "cpu-load",
+        ATTR_GROUP: "System",
+        ATTR_PATH: "resource",
+        ATTR_ATTR: "cpu-load",
     },
     'system_memory-usage': {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:memory",
         ATTR_LABEL: 'Memory usage',
         ATTR_UNIT: "%",
-        'group': "System",
-        'data_path': "resource",
-        'data_attr': "memory-usage",
+        ATTR_GROUP: "System",
+        ATTR_PATH: "resource",
+        ATTR_ATTR: "memory-usage",
     },
     'system_hdd-usage': {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:harddisk",
         ATTR_LABEL: 'HDD usage',
         ATTR_UNIT: "%",
-        'group': "System",
-        'data_path': "resource",
-        'data_attr': "hdd-usage",
+        ATTR_GROUP: "System",
+        ATTR_PATH: "resource",
+        ATTR_ATTR: "hdd-usage",
     },
 }
 
@@ -129,8 +132,8 @@ class MikrotikControllerSensor(Entity):
     def state(self):
         """Return the state."""
         val = "unknown"
-        if SENSOR_TYPES[self.kind]['data_path'] in self.mikrotik_controller.data and SENSOR_TYPES[self.kind]['data_attr'] in self.mikrotik_controller.data[SENSOR_TYPES[self.kind]['data_path']]:
-            val = self.mikrotik_controller.data[SENSOR_TYPES[self.kind]['data_path']][SENSOR_TYPES[self.kind]['data_attr']]
+        if SENSOR_TYPES[self.kind][ATTR_PATH] in self.mikrotik_controller.data and SENSOR_TYPES[self.kind][ATTR_ATTR] in self.mikrotik_controller.data[SENSOR_TYPES[self.kind][ATTR_PATH]]:
+            val = self.mikrotik_controller.data[SENSOR_TYPES[self.kind][ATTR_PATH]][SENSOR_TYPES[self.kind][ATTR_ATTR]]
         
         return val
 
@@ -174,7 +177,7 @@ class MikrotikControllerSensor(Entity):
             "identifiers": {(DOMAIN, "serial-number", self.mikrotik_controller.data['routerboard']['serial-number'], "switch", "PORT")},
             "manufacturer": self.mikrotik_controller.data['resource']['platform'],
             "model": self.mikrotik_controller.data['resource']['board-name'],
-            "name": SENSOR_TYPES[self.kind]['group'],
+            "name": SENSOR_TYPES[self.kind][ATTR_GROUP],
         }
         return info
 
