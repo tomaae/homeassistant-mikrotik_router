@@ -19,6 +19,12 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
+SWITCH_LIST = [
+    "interface",
+    "nat",
+    "script",
+]
+
 DEVICE_ATTRIBUTES_IFACE = [
     "running",
     "enabled",
@@ -80,39 +86,25 @@ def update_items(name, mikrotik_controller, async_add_entities, switches):
     """Update device switch state from the controller."""
     new_switches = []
 
-    # Add interface switches
-    for uid in mikrotik_controller.data['interface']:
-        if mikrotik_controller.data['interface'][uid]['type'] == "ether":
-            item_id = name + "-iface-" + mikrotik_controller.data['interface'][uid]['default-name']
+    # Add switches
+    for sid in SWITCH_LIST:
+        for uid in mikrotik_controller.data[sid]:
+            item_id = name + "-" + sid + "-" + mikrotik_controller.data[sid][uid]['name']
             if item_id in switches:
                 if switches[item_id].enabled:
                     switches[item_id].async_schedule_update_ha_state()
                 continue
 
-            switches[item_id] = MikrotikControllerPortSwitch(name, uid, mikrotik_controller)
+            if sid == 'interface':
+                switches[item_id] = MikrotikControllerPortSwitch(name, uid, mikrotik_controller)
+
+            if sid == 'nat':
+                switches[item_id] = MikrotikControllerNATSwitch(name, uid, mikrotik_controller)
+
+            if sid == 'script':
+                switches[item_id] = MikrotikControllerScriptSwitch(name, uid, mikrotik_controller)
+
             new_switches.append(switches[item_id])
-
-    # Add NAT switches
-    for uid in mikrotik_controller.data['nat']:
-        item_id = name + "-nat-" + mikrotik_controller.data['nat'][uid]['name']
-        if item_id in switches:
-            if switches[item_id].enabled:
-                switches[item_id].async_schedule_update_ha_state()
-            continue
-
-        switches[item_id] = MikrotikControllerNATSwitch(name, uid, mikrotik_controller)
-        new_switches.append(switches[item_id])
-
-    # Add script switches
-    for uid in mikrotik_controller.data['script']:
-        item_id = name + "-script-" + mikrotik_controller.data['script'][uid]['name']
-        if item_id in switches:
-            if switches[item_id].enabled:
-                switches[item_id].async_schedule_update_ha_state()
-            continue
-
-        switches[item_id] = MikrotikControllerScriptSwitch(name, uid, mikrotik_controller)
-        new_switches.append(switches[item_id])
 
     if new_switches:
         async_add_entities(new_switches)

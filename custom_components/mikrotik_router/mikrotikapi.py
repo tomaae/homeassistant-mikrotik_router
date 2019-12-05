@@ -37,7 +37,7 @@ class MikrotikAPI:
     def connect(self):
         """Connect to Mikrotik device."""
         self.error = ""
-        self._connected = False
+        self._connected = None
 
         kwargs = {
             "encoding": self._encoding,
