@@ -58,16 +58,16 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     name = config_entry.data[CONF_NAME]
     mikrotik_controller = hass.data[DOMAIN][DATA_CLIENT][config_entry.entry_id]
     switches = {}
-    
+
     @callback
     def update_controller():
         """Update the values of the controller."""
         update_items(name, mikrotik_controller, async_add_entities, switches)
-    
+
     mikrotik_controller.listeners.append(
         async_dispatcher_connect(hass, mikrotik_controller.signal_update, update_controller)
     )
-    
+
     update_controller()
     return
 
@@ -79,7 +79,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 def update_items(name, mikrotik_controller, async_add_entities, switches):
     """Update device switch state from the controller."""
     new_switches = []
-    
+
     # Add interface switches
     for uid in mikrotik_controller.data['interface']:
         if mikrotik_controller.data['interface'][uid]['type'] == "ether":
@@ -88,10 +88,10 @@ def update_items(name, mikrotik_controller, async_add_entities, switches):
                 if switches[item_id].enabled:
                     switches[item_id].async_schedule_update_ha_state()
                 continue
-            
+
             switches[item_id] = MikrotikControllerPortSwitch(name, uid, mikrotik_controller)
             new_switches.append(switches[item_id])
-    
+
     # Add NAT switches
     for uid in mikrotik_controller.data['nat']:
         item_id = name + "-nat-" + mikrotik_controller.data['nat'][uid]['name']
@@ -99,10 +99,10 @@ def update_items(name, mikrotik_controller, async_add_entities, switches):
             if switches[item_id].enabled:
                 switches[item_id].async_schedule_update_ha_state()
             continue
-        
+
         switches[item_id] = MikrotikControllerNATSwitch(name, uid, mikrotik_controller)
         new_switches.append(switches[item_id])
-    
+
     # Add script switches
     for uid in mikrotik_controller.data['script']:
         item_id = name + "-script-" + mikrotik_controller.data['script'][uid]['name']
@@ -110,13 +110,13 @@ def update_items(name, mikrotik_controller, async_add_entities, switches):
             if switches[item_id].enabled:
                 switches[item_id].async_schedule_update_ha_state()
             continue
-        
+
         switches[item_id] = MikrotikControllerScriptSwitch(name, uid, mikrotik_controller)
         new_switches.append(switches[item_id])
-    
+
     if new_switches:
         async_add_entities(new_switches)
-    
+
     return
 
 
@@ -125,23 +125,23 @@ def update_items(name, mikrotik_controller, async_add_entities, switches):
 # ---------------------------
 class MikrotikControllerSwitch(SwitchDevice, RestoreEntity):
     """Representation of a network port switch."""
-    
+
     def __init__(self, name, uid, mikrotik_controller):
         """Set up switch."""
         self._name = name
         self._uid = uid
         self.mikrotik_controller = mikrotik_controller
-        
+
     async def async_added_to_hass(self):
         """Switch entity created."""
         _LOGGER.debug("New switch %s (%s)", self._name, self._uid)
         return
-    
+
     async def async_update(self):
         """Synchronize state with controller."""
         # await self.mikrotik_controller.async_update()
         return
-    
+
     @property
     def available(self) -> bool:
         """Return if controller is available."""
@@ -153,30 +153,30 @@ class MikrotikControllerSwitch(SwitchDevice, RestoreEntity):
 # ---------------------------
 class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
     """Representation of a network port switch."""
-    
+
     def __init__(self, name, uid, mikrotik_controller):
         """Set up tracked port."""
         super().__init__(name, uid, mikrotik_controller)
-        
+
         self._attrs = {
             ATTR_ATTRIBUTION: ATTRIBUTION,
         }
-    
+
     async def async_added_to_hass(self):
         """Port entity created."""
         _LOGGER.debug("New port switch %s (%s)", self._name, self.mikrotik_controller.data['interface'][self._uid]['port-mac-address'])
         return
-    
+
     @property
     def name(self) -> str:
         """Return the name of the port."""
         return f"{self._name} port {self.mikrotik_controller.data['interface'][self._uid]['default-name']}"
-    
+
     @property
     def unique_id(self) -> str:
         """Return a unique identifier for this port."""
         return f"{self._name.lower()}-enable_switch-{self.mikrotik_controller.data['interface'][self._uid]['port-mac-address']}"
-    
+
     @property
     def icon(self):
         """Return the icon."""
@@ -184,12 +184,12 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
             icon = 'mdi:lan-connect'
         else:
             icon = 'mdi:lan-pending'
-        
+
         if not self.mikrotik_controller.data['interface'][self._uid]['enabled']:
             icon = 'mdi:lan-disconnect'
-        
+
         return icon
-    
+
     @property
     def device_info(self):
         """Return a port description for device registry."""
@@ -200,16 +200,16 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
             "name": self.mikrotik_controller.data['interface'][self._uid]['default-name'],
         }
         return info
-    
+
     @property
     def device_state_attributes(self):
         """Return the port state attributes."""
         attributes = self._attrs
-        
+
         for variable in DEVICE_ATTRIBUTES_IFACE:
             if variable in self.mikrotik_controller.data['interface'][self._uid]:
                 attributes[variable] = self.mikrotik_controller.data['interface'][self._uid][variable]
-        
+
         return attributes
 
     async def async_turn_on(self):
@@ -245,30 +245,30 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
 # ---------------------------
 class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
     """Representation of a NAT switch."""
-    
+
     def __init__(self, name, uid, mikrotik_controller):
         """Set up NAT switch."""
         super().__init__(name, uid, mikrotik_controller)
-        
+
         self._attrs = {
             ATTR_ATTRIBUTION: ATTRIBUTION,
         }
-    
+
     async def async_added_to_hass(self):
         """NAT switch entity created."""
         _LOGGER.debug("New port switch %s (%s)", self._name, self.mikrotik_controller.data['nat'][self._uid]['name'])
         return
-    
+
     @property
     def name(self) -> str:
         """Return the name of the NAT switch."""
         return f"{self._name} NAT {self.mikrotik_controller.data['nat'][self._uid]['name']}"
-    
+
     @property
     def unique_id(self) -> str:
         """Return a unique identifier for this NAT switch."""
         return f"{self._name.lower()}-nat_switch-{self.mikrotik_controller.data['nat'][self._uid]['name']}"
-    
+
     @property
     def icon(self):
         """Return the icon."""
@@ -276,9 +276,9 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
             icon = 'mdi:network-off-outline'
         else:
             icon = 'mdi:network-outline'
-        
+
         return icon
-    
+
     @property
     def device_info(self):
         """Return a NAT switch description for device registry."""
@@ -289,16 +289,16 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
             "name": "NAT",
         }
         return info
-    
+
     @property
     def device_state_attributes(self):
         """Return the NAT switch state attributes."""
         attributes = self._attrs
-        
+
         for variable in DEVICE_ATTRIBUTES_NAT:
             if variable in self.mikrotik_controller.data['nat'][self._uid]:
                 attributes[variable] = self.mikrotik_controller.data['nat'][self._uid][variable]
-        
+
         return attributes
 
     async def async_turn_on(self):
@@ -334,35 +334,35 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
 # ---------------------------
 class MikrotikControllerScriptSwitch(MikrotikControllerSwitch):
     """Representation of a script switch."""
-    
+
     def __init__(self, name, uid, mikrotik_controller):
         """Set up script switch."""
         super().__init__(name, uid, mikrotik_controller)
-        
+
         self._attrs = {
             ATTR_ATTRIBUTION: ATTRIBUTION,
         }
-    
+
     async def async_added_to_hass(self):
         """Script switch entity created."""
         _LOGGER.debug("New script switch %s (%s)", self._name, self.mikrotik_controller.data['script'][self._uid]['name'])
         return
-    
+
     @property
     def name(self) -> str:
         """Return the name of the script switch."""
         return f"{self._name} script {self.mikrotik_controller.data['script'][self._uid]['name']}"
-    
+
     @property
     def unique_id(self) -> str:
         """Return a unique identifier for this script switch."""
         return f"{self._name.lower()}-script_switch-{self.mikrotik_controller.data['script'][self._uid]['name']}"
-    
+
     @property
     def icon(self):
         """Return the icon."""
         return 'mdi:script-text-outline'
-    
+
     @property
     def device_info(self):
         """Return a script switch description for device registry."""
@@ -373,16 +373,16 @@ class MikrotikControllerScriptSwitch(MikrotikControllerSwitch):
             "name": "Scripts",
         }
         return info
-    
+
     @property
     def device_state_attributes(self):
         """Return the script switch state attributes."""
         attributes = self._attrs
-        
+
         for variable in DEVICE_ATTRIBUTES_SCRIPT:
             if variable in self.mikrotik_controller.data['script'][self._uid]:
                 attributes[variable] = self.mikrotik_controller.data['script'][self._uid][variable]
-        
+
         return attributes
 
     async def async_turn_on(self):

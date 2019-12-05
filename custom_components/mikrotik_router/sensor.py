@@ -64,16 +64,16 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     name = config_entry.data[CONF_NAME]
     mikrotik_controller = hass.data[DOMAIN][DATA_CLIENT][config_entry.entry_id]
     sensors = {}
-    
+
     @callback
     def update_controller():
         """Update the values of the controller."""
         update_items(name, mikrotik_controller, async_add_entities, sensors)
-    
+
     mikrotik_controller.listeners.append(
         async_dispatcher_connect(hass, mikrotik_controller.signal_update, update_controller)
     )
-    
+
     update_controller()
     return
 
@@ -85,42 +85,42 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 def update_items(name, mikrotik_controller, async_add_entities, sensors):
     """Update sensor state from the controller."""
     new_sensors = []
-    
+
     for sensor in SENSOR_TYPES:
         item_id = name + "-" + sensor
         if item_id in sensors:
             if sensors[item_id].enabled:
                 sensors[item_id].async_schedule_update_ha_state()
             continue
-        
+
         sensors[item_id] = MikrotikControllerSensor(mikrotik_controller=mikrotik_controller, name=name, kind=sensor)
         new_sensors.append(sensors[item_id])
-    
+
     if new_sensors:
         async_add_entities(new_sensors, True)
-    
+
     return
-    
+
 
 # ---------------------------
 #   MikrotikControllerSensor
 # ---------------------------
 class MikrotikControllerSensor(Entity):
     """Define an Mikrotik Controller sensor."""
-    
+
     def __init__(self, mikrotik_controller, name, kind, uid=''):
         """Initialize."""
         self.mikrotik_controller = mikrotik_controller
         self._name = name
         self.kind = kind
         self.uid = uid
-        
+
         self._device_class = None
         self._state = None
         self._icon = None
         self._unit_of_measurement = None
         self._attrs = {ATTR_ATTRIBUTION: ATTRIBUTION}
-        
+
     @property
     def name(self):
         """Return the name."""
@@ -134,7 +134,7 @@ class MikrotikControllerSensor(Entity):
         val = "unknown"
         if SENSOR_TYPES[self.kind][ATTR_PATH] in self.mikrotik_controller.data and SENSOR_TYPES[self.kind][ATTR_ATTR] in self.mikrotik_controller.data[SENSOR_TYPES[self.kind][ATTR_PATH]]:
             val = self.mikrotik_controller.data[SENSOR_TYPES[self.kind][ATTR_PATH]][SENSOR_TYPES[self.kind][ATTR_ATTR]]
-        
+
         return val
 
     @property
@@ -169,7 +169,7 @@ class MikrotikControllerSensor(Entity):
     def available(self):
         """Return True if entity is available."""
         return bool(self.mikrotik_controller.data)
-    
+
     @property
     def device_info(self):
         """Return a port description for device registry."""
@@ -185,7 +185,7 @@ class MikrotikControllerSensor(Entity):
         """Synchronize state with controller."""
         # await self.mikrotik_controller.async_update()
         return
-    
+
     async def async_added_to_hass(self):
         """Port entity created."""
         _LOGGER.debug("New sensor %s (%s)", self._name, self.kind)

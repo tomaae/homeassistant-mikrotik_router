@@ -30,7 +30,7 @@ class MikrotikControllerData():
         self.name = name
         self.hass = hass
         self.config_entry = config_entry
-        
+
         self.data = {}
         self.data['routerboard'] = {}
         self.data['resource'] = {}
@@ -39,18 +39,18 @@ class MikrotikControllerData():
         self.data['nat'] = {}
         self.data['fw-update'] = {}
         self.data['script'] = {}
-        
+
         self.listeners = []
-        
+
         self.api = MikrotikAPI(host, username, password, port, use_ssl)
         if not self.api.connect():
             self.api = None
-        
+
         async_track_time_interval(self.hass, self.force_update, self.option_scan_interval)
         async_track_time_interval(self.hass, self.force_fwupdate_check, timedelta(hours=1))
-        
+
         return
-    
+
     # ---------------------------
     #   force_update
     # ---------------------------
@@ -58,7 +58,7 @@ class MikrotikControllerData():
         """Trigger update by timer"""
         await self.async_update()
         return
-    
+
     # ---------------------------
     #   force_fwupdate_check
     # ---------------------------
@@ -66,7 +66,7 @@ class MikrotikControllerData():
         """Trigger hourly update by timer"""
         await self.async_fwupdate_check()
         return
-    
+
     # ---------------------------
     #   option_track_arp
     # ---------------------------
@@ -74,7 +74,7 @@ class MikrotikControllerData():
     def option_track_arp(self):
         """Config entry option to not track ARP."""
         return self.config_entry.options.get(CONF_TRACK_ARP, DEFAULT_TRACK_ARP)
-    
+
     # ---------------------------
     #   option_scan_interval
     # ---------------------------
@@ -83,7 +83,7 @@ class MikrotikControllerData():
         """Config entry option scan interval."""
         scan_interval = self.config_entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
         return timedelta(seconds=scan_interval)
-    
+
     # ---------------------------
     #   signal_update
     # ---------------------------
@@ -91,14 +91,14 @@ class MikrotikControllerData():
     def signal_update(self):
         """Event to signal new data."""
         return f"{DOMAIN}-update-{self.name}"
-    
+
     # ---------------------------
     #   connected
     # ---------------------------
     def connected(self):
         """Return connected state"""
         return self.api.connected()
-    
+
     # ---------------------------
     #   hwinfo_update
     # ---------------------------
@@ -107,37 +107,37 @@ class MikrotikControllerData():
         self.get_system_routerboard()
         self.get_system_resource()
         return
-    
+
     # ---------------------------
     #   async_fwupdate_check
     # ---------------------------
     async def async_fwupdate_check(self):
         """Update Mikrotik data"""
-        
+
         self.get_firmare_update()
-        
+
         async_dispatcher_send(self.hass, self.signal_update)
         return
-    
+
     # ---------------------------
     #   async_update
     # ---------------------------
     # @Throttle(DEFAULT_SCAN_INTERVAL)
     async def async_update(self):
         """Update Mikrotik data"""
-        
+
         if 'available' not in self.data['fw-update']:
             await self.async_fwupdate_check()
-        
+
         self.get_interface()
         self.get_arp()
         self.get_nat()
         self.get_system_resource()
         self.get_script()
-        
+
         async_dispatcher_send(self.hass, self.signal_update)
         return
-    
+
     # ---------------------------
     #   async_reset
     # ---------------------------
@@ -145,24 +145,24 @@ class MikrotikControllerData():
         """Reset dispatchers"""
         for unsub_dispatcher in self.listeners:
             unsub_dispatcher()
-        
+
         self.listeners = []
         return True
-    
+
     # ---------------------------
     #   set_value
     # ---------------------------
     def set_value(self, path, param, value, mod_param, mod_value):
         """Change value using Mikrotik API"""
         return self.api.update(path, param, value, mod_param, mod_value)
-    
+
     # ---------------------------
     #   run_script
     # ---------------------------
     def run_script(self, name):
         """Run script using Mikrotik API"""
         return self.api.run_script(name)
-    
+
     # ---------------------------
     #   get_interface
     # ---------------------------
@@ -172,11 +172,11 @@ class MikrotikControllerData():
         for iface in ifaces:
             if 'default-name' not in iface:
                 continue
-            
+
             uid = iface['default-name']
             if uid not in self.data['interface']:
                 self.data['interface'][uid] = {}
-            
+
             self.data['interface'][uid]['default-name'] = iface['default-name']
             self.data['interface'][uid]['name'] = iface['name'] if 'name' in iface else iface['default-name']
             self.data['interface'][uid]['type'] = iface['type'] if 'type' in iface else "unknown"
@@ -191,15 +191,15 @@ class MikrotikControllerData():
             self.data['interface'][uid]['tx-byte'] = iface['tx-byte'] if 'tx-byte' in iface else ""
             self.data['interface'][uid]['tx-queue-drop'] = iface['tx-queue-drop'] if 'tx-queue-drop' in iface else ""
             self.data['interface'][uid]['actual-mtu'] = iface['actual-mtu'] if 'actual-mtu' in iface else ""
-            
+
             if 'client-ip-address' not in self.data['interface'][uid]:
                 self.data['interface'][uid]['client-ip-address'] = ""
-            
+
             if 'client-mac-address' not in self.data['interface'][uid]:
                 self.data['interface'][uid]['client-mac-address'] = ""
-        
+
         return
-    
+
     # ---------------------------
     #   get_arp
     # ---------------------------
@@ -211,7 +211,7 @@ class MikrotikControllerData():
                 self.data['interface'][uid]['client-ip-address'] = "disabled"
                 self.data['interface'][uid]['client-mac-address'] = "disabled"
             return False
-        
+
         mac2ip = {}
         bridge_used = False
         data = self.api.path("/ip/arp")
@@ -219,40 +219,40 @@ class MikrotikControllerData():
             # Ignore invalid entries
             if entry['invalid']:
                 continue
-            
+
             # Do not add ARP detected on bridge
             if entry['interface'] == "bridge":
                 bridge_used = True
                 # Build address table on bridge
                 if 'mac-address' in entry and 'address' in entry:
                     mac2ip[entry['mac-address']] = entry['address']
-                
+
                 continue
-            
+
             # Get iface default-name from custom name
             uid = self.get_iface_from_entry(entry)
             if not uid:
                 continue
-            
+
             # Create uid arp dict
             if uid not in self.data['arp']:
                 self.data['arp'][uid] = {}
-            
+
             # Add data
             self.data['arp'][uid]['interface'] = uid
             self.data['arp'][uid]['mac-address'] = "multiple" if 'mac-address' in self.data['arp'][uid] else entry['mac-address']
             self.data['arp'][uid]['address'] = "multiple" if 'address' in self.data['arp'][uid] else entry['address']
-        
+
         if bridge_used:
             self.update_bridge_hosts(mac2ip)
-        
+
         # Map ARP to ifaces
         for uid in self.data['interface']:
             self.data['interface'][uid]['client-ip-address'] = self.data['arp'][uid]['address'] if uid in self.data['arp'] and 'address' in self.data['arp'][uid] else ""
             self.data['interface'][uid]['client-mac-address'] = self.data['arp'][uid]['mac-address'] if uid in self.data['arp'] and 'mac-address' in self.data['arp'][uid] else ""
-        
+
         return True
-    
+
     # ---------------------------
     #   update_bridge_hosts
     # ---------------------------
@@ -263,16 +263,16 @@ class MikrotikControllerData():
             # Ignore port MAC
             if entry['local']:
                 continue
-            
+
             # Get iface default-name from custom name
             uid = self.get_iface_from_entry(entry)
             if not uid:
                 continue
-            
+
             # Create uid arp dict
             if uid not in self.data['arp']:
                 self.data['arp'][uid] = {}
-            
+
             # Add data
             self.data['arp'][uid]['interface'] = uid
             if 'mac-address' in self.data['arp'][uid]:
@@ -281,12 +281,12 @@ class MikrotikControllerData():
             else:
                 self.data['arp'][uid]['mac-address'] = entry['mac-address']
                 self.data['arp'][uid]['address'] = ""
-            
+
             if self.data['arp'][uid]['address'] == "" and self.data['arp'][uid]['mac-address'] in mac2ip:
                 self.data['arp'][uid]['address'] = mac2ip[self.data['arp'][uid]['mac-address']]
-        
+
         return
-    
+
     # ---------------------------
     #   get_iface_from_entry
     # ---------------------------
@@ -297,9 +297,9 @@ class MikrotikControllerData():
             if self.data['interface'][ifacename]['name'] == entry['interface']:
                 uid = self.data['interface'][ifacename]['default-name']
                 break
-        
+
         return uid
-    
+
     # ---------------------------
     #   get_nat
     # ---------------------------
@@ -309,11 +309,11 @@ class MikrotikControllerData():
         for entry in data:
             if entry['action'] != 'dst-nat':
                 continue
-            
+
             uid = entry['.id']
             if uid not in self.data['nat']:
                 self.data['nat'][uid] = {}
-            
+
             self.data['nat'][uid]['name'] = entry['protocol'] + ':' + str(entry['dst-port'])
             self.data['nat'][uid]['protocol'] = entry['protocol'] if 'protocol' in entry else ""
             self.data['nat'][uid]['dst-port'] = entry['dst-port'] if 'dst-port' in entry else ""
@@ -324,9 +324,9 @@ class MikrotikControllerData():
             self.data['nat'][uid]['enabled'] = True
             if 'disabled' in entry and entry['disabled']:
                 self.data['nat'][uid]['enabled'] = False
-        
+
         return
-    
+
     # ---------------------------
     #   get_system_routerboard
     # ---------------------------
@@ -338,9 +338,9 @@ class MikrotikControllerData():
             self.data['routerboard']['model'] = entry['model'] if 'model' in entry else "unknown"
             self.data['routerboard']['serial-number'] = entry['serial-number'] if 'serial-number' in entry else "unknown"
             self.data['routerboard']['firmware'] = entry['current-firmware'] if 'current-firmware' in entry else "unknown"
-        
+
         return
-    
+
     # ---------------------------
     #   get_system_resource
     # ---------------------------
@@ -357,14 +357,14 @@ class MikrotikControllerData():
                 self.data['resource']['memory-usage'] = round(((entry['total-memory'] - entry['free-memory']) / entry['total-memory']) * 100)
             else:
                 self.data['resource']['memory-usage'] = "unknown"
-            
+
             if 'free-hdd-space' in entry and 'total-hdd-space' in entry:
                 self.data['resource']['hdd-usage'] = round(((entry['total-hdd-space'] - entry['free-hdd-space']) / entry['total-hdd-space']) * 100)
             else:
                 self.data['resource']['hdd-usage'] = "unknown"
-        
+
         return
-    
+
     # ---------------------------
     #   get_system_routerboard
     # ---------------------------
@@ -376,9 +376,9 @@ class MikrotikControllerData():
             self.data['fw-update']['channel'] = entry['channel'] if 'channel' in entry else "unknown"
             self.data['fw-update']['installed-version'] = entry['installed-version'] if 'installed-version' in entry else "unknown"
             self.data['fw-update']['latest-version'] = entry['latest-version'] if 'latest-version' in entry else "unknown"
-        
+
         return
-    
+
     # ---------------------------
     #   get_script
     # ---------------------------
@@ -388,13 +388,13 @@ class MikrotikControllerData():
         for entry in data:
             if 'name' not in entry:
                 continue
-            
+
             uid = entry['name']
             if uid not in self.data['script']:
                 self.data['script'][uid] = {}
-            
+
             self.data['script'][uid]['name'] = entry['name']
             self.data['script'][uid]['last-started'] = entry['last-started'] if 'last-started' in entry else "unknown"
             self.data['script'][uid]['run-count'] = entry['run-count'] if 'run-count' in entry else "unknown"
-            
+
         return

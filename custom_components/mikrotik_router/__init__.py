@@ -42,32 +42,32 @@ async def async_setup_entry(hass, config_entry):
     username = config_entry.data[CONF_USERNAME]
     password = config_entry.data[CONF_PASSWORD]
     use_ssl = config_entry.data[CONF_SSL]
-    
+
     mikrotik_controller = MikrotikControllerData(hass, config_entry, name, host, port, username, password, use_ssl)
     await mikrotik_controller.hwinfo_update()
     await mikrotik_controller.async_update()
-    
+
     if not mikrotik_controller.data:
         raise ConfigEntryNotReady()
-    
+
     hass.data[DOMAIN][DATA_CLIENT][config_entry.entry_id] = mikrotik_controller
-    
+
     hass.async_create_task(
         hass.config_entries.async_forward_entry_setup(config_entry, "sensor")
     )
-    
+
     hass.async_create_task(
         hass.config_entries.async_forward_entry_setup(config_entry, "binary_sensor")
     )
-    
+
     hass.async_create_task(
         hass.config_entries.async_forward_entry_setup(config_entry, "device_tracker")
     )
-    
+
     hass.async_create_task(
         hass.config_entries.async_forward_entry_setup(config_entry, "switch")
     )
-    
+
     device_registry = await hass.helpers.device_registry.async_get_registry()
     device_registry.async_get_or_create(
         config_entry_id=config_entry.entry_id,
@@ -76,7 +76,7 @@ async def async_setup_entry(hass, config_entry):
         name=mikrotik_controller.data['routerboard']['model'],
         sw_version=mikrotik_controller.data['resource']['version'],
     )
-    
+
     return True
 
 

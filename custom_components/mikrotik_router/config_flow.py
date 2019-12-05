@@ -44,17 +44,17 @@ class MikrotikControllerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def __init__(self):
         """Initialize MikrotikControllerConfigFlow."""
         return
-    
+
     @staticmethod
     @callback
     def async_get_options_flow(config_entry):
         """Get the options flow for this handler."""
         return MikrotikControllerOptionsFlowHandler(config_entry)
-    
+
     async def async_step_import(self, user_input=None):
         """Occurs when a previously entry setup fails and is re-initiated."""
         return await self.async_step_user(user_input)
-    
+
     async def async_step_user(self, user_input=None):
         """Handle a flow initialized by the user."""
         errors = {}
@@ -62,7 +62,7 @@ class MikrotikControllerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             # Check if instance with this name already exists
             if user_input[CONF_NAME] in configured_instances(self.hass):
                 errors["base"] = "name_exists"
-            
+
             # Test connection
             api = MikrotikAPI(host=user_input["host"],
                               username=user_input["username"],
@@ -72,14 +72,14 @@ class MikrotikControllerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                               )
             if not api.connect():
                 errors[CONF_HOST] = api.error
-            
+
             # Save instance
             if not errors:
                 return self.async_create_entry(
                     title=user_input[CONF_NAME],
                     data=user_input
                 )
-            
+
             return self._show_config_form(host=user_input["host"],
                                           username=user_input["username"],
                                           password=user_input["password"],
@@ -88,9 +88,9 @@ class MikrotikControllerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                                           use_ssl=user_input["ssl"],
                                           errors=errors
                                           )
-        
+
         return self._show_config_form(errors=errors)
-    
+
     # ---------------------------
     #   _show_config_form
     # ---------------------------
@@ -115,22 +115,22 @@ class MikrotikControllerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 # ---------------------------
 class MikrotikControllerOptionsFlowHandler(config_entries.OptionsFlow):
     """Handle options."""
-    
+
     def __init__(self, config_entry):
         """Initialize options flow."""
         self.config_entry = config_entry
         self.options = dict(config_entry.options)
-    
+
     async def async_step_init(self, user_input=None):
         """Manage the options."""
         return await self.async_step_device_tracker(user_input)
-    
+
     async def async_step_device_tracker(self, user_input=None):
         """Manage the device tracker options."""
         if user_input is not None:
             self.options.update(user_input)
             return self.async_create_entry(title="", data=self.options)
-        
+
         return self.async_show_form(
             step_id="device_tracker",
             data_schema=vol.Schema(
