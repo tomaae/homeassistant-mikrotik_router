@@ -158,7 +158,7 @@ class MikrotikControllerData():
             await self.async_fwupdate_check()
 
         self.get_interface()
-        self.get_arp()
+        self.get_interface_client()
         self.get_nat()
         self.get_system_resource()
         self.get_script()
@@ -227,11 +227,13 @@ class MikrotikControllerData():
         return
 
     # ---------------------------
-    #   get_arp
+    #   get_interface_client
     # ---------------------------
-    def get_arp(self):
+    def get_interface_client(self):
         """Get ARP data from Mikrotik"""
         self.data['arp'] = {}
+
+        # Remove data if disabled
         if not self.option_track_arp:
             for uid in self.data['interface']:
                 self.data['interface'][uid]['client-ip-address'] = "disabled"
@@ -240,6 +242,23 @@ class MikrotikControllerData():
 
         mac2ip = {}
         bridge_used = False
+        mac2ip, bridge_used = self.update_arp(mac2ip, bridge_used)
+
+        if bridge_used:
+            self.update_bridge_hosts(mac2ip)
+
+        # Map ARP to ifaces
+        for uid in self.data['interface']:
+            self.data['interface'][uid]['client-ip-address'] = self.data['arp'][uid]['address'] if uid in self.data['arp'] and 'address' in self.data['arp'][uid] else ""
+            self.data['interface'][uid]['client-mac-address'] = self.data['arp'][uid]['mac-address'] if uid in self.data['arp'] and 'mac-address' in self.data['arp'][uid] else ""
+
+        return True
+
+    # ---------------------------
+    #   update_arp
+    # ---------------------------
+    def update_arp(self, mac2ip, bridge_used):
+        """Get list of hosts in ARP for interface client data from Mikrotik"""
         data = self.api.path("/ip/arp")
         for entry in data:
             # Ignore invalid entries
@@ -268,22 +287,13 @@ class MikrotikControllerData():
             self.data['arp'][uid]['interface'] = uid
             self.data['arp'][uid]['mac-address'] = "multiple" if 'mac-address' in self.data['arp'][uid] else entry['mac-address']
             self.data['arp'][uid]['address'] = "multiple" if 'address' in self.data['arp'][uid] else entry['address']
-
-        if bridge_used:
-            self.update_bridge_hosts(mac2ip)
-
-        # Map ARP to ifaces
-        for uid in self.data['interface']:
-            self.data['interface'][uid]['client-ip-address'] = self.data['arp'][uid]['address'] if uid in self.data['arp'] and 'address' in self.data['arp'][uid] else ""
-            self.data['interface'][uid]['client-mac-address'] = self.data['arp'][uid]['mac-address'] if uid in self.data['arp'] and 'mac-address' in self.data['arp'][uid] else ""
-
-        return True
+        return mac2ip, bridge_used
 
     # ---------------------------
     #   update_bridge_hosts
     # ---------------------------
     def update_bridge_hosts(self, mac2ip):
-        """Get list of hosts in bridge for ARP data from Mikrotik"""
+        """Get list of hosts in bridge for interface client data from Mikrotik"""
         data = self.api.path("/interface/bridge/host")
         for entry in data:
             # Ignore port MAC
