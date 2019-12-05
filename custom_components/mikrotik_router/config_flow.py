@@ -40,8 +40,9 @@ def configured_instances(hass):
 #   MikrotikControllerConfigFlow
 # ---------------------------
 class MikrotikControllerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    """MikrotikControllerConfigFlow class"""
     def __init__(self):
-        """Initialize."""
+        """Initialize MikrotikControllerConfigFlow."""
         return
     
     @staticmethod

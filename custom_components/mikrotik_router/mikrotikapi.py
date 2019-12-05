@@ -76,6 +76,7 @@ class MikrotikAPI:
     #   error_to_strings
     # ---------------------------
     def error_to_strings(self, error):
+        """Translate error output to error string."""
         self.error = "cannot_connect"
         if error == "invalid user name or password (6)":
             self.error = "wrong_login"
@@ -121,6 +122,7 @@ class MikrotikAPI:
     #   update
     # ---------------------------
     def update(self, path, param, value, mod_param, mod_value):
+        """Modify a parameter"""
         response = self.path(path)
         if response is None:
             return False
@@ -145,6 +147,7 @@ class MikrotikAPI:
     #   run_script
     # ---------------------------
     def run_script(self, name):
+        """Run script"""
         response = self.path('/system/script')
         if response is None:
             return False

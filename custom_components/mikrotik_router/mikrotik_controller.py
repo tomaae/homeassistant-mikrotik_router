@@ -24,8 +24,9 @@ _LOGGER = logging.getLogger(__name__)
 #   MikrotikControllerData
 # ---------------------------
 class MikrotikControllerData():
+    """MikrotikController Class"""
     def __init__(self, hass, config_entry, name, host, port, username, password, use_ssl):
-        """Initialize."""
+        """Initialize MikrotikController."""
         self.name = name
         self.hass = hass
         self.config_entry = config_entry
@@ -54,7 +55,7 @@ class MikrotikControllerData():
     #   force_update
     # ---------------------------
     async def force_update(self, now=None):
-        """Periodic update."""
+        """Trigger update by timer"""
         await self.async_update()
         return
     
@@ -62,7 +63,7 @@ class MikrotikControllerData():
     #   force_fwupdate_check
     # ---------------------------
     async def force_fwupdate_check(self, now=None):
-        """Periodic update."""
+        """Trigger hourly update by timer"""
         await self.async_fwupdate_check()
         return
     
@@ -88,21 +89,21 @@ class MikrotikControllerData():
     # ---------------------------
     @property
     def signal_update(self):
-        """Event specific per UniFi entry to signal new data."""
+        """Event to signal new data."""
         return f"{DOMAIN}-update-{self.name}"
     
     # ---------------------------
     #   connected
     # ---------------------------
     def connected(self):
-        """Return connected boolean."""
+        """Return connected state"""
         return self.api.connected()
     
     # ---------------------------
     #   hwinfo_update
     # ---------------------------
     async def hwinfo_update(self):
-        """Update Mikrotik hardware info."""
+        """Update Mikrotik hardware info"""
         self.get_system_routerboard()
         self.get_system_resource()
         return
@@ -111,7 +112,7 @@ class MikrotikControllerData():
     #   async_fwupdate_check
     # ---------------------------
     async def async_fwupdate_check(self):
-        """Update Mikrotik Controller data."""
+        """Update Mikrotik data"""
         
         self.get_firmare_update()
         
@@ -123,12 +124,12 @@ class MikrotikControllerData():
     # ---------------------------
     # @Throttle(DEFAULT_SCAN_INTERVAL)
     async def async_update(self):
-        """Update Mikrotik Controller data."""
+        """Update Mikrotik data"""
         
         if 'available' not in self.data['fw-update']:
             await self.async_fwupdate_check()
         
-        self.get_interfaces()
+        self.get_interface()
         self.get_arp()
         self.get_nat()
         self.get_system_resource()
@@ -141,7 +142,7 @@ class MikrotikControllerData():
     #   async_reset
     # ---------------------------
     async def async_reset(self):
-        """Reset this controller to default state."""
+        """Reset dispatchers"""
         for unsub_dispatcher in self.listeners:
             unsub_dispatcher()
         
@@ -152,18 +153,21 @@ class MikrotikControllerData():
     #   set_value
     # ---------------------------
     def set_value(self, path, param, value, mod_param, mod_value):
+        """Change value using Mikrotik API"""
         return self.api.update(path, param, value, mod_param, mod_value)
     
     # ---------------------------
     #   run_script
     # ---------------------------
     def run_script(self, name):
+        """Run script using Mikrotik API"""
         return self.api.run_script(name)
     
     # ---------------------------
-    #   get_interfaces
+    #   get_interface
     # ---------------------------
-    def get_interfaces(self):
+    def get_interface(self):
+        """Get all interfaces data from Mikrotik"""
         ifaces = self.api.path("/interface")
         for iface in ifaces:
             if 'default-name' not in iface:
@@ -200,6 +204,7 @@ class MikrotikControllerData():
     #   get_arp
     # ---------------------------
     def get_arp(self):
+        """Get ARP data from Mikrotik"""
         self.data['arp'] = {}
         if not self.option_track_arp:
             for uid in self.data['interface']:
@@ -225,7 +230,7 @@ class MikrotikControllerData():
                 continue
             
             # Get iface default-name from custom name
-            uid = self.get_iface_name(entry)
+            uid = self.get_iface_from_entry(entry)
             if not uid:
                 continue
             
@@ -252,6 +257,7 @@ class MikrotikControllerData():
     #   update_bridge_hosts
     # ---------------------------
     def update_bridge_hosts(self, mac2ip):
+        """Get list of hosts in bridge for ARP data from Mikrotik"""
         data = self.api.path("/interface/bridge/host")
         for entry in data:
             # Ignore port MAC
@@ -259,7 +265,7 @@ class MikrotikControllerData():
                 continue
             
             # Get iface default-name from custom name
-            uid = self.get_iface_name(entry)
+            uid = self.get_iface_from_entry(entry)
             if not uid:
                 continue
             
@@ -282,9 +288,10 @@ class MikrotikControllerData():
         return
     
     # ---------------------------
-    #   get_iface_name
+    #   get_iface_from_entry
     # ---------------------------
-    def get_iface_name(self, entry):
+    def get_iface_from_entry(self, entry):
+        """Get interface name from Mikrotik"""
         uid = None
         for ifacename in self.data['interface']:
             if self.data['interface'][ifacename]['name'] == entry['interface']:
@@ -297,6 +304,7 @@ class MikrotikControllerData():
     #   get_nat
     # ---------------------------
     def get_nat(self):
+        """Get NAT data from Mikrotik"""
         data = self.api.path("/ip/firewall/nat")
         for entry in data:
             if entry['action'] != 'dst-nat':
@@ -323,6 +331,7 @@ class MikrotikControllerData():
     #   get_system_routerboard
     # ---------------------------
     def get_system_routerboard(self):
+        """Get routerboard data from Mikrotik"""
         data = self.api.path("/system/routerboard")
         for entry in data:
             self.data['routerboard']['routerboard'] = True if entry['routerboard'] else False
@@ -336,6 +345,7 @@ class MikrotikControllerData():
     #   get_system_resource
     # ---------------------------
     def get_system_resource(self):
+        """Get system resources data from Mikrotik"""
         data = self.api.path("/system/resource")
         for entry in data:
             self.data['resource']['platform'] = entry['platform'] if 'platform' in entry else "unknown"
@@ -359,6 +369,7 @@ class MikrotikControllerData():
     #   get_system_routerboard
     # ---------------------------
     def get_firmare_update(self):
+        """Check for firmware update on Mikrotik"""
         data = self.api.path("/system/package/update")
         for entry in data:
             self.data['fw-update']['available'] = True if entry['status'] == "New version is available" else False
@@ -372,6 +383,7 @@ class MikrotikControllerData():
     #   get_script
     # ---------------------------
     def get_script(self):
+        """Get list of all scripts from Mikrotik"""
         data = self.api.path("/system/script")
         for entry in data:
             if 'name' not in entry:
