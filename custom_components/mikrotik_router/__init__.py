@@ -24,7 +24,7 @@ _LOGGER = logging.getLogger(__name__)
 # ---------------------------
 #   async_setup
 # ---------------------------
-async def async_setup(hass, config):
+async def async_setup(hass, _):
     """Set up configured Mikrotik Controller."""
     hass.data[DOMAIN] = {}
     hass.data[DOMAIN][DATA_CLIENT] = {}

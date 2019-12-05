@@ -54,7 +54,7 @@ class MikrotikControllerData():
     # ---------------------------
     #   force_update
     # ---------------------------
-    async def force_update(self, now=None):
+    async def force_update(self, _):
         """Trigger update by timer"""
         await self.async_update()
         return
@@ -62,7 +62,7 @@ class MikrotikControllerData():
     # ---------------------------
     #   force_fwupdate_check
     # ---------------------------
-    async def force_fwupdate_check(self, now=None):
+    async def force_fwupdate_check(self, _):
         """Trigger hourly update by timer"""
         await self.async_fwupdate_check()
         return
