@@ -123,23 +123,41 @@ class MikrotikAPI:
     # ---------------------------
     def update(self, path, param, value, mod_param, mod_value):
         """Modify a parameter"""
-        response = self.path(path)
-        if response is None:
-            return False
+        if not self._connected or not self._connection:
+            if not self.connect():
+                return None
 
-        for tmp in response:
-            if param not in tmp:
-                continue
+        try:
+            response = self.path(path)
+            if response is None:
+                return False
 
-            if tmp[param] != value:
-                continue
+            for tmp in response:
+                if param not in tmp:
+                    continue
 
-            params = {
-                '.id': tmp['.id'],
-                mod_param: mod_value
-            }
+                if tmp[param] != value:
+                    continue
 
-            response.update(**params)
+                params = {
+                    '.id': tmp['.id'],
+                    mod_param: mod_value
+                }
+
+                response.update(**params)
+        except librouteros.exceptions.ConnectionClosed:
+            _LOGGER.error("Mikrotik %s connection closed", self._host)
+            self._connected = False
+            self._connection = None
+            return None
+        except (
+                librouteros.exceptions.TrapError,
+                librouteros.exceptions.MultiTrapError,
+                librouteros.exceptions.ProtocolError,
+                librouteros.exceptions.FatalError
+        ) as api_error:
+            _LOGGER.error("Mikrotik %s connection error %s", self._host, api_error)
+            return None
 
         return True
 
@@ -148,18 +166,36 @@ class MikrotikAPI:
     # ---------------------------
     def run_script(self, name):
         """Run script"""
-        response = self.path('/system/script')
-        if response is None:
-            return False
+        if not self._connected or not self._connection:
+            if not self.connect():
+                return None
 
-        for tmp in response:
-            if 'name' not in tmp:
-                continue
+        try:
+            response = self.path('/system/script')
+            if response is None:
+                return False
 
-            if tmp['name'] != name:
-                continue
+            for tmp in response:
+                if 'name' not in tmp:
+                    continue
 
-            run = response('run', **{'.id': tmp['.id']})
-            tuple(run)
+                if tmp['name'] != name:
+                    continue
+
+                run = response('run', **{'.id': tmp['.id']})
+                tuple(run)
+        except librouteros.exceptions.ConnectionClosed:
+            _LOGGER.error("Mikrotik %s connection closed", self._host)
+            self._connected = False
+            self._connection = None
+            return None
+        except (
+                librouteros.exceptions.TrapError,
+                librouteros.exceptions.MultiTrapError,
+                librouteros.exceptions.ProtocolError,
+                librouteros.exceptions.FatalError
+        ) as api_error:
+            _LOGGER.error("Mikrotik %s connection error %s", self._host, api_error)
+            return None
 
         return True
