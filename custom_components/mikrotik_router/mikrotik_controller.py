@@ -4,7 +4,6 @@ from datetime import timedelta
 import logging
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval
-# from homeassistant.util import Throttle
 
 from .const import (
     DOMAIN,
@@ -17,7 +16,6 @@ from .const import (
 from .mikrotikapi import MikrotikAPI
 
 _LOGGER = logging.getLogger(__name__)
-# DEFAULT_SCAN_INTERVAL = timedelta(seconds=DEFAULT_SCAN_INTERVAL)
 
 
 # ---------------------------
@@ -61,14 +59,14 @@ class MikrotikControllerData():
         self.hass = hass
         self.config_entry = config_entry
 
-        self.data = {}
-        self.data['routerboard'] = {}
-        self.data['resource'] = {}
-        self.data['interface'] = {}
-        self.data['arp'] = {}
-        self.data['nat'] = {}
-        self.data['fw-update'] = {}
-        self.data['script'] = {}
+        self.data = {'routerboard': {},
+                     'resource': {},
+                     'interface': {},
+                     'arp': {},
+                     'nat': {},
+                     'fw-update': {},
+                     'script': {}
+                     }
 
         self.listeners = []
 
@@ -118,7 +116,7 @@ class MikrotikControllerData():
     @property
     def signal_update(self):
         """Event to signal new data."""
-        return f"{DOMAIN}-update-{self.name}"
+        return "{}-update-{}".format(DOMAIN, self.name)
 
     # ---------------------------
     #   connected
@@ -150,7 +148,6 @@ class MikrotikControllerData():
     # ---------------------------
     #   async_update
     # ---------------------------
-    # @Throttle(DEFAULT_SCAN_INTERVAL)
     async def async_update(self):
         """Update Mikrotik data"""
 

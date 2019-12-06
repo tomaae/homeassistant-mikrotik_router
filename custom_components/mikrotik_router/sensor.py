@@ -61,14 +61,14 @@ SENSOR_TYPES = {
 # ---------------------------
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up device tracker for Mikrotik Router component."""
-    name = config_entry.data[CONF_NAME]
+    inst = config_entry.data[CONF_NAME]
     mikrotik_controller = hass.data[DOMAIN][DATA_CLIENT][config_entry.entry_id]
     sensors = {}
 
     @callback
     def update_controller():
         """Update the values of the controller."""
-        update_items(name, mikrotik_controller, async_add_entities, sensors)
+        update_items(inst, mikrotik_controller, async_add_entities, sensors)
 
     mikrotik_controller.listeners.append(
         async_dispatcher_connect(hass, mikrotik_controller.signal_update, update_controller)
@@ -82,18 +82,18 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 #   update_items
 # ---------------------------
 @callback
-def update_items(name, mikrotik_controller, async_add_entities, sensors):
+def update_items(inst, mikrotik_controller, async_add_entities, sensors):
     """Update sensor state from the controller."""
     new_sensors = []
 
     for sensor in SENSOR_TYPES:
-        item_id = name + "-" + sensor
+        item_id = "{}-{}".format(inst, sensor)
         if item_id in sensors:
             if sensors[item_id].enabled:
                 sensors[item_id].async_schedule_update_ha_state()
             continue
 
-        sensors[item_id] = MikrotikControllerSensor(mikrotik_controller=mikrotik_controller, name=name, kind=sensor)
+        sensors[item_id] = MikrotikControllerSensor(mikrotik_controller=mikrotik_controller, inst=inst, sensor=sensor)
         new_sensors.append(sensors[item_id])
 
     if new_sensors:
@@ -108,12 +108,14 @@ def update_items(name, mikrotik_controller, async_add_entities, sensors):
 class MikrotikControllerSensor(Entity):
     """Define an Mikrotik Controller sensor."""
 
-    def __init__(self, mikrotik_controller, name, kind, uid=''):
+    def __init__(self, mikrotik_controller, inst, sensor):
         """Initialize."""
-        self.mikrotik_controller = mikrotik_controller
-        self._name = name
-        self.kind = kind
-        self.uid = uid
+        self._inst = inst
+        self._sensor = sensor
+        self._ctrl = mikrotik_controller
+        self._data = mikrotik_controller.data[SENSOR_TYPES[sensor][ATTR_PATH]]
+        self._type = SENSOR_TYPES[sensor]
+        self._attr = SENSOR_TYPES[sensor][ATTR_ATTR]
 
         self._device_class = None
         self._state = None
@@ -124,16 +126,14 @@ class MikrotikControllerSensor(Entity):
     @property
     def name(self):
         """Return the name."""
-        if self.uid:
-            return f"{self._name} {self.uid} {SENSOR_TYPES[self.kind][ATTR_LABEL]}"
-        return f"{self._name} {SENSOR_TYPES[self.kind][ATTR_LABEL]}"
+        return "{} {}".format(self._inst, self._type[ATTR_LABEL])
 
     @property
     def state(self):
         """Return the state."""
         val = "unknown"
-        if SENSOR_TYPES[self.kind][ATTR_PATH] in self.mikrotik_controller.data and SENSOR_TYPES[self.kind][ATTR_ATTR] in self.mikrotik_controller.data[SENSOR_TYPES[self.kind][ATTR_PATH]]:
-            val = self.mikrotik_controller.data[SENSOR_TYPES[self.kind][ATTR_PATH]][SENSOR_TYPES[self.kind][ATTR_ATTR]]
+        if self._attr in self._data:
+            val = self._data[self._attr]
 
         return val
 
@@ -145,48 +145,45 @@ class MikrotikControllerSensor(Entity):
     @property
     def icon(self):
         """Return the icon."""
-        self._icon = SENSOR_TYPES[self.kind][ATTR_ICON]
+        self._icon = self._type[ATTR_ICON]
         return self._icon
 
     @property
     def device_class(self):
         """Return the device_class."""
-        return SENSOR_TYPES[self.kind][ATTR_DEVICE_CLASS]
+        return self._type[ATTR_DEVICE_CLASS]
 
     @property
     def unique_id(self):
         """Return a unique_id for this entity."""
-        if self.uid:
-            return f"{self._name.lower()}-{self.kind.lower()}-{self.uid.lower()}"
-        return f"{self._name.lower()}-{self.kind.lower()}"
+        return "{}-{}".format(self._inst.lower(), self._sensor.lower())
 
     @property
     def unit_of_measurement(self):
         """Return the unit the value is expressed in."""
-        return SENSOR_TYPES[self.kind][ATTR_UNIT]
+        return self._type[ATTR_UNIT]
 
     @property
     def available(self):
         """Return True if entity is available."""
-        return bool(self.mikrotik_controller.data)
+        return bool(self._ctrl.data)
 
     @property
     def device_info(self):
         """Return a port description for device registry."""
         info = {
-            "identifiers": {(DOMAIN, "serial-number", self.mikrotik_controller.data['routerboard']['serial-number'], "switch", "PORT")},
-            "manufacturer": self.mikrotik_controller.data['resource']['platform'],
-            "model": self.mikrotik_controller.data['resource']['board-name'],
-            "name": SENSOR_TYPES[self.kind][ATTR_GROUP],
+            "identifiers": {(DOMAIN, "serial-number", self._ctrl.data['routerboard']['serial-number'], "switch", "PORT")},
+            "manufacturer": self._ctrl.data['resource']['platform'],
+            "model": self._ctrl.data['resource']['board-name'],
+            "name": self._type[ATTR_GROUP],
         }
         return info
 
     async def async_update(self):
         """Synchronize state with controller."""
-        # await self.mikrotik_controller.async_update()
         return
 
     async def async_added_to_hass(self):
         """Port entity created."""
-        _LOGGER.debug("New sensor %s (%s)", self._name, self.kind)
+        _LOGGER.debug("New sensor %s (%s)", self._inst, self._sensor)
         return

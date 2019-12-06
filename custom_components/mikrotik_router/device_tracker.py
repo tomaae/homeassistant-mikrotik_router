@@ -40,14 +40,14 @@ DEVICE_ATTRIBUTES = [
 # ---------------------------
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up device tracker for Mikrotik Router component."""
-    name = config_entry.data[CONF_NAME]
+    inst = config_entry.data[CONF_NAME]
     mikrotik_controller = hass.data[DOMAIN][DATA_CLIENT][config_entry.entry_id]
     tracked = {}
 
     @callback
     def update_controller():
         """Update the values of the controller."""
-        update_items(name, mikrotik_controller, async_add_entities, tracked)
+        update_items(inst, mikrotik_controller, async_add_entities, tracked)
 
     mikrotik_controller.listeners.append(
         async_dispatcher_connect(hass, mikrotik_controller.signal_update, update_controller)
@@ -61,19 +61,19 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 #   update_items
 # ---------------------------
 @callback
-def update_items(name, mikrotik_controller, async_add_entities, tracked):
+def update_items(inst, mikrotik_controller, async_add_entities, tracked):
     """Update tracked device state from the controller."""
     new_tracked = []
 
     for uid in mikrotik_controller.data['interface']:
         if mikrotik_controller.data['interface'][uid]['type'] == "ether":
-            item_id = name + "-" + mikrotik_controller.data['interface'][uid]['default-name']
+            item_id = "{}-{}".format(inst, mikrotik_controller.data['interface'][uid]['default-name'])
             if item_id in tracked:
                 if tracked[item_id].enabled:
                     tracked[item_id].async_schedule_update_ha_state()
                 continue
 
-            tracked[item_id] = MikrotikControllerPortDeviceTracker(name, uid, mikrotik_controller)
+            tracked[item_id] = MikrotikControllerPortDeviceTracker(inst, uid, mikrotik_controller)
             new_tracked.append(tracked[item_id])
 
     if new_tracked:
@@ -88,11 +88,11 @@ def update_items(name, mikrotik_controller, async_add_entities, tracked):
 class MikrotikControllerPortDeviceTracker(ScannerEntity):
     """Representation of a network port."""
 
-    def __init__(self, name, uid, mikrotik_controller):
+    def __init__(self, inst, uid, mikrotik_controller):
         """Set up tracked port."""
-        self._name = name
-        self._uid = uid
-        self.mikrotik_controller = mikrotik_controller
+        self._inst = inst
+        self._ctrl = mikrotik_controller
+        self._data = mikrotik_controller.data['interface'][uid]
 
         self._attrs = {
             ATTR_ATTRIBUTION: ATTRIBUTION,
@@ -105,18 +105,17 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
 
     async def async_added_to_hass(self):
         """Port entity created."""
-        _LOGGER.debug("New port tracker %s (%s)", self._name, self.mikrotik_controller.data['interface'][self._uid]['port-mac-address'])
+        _LOGGER.debug("New port tracker %s (%s)", self._inst, self._data['port-mac-address'])
         return
 
     async def async_update(self):
         """Synchronize state with controller."""
-        # await self.mikrotik_controller.async_update()
         return
 
     @property
     def is_connected(self):
         """Return true if the port is connected to the network."""
-        return self.mikrotik_controller.data['interface'][self._uid]['running']
+        return self._data['running']
 
     @property
     def source_type(self):
@@ -124,29 +123,29 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
         return SOURCE_TYPE_ROUTER
 
     @property
-    def name(self) -> str:
+    def name(self):
         """Return the name of the port."""
-        return f"{self._name} {self.mikrotik_controller.data['interface'][self._uid]['default-name']}"
+        return "{} {}".format(self._inst, self._data['default-name'])
 
     @property
-    def unique_id(self) -> str:
+    def unique_id(self):
         """Return a unique identifier for this port."""
-        return f"{self._name.lower()}-{self.mikrotik_controller.data['interface'][self._uid]['port-mac-address']}"
+        return "{}-{}".format(self._inst.lower(), self._data['port-mac-address'])
 
     @property
-    def available(self) -> bool:
+    def available(self):
         """Return if controller is available."""
-        return self.mikrotik_controller.connected()
+        return self._ctrl.connected()
 
     @property
     def icon(self):
         """Return the icon."""
-        if self.mikrotik_controller.data['interface'][self._uid]['running']:
+        if self._data['running']:
             icon = 'mdi:lan-connect'
         else:
             icon = 'mdi:lan-pending'
 
-        if not self.mikrotik_controller.data['interface'][self._uid]['enabled']:
+        if not self._data['enabled']:
             icon = 'mdi:lan-disconnect'
 
         return icon
@@ -155,10 +154,10 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
     def device_info(self):
         """Return a port description for device registry."""
         info = {
-            "connections": {(CONNECTION_NETWORK_MAC, self.mikrotik_controller.data['interface'][self._uid]['port-mac-address'])},
-            "manufacturer": self.mikrotik_controller.data['resource']['platform'],
-            "model": self.mikrotik_controller.data['resource']['board-name'],
-            "name": self.mikrotik_controller.data['interface'][self._uid]['default-name'],
+            "connections": {(CONNECTION_NETWORK_MAC, self._data['port-mac-address'])},
+            "manufacturer": self._ctrl.data['resource']['platform'],
+            "model": self._ctrl.data['resource']['board-name'],
+            "name": self._data['default-name'],
         }
         return info
 
@@ -168,7 +167,7 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
         attributes = self._attrs
 
         for variable in DEVICE_ATTRIBUTES:
-            if variable in self.mikrotik_controller.data['interface'][self._uid]:
-                attributes[variable] = self.mikrotik_controller.data['interface'][self._uid][variable]
+            if variable in self._data:
+                attributes[variable] = self._data[variable]
 
         return attributes
