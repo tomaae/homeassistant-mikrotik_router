@@ -127,37 +127,37 @@ class MikrotikAPI:
             if not self.connect():
                 return None
 
-        try:
-            response = self.path(path)
-            if response is None:
-                return False
+        response = self.path(path)
+        if response is None:
+            return False
 
-            for tmp in response:
-                if param not in tmp:
-                    continue
+        for tmp in response:
+            if param not in tmp:
+                continue
 
-                if tmp[param] != value:
-                    continue
+            if tmp[param] != value:
+                continue
 
-                params = {
-                    '.id': tmp['.id'],
-                    mod_param: mod_value
-                }
+            params = {
+                '.id': tmp['.id'],
+                mod_param: mod_value
+            }
 
+            try:
                 response.update(**params)
-        except librouteros.exceptions.ConnectionClosed:
-            _LOGGER.error("Mikrotik %s connection closed", self._host)
-            self._connected = False
-            self._connection = None
-            return None
-        except (
-                librouteros.exceptions.TrapError,
-                librouteros.exceptions.MultiTrapError,
-                librouteros.exceptions.ProtocolError,
-                librouteros.exceptions.FatalError
-        ) as api_error:
-            _LOGGER.error("Mikrotik %s connection error %s", self._host, api_error)
-            return None
+            except librouteros.exceptions.ConnectionClosed:
+                _LOGGER.error("Mikrotik %s connection closed", self._host)
+                self._connected = False
+                self._connection = None
+                return None
+            except (
+                    librouteros.exceptions.TrapError,
+                    librouteros.exceptions.MultiTrapError,
+                    librouteros.exceptions.ProtocolError,
+                    librouteros.exceptions.FatalError
+            ) as api_error:
+                _LOGGER.error("Mikrotik %s connection error %s", self._host, api_error)
+                return None
 
         return True
 
@@ -170,32 +170,33 @@ class MikrotikAPI:
             if not self.connect():
                 return None
 
-        try:
-            response = self.path('/system/script')
-            if response is None:
-                return False
+        response = self.path('/system/script')
+        if response is None:
+            return False
 
-            for tmp in response:
-                if 'name' not in tmp:
-                    continue
+        for tmp in response:
+            if 'name' not in tmp:
+                continue
 
-                if tmp['name'] != name:
-                    continue
+            if tmp['name'] != name:
+                continue
 
+            try:
                 run = response('run', **{'.id': tmp['.id']})
-                tuple(run)
-        except librouteros.exceptions.ConnectionClosed:
-            _LOGGER.error("Mikrotik %s connection closed", self._host)
-            self._connected = False
-            self._connection = None
-            return None
-        except (
-                librouteros.exceptions.TrapError,
-                librouteros.exceptions.MultiTrapError,
-                librouteros.exceptions.ProtocolError,
-                librouteros.exceptions.FatalError
-        ) as api_error:
-            _LOGGER.error("Mikrotik %s connection error %s", self._host, api_error)
-            return None
+            except librouteros.exceptions.ConnectionClosed:
+                _LOGGER.error("Mikrotik %s connection closed", self._host)
+                self._connected = False
+                self._connection = None
+                return None
+            except (
+                    librouteros.exceptions.TrapError,
+                    librouteros.exceptions.MultiTrapError,
+                    librouteros.exceptions.ProtocolError,
+                    librouteros.exceptions.FatalError
+            ) as api_error:
+                _LOGGER.error("Mikrotik %s connection error %s", self._host, api_error)
+                return None
+
+            tuple(run)
 
         return True
