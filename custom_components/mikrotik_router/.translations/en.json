@@ -17,9 +17,9 @@
         },
         "error": {
             "name_exists": "Name already exists.",
+            "librouteros_invalid": "Invalid librouteros library version installed.",
             "cannot_connect": "Cannot connect to Mikrotik.",
-            "wrong_login": "Invalid user name or password.",
-            "routeros_api_missing": "Python module routeros_api not installed."
+            "wrong_login": "Invalid user name or password."
         }
     },
     "options": {
@@ -29,7 +29,7 @@
             },
             "device_tracker": {
                 "data": {
-                    "scan_interval": "Scan interval",
+                    "scan_interval": "Scan interval (requires HA restart)",
                     "track_arp": "Show client MAC and IP on interfaces"
                 }
             }

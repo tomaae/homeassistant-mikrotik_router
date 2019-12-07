@@ -39,11 +39,11 @@ class MikrotikAPI:
     # ---------------------------
     def check_library(self):
         if not hasattr(librouteros.exceptions, 'ConnectionClosed'):
-            error = "Old librouteros installed, check for possible conflicts with other integrations."
+            error = "Invalid librouteros library version installed, possible conflict with other software."
             raise OldLibrouteros(error)
 
         if not hasattr(librouteros.exceptions, 'ProtocolError'):
-            error = "Old librouteros installed, check for possible conflicts with other integrations."
+            error = "Invalid librouteros library version installed, possible conflict with other software."
             raise OldLibrouteros(error)
 
     # ---------------------------

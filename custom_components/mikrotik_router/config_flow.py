@@ -21,6 +21,7 @@ from .const import (
     DEFAULT_SCAN_INTERVAL,
 )
 
+from .exceptions import OldLibrouteros
 from .mikrotikapi import MikrotikAPI
 
 _LOGGER = logging.getLogger(__name__)
@@ -64,14 +65,18 @@ class MikrotikControllerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "name_exists"
 
             # Test connection
-            api = MikrotikAPI(host=user_input["host"],
-                              username=user_input["username"],
-                              password=user_input["password"],
-                              port=user_input["port"],
-                              use_ssl=user_input["ssl"]
-                              )
-            if not api.connect():
-                errors[CONF_HOST] = api.error
+            try:
+                api = MikrotikAPI(host=user_input["host"],
+                                  username=user_input["username"],
+                                  password=user_input["password"],
+                                  port=user_input["port"],
+                                  use_ssl=user_input["ssl"]
+                                  )
+            except OldLibrouteros:
+                errors["base"] = "librouteros_invalid"
+            else:
+                if not api.connect():
+                    errors[CONF_HOST] = api.error
 
             # Save instance
             if not errors:
