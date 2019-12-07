@@ -3,6 +3,7 @@
 import ssl
 import logging
 import librouteros
+from .exceptions import OldLibrouteros
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -27,9 +28,23 @@ class MikrotikAPI:
         self._connected = False
         self.error = ""
 
+        self.check_library()
+
         # Default ports
         if not self._port:
             self._port = 8729 if self._use_ssl else 8728
+
+    # ---------------------------
+    #   check_library
+    # ---------------------------
+    def check_library(self):
+        if not hasattr(librouteros.exceptions, 'ConnectionClosed'):
+            error = "Old librouteros installed, check for possible conflicts with other integrations."
+            raise OldLibrouteros(error)
+
+        if not hasattr(librouteros.exceptions, 'ProtocolError'):
+            error = "Old librouteros installed, check for possible conflicts with other integrations."
+            raise OldLibrouteros(error)
 
     # ---------------------------
     #   connect
