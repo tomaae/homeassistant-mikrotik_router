@@ -2,8 +2,12 @@
 
 import logging
 import voluptuous as vol
-from homeassistant import config_entries
 from homeassistant.core import callback
+from homeassistant.config_entries import (
+    CONN_CLASS_LOCAL_POLL,
+    ConfigFlow,
+    OptionsFlow,
+)
 from homeassistant.const import (
     CONF_NAME,
     CONF_HOST,
@@ -40,8 +44,12 @@ def configured_instances(hass):
 # ---------------------------
 #   MikrotikControllerConfigFlow
 # ---------------------------
-class MikrotikControllerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
     """MikrotikControllerConfigFlow class"""
+
+    VERSION = 1
+    CONNECTION_CLASS = CONN_CLASS_LOCAL_POLL
+
     def __init__(self):
         """Initialize MikrotikControllerConfigFlow."""
         return
@@ -118,7 +126,7 @@ class MikrotikControllerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 # ---------------------------
 #   MikrotikControllerOptionsFlowHandler
 # ---------------------------
-class MikrotikControllerOptionsFlowHandler(config_entries.OptionsFlow):
+class MikrotikControllerOptionsFlowHandler(OptionsFlow):
     """Handle options."""
 
     def __init__(self, config_entry):
