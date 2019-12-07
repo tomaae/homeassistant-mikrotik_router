@@ -3,7 +3,7 @@
 import ssl
 import logging
 import librouteros
-from .exceptions import OldLibrouteros
+from .exceptions import OldLibrouteros, ApiEntryNotFound
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -138,6 +138,7 @@ class MikrotikAPI:
     # ---------------------------
     def update(self, path, param, value, mod_param, mod_value):
         """Modify a parameter"""
+        entry_found = False
         if not self._connected or not self._connection:
             if not self.connect():
                 return None
@@ -153,6 +154,7 @@ class MikrotikAPI:
             if tmp[param] != value:
                 continue
 
+            entry_found = True
             params = {
                 '.id': tmp['.id'],
                 mod_param: mod_value
@@ -174,6 +176,10 @@ class MikrotikAPI:
                 _LOGGER.error("Mikrotik %s connection error %s", self._host, api_error)
                 return None
 
+        if not entry_found:
+            error = "Parameter \"{}\" with value \"{}\" not found".format(param, value)
+            raise ApiEntryNotFound(error)
+
         return True
 
     # ---------------------------
@@ -181,6 +187,7 @@ class MikrotikAPI:
     # ---------------------------
     def run_script(self, name):
         """Run script"""
+        entry_found = False
         if not self._connected or not self._connection:
             if not self.connect():
                 return None
@@ -196,6 +203,7 @@ class MikrotikAPI:
             if tmp['name'] != name:
                 continue
 
+            entry_found = True
             try:
                 run = response('run', **{'.id': tmp['.id']})
             except librouteros.exceptions.ConnectionClosed:
@@ -213,5 +221,9 @@ class MikrotikAPI:
                 return None
 
             tuple(run)
+
+        if not entry_found:
+            error = "Script \"{}\" not found".format(name)
+            raise ApiEntryNotFound(error)
 
         return True
