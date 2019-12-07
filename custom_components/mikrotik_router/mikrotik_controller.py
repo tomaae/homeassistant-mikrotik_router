@@ -347,7 +347,8 @@ class MikrotikControllerData():
             if uid not in self.data['nat']:
                 self.data['nat'][uid] = {}
 
-            self.data['nat'][uid]['name'] = entry['protocol'] + ':' + str(entry['dst-port'])
+            self.data['nat'][uid]['name'] = "{}:{}".format(entry['protocol'], entry['dst-port'])
+            self.data['nat'][uid]['.id'] = from_entry(entry, '.id')
             self.data['nat'][uid]['protocol'] = from_entry(entry, 'protocol')
             self.data['nat'][uid]['dst-port'] = from_entry(entry, 'dst-port')
             self.data['nat'][uid]['in-interface'] = from_entry(entry, 'in-interface', 'any')

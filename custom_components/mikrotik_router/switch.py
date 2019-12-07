@@ -55,6 +55,10 @@ DEVICE_ATTRIBUTES_SCRIPT = [
     "run-count",
 ]
 
+
+# ---------------------------
+#   format_attribute
+# ---------------------------
 def format_attribute(attr):
     res = attr.replace("-", " ")
     res = res.capitalize()
@@ -306,7 +310,11 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
         """Turn on the switch."""
         path = '/ip/firewall/nat'
         param = '.id'
-        value = self._uid
+        value = None
+        for uid in self._ctrl.data['nat']:
+            if self._ctrl.data['nat'][uid]['name'] == "{}:{}".format(self._data['protocol'], self._data['dst-port']):
+                value = self._ctrl.data['nat'][uid]['.id']
+
         mod_param = 'disabled'
         mod_value = False
         self._ctrl.set_value(path, param, value, mod_param, mod_value)
@@ -317,7 +325,11 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
         """Turn on the switch."""
         path = '/ip/firewall/nat'
         param = '.id'
-        value = self._uid
+        value = None
+        for uid in self._ctrl.data['nat']:
+            if self._ctrl.data['nat'][uid]['name'] == "{}:{}".format(self._data['protocol'], self._data['dst-port']):
+                value = self._ctrl.data['nat'][uid]['.id']
+
         mod_param = 'disabled'
         mod_value = True
         self._ctrl.set_value(path, param, value, mod_param, mod_value)

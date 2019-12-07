@@ -34,6 +34,10 @@ DEVICE_ATTRIBUTES = [
     "default-name",
 ]
 
+
+# ---------------------------
+#   format_attribute
+# ---------------------------
 def format_attribute(attr):
     res = attr.replace("-", " ")
     res = res.capitalize()
