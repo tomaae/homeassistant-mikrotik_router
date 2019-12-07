@@ -34,6 +34,14 @@ DEVICE_ATTRIBUTES = [
     "default-name",
 ]
 
+def format_attribute(attr):
+    res = attr.replace("-", " ")
+    res = res.capitalize()
+    res = res.replace(" ip ", " IP ")
+    res = res.replace(" mac ", " MAC ")
+    res = res.replace(" mtu", " MTU")
+    return res
+
 
 # ---------------------------
 #   async_setup_entry
@@ -168,6 +176,6 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
 
         for variable in DEVICE_ATTRIBUTES:
             if variable in self._data:
-                attributes[variable] = self._data[variable]
+                attributes[format_attribute(variable)] = self._data[variable]
 
         return attributes

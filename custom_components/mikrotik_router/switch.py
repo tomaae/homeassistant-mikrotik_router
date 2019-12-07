@@ -55,6 +55,14 @@ DEVICE_ATTRIBUTES_SCRIPT = [
     "run-count",
 ]
 
+def format_attribute(attr):
+    res = attr.replace("-", " ")
+    res = res.capitalize()
+    res = res.replace(" ip ", " IP ")
+    res = res.replace(" mac ", " MAC ")
+    res = res.replace(" mtu", " MTU")
+    return res
+
 
 # ---------------------------
 #   async_setup_entry
@@ -200,7 +208,7 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
 
         for variable in DEVICE_ATTRIBUTES_IFACE:
             if variable in self._data:
-                attributes[variable] = self._data[variable]
+                attributes[format_attribute(variable)] = self._data[variable]
 
         return attributes
 
@@ -290,7 +298,7 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
 
         for variable in DEVICE_ATTRIBUTES_NAT:
             if variable in self._data:
-                attributes[variable] = self._data[variable]
+                attributes[format_attribute(variable)] = self._data[variable]
 
         return attributes
 
@@ -375,7 +383,7 @@ class MikrotikControllerScriptSwitch(MikrotikControllerSwitch):
 
         for variable in DEVICE_ATTRIBUTES_SCRIPT:
             if variable in self._data:
-                attributes[variable] = self._data[variable]
+                attributes[format_attribute(variable)] = self._data[variable]
 
         return attributes
 
