@@ -196,6 +196,9 @@ class MikrotikControllerData():
         """Get all interfaces data from Mikrotik"""
         interface_list = ""
         data = self.api.path("/interface")
+        if not data:
+            return
+
         for entry in data:
             if 'default-name' not in entry:
                 continue
@@ -286,6 +289,9 @@ class MikrotikControllerData():
     def update_arp(self, mac2ip, bridge_used):
         """Get list of hosts in ARP for interface client data from Mikrotik"""
         data = self.api.path("/ip/arp")
+        if not data:
+            return
+
         for entry in data:
             # Ignore invalid entries
             if entry['invalid']:
@@ -321,6 +327,9 @@ class MikrotikControllerData():
     def update_bridge_hosts(self, mac2ip):
         """Get list of hosts in bridge for interface client data from Mikrotik"""
         data = self.api.path("/interface/bridge/host")
+        if not data:
+            return
+
         for entry in data:
             # Ignore port MAC
             if entry['local']:
@@ -368,6 +377,9 @@ class MikrotikControllerData():
     def get_nat(self):
         """Get NAT data from Mikrotik"""
         data = self.api.path("/ip/firewall/nat")
+        if not data:
+            return
+
         for entry in data:
             if entry['action'] != 'dst-nat':
                 continue
@@ -394,6 +406,9 @@ class MikrotikControllerData():
     def get_system_routerboard(self):
         """Get routerboard data from Mikrotik"""
         data = self.api.path("/system/routerboard")
+        if not data:
+            return
+
         for entry in data:
             self.data['routerboard']['routerboard'] = from_entry_bool(entry, 'routerboard')
             self.data['routerboard']['model'] = from_entry(entry, 'model', 'unknown')
@@ -408,6 +423,9 @@ class MikrotikControllerData():
     def get_system_resource(self):
         """Get system resources data from Mikrotik"""
         data = self.api.path("/system/resource")
+        if not data:
+            return
+
         for entry in data:
             self.data['resource']['platform'] = from_entry(entry, 'platform', 'unknown')
             self.data['resource']['board-name'] = from_entry(entry, 'board-name', 'unknown')
@@ -432,10 +450,13 @@ class MikrotikControllerData():
     def get_firmare_update(self):
         """Check for firmware update on Mikrotik"""
         data = self.api.path("/system/package/update")
+        if not data:
+            return
+
         for entry in data:
             if 'entry' in entry:
                 self.data['fw-update']['available'] = True if entry['status'] == "New version is available" else False
-            else:
+            elif 'available' not in self.data['fw-update']:
                 self.data['fw-update']['available'] = False
             self.data['fw-update']['channel'] = from_entry(entry, 'channel', 'unknown')
             self.data['fw-update']['installed-version'] = from_entry(entry, 'installed-version', 'unknown')
@@ -449,6 +470,9 @@ class MikrotikControllerData():
     def get_script(self):
         """Get list of all scripts from Mikrotik"""
         data = self.api.path("/system/script")
+        if not data:
+            return
+
         for entry in data:
             if 'name' not in entry:
                 continue
