@@ -57,7 +57,7 @@ SENSOR_TYPES = {
     'traffic_tx': {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:upload-network-outline",
-        ATTR_LABEL: 'TX bps',
+        ATTR_LABEL: 'TX',
         ATTR_UNIT: "bps",
         ATTR_PATH: "interface",
         ATTR_ATTR: "tx-bits-per-second",
@@ -65,7 +65,7 @@ SENSOR_TYPES = {
     'traffic_rx': {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:download-network-outline",
-        ATTR_LABEL: 'RX bps',
+        ATTR_LABEL: 'RX',
         ATTR_UNIT: "bps",
         ATTR_PATH: "interface",
         ATTR_ATTR: "rx-bits-per-second",
