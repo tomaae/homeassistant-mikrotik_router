@@ -76,7 +76,9 @@ class MikrotikAPI:
                 librouteros_custom.exceptions.ConnectionClosed,
                 librouteros_custom.exceptions.ProtocolError,
                 librouteros_custom.exceptions.FatalError,
-                ssl.SSLError
+                ssl.SSLError,
+                BrokenPipeError,
+                OSError
         ) as api_error:
             _LOGGER.error("Mikrotik %s: %s", self._host, api_error)
             self.error_to_strings("%s" % api_error)
