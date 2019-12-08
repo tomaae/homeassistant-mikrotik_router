@@ -6,6 +6,10 @@ import os
 import sys
 import importlib
 from .exceptions import ApiEntryNotFound
+from .const import (
+    DEFAULT_LOGIN_METHOD,
+    DEFAULT_ENCODING,
+)
 
 MODULE_PATH = os.path.join(os.path.dirname(__file__), "librouteros", "__init__.py")
 MODULE_NAME = "librouteros"
@@ -23,7 +27,7 @@ _LOGGER = logging.getLogger(__name__)
 class MikrotikAPI:
     """Handle all communication with the Mikrotik API."""
 
-    def __init__(self, host, username, password, port=0, use_ssl=True, login_method="plain", encoding="utf-8"):
+    def __init__(self, host, username, password, port=0, use_ssl=True, login_method=DEFAULT_LOGIN_METHOD, encoding=DEFAULT_ENCODING):
         """Initialize the Mikrotik Client."""
         self._host = host
         self._use_ssl = use_ssl
