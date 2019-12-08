@@ -4,9 +4,7 @@
     "config_flow": true,
     "documentation": "https://github.com/tomaae/homeassistant-mikrotik_router",
     "dependencies": [],
-    "requirements": [
-        "librouteros==3.0.0"
-    ],
+    "requirements": [],
     "codeowners": [
         "@tomaae"
     ]

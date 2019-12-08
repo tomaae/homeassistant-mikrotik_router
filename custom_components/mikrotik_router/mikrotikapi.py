@@ -2,8 +2,18 @@
 
 import ssl
 import logging
-import librouteros
+import os
+import sys
+import importlib
 from .exceptions import OldLibrouteros, ApiEntryNotFound
+
+MODULE_PATH = os.path.join(os.path.dirname(__file__), "librouteros", "__init__.py")
+MODULE_NAME = "librouteros"
+spec = importlib.util.spec_from_file_location(MODULE_NAME, MODULE_PATH)
+librouteros = importlib.util.module_from_spec(spec)
+sys.modules[spec.name] = librouteros
+spec.loader.exec_module(librouteros)
+
 _LOGGER = logging.getLogger(__name__)
 
 
