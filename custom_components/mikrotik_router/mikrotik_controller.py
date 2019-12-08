@@ -290,7 +290,7 @@ class MikrotikControllerData():
         """Get list of hosts in ARP for interface client data from Mikrotik"""
         data = self.api.path("/ip/arp")
         if not data:
-            return
+            return mac2ip, bridge_used
 
         for entry in data:
             # Ignore invalid entries
