@@ -205,7 +205,7 @@ class MikrotikControllerData():
                 self.data['interface'][uid] = {}
 
             self.data['interface'][uid]['default-name'] = from_entry(entry, 'default-name')
-            self.data['interface'][uid]['name'] = from_entry(entry, 'name', entry['default-name'])
+            self.data['interface'][uid]['name'] = from_entry(entry, 'name', default=entry['default-name'])
             self.data['interface'][uid]['type'] = from_entry(entry, 'type', 'unknown')
             self.data['interface'][uid]['running'] = from_entry_bool(entry, 'running')
             self.data['interface'][uid]['enabled'] = from_entry_bool(entry, 'disabled', reverse=True)
@@ -448,6 +448,9 @@ class MikrotikControllerData():
         data = self.api.path("/system/script")
         for entry in data:
             if 'name' not in entry:
+                continue
+
+            if not entry['name']:
                 continue
 
             uid = entry['name']
