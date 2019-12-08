@@ -145,7 +145,7 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
         return "{}-{}".format(self._inst.lower(), self._data['port-mac-address'])
 
     @property
-    def available(self):
+    def available(self) -> bool:
         """Return if controller is available."""
         return self._ctrl.connected()
 

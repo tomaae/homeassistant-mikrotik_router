@@ -112,9 +112,9 @@ class MikrotikControllerBinarySensor(BinarySensorDevice):
         return "{}-{}".format(self._inst.lower(), self._sensor.lower())
 
     @property
-    def available(self):
-        """Return True if entity is available."""
-        return bool(self._ctrl.data)
+    def available(self) -> bool:
+        """Return if controller is available."""
+        return self._ctrl.connected()
 
     @property
     def device_info(self):
