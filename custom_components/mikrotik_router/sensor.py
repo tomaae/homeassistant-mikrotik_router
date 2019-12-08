@@ -2,6 +2,7 @@
 
 import logging
 from homeassistant.core import callback
+from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity
 from homeassistant.const import (
@@ -53,6 +54,22 @@ SENSOR_TYPES = {
         ATTR_PATH: "resource",
         ATTR_ATTR: "hdd-usage",
     },
+    'traffic_tx': {
+        ATTR_DEVICE_CLASS: None,
+        ATTR_ICON: "mdi:upload-network-outline",
+        ATTR_LABEL: 'TX bps',
+        ATTR_UNIT: "bps",
+        ATTR_PATH: "interface",
+        ATTR_ATTR: "tx-bits-per-second",
+    },
+    'traffic_rx': {
+        ATTR_DEVICE_CLASS: None,
+        ATTR_ICON: "mdi:download-network-outline",
+        ATTR_LABEL: 'RX bps',
+        ATTR_UNIT: "bps",
+        ATTR_PATH: "interface",
+        ATTR_ATTR: "rx-bits-per-second",
+    },
 }
 
 
@@ -87,6 +104,9 @@ def update_items(inst, mikrotik_controller, async_add_entities, sensors):
     new_sensors = []
 
     for sensor in SENSOR_TYPES:
+        if "traffic_" in sensor:
+            continue
+        
         item_id = "{}-{}".format(inst, sensor)
         if item_id in sensors:
             if sensors[item_id].enabled:
@@ -95,6 +115,21 @@ def update_items(inst, mikrotik_controller, async_add_entities, sensors):
 
         sensors[item_id] = MikrotikControllerSensor(mikrotik_controller=mikrotik_controller, inst=inst, sensor=sensor)
         new_sensors.append(sensors[item_id])
+
+    for sensor in SENSOR_TYPES:
+        if "traffic_" not in sensor:
+            continue
+
+        for uid in mikrotik_controller.data['interface']:
+            if mikrotik_controller.data['interface'][uid]['type'] == "ether":
+                item_id = "{}-{}-{}".format(inst, sensor, mikrotik_controller.data['interface'][uid]['default-name'])
+                if item_id in sensors:
+                    if sensors[item_id].enabled:
+                        sensors[item_id].async_schedule_update_ha_state()
+                    continue
+
+                sensors[item_id] = MikrotikControllerTrafficSensor(mikrotik_controller=mikrotik_controller, inst=inst, sensor=sensor, uid=uid)
+                new_sensors.append(sensors[item_id])
 
     if new_sensors:
         async_add_entities(new_sensors, True)
@@ -187,3 +222,37 @@ class MikrotikControllerSensor(Entity):
         """Port entity created."""
         _LOGGER.debug("New sensor %s (%s)", self._inst, self._sensor)
         return
+
+
+# ---------------------------
+#   MikrotikControllerTrafficSensor
+# ---------------------------
+class MikrotikControllerTrafficSensor(MikrotikControllerSensor):
+    """Define an Mikrotik Controller sensor."""
+
+    def __init__(self, mikrotik_controller, inst, sensor, uid):
+        """Initialize."""
+        super().__init__(mikrotik_controller, inst, sensor)
+        self._uid = uid
+        self._data = mikrotik_controller.data[SENSOR_TYPES[sensor][ATTR_PATH]][uid]
+
+    @property
+    def name(self):
+        """Return the name."""
+        return "{} {} {}".format(self._inst, self._data['name'], self._type[ATTR_LABEL])
+
+    @property
+    def unique_id(self):
+        """Return a unique_id for this entity."""
+        return "{}-{}-{}".format(self._inst.lower(), self._sensor.lower(), self._data['name'].lower())
+
+    @property
+    def device_info(self):
+        """Return a port description for device registry."""
+        info = {
+            "connections": {(CONNECTION_NETWORK_MAC, self._data['port-mac-address'])},
+            "manufacturer": self._ctrl.data['resource']['platform'],
+            "model": self._ctrl.data['resource']['board-name'],
+            "name": self._data['default-name'],
+        }
+        return info

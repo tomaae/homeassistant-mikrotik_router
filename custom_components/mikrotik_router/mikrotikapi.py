@@ -231,3 +231,36 @@ class MikrotikAPI:
             raise ApiEntryNotFound(error)
 
         return True
+
+    # ---------------------------
+    #   get_traffic
+    # ---------------------------
+    def get_traffic(self, interfaces):
+        """Get traffic stats"""
+        traffic = None
+        if not self._connected or not self._connection:
+            if not self.connect():
+                return None
+
+        response = self.path('/interface')
+        if response is None:
+            return None
+        
+        args = {'interface': interfaces, 'once': True}
+        try:
+            traffic = response('monitor-traffic', **args)
+        except librouteros.exceptions.ConnectionClosed:
+            _LOGGER.error("Mikrotik %s connection closed", self._host)
+            self._connected = False
+            self._connection = None
+            return None
+        except (
+                librouteros.exceptions.TrapError,
+                librouteros.exceptions.MultiTrapError,
+                librouteros.exceptions.ProtocolError,
+                librouteros.exceptions.FatalError
+        ) as api_error:
+            _LOGGER.error("Mikrotik %s connection error %s", self._host, api_error)
+            return None
+
+        return traffic

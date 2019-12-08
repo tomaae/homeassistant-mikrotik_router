@@ -62,6 +62,7 @@ class MikrotikControllerData():
         self.data = {'routerboard': {},
                      'resource': {},
                      'interface': {},
+                     'interface_map': {},
                      'arp': {},
                      'nat': {},
                      'fw-update': {},
@@ -193,6 +194,7 @@ class MikrotikControllerData():
     # ---------------------------
     def get_interface(self):
         """Get all interfaces data from Mikrotik"""
+        interface_list = ""
         data = self.api.path("/interface")
         for entry in data:
             if 'default-name' not in entry:
@@ -214,12 +216,39 @@ class MikrotikControllerData():
             self.data['interface'][uid]['link-downs'] = from_entry(entry, 'link-downs')
             self.data['interface'][uid]['tx-queue-drop'] = from_entry(entry, 'tx-queue-drop')
             self.data['interface'][uid]['actual-mtu'] = from_entry(entry, 'actual-mtu')
+            
+            self.data['interface_map'][self.data['interface'][uid]['name']] = self.data['interface'][uid]['default-name']
+
+            if interface_list:
+                interface_list += ","
+
+            interface_list += self.data['interface'][uid]['name']
 
             if 'client-ip-address' not in self.data['interface'][uid]:
                 self.data['interface'][uid]['client-ip-address'] = ""
 
             if 'client-mac-address' not in self.data['interface'][uid]:
                 self.data['interface'][uid]['client-mac-address'] = ""
+
+            if 'rx-bits-per-second' not in self.data['interface'][uid]:
+                self.data['interface'][uid]['rx-bits-per-second'] = 0
+
+            if 'tx-bits-per-second' not in self.data['interface'][uid]:
+                self.data['interface'][uid]['tx-bits-per-second'] = 0
+        
+        self.get_interface_traffic(interface_list)
+        
+        return
+
+    # ---------------------------
+    #   get_interface_traffic
+    # ---------------------------
+    def get_interface_traffic(self, interface_list):
+        data = self.api.get_traffic(interface_list)
+        for entry in data:
+            uid = self.data['interface_map'][from_entry(entry, 'name')]
+            self.data['interface'][uid]['rx-bits-per-second'] = from_entry(entry, 'rx-bits-per-second', default=0)
+            self.data['interface'][uid]['tx-bits-per-second'] = from_entry(entry, 'tx-bits-per-second', default=0)
 
         return
 
