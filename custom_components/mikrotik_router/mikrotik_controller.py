@@ -433,7 +433,10 @@ class MikrotikControllerData():
         """Check for firmware update on Mikrotik"""
         data = self.api.path("/system/package/update")
         for entry in data:
-            self.data['fw-update']['available'] = True if entry['status'] == "New version is available" else False
+            if 'entry' in entry:
+                self.data['fw-update']['available'] = True if entry['status'] == "New version is available" else False
+            else:
+                self.data['fw-update']['available'] = False
             self.data['fw-update']['channel'] = from_entry(entry, 'channel', 'unknown')
             self.data['fw-update']['installed-version'] = from_entry(entry, 'installed-version', 'unknown')
             self.data['fw-update']['latest-version'] = from_entry(entry, 'latest-version', 'unknown')
