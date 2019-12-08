@@ -75,7 +75,8 @@ class MikrotikAPI:
                 librouteros.exceptions.MultiTrapError,
                 librouteros.exceptions.ConnectionClosed,
                 librouteros.exceptions.ProtocolError,
-                librouteros.exceptions.FatalError
+                librouteros.exceptions.FatalError,
+                ssl.SSLError
         ) as api_error:
             _LOGGER.error("Mikrotik %s: %s", self._host, api_error)
             self.error_to_strings("%s" % api_error)
@@ -95,6 +96,9 @@ class MikrotikAPI:
         self.error = "cannot_connect"
         if error == "invalid user name or password (6)":
             self.error = "wrong_login"
+        
+        if "ALERT_HANDSHAKE_FAILURE" in error:
+            self.error = "ssl_handshake_failure"
 
         return
 
