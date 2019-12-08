@@ -21,6 +21,7 @@ Features:
  * Interface device tracker
  * Enable/disable interface switches
  * Enable/disable NAT rule switches
+ * RX/TX traffic sensors per interface
  * System sensors (CPU, Memory, HDD)
  * Firmware update binary sensor
  * Switches to run scripts
