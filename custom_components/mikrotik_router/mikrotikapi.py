@@ -5,7 +5,7 @@ import logging
 import os
 import sys
 import importlib
-from .exceptions import OldLibrouteros, ApiEntryNotFound
+from .exceptions import ApiEntryNotFound
 
 MODULE_PATH = os.path.join(os.path.dirname(__file__), "librouteros", "__init__.py")
 MODULE_NAME = "librouteros"
@@ -38,23 +38,9 @@ class MikrotikAPI:
         self._connected = False
         self.error = ""
 
-        self.check_library()
-
         # Default ports
         if not self._port:
             self._port = 8729 if self._use_ssl else 8728
-
-    # ---------------------------
-    #   check_library
-    # ---------------------------
-    def check_library(self):
-        if not hasattr(librouteros.exceptions, 'ConnectionClosed'):
-            error = "Invalid librouteros library version installed, possible conflict with other software."
-            raise OldLibrouteros(error)
-
-        if not hasattr(librouteros.exceptions, 'ProtocolError'):
-            error = "Invalid librouteros library version installed, possible conflict with other software."
-            raise OldLibrouteros(error)
 
     # ---------------------------
     #   connect
