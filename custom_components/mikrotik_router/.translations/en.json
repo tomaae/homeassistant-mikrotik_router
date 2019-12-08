@@ -17,8 +17,8 @@
         },
         "error": {
             "name_exists": "Name already exists.",
-            "librouteros_invalid": "Invalid librouteros library version installed.",
             "cannot_connect": "Cannot connect to Mikrotik.",
+            "connection_timeout": "Mikrotik connection timeout.",
             "wrong_login": "Invalid user name or password."
         }
     },
