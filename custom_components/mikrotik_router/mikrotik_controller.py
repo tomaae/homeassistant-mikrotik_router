@@ -478,6 +478,7 @@ class MikrotikControllerData():
                 continue
 
             if not entry['name']:
+                _LOGGER.error("Mikrotik %s found a script without a name. It will not be available in UI.")
                 continue
 
             uid = entry['name']
