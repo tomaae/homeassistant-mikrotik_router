@@ -3,7 +3,7 @@
 from struct import pack, unpack
 from logging import getLogger, NullHandler
 
-from librouteros.exceptions import (
+from .exceptions import (
     ProtocolError,
     FatalError,
 )

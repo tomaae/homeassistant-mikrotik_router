@@ -11,12 +11,12 @@ from .const import (
     DEFAULT_ENCODING,
 )
 
-MODULE_PATH = os.path.join(os.path.dirname(__file__), "librouteros", "__init__.py")
-MODULE_NAME = "librouteros"
+MODULE_PATH = os.path.join(os.path.dirname(__file__), "librouteros_custom", "__init__.py")
+MODULE_NAME = "librouteros_custom"
 spec = importlib.util.spec_from_file_location(MODULE_NAME, MODULE_PATH)
-librouteros = importlib.util.module_from_spec(spec)
-sys.modules[spec.name] = librouteros
-spec.loader.exec_module(librouteros)
+librouteros_custom = importlib.util.module_from_spec(spec)
+sys.modules[spec.name] = librouteros_custom
+spec.loader.exec_module(librouteros_custom)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -69,13 +69,13 @@ class MikrotikAPI:
             kwargs["ssl_wrapper"] = self._ssl_wrapper
 
         try:
-            self._connection = librouteros.connect(self._host, self._username, self._password, **kwargs)
+            self._connection = librouteros_custom.connect(self._host, self._username, self._password, **kwargs)
         except (
-                librouteros.exceptions.TrapError,
-                librouteros.exceptions.MultiTrapError,
-                librouteros.exceptions.ConnectionClosed,
-                librouteros.exceptions.ProtocolError,
-                librouteros.exceptions.FatalError,
+                librouteros_custom.exceptions.TrapError,
+                librouteros_custom.exceptions.MultiTrapError,
+                librouteros_custom.exceptions.ConnectionClosed,
+                librouteros_custom.exceptions.ProtocolError,
+                librouteros_custom.exceptions.FatalError,
                 ssl.SSLError
         ) as api_error:
             _LOGGER.error("Mikrotik %s: %s", self._host, api_error)
@@ -121,16 +121,16 @@ class MikrotikAPI:
         try:
             response = self._connection.path(path)
             tuple(response)
-        except librouteros.exceptions.ConnectionClosed:
+        except librouteros_custom.exceptions.ConnectionClosed:
             _LOGGER.error("Mikrotik %s connection closed", self._host)
             self._connected = False
             self._connection = None
             return None
         except (
-                librouteros.exceptions.TrapError,
-                librouteros.exceptions.MultiTrapError,
-                librouteros.exceptions.ProtocolError,
-                librouteros.exceptions.FatalError
+                librouteros_custom.exceptions.TrapError,
+                librouteros_custom.exceptions.MultiTrapError,
+                librouteros_custom.exceptions.ProtocolError,
+                librouteros_custom.exceptions.FatalError
         ) as api_error:
             _LOGGER.error("Mikrotik %s connection error %s", self._host, api_error)
             return None
@@ -166,16 +166,16 @@ class MikrotikAPI:
 
             try:
                 response.update(**params)
-            except librouteros.exceptions.ConnectionClosed:
+            except librouteros_custom.exceptions.ConnectionClosed:
                 _LOGGER.error("Mikrotik %s connection closed", self._host)
                 self._connected = False
                 self._connection = None
                 return None
             except (
-                    librouteros.exceptions.TrapError,
-                    librouteros.exceptions.MultiTrapError,
-                    librouteros.exceptions.ProtocolError,
-                    librouteros.exceptions.FatalError
+                    librouteros_custom.exceptions.TrapError,
+                    librouteros_custom.exceptions.MultiTrapError,
+                    librouteros_custom.exceptions.ProtocolError,
+                    librouteros_custom.exceptions.FatalError
             ) as api_error:
                 _LOGGER.error("Mikrotik %s connection error %s", self._host, api_error)
                 return None
@@ -210,16 +210,16 @@ class MikrotikAPI:
             entry_found = True
             try:
                 run = response('run', **{'.id': tmp['.id']})
-            except librouteros.exceptions.ConnectionClosed:
+            except librouteros_custom.exceptions.ConnectionClosed:
                 _LOGGER.error("Mikrotik %s connection closed", self._host)
                 self._connected = False
                 self._connection = None
                 return None
             except (
-                    librouteros.exceptions.TrapError,
-                    librouteros.exceptions.MultiTrapError,
-                    librouteros.exceptions.ProtocolError,
-                    librouteros.exceptions.FatalError
+                    librouteros_custom.exceptions.TrapError,
+                    librouteros_custom.exceptions.MultiTrapError,
+                    librouteros_custom.exceptions.ProtocolError,
+                    librouteros_custom.exceptions.FatalError
             ) as api_error:
                 _LOGGER.error("Mikrotik %s connection error %s", self._host, api_error)
                 return None
@@ -249,16 +249,16 @@ class MikrotikAPI:
         args = {'interface': interfaces, 'once': True}
         try:
             traffic = response('monitor-traffic', **args)
-        except librouteros.exceptions.ConnectionClosed:
+        except librouteros_custom.exceptions.ConnectionClosed:
             _LOGGER.error("Mikrotik %s connection closed", self._host)
             self._connected = False
             self._connection = None
             return None
         except (
-                librouteros.exceptions.TrapError,
-                librouteros.exceptions.MultiTrapError,
-                librouteros.exceptions.ProtocolError,
-                librouteros.exceptions.FatalError
+                librouteros_custom.exceptions.TrapError,
+                librouteros_custom.exceptions.MultiTrapError,
+                librouteros_custom.exceptions.ProtocolError,
+                librouteros_custom.exceptions.FatalError
         ) as api_error:
             _LOGGER.error("Mikrotik %s connection error %s", self._host, api_error)
             return None

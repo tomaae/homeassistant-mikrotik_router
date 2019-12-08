@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 from itertools import chain
-from librouteros.protocol import (
+from .protocol import (
     cast_to_api,
 )
 

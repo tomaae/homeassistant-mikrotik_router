@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-from librouteros.exceptions import ConnectionClosed
+from .exceptions import ConnectionClosed
 
 
 class SocketTransport:

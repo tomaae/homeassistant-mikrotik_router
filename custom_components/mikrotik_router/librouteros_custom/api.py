@@ -2,12 +2,12 @@
 
 from posixpath import join as pjoin
 
-from librouteros.exceptions import TrapError, MultiTrapError
-from librouteros.protocol import (
+from .exceptions import TrapError, MultiTrapError
+from .protocol import (
     compose_word,
     parse_word,
 )
-from librouteros.query import Query
+from .query import Query
 
 
 class Api:
