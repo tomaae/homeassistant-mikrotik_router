@@ -278,8 +278,11 @@ class MikrotikControllerData():
 
         # Map ARP to ifaces
         for uid in self.data['interface']:
-            self.data['interface'][uid]['client-ip-address'] = self.data['arp'][uid]['address'] if uid in self.data['arp'] and 'address' in self.data['arp'][uid] else ""
-            self.data['interface'][uid]['client-mac-address'] = self.data['arp'][uid]['mac-address'] if uid in self.data['arp'] and 'mac-address' in self.data['arp'][uid] else ""
+            if uid not in self.data['arp']:
+                continue
+
+            self.data['interface'][uid]['client-ip-address'] = from_entry(self.data['arp'][uid], 'address')
+            self.data['interface'][uid]['client-mac-address'] = from_entry(self.data['arp'][uid], 'mac-address')
 
         return True
 
@@ -317,8 +320,9 @@ class MikrotikControllerData():
 
             # Add data
             self.data['arp'][uid]['interface'] = uid
-            self.data['arp'][uid]['mac-address'] = "multiple" if 'mac-address' in self.data['arp'][uid] else entry['mac-address']
-            self.data['arp'][uid]['address'] = "multiple" if 'address' in self.data['arp'][uid] else entry['address']
+            self.data['arp'][uid]['mac-address'] = from_entry(entry, 'mac-address') if 'mac-address' not in self.data['arp'][uid] else "multiple"
+            self.data['arp'][uid]['address'] = from_entry(entry, 'address') if 'address' not in self.data['arp'][uid] else "multiple"
+
         return mac2ip, bridge_used
 
     # ---------------------------
@@ -350,7 +354,7 @@ class MikrotikControllerData():
                 self.data['arp'][uid]['mac-address'] = "multiple"
                 self.data['arp'][uid]['address'] = "multiple"
             else:
-                self.data['arp'][uid]['mac-address'] = entry['mac-address']
+                self.data['arp'][uid]['mac-address'] = from_entry(entry, 'mac-address')
                 self.data['arp'][uid]['address'] = ""
 
             if self.data['arp'][uid]['address'] == "" and self.data['arp'][uid]['mac-address'] in mac2ip:
@@ -454,7 +458,7 @@ class MikrotikControllerData():
             return
 
         for entry in data:
-            if 'entry' in entry:
+            if 'status' in entry:
                 self.data['fw-update']['available'] = True if entry['status'] == "New version is available" else False
             elif 'available' not in self.data['fw-update']:
                 self.data['fw-update']['available'] = False
