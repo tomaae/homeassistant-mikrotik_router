@@ -99,7 +99,10 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
     new_switches = []
 
     # Add switches
-    for sid in SWITCH_LIST:
+    for sid, sid_func in zip(
+        ["interface", "nat", "script"], 
+        [MikrotikControllerPortSwitch, MikrotikControllerNATSwitch, MikrotikControllerScriptSwitch]
+    ):
         for uid in mikrotik_controller.data[sid]:
             item_id = "{}-{}-{}".format(inst, sid, mikrotik_controller.data[sid][uid]['name'])
             if item_id in switches:
@@ -107,15 +110,7 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
                     switches[item_id].async_schedule_update_ha_state()
                 continue
 
-            if sid == 'interface':
-                switches[item_id] = MikrotikControllerPortSwitch(inst, uid, mikrotik_controller)
-
-            if sid == 'nat':
-                switches[item_id] = MikrotikControllerNATSwitch(inst, uid, mikrotik_controller)
-
-            if sid == 'script':
-                switches[item_id] = MikrotikControllerScriptSwitch(inst, uid, mikrotik_controller)
-
+            switches[item_id] = sid_func(inst, uid, mikrotik_controller)
             new_switches.append(switches[item_id])
 
     if new_switches:
