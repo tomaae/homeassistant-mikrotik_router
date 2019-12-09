@@ -104,32 +104,27 @@ def update_items(inst, mikrotik_controller, async_add_entities, sensors):
     new_sensors = []
 
     for sensor in SENSOR_TYPES:
-        if "traffic_" in sensor:
-            continue
-        
-        item_id = "{}-{}".format(inst, sensor)
-        if item_id in sensors:
-            if sensors[item_id].enabled:
-                sensors[item_id].async_schedule_update_ha_state()
-            continue
-
-        sensors[item_id] = MikrotikControllerSensor(mikrotik_controller=mikrotik_controller, inst=inst, sensor=sensor)
-        new_sensors.append(sensors[item_id])
-
-    for sensor in SENSOR_TYPES:
         if "traffic_" not in sensor:
-            continue
+            item_id = "{}-{}".format(inst, sensor)
+            if item_id in sensors:
+                if sensors[item_id].enabled:
+                    sensors[item_id].async_schedule_update_ha_state()
+                continue
 
-        for uid in mikrotik_controller.data['interface']:
-            if mikrotik_controller.data['interface'][uid]['type'] == "ether":
-                item_id = "{}-{}-{}".format(inst, sensor, mikrotik_controller.data['interface'][uid]['default-name'])
-                if item_id in sensors:
-                    if sensors[item_id].enabled:
-                        sensors[item_id].async_schedule_update_ha_state()
-                    continue
+            sensors[item_id] = MikrotikControllerSensor(mikrotik_controller=mikrotik_controller, inst=inst, sensor=sensor)
+            new_sensors.append(sensors[item_id])
 
-                sensors[item_id] = MikrotikControllerTrafficSensor(mikrotik_controller=mikrotik_controller, inst=inst, sensor=sensor, uid=uid)
-                new_sensors.append(sensors[item_id])
+        if "traffic_" in sensor:
+            for uid in mikrotik_controller.data['interface']:
+                if mikrotik_controller.data['interface'][uid]['type'] == "ether":
+                    item_id = "{}-{}-{}".format(inst, sensor, mikrotik_controller.data['interface'][uid]['default-name'])
+                    if item_id in sensors:
+                        if sensors[item_id].enabled:
+                            sensors[item_id].async_schedule_update_ha_state()
+                        continue
+
+                    sensors[item_id] = MikrotikControllerTrafficSensor(mikrotik_controller=mikrotik_controller, inst=inst, sensor=sensor, uid=uid)
+                    new_sensors.append(sensors[item_id])
 
     if new_sensors:
         async_add_entities(new_sensors, True)
