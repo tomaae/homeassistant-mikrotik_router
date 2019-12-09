@@ -19,12 +19,6 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-SWITCH_LIST = [
-    "interface",
-    "nat",
-    "script",
-]
-
 DEVICE_ATTRIBUTES_IFACE = [
     "running",
     "enabled",
