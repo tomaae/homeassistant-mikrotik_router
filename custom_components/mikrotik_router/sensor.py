@@ -239,7 +239,7 @@ class MikrotikControllerTrafficSensor(MikrotikControllerSensor):
     @property
     def unique_id(self):
         """Return a unique_id for this entity."""
-        return "{}-{}-{}".format(self._inst.lower(), self._sensor.lower(), self._data['name'].lower())
+        return "{}-{}-{}".format(self._inst.lower(), self._sensor.lower(), self._data['default-name'].lower())
 
     @property
     def device_info(self):
@@ -251,3 +251,8 @@ class MikrotikControllerTrafficSensor(MikrotikControllerSensor):
             "name": self._data['default-name'],
         }
         return info
+
+    async def async_added_to_hass(self):
+        """Port entity created."""
+        _LOGGER.debug("New sensor %s (%s %s)", self._inst, self._data['default-name'], self._sensor)
+        return

@@ -122,7 +122,7 @@ class MikrotikAPI:
 
         try:
             response = self._connection.path(path)
-            tuple(response)
+            _LOGGER.debug("API response ({}): {}".format(path, tuple(response)))
         except librouteros_custom.exceptions.ConnectionClosed:
             _LOGGER.error("Mikrotik %s connection closed", self._host)
             self._connected = False
@@ -251,6 +251,7 @@ class MikrotikAPI:
         args = {'interface': interfaces, 'once': True}
         try:
             traffic = response('monitor-traffic', **args)
+            _LOGGER.debug("API response ({}): {}".format("/interface/monitor-traffic", tuple(response)))
         except librouteros_custom.exceptions.ConnectionClosed:
             _LOGGER.error("Mikrotik %s connection closed", self._host)
             self._connected = False

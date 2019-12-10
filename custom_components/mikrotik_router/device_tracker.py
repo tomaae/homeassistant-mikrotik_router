@@ -117,7 +117,7 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
 
     async def async_added_to_hass(self):
         """Port entity created."""
-        _LOGGER.debug("New port tracker %s (%s)", self._inst, self._data['port-mac-address'])
+        _LOGGER.debug("New port tracker %s (%s %s)", self._inst, self._data['default-name'], self._data['port-mac-address'])
         return
 
     async def async_update(self):

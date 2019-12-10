@@ -94,7 +94,7 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
 
     # Add switches
     for sid, sid_func in zip(
-        ["interface", "nat", "script"], 
+        ["interface", "nat", "script"],
         [MikrotikControllerPortSwitch, MikrotikControllerNATSwitch, MikrotikControllerScriptSwitch]
     ):
         for uid in mikrotik_controller.data[sid]:
@@ -157,7 +157,7 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
 
     async def async_added_to_hass(self):
         """Port entity created."""
-        _LOGGER.debug("New port switch %s (%s)", self._inst, self._data['port-mac-address'])
+        _LOGGER.debug("New port switch %s (%s %s)", self._inst, self._data['default-name'], self._data['port-mac-address'])
         return
 
     @property
