@@ -14,38 +14,9 @@ from .const import (
 )
 
 from .mikrotikapi import MikrotikAPI
+from .helper import from_entry, from_entry_bool, from_list
 
 _LOGGER = logging.getLogger(__name__)
-
-
-# ---------------------------
-#   from_entry
-# ---------------------------
-def from_entry(entry, param, default=""):
-    """Validate and return a value from a Mikrotik API dict"""
-    if param not in entry:
-        return default
-
-    return entry[param]
-
-
-# ---------------------------
-#   from_entry_bool
-# ---------------------------
-def from_entry_bool(entry, param, default=False, reverse=False):
-    """Validate and return a bool value from a Mikrotik API dict"""
-    if param not in entry:
-        return default
-
-    if not reverse:
-        ret = entry[param]
-    else:
-        if entry[param]:
-            ret = False
-        else:
-            ret = True
-
-    return ret
 
 
 # ---------------------------
@@ -141,7 +112,7 @@ class MikrotikControllerData():
     async def async_fwupdate_check(self):
         """Update Mikrotik data"""
 
-        self.get_firmare_update()
+        self.get_firmware_update()
 
         async_dispatcher_send(self.hass, self.signal_update)
         return
@@ -155,8 +126,8 @@ class MikrotikControllerData():
         if 'available' not in self.data['fw-update']:
             await self.async_fwupdate_check()
 
-        self.get_interface()
-        self.get_interface_client()
+        await self.get_interface()
+        await self.get_interface_client()
         self.get_nat()
         self.get_system_resource()
         self.get_script()
@@ -192,34 +163,39 @@ class MikrotikControllerData():
     # ---------------------------
     #   get_interface
     # ---------------------------
-    def get_interface(self):
+    async def get_interface(self):
         """Get all interfaces data from Mikrotik"""
+        self.data['interface'] = await from_list(
+            data=self.data['interface'],
+            source=await self.hass.async_add_executor_job(self.api.path, "/interface"),
+            key='default-name',
+            vals=[
+                {'name': 'default-name'},
+                {'name': 'name'},
+                {'name': 'type', 'default': 'unknown'},
+                {'name': 'running', 'type': 'bool'},
+                {'name': 'enabled', 'source': 'disabled', 'type': 'bool', 'reverse': True},
+                {'name': 'port-mac-address', 'source': 'mac-address'},
+                {'name': 'comment'},
+                {'name': 'last-link-down-time'},
+                {'name': 'last-link-up-time'},
+                {'name': 'link-downs'},
+                {'name': 'tx-queue-drop'},
+                {'name': 'actual-mtu'}
+            ],
+            ensure_vals=[
+                {'name': 'client-ip-address'},
+                {'name': 'client-mac-address'},
+                {'name': 'rx-bits-per-second', 'default': 0},
+                {'name': 'tx-bits-per-second', 'default': 0}
+            ]
+        )
+
         interface_list = ""
-        data = self.api.path("/interface")
-        if not data:
-            return
+        for uid in self.data['interface']:
+            if not self.data['interface'][uid]['name']:
+                self.data['interface'][uid]['name'] = self.data['interface'][uid]['default-name']
 
-        for entry in data:
-            if 'default-name' not in entry:
-                continue
-
-            uid = entry['default-name']
-            if uid not in self.data['interface']:
-                self.data['interface'][uid] = {}
-
-            self.data['interface'][uid]['default-name'] = from_entry(entry, 'default-name')
-            self.data['interface'][uid]['name'] = from_entry(entry, 'name', default=entry['default-name'])
-            self.data['interface'][uid]['type'] = from_entry(entry, 'type', 'unknown')
-            self.data['interface'][uid]['running'] = from_entry_bool(entry, 'running')
-            self.data['interface'][uid]['enabled'] = from_entry_bool(entry, 'disabled', reverse=True)
-            self.data['interface'][uid]['port-mac-address'] = from_entry(entry, 'mac-address')
-            self.data['interface'][uid]['comment'] = from_entry(entry, 'comment')
-            self.data['interface'][uid]['last-link-down-time'] = from_entry(entry, 'last-link-down-time')
-            self.data['interface'][uid]['last-link-up-time'] = from_entry(entry, 'last-link-up-time')
-            self.data['interface'][uid]['link-downs'] = from_entry(entry, 'link-downs')
-            self.data['interface'][uid]['tx-queue-drop'] = from_entry(entry, 'tx-queue-drop')
-            self.data['interface'][uid]['actual-mtu'] = from_entry(entry, 'actual-mtu')
-            
             self.data['interface_map'][self.data['interface'][uid]['name']] = self.data['interface'][uid]['default-name']
 
             if interface_list:
@@ -227,29 +203,21 @@ class MikrotikControllerData():
 
             interface_list += self.data['interface'][uid]['name']
 
-            if 'client-ip-address' not in self.data['interface'][uid]:
-                self.data['interface'][uid]['client-ip-address'] = ""
-
-            if 'client-mac-address' not in self.data['interface'][uid]:
-                self.data['interface'][uid]['client-mac-address'] = ""
-
-            if 'rx-bits-per-second' not in self.data['interface'][uid]:
-                self.data['interface'][uid]['rx-bits-per-second'] = 0
-
-            if 'tx-bits-per-second' not in self.data['interface'][uid]:
-                self.data['interface'][uid]['tx-bits-per-second'] = 0
-        
-        self.get_interface_traffic(interface_list)
-        
+        await self.get_interface_traffic(interface_list)
         return
 
     # ---------------------------
     #   get_interface_traffic
     # ---------------------------
-    def get_interface_traffic(self, interface_list):
-        data = self.api.get_traffic(interface_list)
+    async def get_interface_traffic(self, interface_list):
+        data = await self.hass.async_add_executor_job(self.api.get_traffic, interface_list)
         for entry in data:
-            uid = self.data['interface_map'][from_entry(entry, 'name')]
+            iface_name = from_entry(entry, 'name')
+            if iface_name not in self.data['interface_map']:
+                continue
+
+            _LOGGER.debug("Processing entry {}, entry {}".format("/interface/monitor-traffic", entry))
+            uid = self.data['interface_map'][iface_name]
             self.data['interface'][uid]['rx-bits-per-second'] = from_entry(entry, 'rx-bits-per-second', default=0)
             self.data['interface'][uid]['tx-bits-per-second'] = from_entry(entry, 'tx-bits-per-second', default=0)
 
@@ -258,7 +226,7 @@ class MikrotikControllerData():
     # ---------------------------
     #   get_interface_client
     # ---------------------------
-    def get_interface_client(self):
+    async def get_interface_client(self):
         """Get ARP data from Mikrotik"""
         self.data['arp'] = {}
 
@@ -271,10 +239,10 @@ class MikrotikControllerData():
 
         mac2ip = {}
         bridge_used = False
-        mac2ip, bridge_used = self.update_arp(mac2ip, bridge_used)
+        mac2ip, bridge_used = await self.update_arp(mac2ip, bridge_used)
 
         if bridge_used:
-            self.update_bridge_hosts(mac2ip)
+            await self.update_bridge_hosts(mac2ip)
 
         # Map ARP to ifaces
         for uid in self.data['interface']:
@@ -289,9 +257,9 @@ class MikrotikControllerData():
     # ---------------------------
     #   update_arp
     # ---------------------------
-    def update_arp(self, mac2ip, bridge_used):
+    async def update_arp(self, mac2ip, bridge_used):
         """Get list of hosts in ARP for interface client data from Mikrotik"""
-        data = self.api.path("/ip/arp")
+        data = await self.hass.async_add_executor_job(self.api.path, "/ip/arp")
         if not data:
             return mac2ip, bridge_used
 
@@ -310,10 +278,11 @@ class MikrotikControllerData():
                 continue
 
             # Get iface default-name from custom name
-            uid = self.get_iface_from_entry(entry)
+            uid = await self.get_iface_from_entry(entry)
             if not uid:
                 continue
 
+            _LOGGER.debug("Processing entry {}, entry {}".format("/interface/bridge/host", entry))
             # Create uid arp dict
             if uid not in self.data['arp']:
                 self.data['arp'][uid] = {}
@@ -328,9 +297,9 @@ class MikrotikControllerData():
     # ---------------------------
     #   update_bridge_hosts
     # ---------------------------
-    def update_bridge_hosts(self, mac2ip):
+    async def update_bridge_hosts(self, mac2ip):
         """Get list of hosts in bridge for interface client data from Mikrotik"""
-        data = self.api.path("/interface/bridge/host")
+        data = await self.hass.async_add_executor_job(self.api.path, "/interface/bridge/host")
         if not data:
             return
 
@@ -340,10 +309,11 @@ class MikrotikControllerData():
                 continue
 
             # Get iface default-name from custom name
-            uid = self.get_iface_from_entry(entry)
+            uid = await self.get_iface_from_entry(entry)
             if not uid:
                 continue
 
+            _LOGGER.debug("Processing entry {}, entry {}".format("/interface/bridge/host", entry))
             # Create uid arp dict
             if uid not in self.data['arp']:
                 self.data['arp'][uid] = {}
@@ -355,18 +325,15 @@ class MikrotikControllerData():
                 self.data['arp'][uid]['address'] = "multiple"
             else:
                 self.data['arp'][uid]['mac-address'] = from_entry(entry, 'mac-address')
-                self.data['arp'][uid]['address'] = ""
-
-            if self.data['arp'][uid]['address'] == "" and self.data['arp'][uid]['mac-address'] in mac2ip:
-                self.data['arp'][uid]['address'] = mac2ip[self.data['arp'][uid]['mac-address']]
+                self.data['arp'][uid]['address'] = mac2ip[self.data['arp'][uid]['mac-address']] if self.data['arp'][uid]['mac-address'] in mac2ip else ""
 
         return
 
     # ---------------------------
     #   get_iface_from_entry
     # ---------------------------
-    def get_iface_from_entry(self, entry):
-        """Get interface name from Mikrotik"""
+    async def get_iface_from_entry(self, entry):
+        """Get interface default-name using name from interface dict"""
         uid = None
         for ifacename in self.data['interface']:
             if self.data['interface'][ifacename]['name'] == entry['interface']:
@@ -451,7 +418,7 @@ class MikrotikControllerData():
     # ---------------------------
     #   get_system_routerboard
     # ---------------------------
-    def get_firmare_update(self):
+    def get_firmware_update(self):
         """Check for firmware update on Mikrotik"""
         data = self.api.path("/system/package/update")
         if not data:
