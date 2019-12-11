@@ -126,6 +126,7 @@ class MikrotikControllerData():
             await self.async_fwupdate_check()
 
         await self.get_interface()
+        await self.get_interface_traffic()
         await self.get_interface_client()
         self.get_nat()
         self.get_system_resource()
@@ -190,20 +191,18 @@ class MikrotikControllerData():
             ]
         )
 
-        await self.get_interface_traffic(interface_list)
         return
 
     # ---------------------------
     #   get_interface_traffic
     # ---------------------------
-    async def get_interface_traffic(self, interface_list):
+    async def get_interface_traffic(self):
         """Get traffic for all interfaces from Mikrotik"""
         interface_list = ""
         for uid in self.data['interface']:
-            if interface_list:
-                interface_list += ","
+            interface_list += self.data['interface'][uid]['name'] + ","
 
-            interface_list += self.data['interface'][uid]['name']
+        interface_list = interface_list[:-1]
 
         self.data['interface'] = await from_list(
             data=self.data['interface'],
@@ -330,7 +329,7 @@ class MikrotikControllerData():
         uid = None
         for ifacename in self.data['interface']:
             if self.data['interface'][ifacename]['name'] == entry['interface']:
-                uid = self.data['interface'][ifacename]['default-name']
+                uid = ifacename
                 break
 
         return uid
@@ -340,6 +339,26 @@ class MikrotikControllerData():
     # ---------------------------
     def get_nat(self):
         """Get NAT data from Mikrotik"""
+#        self.data['nat'] = await from_list(
+#            data=self.data['nat'],
+#            source=await self.hass.async_add_executor_job(self.api.path, "/ip/firewall/nat"),
+#            key='.id',
+#            vals=[
+#                {'name': 'name', 'source': 'dst-port'},
+#                {'name': '.id'},
+#                {'name': 'protocol'},
+#                {'name': 'dst-port'},
+#                {'name': 'in-interface', 'default': 'any'},
+#                {'name': 'to-addresses'},
+#                {'name': 'to-ports'},
+#                {'name': 'comment'},
+#                {'name': 'enabled', 'source': 'disabled', 'type': 'bool', 'reverse': True}
+#            ],
+#            only=[
+#                {'key': 'action', 'value': 'dst-nat'}
+#            ]
+#        )
+        
         data = self.api.path("/ip/firewall/nat")
         if not data:
             return
@@ -369,16 +388,16 @@ class MikrotikControllerData():
     # ---------------------------
     def get_system_routerboard(self):
         """Get routerboard data from Mikrotik"""
-        data = self.api.path("/system/routerboard")
-        if not data:
-            return
-
-        for entry in data:
-            self.data['routerboard']['routerboard'] = from_entry_bool(entry, 'routerboard')
-            self.data['routerboard']['model'] = from_entry(entry, 'model', 'unknown')
-            self.data['routerboard']['serial-number'] = from_entry(entry, 'serial-number', 'unknown')
-            self.data['routerboard']['firmware'] = from_entry(entry, 'current-firmware', 'unknown')
-
+        self.data['routerboard'] = await from_list(
+            data=self.data['routerboard'],
+            source=await self.hass.async_add_executor_job(self.api.path, "/system/routerboard"),
+            vals=[
+                {'name': 'routerboard', 'type': 'bool'},
+                {'name': 'model', 'default': 'unknown'},
+                {'name': 'serial-number', 'default': 'unknown'},
+                {'name': 'firmware', 'default': 'unknown'},
+            ]
+        )
         return
 
     # ---------------------------
@@ -386,22 +405,29 @@ class MikrotikControllerData():
     # ---------------------------
     def get_system_resource(self):
         """Get system resources data from Mikrotik"""
-        data = self.api.path("/system/resource")
-        if not data:
-            return
+        self.data['resource'] = await from_list(
+            data=self.data['resource'],
+            source=await self.hass.async_add_executor_job(self.api.path, "/system/resource"),
+            vals=[
+                {'name': 'platform', 'default': 'unknown'},
+                {'name': 'board-name', 'default': 'unknown'},
+                {'name': 'version', 'default': 'unknown'},
+                {'name': 'uptime', 'default': 'unknown'},
+                {'name': 'cpu-load', 'default': 'unknown'},
+                {'name': 'free-memory', 'default': 0},
+                {'name': 'total-memory', 'default': 0},
+                {'name': 'free-hdd-space', 'default': 0},
+                {'name': 'total-hdd-space', 'default': 0}
+            ]
+        )
 
-        for entry in data:
-            self.data['resource']['platform'] = from_entry(entry, 'platform', 'unknown')
-            self.data['resource']['board-name'] = from_entry(entry, 'board-name', 'unknown')
-            self.data['resource']['version'] = from_entry(entry, 'version', 'unknown')
-            self.data['resource']['uptime'] = from_entry(entry, 'uptime', 'unknown')
-            self.data['resource']['cpu-load'] = from_entry(entry, 'cpu-load', 'unknown')
-            if 'free-memory' in entry and 'total-memory' in entry:
+        for entry in data['resource']:
+            if entry['total-memory'] > 0:
                 self.data['resource']['memory-usage'] = round(((entry['total-memory'] - entry['free-memory']) / entry['total-memory']) * 100)
             else:
                 self.data['resource']['memory-usage'] = "unknown"
 
-            if 'free-hdd-space' in entry and 'total-hdd-space' in entry:
+            if entry['total-hdd-space'] > 0:
                 self.data['resource']['hdd-usage'] = round(((entry['total-hdd-space'] - entry['free-hdd-space']) / entry['total-hdd-space']) * 100)
             else:
                 self.data['resource']['hdd-usage'] = "unknown"
@@ -413,44 +439,37 @@ class MikrotikControllerData():
     # ---------------------------
     def get_firmware_update(self):
         """Check for firmware update on Mikrotik"""
-        data = self.api.path("/system/package/update")
-        if not data:
-            return
+       self.data['fw-update'] = await from_list(
+           data=self.data['fw-update'],
+           source=await self.hass.async_add_executor_job(self.api.path, "/system/package/update"),
+           vals=[
+               {'name': 'status'},
+               {'name': 'channel', 'default': 'unknown'},
+               {'name': 'installed-version', 'default': 'unknown'},
+               {'name': 'latest-version', 'default': 'unknown'}
+           ]
+       )
 
-        for entry in data:
-            if 'status' in entry:
-                self.data['fw-update']['available'] = True if entry['status'] == "New version is available" else False
-            elif 'available' not in self.data['fw-update']:
-                self.data['fw-update']['available'] = False
-            self.data['fw-update']['channel'] = from_entry(entry, 'channel', 'unknown')
-            self.data['fw-update']['installed-version'] = from_entry(entry, 'installed-version', 'unknown')
-            self.data['fw-update']['latest-version'] = from_entry(entry, 'latest-version', 'unknown')
-
-        return
+       if status in self.data['fw-update']:
+           self.data['fw-update']['available'] = True if self.data['fw-update']['status'] == "New version is available" else False
+       else:
+           self.data['fw-update']['available'] = False
+        
+       return
 
     # ---------------------------
     #   get_script
     # ---------------------------
     def get_script(self):
         """Get list of all scripts from Mikrotik"""
-        data = self.api.path("/system/script")
-        if not data:
-            return
-
-        for entry in data:
-            if 'name' not in entry:
-                continue
-
-            if not entry['name']:
-                _LOGGER.error("Mikrotik %s found a script without a name. It will not be available in UI.")
-                continue
-
-            uid = entry['name']
-            if uid not in self.data['script']:
-                self.data['script'][uid] = {}
-
-            self.data['script'][uid]['name'] = from_entry(entry, 'name')
-            self.data['script'][uid]['last-started'] = from_entry(entry, 'last-started', 'unknown')
-            self.data['script'][uid]['run-count'] = from_entry(entry, 'run-count', 'unknown')
-
+        self.data['script'] = await from_list(
+            data=self.data['script'],
+            source=await self.hass.async_add_executor_job(self.api.path, "/system/script"),
+            key='name',
+            vals=[
+                {'name': 'name'},
+                {'name': 'last-started', 'default': 'unknown'},
+                {'name': 'run-count', 'default': 'unknown'}
+            ]
+        )
         return
