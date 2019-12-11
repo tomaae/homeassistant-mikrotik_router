@@ -50,40 +50,17 @@ async def from_list(data=None, source=None, key=None, key_search=None, vals=[], 
         if skip and await can_skip(entry, skip):
             continue
 
-        # get uid
         uid = await get_uid(entry, key, key_search, keymap)
-
         if not uid:
             continue
 
         if uid not in data:
             data[uid] = {}
 
-        # vals
         _LOGGER.debug("Processing entry {}, entry {}".format(source, entry))
-        for val in vals:
-            _name = val['name']
-            _type = val['type'] if 'type' in val else 'str'
-            _source = val['source'] if 'source' in val else _name
-
-            if _type == 'str':
-                _default = val['default'] if 'default' in val else ''
-                if 'default_val' in val and val['default_val'] in val:
-                    _default = val[val['default_val']]
-                    
-                data[uid][_name] = from_entry(entry, _source, default=_default)
-
-            elif _type == 'bool':
-                _default = val['default'] if 'default' in val else False
-                _reverse = val['reverse'] if 'reverse' in val else False
-                data[uid][_name] = from_entry_bool(entry, _source, default=_default, reverse=_reverse)
-
-        # ensure_vals
+        data = await fill_vals(data, uid, vals)
         if ensure_vals:
-            for val in ensure_vals:
-                if val['name'] not in data[uid]:
-                    _default = val['default'] if 'default' in val else ''
-                    data[uid][val['name']] = _default
+            data = await fill_ensure_vals(data, uid, ensure_vals)
 
     return data
 
@@ -150,3 +127,39 @@ async def can_skip(entry, skip):
             break
 
     return can_skip
+
+
+# ---------------------------
+#   fill_vals
+# ---------------------------
+async def fill_vals(data, uid, vals):
+    for val in vals:
+        _name = val['name']
+        _type = val['type'] if 'type' in val else 'str'
+        _source = val['source'] if 'source' in val else _name
+
+        if _type == 'str':
+            _default = val['default'] if 'default' in val else ''
+            if 'default_val' in val and val['default_val'] in val:
+                _default = val[val['default_val']]
+                
+            data[uid][_name] = from_entry(entry, _source, default=_default)
+
+        elif _type == 'bool':
+            _default = val['default'] if 'default' in val else False
+            _reverse = val['reverse'] if 'reverse' in val else False
+            data[uid][_name] = from_entry_bool(entry, _source, default=_default, reverse=_reverse)
+
+    return data
+
+
+# ---------------------------
+#   fill_ensure_vals
+# ---------------------------
+async def fill_ensure_vals(data, uid, ensure_vals):
+    for val in ensure_vals:
+        if val['name'] not in data[uid]:
+            _default = val['default'] if 'default' in val else ''
+            data[uid][val['name']] = _default
+
+    return data
