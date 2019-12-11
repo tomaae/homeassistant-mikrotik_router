@@ -51,9 +51,7 @@ async def from_list(data=None, source=None, key=None, key_search=None, vals=[], 
             continue
 
         # get uid
-        uid = await get_uid(entry, key)
-        if keymap and key_search in entry and entry[key_search] in keymap:
-            uid = keymap[entry[key_search]]
+        uid = await get_uid(entry, key, key_search, keymap)
 
         if not uid:
             continue
@@ -93,12 +91,19 @@ async def from_list(data=None, source=None, key=None, key_search=None, vals=[], 
 # ---------------------------
 #   get_uid
 # ---------------------------
-async def get_uid(entry, key):
-    if key not in entry:
-        return False
+async def get_uid(entry, key, key_search, keymap):
+    if not key_search:
+        if key not in entry:
+            return False
 
-    if not entry[key]:
-        return False
+        if not entry[key]:
+            return False
+
+    else:
+        if not keymap or key_search not in entry or entry[key_search] not in keymap:
+            return False
+
+        uid = keymap[entry[key_search]]
 
     return entry[key]
 
