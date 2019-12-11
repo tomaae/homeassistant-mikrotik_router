@@ -46,16 +46,20 @@ async def from_list(data=None, source=None, key=None, key_search=None, vals=[], 
     for entry in source:
         if only and not await matches_only(entry, only):
             continue
-        
+
         if skip and await can_skip(entry, skip):
             continue
 
-        uid = await get_uid(entry, key, key_search, keymap)
-        if not uid:
-            continue
+        if key or key_search:
+            uid = await get_uid(entry, key, key_search, keymap)
+            if not uid:
+                continue
 
-        if uid not in data:
-            data[uid] = {}
+            if uid not in data:
+                data[uid] = {}
+
+        else:
+            uid=None
 
         _LOGGER.debug("Processing entry {}, entry {}".format(source, entry))
         data = await fill_vals(data, uid, vals)
@@ -142,13 +146,20 @@ async def fill_vals(data, uid, vals):
             _default = val['default'] if 'default' in val else ''
             if 'default_val' in val and val['default_val'] in val:
                 _default = val[val['default_val']]
-                
-            data[uid][_name] = from_entry(entry, _source, default=_default)
+
+            if uid:
+                data[uid][_name] = from_entry(entry, _source, default=_default)
+            else:
+                data[_name] = from_entry(entry, _source, default=_default)
 
         elif _type == 'bool':
             _default = val['default'] if 'default' in val else False
             _reverse = val['reverse'] if 'reverse' in val else False
-            data[uid][_name] = from_entry_bool(entry, _source, default=_default, reverse=_reverse)
+
+            if uid:
+                data[uid][_name] = from_entry_bool(entry, _source, default=_default, reverse=_reverse)
+            else:
+                data[_name] = from_entry_bool(entry, _source, default=_default, reverse=_reverse)
 
     return data
 
@@ -158,8 +169,13 @@ async def fill_vals(data, uid, vals):
 # ---------------------------
 async def fill_ensure_vals(data, uid, ensure_vals):
     for val in ensure_vals:
-        if val['name'] not in data[uid]:
-            _default = val['default'] if 'default' in val else ''
-            data[uid][val['name']] = _default
+        if uid:
+            if val['name'] not in data[uid]:
+                _default = val['default'] if 'default' in val else ''
+                data[uid][val['name']] = _default
+        else:
+            if val['name'] not in data:
+                _default = val['default'] if 'default' in val else ''
+                data[val['name']] = _default
 
     return data
