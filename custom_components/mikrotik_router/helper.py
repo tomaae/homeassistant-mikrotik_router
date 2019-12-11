@@ -37,13 +37,20 @@ def from_entry_bool(entry, param, default=False, reverse=False):
 # ---------------------------
 #   from_list
 # ---------------------------
-async def from_list(data=None, source=None, key=None, key_search=None, vals=[], ensure_vals=[]):
+async def from_list(data=None, source=None, key=None, key_search=None, vals=[], ensure_vals=None, only=None, skip=None):
     if not source:
         return data
 
     keymap = generate_keymap(data, key_search)
 
     for entry in source:
+        if only and not await matches_only(entry, only):
+            continue
+        
+        if skip and await can_skip(entry, skip):
+            continue
+
+        # get uid
         uid = await get_uid(entry, key)
         if keymap and key_search in entry and entry[key_search] in keymap:
             uid = keymap[entry[key_search]]
@@ -54,6 +61,7 @@ async def from_list(data=None, source=None, key=None, key_search=None, vals=[], 
         if uid not in data:
             data[uid] = {}
 
+        # vals
         _LOGGER.debug("Processing entry {}, entry {}".format(source, entry))
         for val in vals:
             _name = val['name']
@@ -66,15 +74,18 @@ async def from_list(data=None, source=None, key=None, key_search=None, vals=[], 
                     _default = val[val['default_val']]
                     
                 data[uid][_name] = from_entry(entry, _source, default=_default)
+
             elif _type == 'bool':
                 _default = val['default'] if 'default' in val else False
                 _reverse = val['reverse'] if 'reverse' in val else False
                 data[uid][_name] = from_entry_bool(entry, _source, default=_default, reverse=_reverse)
 
-        for val in ensure_vals:
-            if val['name'] not in data[uid]:
-                _default = val['default'] if 'default' in val else ''
-                data[uid][val['name']] = _default
+        # ensure_vals
+        if ensure_vals:
+            for val in ensure_vals:
+                if val['name'] not in data[uid]:
+                    _default = val['default'] if 'default' in val else ''
+                    data[uid][val['name']] = _default
 
     return data
 
@@ -106,3 +117,31 @@ async def generate_keymap(data, key_search):
         keymap[data[uid]['name']] = data[uid]['default-name']
 
     return keymap
+
+
+# ---------------------------
+#   matches_only
+# ---------------------------
+async def matches_only(entry, only):
+    can_continue = False
+    for val in only:
+        if val['name'] in entry and entry[val['name']] == val['value']:
+            can_continue = True
+        else:
+            can_continue = False
+            break
+
+    return can_continue
+
+
+# ---------------------------
+#   can_skip
+# ---------------------------
+async def can_skip(entry, skip):
+    can_skip = False
+    for val in skip:
+        if val['name'] in entry and entry[val['name']] == val['value']:
+            can_skip = True
+            break
+
+    return can_skip
