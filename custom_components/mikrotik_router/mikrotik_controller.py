@@ -171,7 +171,7 @@ class MikrotikControllerData():
             key='default-name',
             vals=[
                 {'name': 'default-name'},
-                {'name': 'name'},
+                {'name': 'name', 'default_val': 'default-name'},
                 {'name': 'type', 'default': 'unknown'},
                 {'name': 'running', 'type': 'bool'},
                 {'name': 'enabled', 'source': 'disabled', 'type': 'bool', 'reverse': True},
@@ -193,9 +193,6 @@ class MikrotikControllerData():
 
         interface_list = ""
         for uid in self.data['interface']:
-            if not self.data['interface'][uid]['name']:
-                self.data['interface'][uid]['name'] = self.data['interface'][uid]['default-name']
-
             self.data['interface_map'][self.data['interface'][uid]['name']] = self.data['interface'][uid]['default-name']
 
             if interface_list:

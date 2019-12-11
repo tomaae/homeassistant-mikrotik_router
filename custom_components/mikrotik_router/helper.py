@@ -60,6 +60,9 @@ async def from_list(data=None, source=None, key=None, vals=[], ensure_vals=[]):
 
             if _type == 'str':
                 _default = val['default'] if 'default' in val else ''
+                if 'default_val' in val and val['default_val'] in val:
+                    _default = val[val['default_val']]
+                    
                 data[uid][_name] = from_entry(entry, _source, default=_default)
             elif _type == 'bool':
                 _default = val['default'] if 'default' in val else False
