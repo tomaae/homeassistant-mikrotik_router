@@ -33,7 +33,6 @@ class MikrotikControllerData():
         self.data = {'routerboard': {},
                      'resource': {},
                      'interface': {},
-                     'interface_map': {},
                      'arp': {},
                      'nat': {},
                      'fw-update': {},
@@ -191,15 +190,6 @@ class MikrotikControllerData():
             ]
         )
 
-        interface_list = ""
-        for uid in self.data['interface']:
-            self.data['interface_map'][self.data['interface'][uid]['name']] = self.data['interface'][uid]['default-name']
-
-            if interface_list:
-                interface_list += ","
-
-            interface_list += self.data['interface'][uid]['name']
-
         await self.get_interface_traffic(interface_list)
         return
 
@@ -207,17 +197,23 @@ class MikrotikControllerData():
     #   get_interface_traffic
     # ---------------------------
     async def get_interface_traffic(self, interface_list):
-        data = await self.hass.async_add_executor_job(self.api.get_traffic, interface_list)
-        for entry in data:
-            iface_name = from_entry(entry, 'name')
-            if iface_name not in self.data['interface_map']:
-                continue
+        """Get traffic for all interfaces from Mikrotik"""
+        interface_list = ""
+        for uid in self.data['interface']:
+            if interface_list:
+                interface_list += ","
 
-            _LOGGER.debug("Processing entry {}, entry {}".format("/interface/monitor-traffic", entry))
-            uid = self.data['interface_map'][iface_name]
-            self.data['interface'][uid]['rx-bits-per-second'] = from_entry(entry, 'rx-bits-per-second', default=0)
-            self.data['interface'][uid]['tx-bits-per-second'] = from_entry(entry, 'tx-bits-per-second', default=0)
+            interface_list += self.data['interface'][uid]['name']
 
+        self.data['interface'] = await from_list(
+            data=self.data['interface'],
+            source=await self.hass.async_add_executor_job(self.api.get_traffic, interface_list),
+            key_search='name',
+            vals=[
+                {'name': 'rx-bits-per-second', 'default': 0},
+                {'name': 'tx-bits-per-second', 'default': 0},
+            ]
+        )
         return
 
     # ---------------------------

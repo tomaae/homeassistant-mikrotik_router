@@ -37,22 +37,24 @@ def from_entry_bool(entry, param, default=False, reverse=False):
 # ---------------------------
 #   from_list
 # ---------------------------
-async def from_list(data=None, source=None, key=None, vals=[], ensure_vals=[]):
+async def from_list(data=None, source=None, key=None, key_search=None, vals=[], ensure_vals=[]):
     if not source:
         return data
 
+    keymap = generate_keymap(data, key_search)
+
     for entry in source:
-        if key not in entry:
+        uid = await get_uid(entry, key)
+        if keymap and key_search in entry and entry[key_search] in keymap:
+            uid = keymap[entry[key_search]]
+
+        if not uid:
             continue
 
-        if not entry[key]:
-            continue
-
-        _LOGGER.debug("Processing entry {}, entry {}".format(source, entry))
-        uid = entry[key]
         if uid not in data:
             data[uid] = {}
 
+        _LOGGER.debug("Processing entry {}, entry {}".format(source, entry))
         for val in vals:
             _name = val['name']
             _type = val['type'] if 'type' in val else 'str'
@@ -75,3 +77,32 @@ async def from_list(data=None, source=None, key=None, vals=[], ensure_vals=[]):
                 data[uid][val['name']] = _default
 
     return data
+
+
+# ---------------------------
+#   get_uid
+# ---------------------------
+async def get_uid(entry, key):
+    if key not in entry:
+        return False
+
+    if not entry[key]:
+        return False
+
+    return entry[key]
+
+
+# ---------------------------
+#   generate_keymap
+# ---------------------------
+async def generate_keymap(data, key_search):
+    if not key_search:
+        return None
+
+    for uid in data:
+        if key_search not in uid:
+            continue
+
+        keymap[data[uid]['name']] = data[uid]['default-name']
+
+    return keymap
