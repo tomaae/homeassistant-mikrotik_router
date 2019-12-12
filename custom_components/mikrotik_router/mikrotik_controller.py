@@ -14,7 +14,7 @@ from .const import (
 )
 
 from .mikrotikapi import MikrotikAPI
-from .helper import from_entry, from_list
+from .helper import from_entry, parse_api
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -165,7 +165,7 @@ class MikrotikControllerData():
     # ---------------------------
     async def get_interface(self):
         """Get all interfaces data from Mikrotik"""
-        self.data['interface'] = await from_list(
+        self.data['interface'] = await parse_api(
             data=self.data['interface'],
             source=await self.hass.async_add_executor_job(self.api.path, "/interface"),
             key='default-name',
@@ -204,7 +204,7 @@ class MikrotikControllerData():
 
         interface_list = interface_list[:-1]
 
-        self.data['interface'] = await from_list(
+        self.data['interface'] = await parse_api(
             data=self.data['interface'],
             source=await self.hass.async_add_executor_job(self.api.get_traffic, interface_list),
             key_search='name',
@@ -339,7 +339,7 @@ class MikrotikControllerData():
     # ---------------------------
     async def get_nat(self):
         """Get NAT data from Mikrotik"""
-        self.data['nat'] = await from_list(
+        self.data['nat'] = await parse_api(
             data=self.data['nat'],
             source=await self.hass.async_add_executor_job(self.api.path, "/ip/firewall/nat"),
             key='.id',
@@ -373,7 +373,7 @@ class MikrotikControllerData():
     # ---------------------------
     async def get_system_routerboard(self):
         """Get routerboard data from Mikrotik"""
-        self.data['routerboard'] = await from_list(
+        self.data['routerboard'] = await parse_api(
             data=self.data['routerboard'],
             source=await self.hass.async_add_executor_job(self.api.path, "/system/routerboard"),
             vals=[
@@ -390,7 +390,7 @@ class MikrotikControllerData():
     # ---------------------------
     async def get_system_resource(self):
         """Get system resources data from Mikrotik"""
-        self.data['resource'] = await from_list(
+        self.data['resource'] = await parse_api(
             data=self.data['resource'],
             source=await self.hass.async_add_executor_job(self.api.path, "/system/resource"),
             vals=[
@@ -423,7 +423,7 @@ class MikrotikControllerData():
     # ---------------------------
     async def get_firmware_update(self):
         """Check for firmware update on Mikrotik"""
-        self.data['fw-update'] = await from_list(
+        self.data['fw-update'] = await parse_api(
             data=self.data['fw-update'],
             source=await self.hass.async_add_executor_job(self.api.path, "/system/package/update"),
             vals=[
@@ -446,7 +446,7 @@ class MikrotikControllerData():
     # ---------------------------
     async def get_script(self):
         """Get list of all scripts from Mikrotik"""
-        self.data['script'] = await from_list(
+        self.data['script'] = await parse_api(
             data=self.data['script'],
             source=await self.hass.async_add_executor_job(self.api.path, "/system/script"),
             key='name',

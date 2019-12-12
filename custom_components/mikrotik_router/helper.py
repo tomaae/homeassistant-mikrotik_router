@@ -7,8 +7,8 @@ _LOGGER = logging.getLogger(__name__)
 # ---------------------------
 #   from_entry
 # ---------------------------
-def from_entry(entry, param, default=""):
-    """Validate and return a value from a Mikrotik API dict"""
+def from_entry(entry, param, default="") -> dict:
+    """Validate and return str value from Mikrotik API dict"""
     if param not in entry:
         return default
 
@@ -18,7 +18,7 @@ def from_entry(entry, param, default=""):
 # ---------------------------
 #   from_entry_bool
 # ---------------------------
-def from_entry_bool(entry, param, default=False, reverse=False):
+def from_entry_bool(entry, param, default=False, reverse=False) -> bool:
     """Validate and return a bool value from a Mikrotik API dict"""
     if param not in entry:
         return default
@@ -35,9 +35,10 @@ def from_entry_bool(entry, param, default=False, reverse=False):
 
 
 # ---------------------------
-#   from_list
+#   parse_api
 # ---------------------------
-async def from_list(data=None, source=None, key=None, key_search=None, vals=None, val_proc=None, ensure_vals=None, only=None, skip=None):
+async def parse_api(data=None, source=None, key=None, key_search=None, vals=None, val_proc=None, ensure_vals=None, only=None, skip=None) -> dict:
+    """Get data from API"""
     if not source:
         return data
 
@@ -74,7 +75,8 @@ async def from_list(data=None, source=None, key=None, key_search=None, vals=None
 # ---------------------------
 #   get_uid
 # ---------------------------
-async def get_uid(entry, key, key_search, keymap):
+async def get_uid(entry, key, key_search, keymap) -> str:
+    """Get UID for data list"""
     if not key_search:
         if key not in entry:
             return False
@@ -94,7 +96,8 @@ async def get_uid(entry, key, key_search, keymap):
 # ---------------------------
 #   generate_keymap
 # ---------------------------
-async def generate_keymap(data, key_search):
+async def generate_keymap(data, key_search) -> dict:
+    """Generate keymap"""
     if not key_search:
         return None
 
@@ -103,7 +106,7 @@ async def generate_keymap(data, key_search):
         if key_search not in uid:
             continue
 
-        keymap[data[uid]['name']] = data[uid]['default-name']
+        keymap[data[uid]['name']] = uid
 
     return keymap
 
@@ -111,7 +114,8 @@ async def generate_keymap(data, key_search):
 # ---------------------------
 #   matches_only
 # ---------------------------
-async def matches_only(entry, only):
+async def matches_only(entry, only) -> bool:
+    """Return True if all variables are matched"""
     ret = False
     for val in only:
         if val['name'] in entry and entry[val['name']] == val['value']:
@@ -126,7 +130,8 @@ async def matches_only(entry, only):
 # ---------------------------
 #   can_skip
 # ---------------------------
-async def can_skip(entry, skip):
+async def can_skip(entry, skip) -> bool:
+    """Return True if at least one variable matches"""
     ret = False
     for val in skip:
         if val['name'] in entry and entry[val['name']] == val['value']:
@@ -139,7 +144,8 @@ async def can_skip(entry, skip):
 # ---------------------------
 #   fill_vals
 # ---------------------------
-async def fill_vals(data, entry, uid, vals):
+async def fill_vals(data, entry, uid, vals) -> dict:
+    """Fill all data"""
     for val in vals:
         _name = val['name']
         _type = val['type'] if 'type' in val else 'str'
@@ -170,7 +176,8 @@ async def fill_vals(data, entry, uid, vals):
 # ---------------------------
 #   fill_ensure_vals
 # ---------------------------
-async def fill_ensure_vals(data, uid, ensure_vals):
+async def fill_ensure_vals(data, uid, ensure_vals) -> dict:
+    """Add required keys which are not available in data"""
     for val in ensure_vals:
         if uid:
             if val['name'] not in data[uid]:
@@ -187,7 +194,8 @@ async def fill_ensure_vals(data, uid, ensure_vals):
 # ---------------------------
 #   fill_vals_proc
 # ---------------------------
-async def fill_vals_proc(data, uid, vals_proc):
+async def fill_vals_proc(data, uid, vals_proc) -> dict:
+    """Add custom keys"""
     _data = data[uid] if uid else data
     for val_sub in vals_proc:
         _name = None
