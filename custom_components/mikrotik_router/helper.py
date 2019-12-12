@@ -37,7 +37,7 @@ def from_entry_bool(entry, param, default=False, reverse=False):
 # ---------------------------
 #   from_list
 # ---------------------------
-async def from_list(data=None, source=None, key=None, key_search=None, vals=[], ensure_vals=None, only=None, skip=None):
+async def from_list(data=None, source=None, key=None, key_search=None, vals=None, val_proc=None, ensure_vals=None, only=None, skip=None):
     if not source:
         return data
 
@@ -62,9 +62,14 @@ async def from_list(data=None, source=None, key=None, key_search=None, vals=[], 
             uid=None
 
         _LOGGER.debug("Processing entry {}, entry {}".format(source, entry))
-        data = await fill_vals(data, uid, vals)
+        if vals:
+            data = await fill_vals(data, uid, vals)
+
         if ensure_vals:
             data = await fill_ensure_vals(data, uid, ensure_vals)
+
+        if val_proc:
+            data = await fill_vals_proc(data, uid, val_proc)
 
     return data
 
@@ -179,3 +184,35 @@ async def fill_ensure_vals(data, uid, ensure_vals):
                 data[val['name']] = _default
 
     return data
+
+# ---------------------------
+#   fill_vals_proc
+# ---------------------------
+async def fill_vals_proc(data, uid, vals_proc):
+    
+    _data = data[uid] if uid else data
+    for val_sub in val_proc:
+        _name = None
+        _action = None
+        _value = None
+        for val in val_sub:
+            if 'name' in val:
+                _name = val['name']
+                continue
+
+            if 'action' in val:
+                _action = val['action']
+                continue
+
+            if not _name and not _action:
+                break
+
+            if _action == 'combine':
+                if 'key' in val:
+                    _value += _data[val['key']] if val['key'] in _data else 'unknown'
+
+                if 'text' in val:
+                    _value += val['text']
+
+    return data
+
