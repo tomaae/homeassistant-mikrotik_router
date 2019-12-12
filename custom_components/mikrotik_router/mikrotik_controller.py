@@ -421,16 +421,15 @@ class MikrotikControllerData():
             ]
         )
 
-        for entry in data['resource']:
-            if entry['total-memory'] > 0:
-                self.data['resource']['memory-usage'] = round(((entry['total-memory'] - entry['free-memory']) / entry['total-memory']) * 100)
-            else:
-                self.data['resource']['memory-usage'] = "unknown"
+        if entry['total-memory'] > 0:
+            self.data['resource']['memory-usage'] = round(((entry['total-memory'] - entry['free-memory']) / entry['total-memory']) * 100)
+        else:
+            self.data['resource']['memory-usage'] = "unknown"
 
-            if entry['total-hdd-space'] > 0:
-                self.data['resource']['hdd-usage'] = round(((entry['total-hdd-space'] - entry['free-hdd-space']) / entry['total-hdd-space']) * 100)
-            else:
-                self.data['resource']['hdd-usage'] = "unknown"
+        if entry['total-hdd-space'] > 0:
+            self.data['resource']['hdd-usage'] = round(((entry['total-hdd-space'] - entry['free-hdd-space']) / entry['total-hdd-space']) * 100)
+        else:
+            self.data['resource']['hdd-usage'] = "unknown"
 
         return
 
