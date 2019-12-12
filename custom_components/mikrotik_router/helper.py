@@ -189,7 +189,6 @@ async def fill_ensure_vals(data, uid, ensure_vals):
 #   fill_vals_proc
 # ---------------------------
 async def fill_vals_proc(data, uid, vals_proc):
-    
     _data = data[uid] if uid else data
     for val_sub in val_proc:
         _name = None
@@ -213,6 +212,12 @@ async def fill_vals_proc(data, uid, vals_proc):
 
                 if 'text' in val:
                     _value += val['text']
+
+        if _name and _value:
+            if uid:
+                data[uid][_name] = _value
+            else:
+                data[_name] = _value
 
     return data
 
