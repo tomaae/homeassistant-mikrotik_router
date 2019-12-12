@@ -37,22 +37,23 @@ def from_entry_bool(entry, param, default=False, reverse=False) -> bool:
 # ---------------------------
 #   parse_api
 # ---------------------------
-async def parse_api(data=None, source=None, key=None, key_search=None, vals=None, val_proc=None, ensure_vals=None, only=None, skip=None) -> dict:
+def parse_api(data=None, source=None, key=None, key_search=None, vals=None, val_proc=None, ensure_vals=None, only=None, skip=None) -> dict:
     """Get data from API"""
     if not source:
         return data
 
+    #print(type(source))
     keymap = generate_keymap(data, key_search)
     for entry in source:
-        if only and not await matches_only(entry, only):
+        if only and not matches_only(entry, only):
             continue
 
-        if skip and await can_skip(entry, skip):
+        if skip and can_skip(entry, skip):
             continue
 
         uid = None
         if key or key_search:
-            uid = await get_uid(entry, key, key_search, keymap)
+            uid = get_uid(entry, key, key_search, keymap)
             if not uid:
                 continue
 
@@ -61,13 +62,13 @@ async def parse_api(data=None, source=None, key=None, key_search=None, vals=None
 
         _LOGGER.debug("Processing entry %s, entry %s", source, entry)
         if vals:
-            data = await fill_vals(data, entry, uid, vals)
+            data = fill_vals(data, entry, uid, vals)
 
         if ensure_vals:
-            data = await fill_ensure_vals(data, uid, ensure_vals)
+            data = fill_ensure_vals(data, uid, ensure_vals)
 
         if val_proc:
-            data = await fill_vals_proc(data, uid, val_proc)
+            data = fill_vals_proc(data, uid, val_proc)
 
     return data
 
@@ -75,38 +76,40 @@ async def parse_api(data=None, source=None, key=None, key_search=None, vals=None
 # ---------------------------
 #   get_uid
 # ---------------------------
-async def get_uid(entry, key, key_search, keymap) -> str:
+def get_uid(entry, key, key_search, keymap) -> str:
     """Get UID for data list"""
+    uid = None
     if not key_search:
         if key not in entry:
-            return False
+            return None
 
         if not entry[key]:
-            return False
+            return None
 
+        uid = entry[key]
     else:
-        if not keymap or key_search not in entry or entry[key_search] not in keymap:
-            return False
+        if keymap and key_search in entry and entry[key_search] in keymap:
+            uid = keymap[entry[key_search]]
+        else:
+            return None
 
-        key = keymap[entry[key_search]]
-
-    return entry[key]
+    return uid
 
 
 # ---------------------------
 #   generate_keymap
 # ---------------------------
-async def generate_keymap(data, key_search) -> dict:
+def generate_keymap(data, key_search) -> dict:
     """Generate keymap"""
     if not key_search:
         return None
 
-    keymap = []
+    keymap = {}
     for uid in data:
-        if key_search not in uid:
+        if key_search not in data[uid]:
             continue
 
-        keymap[data[uid]['name']] = uid
+        keymap[data[uid][key_search]] = uid
 
     return keymap
 
@@ -114,11 +117,11 @@ async def generate_keymap(data, key_search) -> dict:
 # ---------------------------
 #   matches_only
 # ---------------------------
-async def matches_only(entry, only) -> bool:
+def matches_only(entry, only) -> bool:
     """Return True if all variables are matched"""
     ret = False
     for val in only:
-        if val['name'] in entry and entry[val['name']] == val['value']:
+        if val['key'] in entry and entry[val['key']] == val['value']:
             ret = True
         else:
             ret = False
@@ -130,7 +133,7 @@ async def matches_only(entry, only) -> bool:
 # ---------------------------
 #   can_skip
 # ---------------------------
-async def can_skip(entry, skip) -> bool:
+def can_skip(entry, skip) -> bool:
     """Return True if at least one variable matches"""
     ret = False
     for val in skip:
@@ -144,7 +147,7 @@ async def can_skip(entry, skip) -> bool:
 # ---------------------------
 #   fill_vals
 # ---------------------------
-async def fill_vals(data, entry, uid, vals) -> dict:
+def fill_vals(data, entry, uid, vals) -> dict:
     """Fill all data"""
     for val in vals:
         _name = val['name']
@@ -176,7 +179,7 @@ async def fill_vals(data, entry, uid, vals) -> dict:
 # ---------------------------
 #   fill_ensure_vals
 # ---------------------------
-async def fill_ensure_vals(data, uid, ensure_vals) -> dict:
+def fill_ensure_vals(data, uid, ensure_vals) -> dict:
     """Add required keys which are not available in data"""
     for val in ensure_vals:
         if uid:
@@ -194,7 +197,7 @@ async def fill_ensure_vals(data, uid, ensure_vals) -> dict:
 # ---------------------------
 #   fill_vals_proc
 # ---------------------------
-async def fill_vals_proc(data, uid, vals_proc) -> dict:
+def fill_vals_proc(data, uid, vals_proc) -> dict:
     """Add custom keys"""
     _data = data[uid] if uid else data
     for val_sub in vals_proc:
@@ -215,10 +218,18 @@ async def fill_vals_proc(data, uid, vals_proc) -> dict:
 
             if _action == 'combine':
                 if 'key' in val:
-                    _value += _data[val['key']] if val['key'] in _data else 'unknown'
+                    tmp = _data[val['key']] if val['key'] in _data else 'unknown'
+                    if not _value:
+                        _value = tmp
+                    else:
+                        _value = "{}{}".format(_value, tmp)
 
                 if 'text' in val:
-                    _value += val['text']
+                    tmp = val['text']
+                    if not _value:
+                        _value = tmp
+                    else:
+                        _value = "{}{}".format(_value, tmp)
 
         if _name and _value:
             if uid:
