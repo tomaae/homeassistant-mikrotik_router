@@ -42,7 +42,7 @@ class MikrotikAPI:
 
         self._connection = None
         self._connected = False
-        self.error = ""
+        self.error = None
 
         # Default ports
         if not self._port:
@@ -110,8 +110,6 @@ class MikrotikAPI:
 
         if "ALERT_HANDSHAKE_FAILURE" in error:
             self.error = "ssl_handshake_failure"
-
-        return
 
     # ---------------------------
     #   connected
