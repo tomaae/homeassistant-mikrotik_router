@@ -227,7 +227,7 @@ class MikrotikControllerData():
             for uid in self.data['interface']:
                 self.data['interface'][uid]['client-ip-address'] = "disabled"
                 self.data['interface'][uid]['client-mac-address'] = "disabled"
-            return False
+            return
 
         mac2ip = {}
         bridge_used = False
@@ -244,7 +244,7 @@ class MikrotikControllerData():
             self.data['interface'][uid]['client-ip-address'] = from_entry(self.data['arp'][uid], 'address')
             self.data['interface'][uid]['client-mac-address'] = from_entry(self.data['arp'][uid], 'mac-address')
 
-        return True
+        return
 
     # ---------------------------
     #   update_arp
@@ -339,48 +339,33 @@ class MikrotikControllerData():
     # ---------------------------
     def get_nat(self):
         """Get NAT data from Mikrotik"""
-#        self.data['nat'] = await from_list(
-#            data=self.data['nat'],
-#            source=await self.hass.async_add_executor_job(self.api.path, "/ip/firewall/nat"),
-#            key='.id',
-#            vals=[
-#                {'name': 'name', 'source': 'dst-port'},
-#                {'name': '.id'},
-#                {'name': 'protocol'},
-#                {'name': 'dst-port'},
-#                {'name': 'in-interface', 'default': 'any'},
-#                {'name': 'to-addresses'},
-#                {'name': 'to-ports'},
-#                {'name': 'comment'},
-#                {'name': 'enabled', 'source': 'disabled', 'type': 'bool', 'reverse': True}
-#            ],
-#            only=[
-#                {'key': 'action', 'value': 'dst-nat'}
-#            ]
-#        )
-        
-        data = self.api.path("/ip/firewall/nat")
-        if not data:
-            return
-
-        for entry in data:
-            if entry['action'] != 'dst-nat':
-                continue
-
-            uid = entry['.id']
-            if uid not in self.data['nat']:
-                self.data['nat'][uid] = {}
-
-            self.data['nat'][uid]['name'] = "{}:{}".format(entry['protocol'], entry['dst-port'])
-            self.data['nat'][uid]['.id'] = from_entry(entry, '.id')
-            self.data['nat'][uid]['protocol'] = from_entry(entry, 'protocol')
-            self.data['nat'][uid]['dst-port'] = from_entry(entry, 'dst-port')
-            self.data['nat'][uid]['in-interface'] = from_entry(entry, 'in-interface', 'any')
-            self.data['nat'][uid]['to-addresses'] = from_entry(entry, 'to-addresses')
-            self.data['nat'][uid]['to-ports'] = from_entry(entry, 'to-ports')
-            self.data['nat'][uid]['comment'] = from_entry(entry, 'comment')
-            self.data['nat'][uid]['enabled'] = from_entry_bool(entry, 'disabled', default=True, reverse=True)
-
+        self.data['nat'] = await from_list(
+            data=self.data['nat'],
+            source=await self.hass.async_add_executor_job(self.api.path, "/ip/firewall/nat"),
+            key='.id',
+            vals=[
+                {'name': '.id'},
+                {'name': 'protocol'},
+                {'name': 'dst-port'},
+                {'name': 'in-interface', 'default': 'any'},
+                {'name': 'to-addresses'},
+                {'name': 'to-ports'},
+                {'name': 'comment'},
+                {'name': 'enabled', 'source': 'disabled', 'type': 'bool', 'reverse': True}
+            ],
+            val_proc=[
+                [
+                    {'name': 'name'},
+                    {'action': 'combine'},
+                    {'key': 'protocol'},
+                    {'text': ':'},
+                    {'key': 'dst-port'}
+                ]
+            ]
+            only=[
+                {'key': 'action', 'value': 'dst-nat'}
+            ]
+        )
         return
 
     # ---------------------------
