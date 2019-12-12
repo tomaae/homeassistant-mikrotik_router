@@ -49,15 +49,12 @@ class MikrotikControllerData():
         async_track_time_interval(self.hass, self.force_update, self.option_scan_interval)
         async_track_time_interval(self.hass, self.force_fwupdate_check, timedelta(hours=1))
 
-        return
-
     # ---------------------------
     #   force_update
     # ---------------------------
     async def force_update(self, _now=None):
         """Trigger update by timer"""
         await self.async_update()
-        return
 
     # ---------------------------
     #   force_fwupdate_check
@@ -65,7 +62,6 @@ class MikrotikControllerData():
     async def force_fwupdate_check(self, _now=None):
         """Trigger hourly update by timer"""
         await self.async_fwupdate_check()
-        return
 
     # ---------------------------
     #   option_track_arp
@@ -112,7 +108,6 @@ class MikrotikControllerData():
         await self.hass.async_add_executor_job(self.get_system_routerboard)
         await self.hass.async_add_executor_job(self.get_system_resource)
         self.lock.release()
-        return
 
     # ---------------------------
     #   async_fwupdate_check
@@ -120,9 +115,7 @@ class MikrotikControllerData():
     async def async_fwupdate_check(self):
         """Update Mikrotik data"""
         await self.hass.async_add_executor_job(self.get_firmware_update)
-
         async_dispatcher_send(self.hass, self.signal_update)
-        return
 
     # ---------------------------
     #   async_update
@@ -146,7 +139,6 @@ class MikrotikControllerData():
 
         async_dispatcher_send(self.hass, self.signal_update)
         self.lock.release()
-        return
 
     # ---------------------------
     #   async_reset
@@ -175,8 +167,6 @@ class MikrotikControllerData():
             self.api.run_script(name)
         except ApiEntryNotFound as error:
             _LOGGER.error("Failed to run script: %s", error)
-
-        return
 
     # ---------------------------
     #   get_interface
@@ -209,8 +199,6 @@ class MikrotikControllerData():
             ]
         )
 
-        return
-
     # ---------------------------
     #   get_interface_traffic
     # ---------------------------
@@ -231,7 +219,6 @@ class MikrotikControllerData():
                 {'name': 'tx-bits-per-second', 'default': 0},
             ]
         )
-        return
 
     # ---------------------------
     #   get_interface_client
@@ -261,8 +248,6 @@ class MikrotikControllerData():
 
             self.data['interface'][uid]['client-ip-address'] = from_entry(self.data['arp'][uid], 'address')
             self.data['interface'][uid]['client-mac-address'] = from_entry(self.data['arp'][uid], 'mac-address')
-
-        return
 
     # ---------------------------
     #   update_arp
@@ -337,8 +322,6 @@ class MikrotikControllerData():
                 self.data['arp'][uid]['mac-address'] = from_entry(entry, 'mac-address')
                 self.data['arp'][uid]['address'] = mac2ip[self.data['arp'][uid]['mac-address']] if self.data['arp'][uid]['mac-address'] in mac2ip else ""
 
-        return
-
     # ---------------------------
     #   get_iface_from_entry
     # ---------------------------
@@ -384,7 +367,6 @@ class MikrotikControllerData():
                 {'key': 'action', 'value': 'dst-nat'}
             ]
         )
-        return
 
     # ---------------------------
     #   get_system_routerboard
@@ -401,7 +383,6 @@ class MikrotikControllerData():
                 {'name': 'firmware', 'default': 'unknown'}
             ]
         )
-        return
 
     # ---------------------------
     #   get_system_resource
@@ -434,8 +415,6 @@ class MikrotikControllerData():
         else:
             self.data['resource']['hdd-usage'] = "unknown"
 
-        return
-
     # ---------------------------
     #   get_system_routerboard
     # ---------------------------
@@ -457,8 +436,6 @@ class MikrotikControllerData():
         else:
             self.data['fw-update']['available'] = False
 
-        return
-
     # ---------------------------
     #   get_script
     # ---------------------------
@@ -474,4 +451,3 @@ class MikrotikControllerData():
                 {'name': 'run-count', 'default': 'unknown'}
             ]
         )
-        return

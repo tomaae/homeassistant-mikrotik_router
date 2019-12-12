@@ -66,7 +66,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     )
 
     update_controller()
-    return
 
 
 # ---------------------------
@@ -90,8 +89,6 @@ def update_items(inst, mikrotik_controller, async_add_entities, tracked):
 
     if new_tracked:
         async_add_entities(new_tracked)
-
-    return
 
 
 # ---------------------------
@@ -118,11 +115,9 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
     async def async_added_to_hass(self):
         """Port entity created."""
         _LOGGER.debug("New port tracker %s (%s %s)", self._inst, self._data['default-name'], self._data['port-mac-address'])
-        return
 
     async def async_update(self):
         """Synchronize state with controller."""
-        return
 
     @property
     def is_connected(self):

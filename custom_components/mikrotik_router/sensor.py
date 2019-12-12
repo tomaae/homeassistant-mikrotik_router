@@ -92,7 +92,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     )
 
     update_controller()
-    return
 
 
 # ---------------------------
@@ -128,8 +127,6 @@ def update_items(inst, mikrotik_controller, async_add_entities, sensors):
 
     if new_sensors:
         async_add_entities(new_sensors, True)
-
-    return
 
 
 # ---------------------------
@@ -211,12 +208,10 @@ class MikrotikControllerSensor(Entity):
 
     async def async_update(self):
         """Synchronize state with controller."""
-        return
 
     async def async_added_to_hass(self):
         """Port entity created."""
         _LOGGER.debug("New sensor %s (%s)", self._inst, self._sensor)
-        return
 
 
 # ---------------------------
@@ -255,4 +250,3 @@ class MikrotikControllerTrafficSensor(MikrotikControllerSensor):
     async def async_added_to_hass(self):
         """Port entity created."""
         _LOGGER.debug("New sensor %s (%s %s)", self._inst, self._data['default-name'], self._sensor)
-        return

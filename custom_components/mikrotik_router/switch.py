@@ -81,7 +81,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     )
 
     update_controller()
-    return
 
 
 # ---------------------------
@@ -110,8 +109,6 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
     if new_switches:
         async_add_entities(new_switches)
 
-    return
-
 
 # ---------------------------
 #   MikrotikControllerSwitch
@@ -128,11 +125,9 @@ class MikrotikControllerSwitch(SwitchDevice, RestoreEntity):
     async def async_added_to_hass(self):
         """Switch entity created."""
         _LOGGER.debug("New switch %s (%s)", self._inst, self._uid)
-        return
 
     async def async_update(self):
         """Synchronize state with controller."""
-        return
 
     @property
     def available(self) -> bool:
@@ -158,7 +153,6 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
     async def async_added_to_hass(self):
         """Port entity created."""
         _LOGGER.debug("New port switch %s (%s %s)", self._inst, self._data['default-name'], self._data['port-mac-address'])
-        return
 
     @property
     def name(self) -> str:
@@ -214,7 +208,6 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
         mod_value = False
         self._ctrl.set_value(path, param, value, mod_param, mod_value)
         await self._ctrl.force_update()
-        return
 
     async def async_turn_off(self):
         """Turn on the switch."""
@@ -225,7 +218,6 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
         mod_value = True
         self._ctrl.set_value(path, param, value, mod_param, mod_value)
         await self._ctrl.async_update()
-        return
 
     @property
     def is_on(self):
@@ -251,7 +243,6 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
     async def async_added_to_hass(self):
         """NAT switch entity created."""
         _LOGGER.debug("New port switch %s (%s)", self._inst, self._data['name'])
-        return
 
     @property
     def name(self) -> str:
@@ -308,7 +299,6 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
         mod_value = False
         self._ctrl.set_value(path, param, value, mod_param, mod_value)
         await self._ctrl.force_update()
-        return
 
     async def async_turn_off(self):
         """Turn on the switch."""
@@ -323,7 +313,6 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
         mod_value = True
         self._ctrl.set_value(path, param, value, mod_param, mod_value)
         await self._ctrl.async_update()
-        return
 
     @property
     def is_on(self):
@@ -349,7 +338,6 @@ class MikrotikControllerScriptSwitch(MikrotikControllerSwitch):
     async def async_added_to_hass(self):
         """Script switch entity created."""
         _LOGGER.debug("New script switch %s (%s)", self._inst, self._data['name'])
-        return
 
     @property
     def name(self) -> str:
@@ -392,11 +380,9 @@ class MikrotikControllerScriptSwitch(MikrotikControllerSwitch):
         """Turn on the switch."""
         self._ctrl.run_script(self._data['name'])
         await self._ctrl.force_update()
-        return
 
     async def async_turn_off(self):
         """Turn off the switch."""
-        return
 
     @property
     def is_on(self):
