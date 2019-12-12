@@ -1,6 +1,7 @@
 """Mikrotik Controller for Mikrotik Router."""
 
 from datetime import timedelta
+import asyncio
 import logging
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval
@@ -14,38 +15,10 @@ from .const import (
 )
 
 from .mikrotikapi import MikrotikAPI
+from .helper import from_entry, parse_api
+from .exceptions import ApiEntryNotFound
 
 _LOGGER = logging.getLogger(__name__)
-
-
-# ---------------------------
-#   from_entry
-# ---------------------------
-def from_entry(entry, param, default=""):
-    """Validate and return a value from a Mikrotik API dict"""
-    if param not in entry:
-        return default
-
-    return entry[param]
-
-
-# ---------------------------
-#   from_entry_bool
-# ---------------------------
-def from_entry_bool(entry, param, default=False, reverse=False):
-    """Validate and return a bool value from a Mikrotik API dict"""
-    if param not in entry:
-        return default
-
-    if not reverse:
-        ret = entry[param]
-    else:
-        if entry[param]:
-            ret = False
-        else:
-            ret = True
-
-    return ret
 
 
 # ---------------------------
@@ -62,7 +35,6 @@ class MikrotikControllerData():
         self.data = {'routerboard': {},
                      'resource': {},
                      'interface': {},
-                     'interface_map': {},
                      'arp': {},
                      'nat': {},
                      'fw-update': {},
@@ -70,13 +42,12 @@ class MikrotikControllerData():
                      }
 
         self.listeners = []
+        self.lock = asyncio.Lock()
 
         self.api = MikrotikAPI(host, username, password, port, use_ssl)
 
         async_track_time_interval(self.hass, self.force_update, self.option_scan_interval)
         async_track_time_interval(self.hass, self.force_fwupdate_check, timedelta(hours=1))
-
-        return
 
     # ---------------------------
     #   force_update
@@ -84,7 +55,6 @@ class MikrotikControllerData():
     async def force_update(self, _now=None):
         """Trigger update by timer"""
         await self.async_update()
-        return
 
     # ---------------------------
     #   force_fwupdate_check
@@ -92,7 +62,6 @@ class MikrotikControllerData():
     async def force_fwupdate_check(self, _now=None):
         """Trigger hourly update by timer"""
         await self.async_fwupdate_check()
-        return
 
     # ---------------------------
     #   option_track_arp
@@ -131,38 +100,45 @@ class MikrotikControllerData():
     # ---------------------------
     async def hwinfo_update(self):
         """Update Mikrotik hardware info"""
-        self.get_system_routerboard()
-        self.get_system_resource()
-        return
+        try:
+            await asyncio.wait_for(self.lock.acquire(), timeout=10)
+        except:
+            return
+
+        await self.hass.async_add_executor_job(self.get_system_routerboard)
+        await self.hass.async_add_executor_job(self.get_system_resource)
+        self.lock.release()
 
     # ---------------------------
     #   async_fwupdate_check
     # ---------------------------
     async def async_fwupdate_check(self):
         """Update Mikrotik data"""
-
-        self.get_firmare_update()
-
+        await self.hass.async_add_executor_job(self.get_firmware_update)
         async_dispatcher_send(self.hass, self.signal_update)
-        return
 
     # ---------------------------
     #   async_update
     # ---------------------------
     async def async_update(self):
         """Update Mikrotik data"""
+        try:
+            await asyncio.wait_for(self.lock.acquire(), timeout=10)
+        except:
+            return
 
         if 'available' not in self.data['fw-update']:
             await self.async_fwupdate_check()
 
-        self.get_interface()
-        self.get_interface_client()
-        self.get_nat()
-        self.get_system_resource()
-        self.get_script()
+        await self.hass.async_add_executor_job(self.get_interface)
+        await self.hass.async_add_executor_job(self.get_interface_traffic)
+        await self.hass.async_add_executor_job(self.get_interface_client)
+        await self.hass.async_add_executor_job(self.get_nat)
+        await self.hass.async_add_executor_job(self.get_system_resource)
+        await self.hass.async_add_executor_job(self.get_script)
 
         async_dispatcher_send(self.hass, self.signal_update)
-        return
+        self.lock.release()
 
     # ---------------------------
     #   async_reset
@@ -187,73 +163,62 @@ class MikrotikControllerData():
     # ---------------------------
     def run_script(self, name):
         """Run script using Mikrotik API"""
-        return self.api.run_script(name)
+        try:
+            self.api.run_script(name)
+        except ApiEntryNotFound as error:
+            _LOGGER.error("Failed to run script: %s", error)
 
     # ---------------------------
     #   get_interface
     # ---------------------------
     def get_interface(self):
         """Get all interfaces data from Mikrotik"""
-        interface_list = ""
-        data = self.api.path("/interface")
-        if not data:
-            return
-
-        for entry in data:
-            if 'default-name' not in entry:
-                continue
-
-            uid = entry['default-name']
-            if uid not in self.data['interface']:
-                self.data['interface'][uid] = {}
-
-            self.data['interface'][uid]['default-name'] = from_entry(entry, 'default-name')
-            self.data['interface'][uid]['name'] = from_entry(entry, 'name', default=entry['default-name'])
-            self.data['interface'][uid]['type'] = from_entry(entry, 'type', 'unknown')
-            self.data['interface'][uid]['running'] = from_entry_bool(entry, 'running')
-            self.data['interface'][uid]['enabled'] = from_entry_bool(entry, 'disabled', reverse=True)
-            self.data['interface'][uid]['port-mac-address'] = from_entry(entry, 'mac-address')
-            self.data['interface'][uid]['comment'] = from_entry(entry, 'comment')
-            self.data['interface'][uid]['last-link-down-time'] = from_entry(entry, 'last-link-down-time')
-            self.data['interface'][uid]['last-link-up-time'] = from_entry(entry, 'last-link-up-time')
-            self.data['interface'][uid]['link-downs'] = from_entry(entry, 'link-downs')
-            self.data['interface'][uid]['tx-queue-drop'] = from_entry(entry, 'tx-queue-drop')
-            self.data['interface'][uid]['actual-mtu'] = from_entry(entry, 'actual-mtu')
-            
-            self.data['interface_map'][self.data['interface'][uid]['name']] = self.data['interface'][uid]['default-name']
-
-            if interface_list:
-                interface_list += ","
-
-            interface_list += self.data['interface'][uid]['name']
-
-            if 'client-ip-address' not in self.data['interface'][uid]:
-                self.data['interface'][uid]['client-ip-address'] = ""
-
-            if 'client-mac-address' not in self.data['interface'][uid]:
-                self.data['interface'][uid]['client-mac-address'] = ""
-
-            if 'rx-bits-per-second' not in self.data['interface'][uid]:
-                self.data['interface'][uid]['rx-bits-per-second'] = 0
-
-            if 'tx-bits-per-second' not in self.data['interface'][uid]:
-                self.data['interface'][uid]['tx-bits-per-second'] = 0
-        
-        self.get_interface_traffic(interface_list)
-        
-        return
+        self.data['interface'] = parse_api(
+            data=self.data['interface'],
+            source=self.api.path("/interface"),
+            key='default-name',
+            vals=[
+                {'name': 'default-name'},
+                {'name': 'name', 'default_val': 'default-name'},
+                {'name': 'type', 'default': 'unknown'},
+                {'name': 'running', 'type': 'bool'},
+                {'name': 'enabled', 'source': 'disabled', 'type': 'bool', 'reverse': True},
+                {'name': 'port-mac-address', 'source': 'mac-address'},
+                {'name': 'comment'},
+                {'name': 'last-link-down-time'},
+                {'name': 'last-link-up-time'},
+                {'name': 'link-downs'},
+                {'name': 'tx-queue-drop'},
+                {'name': 'actual-mtu'}
+            ],
+            ensure_vals=[
+                {'name': 'client-ip-address'},
+                {'name': 'client-mac-address'},
+                {'name': 'rx-bits-per-second', 'default': 0},
+                {'name': 'tx-bits-per-second', 'default': 0}
+            ]
+        )
 
     # ---------------------------
     #   get_interface_traffic
     # ---------------------------
-    def get_interface_traffic(self, interface_list):
-        data = self.api.get_traffic(interface_list)
-        for entry in data:
-            uid = self.data['interface_map'][from_entry(entry, 'name')]
-            self.data['interface'][uid]['rx-bits-per-second'] = from_entry(entry, 'rx-bits-per-second', default=0)
-            self.data['interface'][uid]['tx-bits-per-second'] = from_entry(entry, 'tx-bits-per-second', default=0)
+    def get_interface_traffic(self):
+        """Get traffic for all interfaces from Mikrotik"""
+        interface_list = ""
+        for uid in self.data['interface']:
+            interface_list += self.data['interface'][uid]['name'] + ","
 
-        return
+        interface_list = interface_list[:-1]
+
+        self.data['interface'] = parse_api(
+            data=self.data['interface'],
+            source=self.api.get_traffic(interface_list),
+            key_search='name',
+            vals=[
+                {'name': 'rx-bits-per-second', 'default': 0},
+                {'name': 'tx-bits-per-second', 'default': 0},
+            ]
+        )
 
     # ---------------------------
     #   get_interface_client
@@ -267,7 +232,7 @@ class MikrotikControllerData():
             for uid in self.data['interface']:
                 self.data['interface'][uid]['client-ip-address'] = "disabled"
                 self.data['interface'][uid]['client-mac-address'] = "disabled"
-            return False
+            return
 
         mac2ip = {}
         bridge_used = False
@@ -283,8 +248,6 @@ class MikrotikControllerData():
 
             self.data['interface'][uid]['client-ip-address'] = from_entry(self.data['arp'][uid], 'address')
             self.data['interface'][uid]['client-mac-address'] = from_entry(self.data['arp'][uid], 'mac-address')
-
-        return True
 
     # ---------------------------
     #   update_arp
@@ -314,6 +277,7 @@ class MikrotikControllerData():
             if not uid:
                 continue
 
+            _LOGGER.debug("Processing entry %s, entry %s", "/interface/bridge/host", entry)
             # Create uid arp dict
             if uid not in self.data['arp']:
                 self.data['arp'][uid] = {}
@@ -344,6 +308,7 @@ class MikrotikControllerData():
             if not uid:
                 continue
 
+            _LOGGER.debug("Processing entry %s, entry %s", "/interface/bridge/host", entry)
             # Create uid arp dict
             if uid not in self.data['arp']:
                 self.data['arp'][uid] = {}
@@ -355,22 +320,17 @@ class MikrotikControllerData():
                 self.data['arp'][uid]['address'] = "multiple"
             else:
                 self.data['arp'][uid]['mac-address'] = from_entry(entry, 'mac-address')
-                self.data['arp'][uid]['address'] = ""
-
-            if self.data['arp'][uid]['address'] == "" and self.data['arp'][uid]['mac-address'] in mac2ip:
-                self.data['arp'][uid]['address'] = mac2ip[self.data['arp'][uid]['mac-address']]
-
-        return
+                self.data['arp'][uid]['address'] = mac2ip[self.data['arp'][uid]['mac-address']] if self.data['arp'][uid]['mac-address'] in mac2ip else ""
 
     # ---------------------------
     #   get_iface_from_entry
     # ---------------------------
     def get_iface_from_entry(self, entry):
-        """Get interface name from Mikrotik"""
+        """Get interface default-name using name from interface dict"""
         uid = None
         for ifacename in self.data['interface']:
             if self.data['interface'][ifacename]['name'] == entry['interface']:
-                uid = self.data['interface'][ifacename]['default-name']
+                uid = ifacename
                 break
 
         return uid
@@ -380,117 +340,114 @@ class MikrotikControllerData():
     # ---------------------------
     def get_nat(self):
         """Get NAT data from Mikrotik"""
-        data = self.api.path("/ip/firewall/nat")
-        if not data:
-            return
-
-        for entry in data:
-            if entry['action'] != 'dst-nat':
-                continue
-
-            uid = entry['.id']
-            if uid not in self.data['nat']:
-                self.data['nat'][uid] = {}
-
-            self.data['nat'][uid]['name'] = "{}:{}".format(entry['protocol'], entry['dst-port'])
-            self.data['nat'][uid]['.id'] = from_entry(entry, '.id')
-            self.data['nat'][uid]['protocol'] = from_entry(entry, 'protocol')
-            self.data['nat'][uid]['dst-port'] = from_entry(entry, 'dst-port')
-            self.data['nat'][uid]['in-interface'] = from_entry(entry, 'in-interface', 'any')
-            self.data['nat'][uid]['to-addresses'] = from_entry(entry, 'to-addresses')
-            self.data['nat'][uid]['to-ports'] = from_entry(entry, 'to-ports')
-            self.data['nat'][uid]['comment'] = from_entry(entry, 'comment')
-            self.data['nat'][uid]['enabled'] = from_entry_bool(entry, 'disabled', default=True, reverse=True)
-
-        return
+        self.data['nat'] = parse_api(
+            data=self.data['nat'],
+            source=self.api.path("/ip/firewall/nat"),
+            key='.id',
+            vals=[
+                {'name': '.id'},
+                {'name': 'protocol'},
+                {'name': 'dst-port'},
+                {'name': 'in-interface', 'default': 'any'},
+                {'name': 'to-addresses'},
+                {'name': 'to-ports'},
+                {'name': 'comment'},
+                {'name': 'enabled', 'source': 'disabled', 'type': 'bool', 'reverse': True}
+            ],
+            val_proc=[
+                [
+                    {'name': 'name'},
+                    {'action': 'combine'},
+                    {'key': 'protocol'},
+                    {'text': ':'},
+                    {'key': 'dst-port'}
+                ]
+            ],
+            only=[
+                {'key': 'action', 'value': 'dst-nat'}
+            ]
+        )
 
     # ---------------------------
     #   get_system_routerboard
     # ---------------------------
     def get_system_routerboard(self):
         """Get routerboard data from Mikrotik"""
-        data = self.api.path("/system/routerboard")
-        if not data:
-            return
-
-        for entry in data:
-            self.data['routerboard']['routerboard'] = from_entry_bool(entry, 'routerboard')
-            self.data['routerboard']['model'] = from_entry(entry, 'model', 'unknown')
-            self.data['routerboard']['serial-number'] = from_entry(entry, 'serial-number', 'unknown')
-            self.data['routerboard']['firmware'] = from_entry(entry, 'current-firmware', 'unknown')
-
-        return
+        self.data['routerboard'] = parse_api(
+            data=self.data['routerboard'],
+            source=self.api.path("/system/routerboard"),
+            vals=[
+                {'name': 'routerboard', 'type': 'bool'},
+                {'name': 'model', 'default': 'unknown'},
+                {'name': 'serial-number', 'default': 'unknown'},
+                {'name': 'firmware', 'default': 'unknown'}
+            ]
+        )
 
     # ---------------------------
     #   get_system_resource
     # ---------------------------
     def get_system_resource(self):
         """Get system resources data from Mikrotik"""
-        data = self.api.path("/system/resource")
-        if not data:
-            return
+        self.data['resource'] = parse_api(
+            data=self.data['resource'],
+            source=self.api.path("/system/resource"),
+            vals=[
+                {'name': 'platform', 'default': 'unknown'},
+                {'name': 'board-name', 'default': 'unknown'},
+                {'name': 'version', 'default': 'unknown'},
+                {'name': 'uptime', 'default': 'unknown'},
+                {'name': 'cpu-load', 'default': 'unknown'},
+                {'name': 'free-memory', 'default': 0},
+                {'name': 'total-memory', 'default': 0},
+                {'name': 'free-hdd-space', 'default': 0},
+                {'name': 'total-hdd-space', 'default': 0}
+            ]
+        )
 
-        for entry in data:
-            self.data['resource']['platform'] = from_entry(entry, 'platform', 'unknown')
-            self.data['resource']['board-name'] = from_entry(entry, 'board-name', 'unknown')
-            self.data['resource']['version'] = from_entry(entry, 'version', 'unknown')
-            self.data['resource']['uptime'] = from_entry(entry, 'uptime', 'unknown')
-            self.data['resource']['cpu-load'] = from_entry(entry, 'cpu-load', 'unknown')
-            if 'free-memory' in entry and 'total-memory' in entry:
-                self.data['resource']['memory-usage'] = round(((entry['total-memory'] - entry['free-memory']) / entry['total-memory']) * 100)
-            else:
-                self.data['resource']['memory-usage'] = "unknown"
+        if self.data['resource']['total-memory'] > 0:
+            self.data['resource']['memory-usage'] = round(((self.data['resource']['total-memory'] - self.data['resource']['free-memory']) / self.data['resource']['total-memory']) * 100)
+        else:
+            self.data['resource']['memory-usage'] = "unknown"
 
-            if 'free-hdd-space' in entry and 'total-hdd-space' in entry:
-                self.data['resource']['hdd-usage'] = round(((entry['total-hdd-space'] - entry['free-hdd-space']) / entry['total-hdd-space']) * 100)
-            else:
-                self.data['resource']['hdd-usage'] = "unknown"
-
-        return
+        if self.data['resource']['total-hdd-space'] > 0:
+            self.data['resource']['hdd-usage'] = round(((self.data['resource']['total-hdd-space'] - self.data['resource']['free-hdd-space']) / self.data['resource']['total-hdd-space']) * 100)
+        else:
+            self.data['resource']['hdd-usage'] = "unknown"
 
     # ---------------------------
     #   get_system_routerboard
     # ---------------------------
-    def get_firmare_update(self):
+    def get_firmware_update(self):
         """Check for firmware update on Mikrotik"""
-        data = self.api.path("/system/package/update")
-        if not data:
-            return
+        self.data['fw-update'] = parse_api(
+            data=self.data['fw-update'],
+            source=self.api.path("/system/package/update"),
+            vals=[
+                {'name': 'status'},
+                {'name': 'channel', 'default': 'unknown'},
+                {'name': 'installed-version', 'default': 'unknown'},
+                {'name': 'latest-version', 'default': 'unknown'}
+            ]
+        )
 
-        for entry in data:
-            if 'status' in entry:
-                self.data['fw-update']['available'] = True if entry['status'] == "New version is available" else False
-            elif 'available' not in self.data['fw-update']:
-                self.data['fw-update']['available'] = False
-            self.data['fw-update']['channel'] = from_entry(entry, 'channel', 'unknown')
-            self.data['fw-update']['installed-version'] = from_entry(entry, 'installed-version', 'unknown')
-            self.data['fw-update']['latest-version'] = from_entry(entry, 'latest-version', 'unknown')
-
-        return
+        if 'status' in self.data['fw-update']:
+            self.data['fw-update']['available'] = True if self.data['fw-update']['status'] == "New version is available" else False
+        else:
+            self.data['fw-update']['available'] = False
 
     # ---------------------------
     #   get_script
     # ---------------------------
     def get_script(self):
         """Get list of all scripts from Mikrotik"""
-        data = self.api.path("/system/script")
-        if not data:
-            return
-
-        for entry in data:
-            if 'name' not in entry:
-                continue
-
-            if not entry['name']:
-                _LOGGER.error("Mikrotik %s found a script without a name. It will not be available in UI.")
-                continue
-
-            uid = entry['name']
-            if uid not in self.data['script']:
-                self.data['script'][uid] = {}
-
-            self.data['script'][uid]['name'] = from_entry(entry, 'name')
-            self.data['script'][uid]['last-started'] = from_entry(entry, 'last-started', 'unknown')
-            self.data['script'][uid]['run-count'] = from_entry(entry, 'run-count', 'unknown')
-
-        return
+        self.data['script'] = parse_api(
+            data=self.data['script'],
+            source=self.api.path("/system/script"),
+            key='name',
+            vals=[
+                {'name': 'name'},
+                {'name': 'last-started', 'default': 'unknown'},
+                {'name': 'run-count', 'default': 'unknown'}
+            ]
+        )

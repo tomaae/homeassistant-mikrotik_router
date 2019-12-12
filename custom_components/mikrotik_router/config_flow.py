@@ -51,7 +51,6 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
 
     def __init__(self):
         """Initialize MikrotikControllerConfigFlow."""
-        return
 
     @staticmethod
     @callback
