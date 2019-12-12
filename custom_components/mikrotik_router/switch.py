@@ -94,8 +94,8 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
 
     # Add switches
     for sid, sid_func in zip(
-        ["interface", "nat", "script"],
-        [MikrotikControllerPortSwitch, MikrotikControllerNATSwitch, MikrotikControllerScriptSwitch]
+            ["interface", "nat", "script"],
+            [MikrotikControllerPortSwitch, MikrotikControllerNATSwitch, MikrotikControllerScriptSwitch]
     ):
         for uid in mikrotik_controller.data[sid]:
             item_id = "{}-{}-{}".format(inst, sid, mikrotik_controller.data[sid][uid]['name'])

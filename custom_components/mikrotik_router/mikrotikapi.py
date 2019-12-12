@@ -98,7 +98,7 @@ class MikrotikAPI:
         self.error = "cannot_connect"
         if error == "invalid user name or password (6)":
             self.error = "wrong_login"
-        
+
         if "ALERT_HANDSHAKE_FAILURE" in error:
             self.error = "ssl_handshake_failure"
 
@@ -122,7 +122,7 @@ class MikrotikAPI:
 
         try:
             response = self._connection.path(path)
-            _LOGGER.debug("API response ({}): {}".format(path, tuple(response)))
+            _LOGGER.debug("API response (%s): %s", path, tuple(response))
         except librouteros_custom.exceptions.ConnectionClosed:
             _LOGGER.error("Mikrotik %s connection closed", self._host)
             self._connected = False
@@ -247,11 +247,11 @@ class MikrotikAPI:
         response = self.path('/interface')
         if response is None:
             return None
-        
+
         args = {'interface': interfaces, 'once': True}
         try:
             traffic = response('monitor-traffic', **args)
-            _LOGGER.debug("API response ({}): {}".format("/interface/monitor-traffic", tuple(response)))
+            _LOGGER.debug("API response (%s): %s", "/interface/monitor-traffic", tuple(response))
         except librouteros_custom.exceptions.ConnectionClosed:
             _LOGGER.error("Mikrotik %s connection closed", self._host)
             self._connected = False

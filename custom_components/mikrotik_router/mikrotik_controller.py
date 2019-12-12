@@ -14,7 +14,7 @@ from .const import (
 )
 
 from .mikrotikapi import MikrotikAPI
-from .helper import from_entry, from_entry_bool, from_list
+from .helper import from_entry, from_list
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -101,8 +101,8 @@ class MikrotikControllerData():
     # ---------------------------
     async def hwinfo_update(self):
         """Update Mikrotik hardware info"""
-        self.get_system_routerboard()
-        self.get_system_resource()
+        await self.get_system_routerboard()
+        await self.get_system_resource()
         return
 
     # ---------------------------
@@ -111,7 +111,7 @@ class MikrotikControllerData():
     async def async_fwupdate_check(self):
         """Update Mikrotik data"""
 
-        self.get_firmware_update()
+        await self.get_firmware_update()
 
         async_dispatcher_send(self.hass, self.signal_update)
         return
@@ -128,9 +128,9 @@ class MikrotikControllerData():
         await self.get_interface()
         await self.get_interface_traffic()
         await self.get_interface_client()
-        self.get_nat()
-        self.get_system_resource()
-        self.get_script()
+        await self.get_nat()
+        await self.get_system_resource()
+        await self.get_script()
 
         async_dispatcher_send(self.hass, self.signal_update)
         return
@@ -274,7 +274,7 @@ class MikrotikControllerData():
             if not uid:
                 continue
 
-            _LOGGER.debug("Processing entry {}, entry {}".format("/interface/bridge/host", entry))
+            _LOGGER.debug("Processing entry %s, entry %s", "/interface/bridge/host", entry)
             # Create uid arp dict
             if uid not in self.data['arp']:
                 self.data['arp'][uid] = {}
@@ -305,7 +305,7 @@ class MikrotikControllerData():
             if not uid:
                 continue
 
-            _LOGGER.debug("Processing entry {}, entry {}".format("/interface/bridge/host", entry))
+            _LOGGER.debug("Processing entry %s, entry %s", "/interface/bridge/host", entry)
             # Create uid arp dict
             if uid not in self.data['arp']:
                 self.data['arp'][uid] = {}
@@ -337,7 +337,7 @@ class MikrotikControllerData():
     # ---------------------------
     #   get_nat
     # ---------------------------
-    def get_nat(self):
+    async def get_nat(self):
         """Get NAT data from Mikrotik"""
         self.data['nat'] = await from_list(
             data=self.data['nat'],
@@ -361,7 +361,7 @@ class MikrotikControllerData():
                     {'text': ':'},
                     {'key': 'dst-port'}
                 ]
-            ]
+            ],
             only=[
                 {'key': 'action', 'value': 'dst-nat'}
             ]
@@ -371,7 +371,7 @@ class MikrotikControllerData():
     # ---------------------------
     #   get_system_routerboard
     # ---------------------------
-    def get_system_routerboard(self):
+    async def get_system_routerboard(self):
         """Get routerboard data from Mikrotik"""
         self.data['routerboard'] = await from_list(
             data=self.data['routerboard'],
@@ -380,7 +380,7 @@ class MikrotikControllerData():
                 {'name': 'routerboard', 'type': 'bool'},
                 {'name': 'model', 'default': 'unknown'},
                 {'name': 'serial-number', 'default': 'unknown'},
-                {'name': 'firmware', 'default': 'unknown'},
+                {'name': 'firmware', 'default': 'unknown'}
             ]
         )
         return
@@ -388,7 +388,7 @@ class MikrotikControllerData():
     # ---------------------------
     #   get_system_resource
     # ---------------------------
-    def get_system_resource(self):
+    async def get_system_resource(self):
         """Get system resources data from Mikrotik"""
         self.data['resource'] = await from_list(
             data=self.data['resource'],
@@ -406,13 +406,13 @@ class MikrotikControllerData():
             ]
         )
 
-        if entry['total-memory'] > 0:
-            self.data['resource']['memory-usage'] = round(((entry['total-memory'] - entry['free-memory']) / entry['total-memory']) * 100)
+        if self.data['resource']['total-memory'] > 0:
+            self.data['resource']['memory-usage'] = round(((self.data['resource']['total-memory'] - self.data['resource']['free-memory']) / self.data['resource']['total-memory']) * 100)
         else:
             self.data['resource']['memory-usage'] = "unknown"
 
-        if entry['total-hdd-space'] > 0:
-            self.data['resource']['hdd-usage'] = round(((entry['total-hdd-space'] - entry['free-hdd-space']) / entry['total-hdd-space']) * 100)
+        if self.data['resource']['total-hdd-space'] > 0:
+            self.data['resource']['hdd-usage'] = round(((self.data['resource']['total-hdd-space'] - self.data['resource']['free-hdd-space']) / self.data['resource']['total-hdd-space']) * 100)
         else:
             self.data['resource']['hdd-usage'] = "unknown"
 
@@ -421,30 +421,30 @@ class MikrotikControllerData():
     # ---------------------------
     #   get_system_routerboard
     # ---------------------------
-    def get_firmware_update(self):
+    async def get_firmware_update(self):
         """Check for firmware update on Mikrotik"""
-       self.data['fw-update'] = await from_list(
-           data=self.data['fw-update'],
-           source=await self.hass.async_add_executor_job(self.api.path, "/system/package/update"),
-           vals=[
-               {'name': 'status'},
-               {'name': 'channel', 'default': 'unknown'},
-               {'name': 'installed-version', 'default': 'unknown'},
-               {'name': 'latest-version', 'default': 'unknown'}
-           ]
-       )
+        self.data['fw-update'] = await from_list(
+            data=self.data['fw-update'],
+            source=await self.hass.async_add_executor_job(self.api.path, "/system/package/update"),
+            vals=[
+                {'name': 'status'},
+                {'name': 'channel', 'default': 'unknown'},
+                {'name': 'installed-version', 'default': 'unknown'},
+                {'name': 'latest-version', 'default': 'unknown'}
+            ]
+        )
 
-       if status in self.data['fw-update']:
-           self.data['fw-update']['available'] = True if self.data['fw-update']['status'] == "New version is available" else False
-       else:
-           self.data['fw-update']['available'] = False
-        
-       return
+        if 'status' in self.data['fw-update']:
+            self.data['fw-update']['available'] = True if self.data['fw-update']['status'] == "New version is available" else False
+        else:
+            self.data['fw-update']['available'] = False
+
+        return
 
     # ---------------------------
     #   get_script
     # ---------------------------
-    def get_script(self):
+    async def get_script(self):
         """Get list of all scripts from Mikrotik"""
         self.data['script'] = await from_list(
             data=self.data['script'],

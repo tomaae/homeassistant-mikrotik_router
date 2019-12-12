@@ -42,7 +42,6 @@ async def from_list(data=None, source=None, key=None, key_search=None, vals=None
         return data
 
     keymap = generate_keymap(data, key_search)
-
     for entry in source:
         if only and not await matches_only(entry, only):
             continue
@@ -50,6 +49,7 @@ async def from_list(data=None, source=None, key=None, key_search=None, vals=None
         if skip and await can_skip(entry, skip):
             continue
 
+        uid = None
         if key or key_search:
             uid = await get_uid(entry, key, key_search, keymap)
             if not uid:
@@ -58,12 +58,9 @@ async def from_list(data=None, source=None, key=None, key_search=None, vals=None
             if uid not in data:
                 data[uid] = {}
 
-        else:
-            uid=None
-
-        _LOGGER.debug("Processing entry {}, entry {}".format(source, entry))
+        _LOGGER.debug("Processing entry %s, entry %s", source, entry)
         if vals:
-            data = await fill_vals(data, uid, vals)
+            data = await fill_vals(data, entry, uid, vals)
 
         if ensure_vals:
             data = await fill_ensure_vals(data, uid, ensure_vals)
@@ -89,7 +86,7 @@ async def get_uid(entry, key, key_search, keymap):
         if not keymap or key_search not in entry or entry[key_search] not in keymap:
             return False
 
-        uid = keymap[entry[key_search]]
+        key = keymap[entry[key_search]]
 
     return entry[key]
 
@@ -101,6 +98,7 @@ async def generate_keymap(data, key_search):
     if not key_search:
         return None
 
+    keymap = []
     for uid in data:
         if key_search not in uid:
             continue
@@ -114,34 +112,34 @@ async def generate_keymap(data, key_search):
 #   matches_only
 # ---------------------------
 async def matches_only(entry, only):
-    can_continue = False
+    ret = False
     for val in only:
         if val['name'] in entry and entry[val['name']] == val['value']:
-            can_continue = True
+            ret = True
         else:
-            can_continue = False
+            ret = False
             break
 
-    return can_continue
+    return ret
 
 
 # ---------------------------
 #   can_skip
 # ---------------------------
 async def can_skip(entry, skip):
-    can_skip = False
+    ret = False
     for val in skip:
         if val['name'] in entry and entry[val['name']] == val['value']:
-            can_skip = True
+            ret = True
             break
 
-    return can_skip
+    return ret
 
 
 # ---------------------------
 #   fill_vals
 # ---------------------------
-async def fill_vals(data, uid, vals):
+async def fill_vals(data, entry, uid, vals):
     for val in vals:
         _name = val['name']
         _type = val['type'] if 'type' in val else 'str'
@@ -185,12 +183,13 @@ async def fill_ensure_vals(data, uid, ensure_vals):
 
     return data
 
+
 # ---------------------------
 #   fill_vals_proc
 # ---------------------------
 async def fill_vals_proc(data, uid, vals_proc):
     _data = data[uid] if uid else data
-    for val_sub in val_proc:
+    for val_sub in vals_proc:
         _name = None
         _action = None
         _value = None
@@ -220,4 +219,3 @@ async def fill_vals_proc(data, uid, vals_proc):
                 data[_name] = _value
 
     return data
-
