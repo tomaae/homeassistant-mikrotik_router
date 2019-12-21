@@ -44,7 +44,6 @@ def parse_api(data=None, source=None, key=None, key_search=None, vals=None, val_
             data = fill_defaults(data, vals)
         return data
 
-    #print(type(source))
     keymap = generate_keymap(data, key_search)
     for entry in source:
         if only and not matches_only(entry, only):

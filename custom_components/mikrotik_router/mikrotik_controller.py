@@ -277,7 +277,7 @@ class MikrotikControllerData():
             if not uid:
                 continue
 
-            _LOGGER.debug("Processing entry %s, entry %s", "/interface/bridge/host", entry)
+            _LOGGER.debug("Processing entry %s, entry %s", "/ip/arp", entry)
             # Create uid arp dict
             if uid not in self.data['arp']:
                 self.data['arp'][uid] = {}
