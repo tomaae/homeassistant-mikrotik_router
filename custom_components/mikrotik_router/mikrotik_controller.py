@@ -346,8 +346,8 @@ class MikrotikControllerData():
             key='.id',
             vals=[
                 {'name': '.id'},
-                {'name': 'protocol'},
-                {'name': 'dst-port'},
+                {'name': 'protocol', 'default': 'any'},
+                {'name': 'dst-port', 'default': 'any'},
                 {'name': 'in-interface', 'default': 'any'},
                 {'name': 'to-addresses'},
                 {'name': 'to-ports'},
