@@ -4,6 +4,7 @@ import ssl
 import logging
 import os
 import sys
+import time
 import importlib
 from threading import Lock
 from .exceptions import ApiEntryNotFound
@@ -42,6 +43,8 @@ class MikrotikAPI:
 
         self._connection = None
         self._connected = False
+        self._connection_epoch = 0
+        self._connection_retry_sec = 58
         self.error = None
 
         # Default ports
@@ -55,6 +58,7 @@ class MikrotikAPI:
         """Connect to Mikrotik device."""
         self.error = ""
         self._connected = None
+        self._connection_epoch = time.time()
 
         kwargs = {
             "encoding": self._encoding,
@@ -124,6 +128,9 @@ class MikrotikAPI:
     def path(self, path) -> list:
         """Retrieve data from Mikrotik API."""
         if not self._connected or not self._connection:
+            if self._connection_epoch > time.time() - self._connection_retry_sec:
+                return None
+
             if not self.connect():
                 return None
 
@@ -167,6 +174,9 @@ class MikrotikAPI:
         """Modify a parameter"""
         entry_found = False
         if not self._connected or not self._connection:
+            if self._connection_epoch > time.time() - self._connection_retry_sec:
+                return None
+
             if not self.connect():
                 return False
 
@@ -229,6 +239,9 @@ class MikrotikAPI:
         """Run script"""
         entry_found = False
         if not self._connected or not self._connection:
+            if self._connection_epoch > time.time() - self._connection_retry_sec:
+                return None
+
             if not self.connect():
                 return False
 
@@ -287,6 +300,9 @@ class MikrotikAPI:
         """Get traffic stats"""
         traffic = None
         if not self._connected or not self._connection:
+            if self._connection_epoch > time.time() - self._connection_retry_sec:
+                return None
+
             if not self.connect():
                 return None
 
