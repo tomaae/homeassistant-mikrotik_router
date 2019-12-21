@@ -24,7 +24,7 @@ If applicable, add screenshots to help explain your problem.
 
 **Software (please complete the following information):**
  - Hass.io / Home Assistant version: [e.g. Hassio v192/ HA v0.102.3]
- - Mikrotik Router version: [e.g. v1.0.0]
+ - HA Mikrotik Router integration version: [e.g. v1.0.0]
  - Mikrotik Hardware: [e.g. RB4011iGS+]
  - Mikrotik Software version: [e.g. v6.45]
 
