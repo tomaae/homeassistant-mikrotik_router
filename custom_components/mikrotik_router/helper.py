@@ -40,6 +40,8 @@ def from_entry_bool(entry, param, default=False, reverse=False) -> bool:
 def parse_api(data=None, source=None, key=None, key_search=None, vals=None, val_proc=None, ensure_vals=None, only=None, skip=None) -> dict:
     """Get data from API"""
     if not source:
+        if not key and not key_search:
+            data = fill_defaults(data, vals)
         return data
 
     #print(type(source))
@@ -142,6 +144,33 @@ def can_skip(entry, skip) -> bool:
             break
 
     return ret
+
+
+# ---------------------------
+#   fill_defaults
+# ---------------------------
+def fill_defaults(data, vals) -> dict:
+    """Fill defaults if source is not present"""
+    for val in vals:
+        _name = val['name']
+        _type = val['type'] if 'type' in val else 'str'
+        _source = val['source'] if 'source' in val else _name
+
+        if _type == 'str':
+            _default = val['default'] if 'default' in val else ''
+            if 'default_val' in val and val['default_val'] in val:
+                _default = val[val['default_val']]
+
+            if _name not in data:
+                data[_name] = from_entry([], _source, default=_default)
+
+        elif _type == 'bool':
+            _default = val['default'] if 'default' in val else False
+            _reverse = val['reverse'] if 'reverse' in val else False
+            if _name not in data:
+                data[_name] = from_entry_bool([], _source, default=_default, reverse=_reverse)
+
+    return data
 
 
 # ---------------------------
