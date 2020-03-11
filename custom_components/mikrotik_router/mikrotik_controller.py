@@ -220,6 +220,12 @@ class MikrotikControllerData():
             ]
         )
 
+        for uid in self.data['interface']:
+            self.data['interface'][uid]['rx-bits-per-second'] = round(
+                self.data['interface'][uid]['rx-bits-per-second'] / 1000)
+            self.data['interface'][uid]['tx-bits-per-second'] = round(
+                self.data['interface'][uid]['tx-bits-per-second'] / 1000)
+
     # ---------------------------
     #   get_interface_client
     # ---------------------------
