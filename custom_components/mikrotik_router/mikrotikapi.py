@@ -52,6 +52,15 @@ class MikrotikAPI:
             self._port = 8729 if self._use_ssl else 8728
 
     # ---------------------------
+    #   disconnect
+    # ---------------------------
+    def disconnect(self) -> bool:
+        """Disconnect from Mikrotik device."""
+        self._connected = False
+        self._connection = None
+        self._connection_epoch = 0
+
+    # ---------------------------
     #   connect
     # ---------------------------
     def connect(self) -> bool:
@@ -157,10 +166,12 @@ class MikrotikAPI:
         ) as api_error:
             self.lock.release()
             _LOGGER.error("Mikrotik %s error while path %s", self._host, api_error)
+            self.disconnect()
             return None
         except:
             self.lock.release()
             _LOGGER.error("Mikrotik %s error while path %s", self._host, "unknown")
+            self.disconnect()
             return None
         else:
             self.lock.release()
@@ -218,10 +229,12 @@ class MikrotikAPI:
             ) as api_error:
                 self.lock.release()
                 _LOGGER.error("Mikrotik %s error while update %s", self._host, api_error)
+                self.disconnect()
                 return False
             except:
                 self.lock.release()
                 _LOGGER.error("Mikrotik %s error while update %s", self._host, "unknown")
+                self.disconnect()
                 return False
             else:
                 self.lock.release()
@@ -279,10 +292,12 @@ class MikrotikAPI:
             ) as api_error:
                 self.lock.release()
                 _LOGGER.error("Mikrotik %s error while run_script %s", self._host, api_error)
+                self.disconnect()
                 return False
             except:
                 self.lock.release()
                 _LOGGER.error("Mikrotik %s error while run_script %s", self._host, "unknown")
+                self.disconnect()
                 return False
             else:
                 self.lock.release()
@@ -333,10 +348,12 @@ class MikrotikAPI:
         ) as api_error:
             self.lock.release()
             _LOGGER.error("Mikrotik %s error while get_traffic %s", self._host, api_error)
+            self.disconnect()
             return None
         except:
             self.lock.release()
             _LOGGER.error("Mikrotik %s error while get_traffic %s", self._host, "unknown")
+            self.disconnect()
             return None
         else:
             self.lock.release()
