@@ -269,6 +269,9 @@ class MikrotikControllerData():
             if entry['invalid']:
                 continue
 
+            if 'interface' not in entry:
+                continue
+
             # Do not add ARP detected on bridge
             if entry['interface'] == "bridge":
                 bridge_used = True
