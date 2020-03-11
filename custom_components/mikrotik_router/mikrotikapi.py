@@ -329,7 +329,7 @@ class MikrotikAPI:
         self.lock.acquire()
         try:
             traffic = response('monitor-traffic', **args)
-            _LOGGER.debug("API response (%s): %s", "/interface/monitor-traffic", tuple(response))
+            _LOGGER.debug("API response (%s): %s", "/interface/monitor-traffic", traffic)
         except librouteros_custom.exceptions.ConnectionClosed:
             self.lock.release()
             _LOGGER.error("Mikrotik %s connection closed", self._host)
