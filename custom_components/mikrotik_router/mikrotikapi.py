@@ -146,8 +146,7 @@ class MikrotikAPI:
         self.lock.acquire()
         try:
             response = self._connection.path(path)
-            tmp = tuple(response)
-            _LOGGER.debug("API response (%s): %s", path, tmp)
+            _LOGGER.debug("API response (%s): %s", path, response)
         except librouteros_custom.exceptions.ConnectionClosed:
             self.lock.release()
             _LOGGER.error("Mikrotik %s connection closed", self._host)
@@ -173,9 +172,8 @@ class MikrotikAPI:
             _LOGGER.error("Mikrotik %s error while path %s", self._host, "unknown")
             self.disconnect()
             return None
-        else:
-            self.lock.release()
 
+        self.lock.release()
         return response if response else None
 
     # ---------------------------
