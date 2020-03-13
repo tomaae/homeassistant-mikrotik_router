@@ -172,6 +172,19 @@ class MikrotikAPI:
             self.lock.release()
             return None
 
+        try:
+            tuple(response)
+        except librouteros_custom.exceptions.ConnectionClosed as api_error:
+            _LOGGER.error("Mikrotik %s error while path %s", self._host, api_error)
+            self.disconnect()
+            self.lock.release()
+            return None
+        except:
+            _LOGGER.error("Mikrotik %s error while path %s", self._host, "unknown")
+            self.disconnect()
+            self.lock.release()
+            return None
+
         self.lock.release()
         return response if response else None
 

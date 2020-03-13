@@ -22,13 +22,13 @@ class SocketTransport:
         """
         data = bytearray()
         while len(data) != length:
+            tmp = None
             try:
                 tmp = self.sock.recv((length - len(data)))
             except:
                 raise ConnectionClosed('Socket recv failed.')
-            finally:
-                data += tmp
 
+            data += tmp
             if not data:
                 raise ConnectionClosed('Connection unexpectedly closed.')
         return data
