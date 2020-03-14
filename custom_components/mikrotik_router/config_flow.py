@@ -101,7 +101,7 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
     # ---------------------------
     #   _show_config_form
     # ---------------------------
-    def _show_config_form(self, host='10.0.0.1', username='admin', password='admin', port=0, name='Mikrotik', use_ssl=False, errors=None):
+    def _show_config_form(self, host='10.0.0.1', username='admin', password='admin', port=8728, name='Mikrotik', use_ssl=False, errors=None):
         """Show the configuration form to edit data."""
         return self.async_show_form(
             step_id='user',
