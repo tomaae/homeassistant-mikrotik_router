@@ -21,7 +21,16 @@ _LOGGER = logging.getLogger(__name__)
 class MikrotikAPI:
     """Handle all communication with the Mikrotik API."""
 
-    def __init__(self, host, username, password, port=0, use_ssl=True, login_method=DEFAULT_LOGIN_METHOD, encoding=DEFAULT_ENCODING):
+    def __init__(
+        self,
+        host,
+        username,
+        password,
+        port=0,
+        use_ssl=True,
+        login_method=DEFAULT_LOGIN_METHOD,
+        encoding=DEFAULT_ENCODING,
+    ):
         """Initialize the Mikrotik Client."""
         self._host = host
         self._use_ssl = use_ssl
@@ -76,24 +85,30 @@ class MikrotikAPI:
             kwargs["ssl_wrapper"] = self._ssl_wrapper
         self.lock.acquire()
         try:
-            self._connection = librouteros.connect(self._host, self._username, self._password, **kwargs)
+            self._connection = librouteros.connect(
+                self._host, self._username, self._password, **kwargs
+            )
         except (
-                librouteros.exceptions.TrapError,
-                librouteros.exceptions.MultiTrapError,
-                librouteros.exceptions.ConnectionClosed,
-                librouteros.exceptions.ProtocolError,
-                librouteros.exceptions.FatalError,
-                ssl.SSLError,
-                BrokenPipeError,
-                OSError
+            librouteros.exceptions.TrapError,
+            librouteros.exceptions.MultiTrapError,
+            librouteros.exceptions.ConnectionClosed,
+            librouteros.exceptions.ProtocolError,
+            librouteros.exceptions.FatalError,
+            ssl.SSLError,
+            BrokenPipeError,
+            OSError,
         ) as api_error:
-            _LOGGER.error("Mikrotik %s error while connecting: %s", self._host, api_error)
+            _LOGGER.error(
+                "Mikrotik %s error while connecting: %s", self._host, api_error
+            )
             self.error_to_strings("%s" % api_error)
             self._connection = None
             self.lock.release()
             return False
         except:
-            _LOGGER.error("Mikrotik %s error while connecting: %s", self._host, "Unknown")
+            _LOGGER.error(
+                "Mikrotik %s error while connecting: %s", self._host, "Unknown"
+            )
             self._connection = None
             self.lock.release()
             return False
@@ -145,14 +160,14 @@ class MikrotikAPI:
             self.lock.release()
             return None
         except (
-                librouteros.exceptions.TrapError,
-                librouteros.exceptions.MultiTrapError,
-                librouteros.exceptions.ProtocolError,
-                librouteros.exceptions.FatalError,
-                ssl.SSLError,
-                BrokenPipeError,
-                OSError,
-                ValueError
+            librouteros.exceptions.TrapError,
+            librouteros.exceptions.MultiTrapError,
+            librouteros.exceptions.ProtocolError,
+            librouteros.exceptions.FatalError,
+            ssl.SSLError,
+            BrokenPipeError,
+            OSError,
+            ValueError,
         ) as api_error:
             _LOGGER.error("Mikrotik %s error while path %s", self._host, api_error)
             self.disconnect()
@@ -205,10 +220,7 @@ class MikrotikAPI:
                 continue
 
             entry_found = True
-            params = {
-                '.id': tmp['.id'],
-                mod_param: mod_value
-            }
+            params = {".id": tmp[".id"], mod_param: mod_value}
 
             self.lock.acquire()
             try:
@@ -219,28 +231,32 @@ class MikrotikAPI:
                 self.lock.release()
                 return False
             except (
-                    librouteros.exceptions.TrapError,
-                    librouteros.exceptions.MultiTrapError,
-                    librouteros.exceptions.ProtocolError,
-                    librouteros.exceptions.FatalError,
-                    ssl.SSLError,
-                    BrokenPipeError,
-                    OSError,
-                    ValueError
+                librouteros.exceptions.TrapError,
+                librouteros.exceptions.MultiTrapError,
+                librouteros.exceptions.ProtocolError,
+                librouteros.exceptions.FatalError,
+                ssl.SSLError,
+                BrokenPipeError,
+                OSError,
+                ValueError,
             ) as api_error:
-                _LOGGER.error("Mikrotik %s error while update %s", self._host, api_error)
+                _LOGGER.error(
+                    "Mikrotik %s error while update %s", self._host, api_error
+                )
                 self.disconnect()
                 self.lock.release()
                 return False
             except:
-                _LOGGER.error("Mikrotik %s error while update %s", self._host, "unknown")
+                _LOGGER.error(
+                    "Mikrotik %s error while update %s", self._host, "unknown"
+                )
                 self.disconnect()
                 self.lock.release()
                 return False
 
         self.lock.release()
         if not entry_found:
-            error = "Parameter \"{}\" with value \"{}\" not found".format(param, value)
+            error = 'Parameter "{}" with value "{}" not found'.format(param, value)
             raise ApiEntryNotFound(error)
 
         return True
@@ -258,21 +274,21 @@ class MikrotikAPI:
             if not self.connect():
                 return False
 
-        response = self.path('/system/script')
+        response = self.path("/system/script")
         if response is None:
             return False
 
         for tmp in response:
-            if 'name' not in tmp:
+            if "name" not in tmp:
                 continue
 
-            if tmp['name'] != name:
+            if tmp["name"] != name:
                 continue
 
             entry_found = True
             self.lock.acquire()
             try:
-                run = response('run', **{'.id': tmp['.id']})
+                run = response("run", **{".id": tmp[".id"]})
                 tuple(run)
             except librouteros.exceptions.ConnectionClosed:
                 _LOGGER.error("Mikrotik %s connection closed", self._host)
@@ -280,28 +296,32 @@ class MikrotikAPI:
                 self.lock.release()
                 return False
             except (
-                    librouteros.exceptions.TrapError,
-                    librouteros.exceptions.MultiTrapError,
-                    librouteros.exceptions.ProtocolError,
-                    librouteros.exceptions.FatalError,
-                    ssl.SSLError,
-                    BrokenPipeError,
-                    OSError,
-                    ValueError
+                librouteros.exceptions.TrapError,
+                librouteros.exceptions.MultiTrapError,
+                librouteros.exceptions.ProtocolError,
+                librouteros.exceptions.FatalError,
+                ssl.SSLError,
+                BrokenPipeError,
+                OSError,
+                ValueError,
             ) as api_error:
-                _LOGGER.error("Mikrotik %s error while run_script %s", self._host, api_error)
+                _LOGGER.error(
+                    "Mikrotik %s error while run_script %s", self._host, api_error
+                )
                 self.disconnect()
                 self.lock.release()
                 return False
             except:
-                _LOGGER.error("Mikrotik %s error while run_script %s", self._host, "unknown")
+                _LOGGER.error(
+                    "Mikrotik %s error while run_script %s", self._host, "unknown"
+                )
                 self.disconnect()
                 self.lock.release()
                 return False
 
         self.lock.release()
         if not entry_found:
-            error = "Script \"{}\" not found".format(name)
+            error = 'Script "{}" not found'.format(name)
             raise ApiEntryNotFound(error)
 
         return True
@@ -319,36 +339,42 @@ class MikrotikAPI:
             if not self.connect():
                 return None
 
-        response = self.path('/interface')
+        response = self.path("/interface")
         if response is None:
             return None
 
-        args = {'interface': interfaces, 'once': True}
+        args = {"interface": interfaces, "once": True}
         self.lock.acquire()
         try:
-            traffic = response('monitor-traffic', **args)
-            _LOGGER.debug("API response (%s): %s", "/interface/monitor-traffic", traffic)
+            traffic = response("monitor-traffic", **args)
+            _LOGGER.debug(
+                "API response (%s): %s", "/interface/monitor-traffic", traffic
+            )
         except librouteros.exceptions.ConnectionClosed:
             _LOGGER.error("Mikrotik %s connection closed", self._host)
             self.disconnect()
             self.lock.release()
             return None
         except (
-                librouteros.exceptions.TrapError,
-                librouteros.exceptions.MultiTrapError,
-                librouteros.exceptions.ProtocolError,
-                librouteros.exceptions.FatalError,
-                ssl.SSLError,
-                BrokenPipeError,
-                OSError,
-                ValueError
+            librouteros.exceptions.TrapError,
+            librouteros.exceptions.MultiTrapError,
+            librouteros.exceptions.ProtocolError,
+            librouteros.exceptions.FatalError,
+            ssl.SSLError,
+            BrokenPipeError,
+            OSError,
+            ValueError,
         ) as api_error:
-            _LOGGER.error("Mikrotik %s error while get_traffic %s", self._host, api_error)
+            _LOGGER.error(
+                "Mikrotik %s error while get_traffic %s", self._host, api_error
+            )
             self.disconnect()
             self.lock.release()
             return None
         except:
-            _LOGGER.error("Mikrotik %s error while get_traffic %s", self._host, "unknown")
+            _LOGGER.error(
+                "Mikrotik %s error while get_traffic %s", self._host, "unknown"
+            )
             self.disconnect()
             self.lock.release()
             return None

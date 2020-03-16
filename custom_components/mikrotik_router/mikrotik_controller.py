@@ -272,7 +272,6 @@ class MikrotikControllerData:
             traffic_type = "bps"
             traffic_div = 1
 
-
         for uid in self.data["interface"]:
             self.data["interface"][uid]["rx-bits-per-second-attr"] = traffic_type
             self.data["interface"][uid]["tx-bits-per-second-attr"] = traffic_type
