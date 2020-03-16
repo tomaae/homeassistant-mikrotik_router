@@ -6,9 +6,13 @@ DATA_CLIENT = "client"
 ATTRIBUTION = "Data provided by Mikrotik"
 
 CONF_SCAN_INTERVAL = "scan_interval"
+CONF_UNIT_OF_MEASUREMENT = "unit_of_measurement"
 DEFAULT_SCAN_INTERVAL = 30
 CONF_TRACK_ARP = "track_arp"
 DEFAULT_TRACK_ARP = True
 
 DEFAULT_ENCODING = "ISO-8859-1"
 DEFAULT_LOGIN_METHOD = "plain"
+
+DEFAULT_TRAFFIC_TYPE = "mbps"
+TRAFFIC_TYPES = ["bps", "kbps", "mbps"]

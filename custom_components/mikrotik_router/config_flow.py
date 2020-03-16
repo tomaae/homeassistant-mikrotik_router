@@ -12,6 +12,7 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_HOST,
     CONF_PORT,
+    CONF_UNIT_OF_MEASUREMENT,
     CONF_USERNAME,
     CONF_PASSWORD,
     CONF_SSL,
@@ -23,6 +24,8 @@ from .const import (
     DEFAULT_TRACK_ARP,
     CONF_SCAN_INTERVAL,
     DEFAULT_SCAN_INTERVAL,
+    DEFAULT_TRAFFIC_TYPE,
+    TRAFFIC_TYPES,
 )
 
 from .mikrotikapi import MikrotikAPI
@@ -109,6 +112,7 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_HOST, default=host): str,
                 vol.Required(CONF_USERNAME, default=username): str,
                 vol.Required(CONF_PASSWORD, default=password): str,
+                vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=DEFAULT_TRAFFIC_TYPE): vol.In(TRAFFIC_TYPES),
                 vol.Optional(CONF_PORT, default=port): int,
                 vol.Optional(CONF_NAME, default=name): str,
                 vol.Optional(CONF_SSL, default=use_ssl): bool,
@@ -154,6 +158,12 @@ class MikrotikControllerOptionsFlowHandler(OptionsFlow):
                             CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
                         ),
                     ): int,
+                    vol.Optional(
+                        CONF_UNIT_OF_MEASUREMENT,
+                        default=self.config_entry.options.get(
+                            CONF_UNIT_OF_MEASUREMENT, DEFAULT_TRAFFIC_TYPE
+                        ),
+                    ): vol.In(TRAFFIC_TYPES),
                 }
             ),
         )

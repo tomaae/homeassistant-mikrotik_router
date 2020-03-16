@@ -22,6 +22,7 @@ _LOGGER = logging.getLogger(__name__)
 ATTR_ICON = "icon"
 ATTR_LABEL = "label"
 ATTR_UNIT = "unit"
+ATTR_UNIT_ATTR = "unit_attr"
 ATTR_GROUP = "group"
 ATTR_PATH = "data_path"
 ATTR_ATTR = "data_attr"
@@ -58,7 +59,8 @@ SENSOR_TYPES = {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:upload-network-outline",
         ATTR_LABEL: 'TX',
-        ATTR_UNIT: "kbps",
+        ATTR_UNIT: "ps",
+        ATTR_UNIT_ATTR: "tx-bits-per-second-attr",
         ATTR_PATH: "interface",
         ATTR_ATTR: "tx-bits-per-second",
     },
@@ -66,7 +68,8 @@ SENSOR_TYPES = {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:download-network-outline",
         ATTR_LABEL: 'RX',
-        ATTR_UNIT: "kbps",
+        ATTR_UNIT: "ps",
+        ATTR_UNIT_ATTR: "rx-bits-per-second-attr",
         ATTR_PATH: "interface",
         ATTR_ATTR: "rx-bits-per-second",
     },
@@ -188,7 +191,11 @@ class MikrotikControllerSensor(Entity):
     @property
     def unit_of_measurement(self):
         """Return the unit the value is expressed in."""
-        return self._type[ATTR_UNIT]
+        if ATTR_UNIT_ATTR in self._type:
+            return self._data[SENSOR_TYPES[self._sensor][ATTR_UNIT_ATTR]]
+
+        if ATTR_UNIT in self._type:
+            return self._type[ATTR_UNIT]
 
     @property
     def available(self) -> bool:

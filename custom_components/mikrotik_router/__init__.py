@@ -6,6 +6,7 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_HOST,
     CONF_PORT,
+    CONF_UNIT_OF_MEASUREMENT,
     CONF_USERNAME,
     CONF_PASSWORD,
     CONF_SSL,
@@ -16,6 +17,7 @@ from .mikrotik_controller import MikrotikControllerData
 from .const import (
     DOMAIN,
     DATA_CLIENT,
+    DEFAULT_TRAFFIC_TYPE,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -42,8 +44,12 @@ async def async_setup_entry(hass, config_entry):
     username = config_entry.data[CONF_USERNAME]
     password = config_entry.data[CONF_PASSWORD]
     use_ssl = config_entry.data[CONF_SSL]
+    if CONF_UNIT_OF_MEASUREMENT in config_entry.data:
+        traffic_type = config_entry.data[CONF_UNIT_OF_MEASUREMENT]
+    else:
+        traffic_type = DEFAULT_TRAFFIC_TYPE
 
-    mikrotik_controller = MikrotikControllerData(hass, config_entry, name, host, port, username, password, use_ssl)
+    mikrotik_controller = MikrotikControllerData(hass, config_entry, name, host, port, username, password, use_ssl, traffic_type)
     await mikrotik_controller.hwinfo_update()
     await mikrotik_controller.async_update()
 

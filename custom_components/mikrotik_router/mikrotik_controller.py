@@ -11,7 +11,9 @@ from .const import (
     CONF_TRACK_ARP,
     DEFAULT_TRACK_ARP,
     CONF_SCAN_INTERVAL,
+    CONF_UNIT_OF_MEASUREMENT,
     DEFAULT_SCAN_INTERVAL,
+    DEFAULT_TRAFFIC_TYPE,
 )
 
 from .mikrotikapi import MikrotikAPI
@@ -26,11 +28,12 @@ _LOGGER = logging.getLogger(__name__)
 # ---------------------------
 class MikrotikControllerData():
     """MikrotikController Class"""
-    def __init__(self, hass, config_entry, name, host, port, username, password, use_ssl):
+    def __init__(self, hass, config_entry, name, host, port, username, password, use_ssl, traffic_type):
         """Initialize MikrotikController."""
         self.name = name
         self.hass = hass
         self.config_entry = config_entry
+        self.traffic_type = traffic_type
 
         self.data = {'routerboard': {},
                      'resource': {},
@@ -79,6 +82,14 @@ class MikrotikControllerData():
         """Config entry option scan interval."""
         scan_interval = self.config_entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
         return timedelta(seconds=scan_interval)
+
+    # ---------------------------
+    #   option_traffic_type
+    # ---------------------------
+    @property
+    def option_traffic_type(self):
+        """Config entry option to not track ARP."""
+        return self.config_entry.options.get(CONF_UNIT_OF_MEASUREMENT, DEFAULT_TRAFFIC_TYPE)
 
     # ---------------------------
     #   signal_update
@@ -220,11 +231,21 @@ class MikrotikControllerData():
             ]
         )
 
+        traffic_type = self.option_traffic_type
+        if traffic_type == "bps":
+            traffic_div = 1
+        elif traffic_type == "kbps":
+            traffic_div = 1000
+        elif traffic_type == "mbps":
+            traffic_div = 1000000
+
         for uid in self.data['interface']:
+            self.data['interface'][uid]['rx-bits-per-second-attr'] = traffic_type
+            self.data['interface'][uid]['tx-bits-per-second-attr'] = traffic_type
             self.data['interface'][uid]['rx-bits-per-second'] = round(
-                self.data['interface'][uid]['rx-bits-per-second'] / 1000)
+                self.data['interface'][uid]['rx-bits-per-second'] / traffic_div)
             self.data['interface'][uid]['tx-bits-per-second'] = round(
-                self.data['interface'][uid]['tx-bits-per-second'] / 1000)
+                self.data['interface'][uid]['tx-bits-per-second'] / traffic_div)
 
     # ---------------------------
     #   get_interface_client
