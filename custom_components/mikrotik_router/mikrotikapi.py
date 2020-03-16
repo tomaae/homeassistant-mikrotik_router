@@ -433,5 +433,28 @@ class MikrotikAPI:
             self.lock.release()
             return None
 
+        try:
+            tuple(response)
+        except librouteros.exceptions.ConnectionClosed as api_error:
+            if not self.connection_error_reported:
+                _LOGGER.error(
+                    "Mikrotik %s error while get_traffic %s", self._host, api_error
+                )
+                self.connection_error_reported = True
+
+            self.disconnect()
+            self.lock.release()
+            return None
+        except:
+            if not self.connection_error_reported:
+                _LOGGER.error(
+                    "Mikrotik %s error while get_traffic %s", self._host, "unknown"
+                )
+                self.connection_error_reported = True
+
+            self.disconnect()
+            self.lock.release()
+            return None
+
         self.lock.release()
         return traffic if traffic else None
