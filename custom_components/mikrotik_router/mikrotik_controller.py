@@ -258,21 +258,29 @@ class MikrotikControllerData:
         )
 
         traffic_type = self.option_traffic_type
-        if traffic_type == "bps":
+        if traffic_type == "Kbps":
+            traffic_div = 0.001
+        elif traffic_type == "Mbps":
+            traffic_div = 0.000001
+        elif traffic_type == "B/s":
+            traffic_div = 0.125
+        elif traffic_type == "KB/s":
+            traffic_div = 0.000125
+        elif traffic_type == "MB/s":
+            traffic_div = 0.000000125
+        else:
+            traffic_type = "bps"
             traffic_div = 1
-        elif traffic_type == "kbps":
-            traffic_div = 1000
-        elif traffic_type == "mbps":
-            traffic_div = 1000000
+
 
         for uid in self.data["interface"]:
             self.data["interface"][uid]["rx-bits-per-second-attr"] = traffic_type
             self.data["interface"][uid]["tx-bits-per-second-attr"] = traffic_type
             self.data["interface"][uid]["rx-bits-per-second"] = round(
-                self.data["interface"][uid]["rx-bits-per-second"] / traffic_div
+                self.data["interface"][uid]["rx-bits-per-second"] * traffic_div
             )
             self.data["interface"][uid]["tx-bits-per-second"] = round(
-                self.data["interface"][uid]["tx-bits-per-second"] / traffic_div
+                self.data["interface"][uid]["tx-bits-per-second"] * traffic_div
             )
 
     # ---------------------------

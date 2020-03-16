@@ -14,5 +14,5 @@ DEFAULT_TRACK_ARP = True
 DEFAULT_ENCODING = "ISO-8859-1"
 DEFAULT_LOGIN_METHOD = "plain"
 
-DEFAULT_TRAFFIC_TYPE = "mbps"
-TRAFFIC_TYPES = ["bps", "kbps", "mbps"]
+DEFAULT_TRAFFIC_TYPE = "Kbps"
+TRAFFIC_TYPES = ["bps", "Kbps", "Mbps", "B/s", "KB/s", "MB/s"]
