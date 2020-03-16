@@ -256,7 +256,7 @@ class MikrotikAPI:
 
         self.lock.release()
         if not entry_found:
-            error = 'Parameter "{}" with value "{}" not found'.format(param, value)
+            error = f'Parameter "{param}" with value "{value}" not found'
             raise ApiEntryNotFound(error)
 
         return True
@@ -321,7 +321,7 @@ class MikrotikAPI:
 
         self.lock.release()
         if not entry_found:
-            error = 'Script "{}" not found'.format(name)
+            error = f'Script "{name}" not found'
             raise ApiEntryNotFound(error)
 
         return True

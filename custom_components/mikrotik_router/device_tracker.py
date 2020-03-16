@@ -80,8 +80,8 @@ def update_items(inst, mikrotik_controller, async_add_entities, tracked):
 
     for uid in mikrotik_controller.data["interface"]:
         if mikrotik_controller.data["interface"][uid]["type"] == "ether":
-            item_id = "{}-{}".format(
-                inst, mikrotik_controller.data["interface"][uid]["default-name"]
+            item_id = (
+                f"{inst}-{mikrotik_controller.data['interface'][uid]['default-name']}"
             )
             if item_id in tracked:
                 if tracked[item_id].enabled:
@@ -143,12 +143,12 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
     @property
     def name(self):
         """Return the name of the port."""
-        return "{} {}".format(self._inst, self._data["default-name"])
+        return f"{self._inst} {self._data['default-name']}"
 
     @property
     def unique_id(self):
         """Return a unique identifier for this port."""
-        return "{}-{}".format(self._inst.lower(), self._data["port-mac-address"])
+        return f"{self._inst.lower()}-{self._data['port-mac-address']}"
 
     @property
     def available(self) -> bool:

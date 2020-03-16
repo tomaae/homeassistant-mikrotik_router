@@ -118,7 +118,7 @@ class MikrotikControllerData:
     @property
     def signal_update(self):
         """Event to signal new data."""
-        return "{}-update-{}".format(DOMAIN, self.name)
+        return f"{DOMAIN}-update-{self.name}"
 
     # ---------------------------
     #   connected

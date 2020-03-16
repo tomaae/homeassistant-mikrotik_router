@@ -109,7 +109,7 @@ def update_items(inst, mikrotik_controller, async_add_entities, sensors):
 
     for sensor in SENSOR_TYPES:
         if "traffic_" not in sensor:
-            item_id = "{}-{}".format(inst, sensor)
+            item_id = f"{inst}-{sensor}"
             if item_id in sensors:
                 if sensors[item_id].enabled:
                     sensors[item_id].async_schedule_update_ha_state()
@@ -123,11 +123,7 @@ def update_items(inst, mikrotik_controller, async_add_entities, sensors):
         if "traffic_" in sensor:
             for uid in mikrotik_controller.data["interface"]:
                 if mikrotik_controller.data["interface"][uid]["type"] == "ether":
-                    item_id = "{}-{}-{}".format(
-                        inst,
-                        sensor,
-                        mikrotik_controller.data["interface"][uid]["default-name"],
-                    )
+                    item_id = f"{inst}-{sensor}-{mikrotik_controller.data['interface'][uid]['default-name']}"
                     if item_id in sensors:
                         if sensors[item_id].enabled:
                             sensors[item_id].async_schedule_update_ha_state()
@@ -169,7 +165,7 @@ class MikrotikControllerSensor(Entity):
     @property
     def name(self):
         """Return the name."""
-        return "{} {}".format(self._inst, self._type[ATTR_LABEL])
+        return f"{self._inst} {self._type[ATTR_LABEL]}"
 
     @property
     def state(self):
@@ -199,7 +195,7 @@ class MikrotikControllerSensor(Entity):
     @property
     def unique_id(self):
         """Return a unique_id for this entity."""
-        return "{}-{}".format(self._inst.lower(), self._sensor.lower())
+        return f"{self._inst.lower()}-{self._sensor.lower()}"
 
     @property
     def unit_of_measurement(self):
@@ -257,14 +253,12 @@ class MikrotikControllerTrafficSensor(MikrotikControllerSensor):
     @property
     def name(self):
         """Return the name."""
-        return "{} {} {}".format(self._inst, self._data["name"], self._type[ATTR_LABEL])
+        return f"{self._inst} {self._data['name']} {self._type[ATTR_LABEL]}"
 
     @property
     def unique_id(self):
         """Return a unique_id for this entity."""
-        return "{}-{}-{}".format(
-            self._inst.lower(), self._sensor.lower(), self._data["default-name"].lower()
-        )
+        return f"{self._inst.lower()}-{self._sensor.lower()}-{self._data['default-name'].lower()}"
 
     @property
     def device_info(self):

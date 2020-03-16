@@ -63,7 +63,7 @@ def update_items(inst, mikrotik_controller, async_add_entities, sensors):
     new_sensors = []
 
     for sensor in SENSOR_TYPES:
-        item_id = "{}-{}".format(inst, sensor)
+        item_id = f"{inst}-{sensor}"
         if item_id in sensors:
             if sensors[item_id].enabled:
                 sensors[item_id].async_schedule_update_ha_state()
@@ -99,7 +99,7 @@ class MikrotikControllerBinarySensor(BinarySensorDevice):
     @property
     def name(self):
         """Return the name."""
-        return "{} {}".format(self._inst, self._type[ATTR_LABEL])
+        return f"{self._inst} {self._type[ATTR_LABEL]}"
 
     @property
     def device_state_attributes(self):
@@ -109,7 +109,7 @@ class MikrotikControllerBinarySensor(BinarySensorDevice):
     @property
     def unique_id(self):
         """Return a unique_id for this entity."""
-        return "{}-{}".format(self._inst.lower(), self._sensor.lower())
+        return f"{self._inst.lower()}-{self._sensor.lower()}"
 
     @property
     def available(self) -> bool:

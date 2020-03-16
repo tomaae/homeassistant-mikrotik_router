@@ -103,9 +103,7 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
         ],
     ):
         for uid in mikrotik_controller.data[sid]:
-            item_id = "{}-{}-{}".format(
-                inst, sid, mikrotik_controller.data[sid][uid]["name"]
-            )
+            item_id = f"{inst}-{sid}-{mikrotik_controller.data[sid][uid]['name']}"
             if item_id in switches:
                 if switches[item_id].enabled:
                     switches[item_id].async_schedule_update_ha_state()
@@ -170,14 +168,12 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
     @property
     def name(self) -> str:
         """Return the name of the port."""
-        return "{} port {}".format(self._inst, self._data["default-name"])
+        return f"{self._inst} port {self._data['default-name']}"
 
     @property
     def unique_id(self) -> str:
         """Return a unique identifier for this port."""
-        return "{}-enable_switch-{}".format(
-            self._inst.lower(), self._data["port-mac-address"]
-        )
+        return f"{self._inst.lower()}-enable_switch-{self._data['port-mac-address']}"
 
     @property
     def icon(self):
@@ -262,12 +258,12 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
     @property
     def name(self) -> str:
         """Return the name of the NAT switch."""
-        return "{} NAT {}".format(self._inst, self._data["name"])
+        return f"{self._inst} NAT {self._data['name']}"
 
     @property
     def unique_id(self) -> str:
         """Return a unique identifier for this NAT switch."""
-        return "{}-nat_switch-{}".format(self._inst.lower(), self._data["name"])
+        return f"{self._inst.lower()}-nat_switch-{self._data['name']}"
 
     @property
     def icon(self):
@@ -315,8 +311,9 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
         param = ".id"
         value = None
         for uid in self._ctrl.data["nat"]:
-            if self._ctrl.data["nat"][uid]["name"] == "{}:{}".format(
-                self._data["protocol"], self._data["dst-port"]
+            if (
+                self._ctrl.data["nat"][uid]["name"]
+                == f"{self._data['protocol']}:{self._data['dst-port']}"
             ):
                 value = self._ctrl.data["nat"][uid][".id"]
 
@@ -331,8 +328,9 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
         param = ".id"
         value = None
         for uid in self._ctrl.data["nat"]:
-            if self._ctrl.data["nat"][uid]["name"] == "{}:{}".format(
-                self._data["protocol"], self._data["dst-port"]
+            if (
+                self._ctrl.data["nat"][uid]["name"]
+                == f"{self._data['protocol']}:{self._data['dst-port']}"
             ):
                 value = self._ctrl.data["nat"][uid][".id"]
 
@@ -369,12 +367,12 @@ class MikrotikControllerScriptSwitch(MikrotikControllerSwitch):
     @property
     def name(self) -> str:
         """Return the name of the script switch."""
-        return "{} script {}".format(self._inst, self._data["name"])
+        return f"{self._inst} script {self._data['name']}"
 
     @property
     def unique_id(self) -> str:
         """Return a unique identifier for this script switch."""
-        return "{}-script_switch-{}".format(self._inst.lower(), self._data["name"])
+        return f"{self._inst.lower()}-script_switch-{self._data['name']}"
 
     @property
     def icon(self):

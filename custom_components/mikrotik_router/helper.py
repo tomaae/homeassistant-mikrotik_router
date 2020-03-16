@@ -267,14 +267,14 @@ def fill_vals_proc(data, uid, vals_proc) -> dict:
                     if not _value:
                         _value = tmp
                     else:
-                        _value = "{}{}".format(_value, tmp)
+                        _value = f"{_value}{tmp}"
 
                 if "text" in val:
                     tmp = val["text"]
                     if not _value:
                         _value = tmp
                     else:
-                        _value = "{}{}".format(_value, tmp)
+                        _value = f"{_value}{tmp}"
 
         if _name and _value:
             if uid:
