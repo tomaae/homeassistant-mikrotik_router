@@ -113,7 +113,7 @@ class MikrotikAPI:
             self.lock.release()
             return False
         else:
-            _LOGGER.info("Mikrotik Connected to %s", self._host)
+            _LOGGER.debug("Mikrotik Connected to %s", self._host)
             self._connected = True
             self.lock.release()
 
