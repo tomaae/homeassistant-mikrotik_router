@@ -21,7 +21,7 @@ Features:
  * Interface device tracker
  * Enable/disable interface switches
  * Enable/disable NAT rule switches
- * RX/TX traffic sensors per interface
+ * RX/TX traffic sensors per interface (configurable measurement in bps/kbps or mpbs)
  * System sensors (CPU, Memory, HDD)
  * Firmware update binary sensor
  * Switches to run scripts
@@ -34,11 +34,13 @@ You can add this integration several times for different devices.
 * "Host" - Use hostname or IP
 * "Port" - Leave at 0 for defaults
 * "Name of the integration" - Friendy name for this router
+* "Unit of measurement" - Traffic sensor measurement in bps/kbps/mbps
 
 # Configuration
 ![Integration options](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/integration_options.png)
 * "Show client MAC and IP" - Display connected IP and MAC address for devices connected to ports on router.
 * "Scan interval" - Scan/refresh time in seconds. HA needs to be reloaded for scan interval change to be applied.
+* "Unit of measurement" - Traffic sensor measurement in bps/kbps/mbps
 
 ## List of detected devices
 ![Integration options](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/integration_devices.png)
