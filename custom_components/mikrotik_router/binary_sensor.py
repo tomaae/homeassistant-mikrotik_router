@@ -23,8 +23,8 @@ ATTR_PATH = "data_path"
 ATTR_ATTR = "data_attr"
 
 SENSOR_TYPES = {
-    'system_fwupdate': {
-        ATTR_LABEL: 'Firmware update',
+    "system_fwupdate": {
+        ATTR_LABEL: "Firmware update",
         ATTR_GROUP: "System",
         ATTR_PATH: "fw-update",
         ATTR_ATTR: "available",
@@ -47,7 +47,9 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         update_items(inst, mikrotik_controller, async_add_entities, sensors)
 
     mikrotik_controller.listeners.append(
-        async_dispatcher_connect(hass, mikrotik_controller.signal_update, update_controller)
+        async_dispatcher_connect(
+            hass, mikrotik_controller.signal_update, update_controller
+        )
     )
     update_controller()
 
@@ -67,7 +69,9 @@ def update_items(inst, mikrotik_controller, async_add_entities, sensors):
                 sensors[item_id].async_schedule_update_ha_state()
             continue
 
-        sensors[item_id] = MikrotikControllerBinarySensor(mikrotik_controller=mikrotik_controller, inst=inst, sensor=sensor)
+        sensors[item_id] = MikrotikControllerBinarySensor(
+            mikrotik_controller=mikrotik_controller, inst=inst, sensor=sensor
+        )
         new_sensors.append(sensors[item_id])
 
     if new_sensors:
@@ -116,9 +120,17 @@ class MikrotikControllerBinarySensor(BinarySensorDevice):
     def device_info(self):
         """Return a port description for device registry."""
         info = {
-            "identifiers": {(DOMAIN, "serial-number", self._ctrl.data['routerboard']['serial-number'], "switch", "PORT")},
-            "manufacturer": self._ctrl.data['resource']['platform'],
-            "model": self._ctrl.data['resource']['board-name'],
+            "identifiers": {
+                (
+                    DOMAIN,
+                    "serial-number",
+                    self._ctrl.data["routerboard"]["serial-number"],
+                    "switch",
+                    "PORT",
+                )
+            },
+            "manufacturer": self._ctrl.data["resource"]["platform"],
+            "model": self._ctrl.data["resource"]["board-name"],
             "name": self._type[ATTR_GROUP],
         }
         return info

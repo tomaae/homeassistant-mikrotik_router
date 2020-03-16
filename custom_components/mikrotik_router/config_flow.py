@@ -74,49 +74,63 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
                 errors["base"] = "name_exists"
 
             # Test connection
-            api = MikrotikAPI(host=user_input["host"],
-                              username=user_input["username"],
-                              password=user_input["password"],
-                              port=user_input["port"],
-                              use_ssl=user_input["ssl"]
-                              )
+            api = MikrotikAPI(
+                host=user_input["host"],
+                username=user_input["username"],
+                password=user_input["password"],
+                port=user_input["port"],
+                use_ssl=user_input["ssl"],
+            )
             if not api.connect():
                 errors[CONF_HOST] = api.error
 
             # Save instance
             if not errors:
                 return self.async_create_entry(
-                    title=user_input[CONF_NAME],
-                    data=user_input
+                    title=user_input[CONF_NAME], data=user_input
                 )
 
-            return self._show_config_form(host=user_input["host"],
-                                          username=user_input["username"],
-                                          password=user_input["password"],
-                                          port=user_input["port"],
-                                          name=user_input["name"],
-                                          use_ssl=user_input["ssl"],
-                                          errors=errors
-                                          )
+            return self._show_config_form(
+                host=user_input["host"],
+                username=user_input["username"],
+                password=user_input["password"],
+                port=user_input["port"],
+                name=user_input["name"],
+                use_ssl=user_input["ssl"],
+                errors=errors,
+            )
 
         return self._show_config_form(errors=errors)
 
     # ---------------------------
     #   _show_config_form
     # ---------------------------
-    def _show_config_form(self, host='10.0.0.1', username='admin', password='admin', port=0, name='Mikrotik', use_ssl=False, errors=None):
+    def _show_config_form(
+        self,
+        host="10.0.0.1",
+        username="admin",
+        password="admin",
+        port=0,
+        name="Mikrotik",
+        use_ssl=False,
+        errors=None,
+    ):
         """Show the configuration form to edit data."""
         return self.async_show_form(
-            step_id='user',
-            data_schema=vol.Schema({
-                vol.Required(CONF_HOST, default=host): str,
-                vol.Required(CONF_USERNAME, default=username): str,
-                vol.Required(CONF_PASSWORD, default=password): str,
-                vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=DEFAULT_TRAFFIC_TYPE): vol.In(TRAFFIC_TYPES),
-                vol.Optional(CONF_PORT, default=port): int,
-                vol.Optional(CONF_NAME, default=name): str,
-                vol.Optional(CONF_SSL, default=use_ssl): bool,
-            }),
+            step_id="user",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_HOST, default=host): str,
+                    vol.Required(CONF_USERNAME, default=username): str,
+                    vol.Required(CONF_PASSWORD, default=password): str,
+                    vol.Optional(
+                        CONF_UNIT_OF_MEASUREMENT, default=DEFAULT_TRAFFIC_TYPE
+                    ): vol.In(TRAFFIC_TYPES),
+                    vol.Optional(CONF_PORT, default=port): int,
+                    vol.Optional(CONF_NAME, default=name): str,
+                    vol.Optional(CONF_SSL, default=use_ssl): bool,
+                }
+            ),
             errors=errors,
         )
 

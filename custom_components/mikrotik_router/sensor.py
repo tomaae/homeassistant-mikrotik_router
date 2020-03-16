@@ -28,46 +28,46 @@ ATTR_PATH = "data_path"
 ATTR_ATTR = "data_attr"
 
 SENSOR_TYPES = {
-    'system_cpu-load': {
+    "system_cpu-load": {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:speedometer",
-        ATTR_LABEL: 'CPU load',
+        ATTR_LABEL: "CPU load",
         ATTR_UNIT: "%",
         ATTR_GROUP: "System",
         ATTR_PATH: "resource",
         ATTR_ATTR: "cpu-load",
     },
-    'system_memory-usage': {
+    "system_memory-usage": {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:memory",
-        ATTR_LABEL: 'Memory usage',
+        ATTR_LABEL: "Memory usage",
         ATTR_UNIT: "%",
         ATTR_GROUP: "System",
         ATTR_PATH: "resource",
         ATTR_ATTR: "memory-usage",
     },
-    'system_hdd-usage': {
+    "system_hdd-usage": {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:harddisk",
-        ATTR_LABEL: 'HDD usage',
+        ATTR_LABEL: "HDD usage",
         ATTR_UNIT: "%",
         ATTR_GROUP: "System",
         ATTR_PATH: "resource",
         ATTR_ATTR: "hdd-usage",
     },
-    'traffic_tx': {
+    "traffic_tx": {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:upload-network-outline",
-        ATTR_LABEL: 'TX',
+        ATTR_LABEL: "TX",
         ATTR_UNIT: "ps",
         ATTR_UNIT_ATTR: "tx-bits-per-second-attr",
         ATTR_PATH: "interface",
         ATTR_ATTR: "tx-bits-per-second",
     },
-    'traffic_rx': {
+    "traffic_rx": {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:download-network-outline",
-        ATTR_LABEL: 'RX',
+        ATTR_LABEL: "RX",
         ATTR_UNIT: "ps",
         ATTR_UNIT_ATTR: "rx-bits-per-second-attr",
         ATTR_PATH: "interface",
@@ -91,7 +91,9 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         update_items(inst, mikrotik_controller, async_add_entities, sensors)
 
     mikrotik_controller.listeners.append(
-        async_dispatcher_connect(hass, mikrotik_controller.signal_update, update_controller)
+        async_dispatcher_connect(
+            hass, mikrotik_controller.signal_update, update_controller
+        )
     )
 
     update_controller()
@@ -113,19 +115,30 @@ def update_items(inst, mikrotik_controller, async_add_entities, sensors):
                     sensors[item_id].async_schedule_update_ha_state()
                 continue
 
-            sensors[item_id] = MikrotikControllerSensor(mikrotik_controller=mikrotik_controller, inst=inst, sensor=sensor)
+            sensors[item_id] = MikrotikControllerSensor(
+                mikrotik_controller=mikrotik_controller, inst=inst, sensor=sensor
+            )
             new_sensors.append(sensors[item_id])
 
         if "traffic_" in sensor:
-            for uid in mikrotik_controller.data['interface']:
-                if mikrotik_controller.data['interface'][uid]['type'] == "ether":
-                    item_id = "{}-{}-{}".format(inst, sensor, mikrotik_controller.data['interface'][uid]['default-name'])
+            for uid in mikrotik_controller.data["interface"]:
+                if mikrotik_controller.data["interface"][uid]["type"] == "ether":
+                    item_id = "{}-{}-{}".format(
+                        inst,
+                        sensor,
+                        mikrotik_controller.data["interface"][uid]["default-name"],
+                    )
                     if item_id in sensors:
                         if sensors[item_id].enabled:
                             sensors[item_id].async_schedule_update_ha_state()
                         continue
 
-                    sensors[item_id] = MikrotikControllerTrafficSensor(mikrotik_controller=mikrotik_controller, inst=inst, sensor=sensor, uid=uid)
+                    sensors[item_id] = MikrotikControllerTrafficSensor(
+                        mikrotik_controller=mikrotik_controller,
+                        inst=inst,
+                        sensor=sensor,
+                        uid=uid,
+                    )
                     new_sensors.append(sensors[item_id])
 
     if new_sensors:
@@ -206,9 +219,17 @@ class MikrotikControllerSensor(Entity):
     def device_info(self):
         """Return a port description for device registry."""
         info = {
-            "identifiers": {(DOMAIN, "serial-number", self._ctrl.data['routerboard']['serial-number'], "switch", "PORT")},
-            "manufacturer": self._ctrl.data['resource']['platform'],
-            "model": self._ctrl.data['resource']['board-name'],
+            "identifiers": {
+                (
+                    DOMAIN,
+                    "serial-number",
+                    self._ctrl.data["routerboard"]["serial-number"],
+                    "switch",
+                    "PORT",
+                )
+            },
+            "manufacturer": self._ctrl.data["resource"]["platform"],
+            "model": self._ctrl.data["resource"]["board-name"],
             "name": self._type[ATTR_GROUP],
         }
         return info
@@ -236,24 +257,31 @@ class MikrotikControllerTrafficSensor(MikrotikControllerSensor):
     @property
     def name(self):
         """Return the name."""
-        return "{} {} {}".format(self._inst, self._data['name'], self._type[ATTR_LABEL])
+        return "{} {} {}".format(self._inst, self._data["name"], self._type[ATTR_LABEL])
 
     @property
     def unique_id(self):
         """Return a unique_id for this entity."""
-        return "{}-{}-{}".format(self._inst.lower(), self._sensor.lower(), self._data['default-name'].lower())
+        return "{}-{}-{}".format(
+            self._inst.lower(), self._sensor.lower(), self._data["default-name"].lower()
+        )
 
     @property
     def device_info(self):
         """Return a port description for device registry."""
         info = {
-            "connections": {(CONNECTION_NETWORK_MAC, self._data['port-mac-address'])},
-            "manufacturer": self._ctrl.data['resource']['platform'],
-            "model": self._ctrl.data['resource']['board-name'],
-            "name": self._data['default-name'],
+            "connections": {(CONNECTION_NETWORK_MAC, self._data["port-mac-address"])},
+            "manufacturer": self._ctrl.data["resource"]["platform"],
+            "model": self._ctrl.data["resource"]["board-name"],
+            "name": self._data["default-name"],
         }
         return info
 
     async def async_added_to_hass(self):
         """Port entity created."""
-        _LOGGER.debug("New sensor %s (%s %s)", self._inst, self._data['default-name'], self._sensor)
+        _LOGGER.debug(
+            "New sensor %s (%s %s)",
+            self._inst,
+            self._data["default-name"],
+            self._sensor,
+        )

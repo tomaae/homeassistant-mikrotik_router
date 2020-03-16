@@ -62,7 +62,9 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         update_items(inst, mikrotik_controller, async_add_entities, tracked)
 
     mikrotik_controller.listeners.append(
-        async_dispatcher_connect(hass, mikrotik_controller.signal_update, update_controller)
+        async_dispatcher_connect(
+            hass, mikrotik_controller.signal_update, update_controller
+        )
     )
 
     update_controller()
@@ -76,15 +78,19 @@ def update_items(inst, mikrotik_controller, async_add_entities, tracked):
     """Update tracked device state from the controller."""
     new_tracked = []
 
-    for uid in mikrotik_controller.data['interface']:
-        if mikrotik_controller.data['interface'][uid]['type'] == "ether":
-            item_id = "{}-{}".format(inst, mikrotik_controller.data['interface'][uid]['default-name'])
+    for uid in mikrotik_controller.data["interface"]:
+        if mikrotik_controller.data["interface"][uid]["type"] == "ether":
+            item_id = "{}-{}".format(
+                inst, mikrotik_controller.data["interface"][uid]["default-name"]
+            )
             if item_id in tracked:
                 if tracked[item_id].enabled:
                     tracked[item_id].async_schedule_update_ha_state()
                 continue
 
-            tracked[item_id] = MikrotikControllerPortDeviceTracker(inst, uid, mikrotik_controller)
+            tracked[item_id] = MikrotikControllerPortDeviceTracker(
+                inst, uid, mikrotik_controller
+            )
             new_tracked.append(tracked[item_id])
 
     if new_tracked:
@@ -101,7 +107,7 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
         """Set up tracked port."""
         self._inst = inst
         self._ctrl = mikrotik_controller
-        self._data = mikrotik_controller.data['interface'][uid]
+        self._data = mikrotik_controller.data["interface"][uid]
 
         self._attrs = {
             ATTR_ATTRIBUTION: ATTRIBUTION,
@@ -114,7 +120,12 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
 
     async def async_added_to_hass(self):
         """Port entity created."""
-        _LOGGER.debug("New port tracker %s (%s %s)", self._inst, self._data['default-name'], self._data['port-mac-address'])
+        _LOGGER.debug(
+            "New port tracker %s (%s %s)",
+            self._inst,
+            self._data["default-name"],
+            self._data["port-mac-address"],
+        )
 
     async def async_update(self):
         """Synchronize state with controller."""
@@ -122,7 +133,7 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
     @property
     def is_connected(self):
         """Return true if the port is connected to the network."""
-        return self._data['running']
+        return self._data["running"]
 
     @property
     def source_type(self):
@@ -132,12 +143,12 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
     @property
     def name(self):
         """Return the name of the port."""
-        return "{} {}".format(self._inst, self._data['default-name'])
+        return "{} {}".format(self._inst, self._data["default-name"])
 
     @property
     def unique_id(self):
         """Return a unique identifier for this port."""
-        return "{}-{}".format(self._inst.lower(), self._data['port-mac-address'])
+        return "{}-{}".format(self._inst.lower(), self._data["port-mac-address"])
 
     @property
     def available(self) -> bool:
@@ -147,13 +158,13 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
     @property
     def icon(self):
         """Return the icon."""
-        if self._data['running']:
-            icon = 'mdi:lan-connect'
+        if self._data["running"]:
+            icon = "mdi:lan-connect"
         else:
-            icon = 'mdi:lan-pending'
+            icon = "mdi:lan-pending"
 
-        if not self._data['enabled']:
-            icon = 'mdi:lan-disconnect'
+        if not self._data["enabled"]:
+            icon = "mdi:lan-disconnect"
 
         return icon
 
@@ -161,10 +172,10 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
     def device_info(self):
         """Return a port description for device registry."""
         info = {
-            "connections": {(CONNECTION_NETWORK_MAC, self._data['port-mac-address'])},
-            "manufacturer": self._ctrl.data['resource']['platform'],
-            "model": self._ctrl.data['resource']['board-name'],
-            "name": self._data['default-name'],
+            "connections": {(CONNECTION_NETWORK_MAC, self._data["port-mac-address"])},
+            "manufacturer": self._ctrl.data["resource"]["platform"],
+            "model": self._ctrl.data["resource"]["board-name"],
+            "name": self._data["default-name"],
         }
         return info
 

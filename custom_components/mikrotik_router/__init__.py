@@ -49,7 +49,9 @@ async def async_setup_entry(hass, config_entry):
     else:
         traffic_type = DEFAULT_TRAFFIC_TYPE
 
-    mikrotik_controller = MikrotikControllerData(hass, config_entry, name, host, port, username, password, use_ssl, traffic_type)
+    mikrotik_controller = MikrotikControllerData(
+        hass, config_entry, name, host, port, username, password, use_ssl, traffic_type
+    )
     await mikrotik_controller.hwinfo_update()
     await mikrotik_controller.async_update()
 
@@ -77,10 +79,10 @@ async def async_setup_entry(hass, config_entry):
     device_registry = await hass.helpers.device_registry.async_get_registry()
     device_registry.async_get_or_create(
         config_entry_id=config_entry.entry_id,
-        manufacturer=mikrotik_controller.data['resource']['platform'],
-        model=mikrotik_controller.data['routerboard']['model'],
-        name=mikrotik_controller.data['routerboard']['model'],
-        sw_version=mikrotik_controller.data['resource']['version'],
+        manufacturer=mikrotik_controller.data["resource"]["platform"],
+        model=mikrotik_controller.data["routerboard"]["model"],
+        name=mikrotik_controller.data["routerboard"]["model"],
+        sw_version=mikrotik_controller.data["resource"]["version"],
     )
 
     return True
