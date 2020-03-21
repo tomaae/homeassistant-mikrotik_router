@@ -4,6 +4,9 @@ import ssl
 import logging
 import time
 from threading import Lock
+
+from voluptuous import Optional
+
 from .exceptions import ApiEntryNotFound
 from .const import (
     DEFAULT_LOGIN_METHOD,
@@ -64,7 +67,7 @@ class MikrotikAPI:
     # ---------------------------
     #   disconnect
     # ---------------------------
-    def disconnect(self) -> bool:
+    def disconnect(self):
         """Disconnect from Mikrotik device."""
         self._connected = False
         self._connection = None
@@ -161,7 +164,7 @@ class MikrotikAPI:
     # ---------------------------
     #   path
     # ---------------------------
-    def path(self, path) -> list:
+    def path(self, path) -> Optional(list):
         """Retrieve data from Mikrotik API."""
         if not self._connected or not self._connection:
             if self._connection_epoch > time.time() - self._connection_retry_sec:
@@ -238,7 +241,7 @@ class MikrotikAPI:
         entry_found = False
         if not self._connected or not self._connection:
             if self._connection_epoch > time.time() - self._connection_retry_sec:
-                return None
+                return False
 
             if not self.connect():
                 return False
@@ -313,7 +316,7 @@ class MikrotikAPI:
         entry_found = False
         if not self._connected or not self._connection:
             if self._connection_epoch > time.time() - self._connection_retry_sec:
-                return None
+                return False
 
             if not self.connect():
                 return False
@@ -382,7 +385,7 @@ class MikrotikAPI:
     # ---------------------------
     #   get_traffic
     # ---------------------------
-    def get_traffic(self, interfaces) -> list:
+    def get_traffic(self, interfaces) -> Optional(list):
         """Get traffic stats"""
         traffic = None
         if not self._connected or not self._connection:
