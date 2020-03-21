@@ -1,8 +1,8 @@
 """Config flow to configure Mikrotik Router."""
 
 import logging
+
 import voluptuous as vol
-from homeassistant.core import callback
 from homeassistant.config_entries import (
     CONN_CLASS_LOCAL_POLL,
     ConfigFlow,
@@ -17,6 +17,7 @@ from homeassistant.const import (
     CONF_PASSWORD,
     CONF_SSL,
 )
+from homeassistant.core import callback
 
 from .const import (
     DOMAIN,
@@ -27,10 +28,10 @@ from .const import (
     DEFAULT_TRAFFIC_TYPE,
     TRAFFIC_TYPES,
 )
-
 from .mikrotikapi import MikrotikAPI
 
 _LOGGER = logging.getLogger(__name__)
+
 
 # ---------------------------
 #   configured_instances
@@ -39,7 +40,8 @@ _LOGGER = logging.getLogger(__name__)
 def configured_instances(hass):
     """Return a set of configured instances."""
     return set(
-        entry.data[CONF_NAME] for entry in hass.config_entries.async_entries(DOMAIN)
+        entry.data[CONF_NAME] for entry in
+        hass.config_entries.async_entries(DOMAIN)
     )
 
 

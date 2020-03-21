@@ -265,7 +265,8 @@ def fill_vals_proc(data, uid, vals_proc) -> dict:
 
             if _action == "combine":
                 if "key" in val:
-                    tmp = _data[val["key"]] if val["key"] in _data else "unknown"
+                    tmp = _data[val["key"]]\
+                        if val["key"] in _data else "unknown"
                     if not _value:
                         _value = tmp
                     else:

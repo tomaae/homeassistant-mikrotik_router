@@ -1,13 +1,14 @@
 """Support for the Mikrotik Router binary sensor service."""
 
 import logging
-from homeassistant.core import callback
+
 from homeassistant.components.binary_sensor import BinarySensorDevice
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.const import (
     CONF_NAME,
     ATTR_ATTRIBUTION,
 )
+from homeassistant.core import callback
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 from .const import (
     DOMAIN,

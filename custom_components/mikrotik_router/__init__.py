@@ -1,7 +1,7 @@
 """Mikrotik Router integration."""
 
 import logging
-from homeassistant.exceptions import ConfigEntryNotReady
+
 from homeassistant.const import (
     CONF_NAME,
     CONF_HOST,
@@ -11,14 +11,14 @@ from homeassistant.const import (
     CONF_PASSWORD,
     CONF_SSL,
 )
-
-from .mikrotik_controller import MikrotikControllerData
+from homeassistant.exceptions import ConfigEntryNotReady
 
 from .const import (
     DOMAIN,
     DATA_CLIENT,
     DEFAULT_TRAFFIC_TYPE,
 )
+from .mikrotik_controller import MikrotikControllerData
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -50,7 +50,8 @@ async def async_setup_entry(hass, config_entry):
         traffic_type = DEFAULT_TRAFFIC_TYPE
 
     mikrotik_controller = MikrotikControllerData(
-        hass, config_entry, name, host, port, username, password, use_ssl, traffic_type
+        hass, config_entry, name, host, port, username, password, use_ssl,
+        traffic_type
     )
     await mikrotik_controller.hwinfo_update()
     await mikrotik_controller.async_update()
@@ -65,11 +66,13 @@ async def async_setup_entry(hass, config_entry):
     )
 
     hass.async_create_task(
-        hass.config_entries.async_forward_entry_setup(config_entry, "binary_sensor")
+        hass.config_entries.async_forward_entry_setup(config_entry,
+                                                      "binary_sensor")
     )
 
     hass.async_create_task(
-        hass.config_entries.async_forward_entry_setup(config_entry, "device_tracker")
+        hass.config_entries.async_forward_entry_setup(config_entry,
+                                                      "device_tracker")
     )
 
     hass.async_create_task(
@@ -95,8 +98,10 @@ async def async_unload_entry(hass, config_entry):
     """Unload a config entry."""
     mikrotik_controller = hass.data[DOMAIN][DATA_CLIENT][config_entry.entry_id]
     await hass.config_entries.async_forward_entry_unload(config_entry, "sensor")
-    await hass.config_entries.async_forward_entry_unload(config_entry, "binary_sensor")
-    await hass.config_entries.async_forward_entry_unload(config_entry, "device_tracker")
+    await hass.config_entries.async_forward_entry_unload(config_entry,
+                                                         "binary_sensor")
+    await hass.config_entries.async_forward_entry_unload(config_entry,
+                                                         "device_tracker")
     await hass.config_entries.async_forward_entry_unload(config_entry, "switch")
     await mikrotik_controller.async_reset()
     hass.data[DOMAIN][DATA_CLIENT].pop(config_entry.entry_id)
