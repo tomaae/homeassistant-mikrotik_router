@@ -1,21 +1,14 @@
 """Support for the Mikrotik Router sensor service."""
 
 import logging
+
+from homeassistant.const import (CONF_NAME, ATTR_ATTRIBUTION, ATTR_DEVICE_CLASS)
 from homeassistant.core import callback
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity
-from homeassistant.const import (
-    CONF_NAME,
-    ATTR_ATTRIBUTION,
-    ATTR_DEVICE_CLASS,
-)
 
-from .const import (
-    DOMAIN,
-    DATA_CLIENT,
-    ATTRIBUTION,
-)
+from .const import (DOMAIN, DATA_CLIENT, ATTRIBUTION)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -116,13 +109,15 @@ def update_items(inst, mikrotik_controller, async_add_entities, sensors):
                 continue
 
             sensors[item_id] = MikrotikControllerSensor(
-                mikrotik_controller=mikrotik_controller, inst=inst, sensor=sensor
+                mikrotik_controller=mikrotik_controller, inst=inst,
+                sensor=sensor
             )
             new_sensors.append(sensors[item_id])
 
         if "traffic_" in sensor:
             for uid in mikrotik_controller.data["interface"]:
-                if mikrotik_controller.data["interface"][uid]["type"] == "ether":
+                if mikrotik_controller.data["interface"][uid][
+                        "type"] == "ether":
                     item_id = f"{inst}-{sensor}-{mikrotik_controller.data['interface'][uid]['default-name']}"
                     if item_id in sensors:
                         if sensors[item_id].enabled:
@@ -248,7 +243,8 @@ class MikrotikControllerTrafficSensor(MikrotikControllerSensor):
         """Initialize."""
         super().__init__(mikrotik_controller, inst, sensor)
         self._uid = uid
-        self._data = mikrotik_controller.data[SENSOR_TYPES[sensor][ATTR_PATH]][uid]
+        self._data = mikrotik_controller.data[SENSOR_TYPES[sensor][ATTR_PATH]][
+            uid]
 
     @property
     def name(self):
@@ -264,7 +260,8 @@ class MikrotikControllerTrafficSensor(MikrotikControllerSensor):
     def device_info(self):
         """Return a port description for device registry."""
         info = {
-            "connections": {(CONNECTION_NETWORK_MAC, self._data["port-mac-address"])},
+            "connections": {
+                (CONNECTION_NETWORK_MAC, self._data["port-mac-address"])},
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
             "name": self._data["default-name"],

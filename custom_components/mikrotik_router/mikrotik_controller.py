@@ -1,8 +1,10 @@
 """Mikrotik Controller for Mikrotik Router."""
 
-from datetime import timedelta
 import asyncio
 import logging
+from datetime import timedelta
+
+from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval
 
@@ -15,10 +17,9 @@ from .const import (
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_TRAFFIC_TYPE,
 )
-
-from .mikrotikapi import MikrotikAPI
-from .helper import from_entry, parse_api
 from .exceptions import ApiEntryNotFound
+from .helper import from_entry, parse_api
+from .mikrotikapi import MikrotikAPI
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -72,6 +73,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   force_update
     # ---------------------------
+    @callback
     async def force_update(self, _now=None):
         """Trigger update by timer"""
         await self.async_update()
@@ -79,6 +81,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   force_fwupdate_check
     # ---------------------------
+    @callback
     async def force_fwupdate_check(self, _now=None):
         """Trigger hourly update by timer"""
         await self.async_fwupdate_check()
@@ -273,8 +276,10 @@ class MikrotikControllerData:
             traffic_div = 1
 
         for uid in self.data["interface"]:
-            self.data["interface"][uid]["rx-bits-per-second-attr"] = traffic_type
-            self.data["interface"][uid]["tx-bits-per-second-attr"] = traffic_type
+            self.data["interface"][uid][
+                "rx-bits-per-second-attr"] = traffic_type
+            self.data["interface"][uid][
+                "tx-bits-per-second-attr"] = traffic_type
             self.data["interface"][uid]["rx-bits-per-second"] = round(
                 self.data["interface"][uid]["rx-bits-per-second"] * traffic_div
             )
@@ -398,7 +403,8 @@ class MikrotikControllerData:
                 self.data["arp"][uid]["mac-address"] = "multiple"
                 self.data["arp"][uid]["address"] = "multiple"
             else:
-                self.data["arp"][uid]["mac-address"] = from_entry(entry, "mac-address")
+                self.data["arp"][uid]["mac-address"] = from_entry(entry,
+                                                                  "mac-address")
                 self.data["arp"][uid]["address"] = (
                     mac2ip[self.data["arp"][uid]["mac-address"]]
                     if self.data["arp"][uid]["mac-address"] in mac2ip
@@ -537,8 +543,8 @@ class MikrotikControllerData:
 
         if "status" in self.data["fw-update"]:
             self.data["fw-update"]["available"] = (
-                True
-                if self.data["fw-update"]["status"] == "New version is available"
+                True if self.data["fw-update"][
+                            "status"] == "New version is available"
                 else False
             )
         else:

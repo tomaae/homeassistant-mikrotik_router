@@ -1,15 +1,17 @@
 """Support for the Mikrotik Router device tracker."""
 
 import logging
-from homeassistant.core import callback
-from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
+
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
 from homeassistant.components.device_tracker.const import SOURCE_TYPE_ROUTER
 from homeassistant.const import (
     CONF_NAME,
     ATTR_ATTRIBUTION,
 )
+from homeassistant.core import callback
+from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
+
 from .const import (
     DOMAIN,
     DATA_CLIENT,
@@ -172,7 +174,8 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
     def device_info(self):
         """Return a port description for device registry."""
         info = {
-            "connections": {(CONNECTION_NETWORK_MAC, self._data["port-mac-address"])},
+            "connections": {
+                (CONNECTION_NETWORK_MAC, self._data["port-mac-address"])},
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
             "name": self._data["default-name"],

@@ -1,19 +1,23 @@
 """Mikrotik API for Mikrotik Router."""
 
-import ssl
+import importlib
 import logging
+import os
+import ssl
+import sys
 import time
 from threading import Lock
-from .exceptions import ApiEntryNotFound
+
+from voluptuous import Optional
+
 from .const import (
     DEFAULT_LOGIN_METHOD,
     DEFAULT_ENCODING,
 )
+from .exceptions import ApiEntryNotFound
 
-import os
-import sys
-import importlib
-MODULE_PATH = os.path.join(os.path.dirname(__file__), "librouteros_custom", "__init__.py")
+MODULE_PATH = os.path.join(os.path.dirname(__file__), "librouteros_custom",
+                           "__init__.py")
 MODULE_NAME = "librouteros_custom"
 spec = importlib.util.spec_from_file_location(MODULE_NAME, MODULE_PATH)
 librouteros_custom = importlib.util.module_from_spec(spec)
@@ -64,7 +68,7 @@ class MikrotikAPI:
     # ---------------------------
     #   disconnect
     # ---------------------------
-    def disconnect(self) -> bool:
+    def disconnect(self):
         """Disconnect from Mikrotik device."""
         self._connected = False
         self._connection = None
@@ -109,7 +113,8 @@ class MikrotikAPI:
         ) as api_error:
             if not self.connection_error_reported:
                 _LOGGER.error(
-                    "Mikrotik %s error while connecting: %s", self._host, api_error
+                    "Mikrotik %s error while connecting: %s", self._host,
+                    api_error
                 )
                 self.connection_error_reported = True
 
@@ -120,7 +125,8 @@ class MikrotikAPI:
         except:
             if not self.connection_error_reported:
                 _LOGGER.error(
-                    "Mikrotik %s error while connecting: %s", self._host, "Unknown"
+                    "Mikrotik %s error while connecting: %s", self._host,
+                    "Unknown"
                 )
                 self.connection_error_reported = True
 
@@ -161,7 +167,7 @@ class MikrotikAPI:
     # ---------------------------
     #   path
     # ---------------------------
-    def path(self, path) -> list:
+    def path(self, path) -> Optional(list):
         """Retrieve data from Mikrotik API."""
         if not self._connected or not self._connection:
             if self._connection_epoch > time.time() - self._connection_retry_sec:
@@ -193,7 +199,8 @@ class MikrotikAPI:
             ValueError,
         ) as api_error:
             if not self.connection_error_reported:
-                _LOGGER.error("Mikrotik %s error while path %s", self._host, api_error)
+                _LOGGER.error("Mikrotik %s error while path %s", self._host,
+                              api_error)
                 self.connection_error_reported = True
 
             self.disconnect()
@@ -201,7 +208,8 @@ class MikrotikAPI:
             return None
         except:
             if not self.connection_error_reported:
-                _LOGGER.error("Mikrotik %s error while path %s", self._host, "unknown")
+                _LOGGER.error("Mikrotik %s error while path %s", self._host,
+                              "unknown")
                 self.connection_error_reported = True
 
             self.disconnect()
@@ -212,7 +220,8 @@ class MikrotikAPI:
             tuple(response)
         except librouteros_custom.exceptions.ConnectionClosed as api_error:
             if not self.connection_error_reported:
-                _LOGGER.error("Mikrotik %s error while path %s", self._host, api_error)
+                _LOGGER.error("Mikrotik %s error while path %s", self._host,
+                              api_error)
                 self.connection_error_reported = True
 
             self.disconnect()
@@ -220,7 +229,8 @@ class MikrotikAPI:
             return None
         except:
             if not self.connection_error_reported:
-                _LOGGER.error("Mikrotik %s error while path %s", self._host, "unknown")
+                _LOGGER.error("Mikrotik %s error while path %s", self._host,
+                              "unknown")
                 self.connection_error_reported = True
 
             self.disconnect()
@@ -238,7 +248,7 @@ class MikrotikAPI:
         entry_found = False
         if not self._connected or not self._connection:
             if self._connection_epoch > time.time() - self._connection_retry_sec:
-                return None
+                return False
 
             if not self.connect():
                 return False
@@ -280,7 +290,8 @@ class MikrotikAPI:
             ) as api_error:
                 if not self.connection_error_reported:
                     _LOGGER.error(
-                        "Mikrotik %s error while update %s", self._host, api_error
+                        "Mikrotik %s error while update %s", self._host,
+                        api_error
                     )
                     self.connection_error_reported = True
 
@@ -290,7 +301,8 @@ class MikrotikAPI:
             except:
                 if not self.connection_error_reported:
                     _LOGGER.error(
-                        "Mikrotik %s error while update %s", self._host, "unknown"
+                        "Mikrotik %s error while update %s", self._host,
+                        "unknown"
                     )
                     self.connection_error_reported = True
 
@@ -313,7 +325,7 @@ class MikrotikAPI:
         entry_found = False
         if not self._connected or not self._connection:
             if self._connection_epoch > time.time() - self._connection_retry_sec:
-                return None
+                return False
 
             if not self.connect():
                 return False
@@ -354,7 +366,8 @@ class MikrotikAPI:
             ) as api_error:
                 if not self.connection_error_reported:
                     _LOGGER.error(
-                        "Mikrotik %s error while run_script %s", self._host, api_error
+                        "Mikrotik %s error while run_script %s", self._host,
+                        api_error
                     )
                     self.connection_error_reported = True
 
@@ -364,7 +377,8 @@ class MikrotikAPI:
             except:
                 if not self.connection_error_reported:
                     _LOGGER.error(
-                        "Mikrotik %s error while run_script %s", self._host, "unknown"
+                        "Mikrotik %s error while run_script %s", self._host,
+                        "unknown"
                     )
                     self.connection_error_reported = True
 
@@ -382,7 +396,7 @@ class MikrotikAPI:
     # ---------------------------
     #   get_traffic
     # ---------------------------
-    def get_traffic(self, interfaces) -> list:
+    def get_traffic(self, interfaces) -> Optional(list):
         """Get traffic stats"""
         traffic = None
         if not self._connected or not self._connection:
@@ -423,7 +437,8 @@ class MikrotikAPI:
         ) as api_error:
             if not self.connection_error_reported:
                 _LOGGER.error(
-                    "Mikrotik %s error while get_traffic %s", self._host, api_error
+                    "Mikrotik %s error while get_traffic %s", self._host,
+                    api_error
                 )
                 self.connection_error_reported = True
 
@@ -433,7 +448,8 @@ class MikrotikAPI:
         except:
             if not self.connection_error_reported:
                 _LOGGER.error(
-                    "Mikrotik %s error while get_traffic %s", self._host, "unknown"
+                    "Mikrotik %s error while get_traffic %s", self._host,
+                    "unknown"
                 )
                 self.connection_error_reported = True
 
@@ -446,7 +462,8 @@ class MikrotikAPI:
         except librouteros_custom.exceptions.ConnectionClosed as api_error:
             if not self.connection_error_reported:
                 _LOGGER.error(
-                    "Mikrotik %s error while get_traffic %s", self._host, api_error
+                    "Mikrotik %s error while get_traffic %s", self._host,
+                    api_error
                 )
                 self.connection_error_reported = True
 
@@ -456,7 +473,8 @@ class MikrotikAPI:
         except:
             if not self.connection_error_reported:
                 _LOGGER.error(
-                    "Mikrotik %s error while get_traffic %s", self._host, "unknown"
+                    "Mikrotik %s error while get_traffic %s", self._host,
+                    "unknown"
                 )
                 self.connection_error_reported = True
 

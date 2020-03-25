@@ -2,13 +2,15 @@
 
 import logging
 
+from voluptuous import Optional
+
 _LOGGER = logging.getLogger(__name__)
 
 
 # ---------------------------
 #   from_entry
 # ---------------------------
-def from_entry(entry, param, default="") -> dict:
+def from_entry(entry, param, default="") -> str:
     """Validate and return str value from Mikrotik API dict"""
     if param not in entry:
         return default
@@ -88,7 +90,7 @@ def parse_api(
 # ---------------------------
 #   get_uid
 # ---------------------------
-def get_uid(entry, key, key_search, keymap) -> str:
+def get_uid(entry, key, key_search, keymap) -> Optional(str):
     """Get UID for data list"""
     uid = None
     if not key_search:
@@ -111,7 +113,7 @@ def get_uid(entry, key, key_search, keymap) -> str:
 # ---------------------------
 #   generate_keymap
 # ---------------------------
-def generate_keymap(data, key_search) -> dict:
+def generate_keymap(data, key_search) -> Optional(dict):
     """Generate keymap"""
     if not key_search:
         return None
@@ -263,7 +265,8 @@ def fill_vals_proc(data, uid, vals_proc) -> dict:
 
             if _action == "combine":
                 if "key" in val:
-                    tmp = _data[val["key"]] if val["key"] in _data else "unknown"
+                    tmp = _data[val["key"]]\
+                        if val["key"] in _data else "unknown"
                     if not _value:
                         _value = tmp
                     else:
