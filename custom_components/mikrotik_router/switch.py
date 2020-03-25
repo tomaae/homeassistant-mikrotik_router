@@ -49,6 +49,23 @@ DEVICE_ATTRIBUTES_SCRIPT = [
     "run-count",
 ]
 
+DEVICE_ATTRIBUTES_QUEUE = [
+    "target",
+    "download-max-limit",
+    "upload-max-limit",
+    "upload-limit-at",
+    "download-limit-at",
+    "upload-burst-limit",
+    "download-burst-limit",
+    "upload-burst-threshold",
+    "download-burst-threshold",
+    "upload-burst-time",
+    "download-burst-time",
+    "packet-marks",
+    "parent",
+    "comment",
+]
+
 
 # ---------------------------
 #   format_attribute
@@ -95,11 +112,12 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
 
     # Add switches
     for sid, sid_func in zip(
-        ["interface", "nat", "script"],
+        ["interface", "nat", "script", "queue"],
         [
             MikrotikControllerPortSwitch,
             MikrotikControllerNATSwitch,
             MikrotikControllerScriptSwitch,
+            MikrotikControllerQueueSwitch,
         ],
     ):
         for uid in mikrotik_controller.data[sid]:
@@ -421,3 +439,112 @@ class MikrotikControllerScriptSwitch(MikrotikControllerSwitch):
     def is_on(self):
         """Return true if device is on."""
         return False
+
+
+# ---------------------------
+#   MikrotikControllerNATSwitch
+# ---------------------------
+class MikrotikControllerQueueSwitch(MikrotikControllerSwitch):
+    """Representation of a queue switch."""
+
+    def __init__(self, inst, uid, mikrotik_controller):
+        """Set up queue switch."""
+        super().__init__(inst, uid, mikrotik_controller)
+
+        self._data = mikrotik_controller.data["queue"][self._uid]
+        self._attrs = {
+            ATTR_ATTRIBUTION: ATTRIBUTION,
+        }
+
+    async def async_added_to_hass(self):
+        """Queue switch entity created."""
+        _LOGGER.debug("New queue switch %s (%s)", self._inst, self._data["name"])
+
+    @property
+    def name(self) -> str:
+        """Return the name of the queue switch."""
+        return f"{self._inst} Queue {self._data['name']}"
+
+    @property
+    def unique_id(self) -> str:
+        """Return a unique identifier for this queue switch."""
+        return f"{self._inst.lower()}-queue_switch-{self._data['name']}"
+
+    @property
+    def icon(self):
+        """Return the icon."""
+        if not self._data["enabled"]:
+            icon = "mdi:leaf-off"
+        else:
+            icon = "mdi:leaf"
+
+        return icon
+
+    @property
+    def device_info(self):
+        """Return a queue switch description for device registry."""
+        info = {
+            "identifiers": {
+                (
+                    DOMAIN,
+                    "serial-number",
+                    self._ctrl.data["routerboard"]["serial-number"],
+                    "switch",
+                    "Queue",
+                )
+            },
+            "manufacturer": self._ctrl.data["resource"]["platform"],
+            "model": self._ctrl.data["resource"]["board-name"],
+            "name": "Queue",
+        }
+        return info
+
+    @property
+    def device_state_attributes(self):
+        """Return the queue switch state attributes."""
+        attributes = self._attrs
+
+        for variable in DEVICE_ATTRIBUTES_QUEUE:
+            if variable in self._data:
+                attributes[format_attribute(variable)] = self._data[variable]
+
+        return attributes
+
+    async def async_turn_on(self):
+        """Turn on the queue switch."""
+        path = "/queue/simple"
+        param = ".id"
+        value = None
+        for uid in self._ctrl.data["queue"]:
+            if (
+                self._ctrl.data["queue"][uid]["name"]
+                == f"{self._data['name']}"
+            ):
+                value = self._ctrl.data["queue"][uid][".id"]
+
+        mod_param = "disabled"
+        mod_value = False
+        self._ctrl.set_value(path, param, value, mod_param, mod_value)
+        await self._ctrl.force_update()
+
+    async def async_turn_off(self):
+        """Turn on the queue switch."""
+        path = "/queue/simple"
+        param = ".id"
+        value = None
+        for uid in self._ctrl.data["queue"]:
+            if (
+                self._ctrl.data["queue"][uid]["name"]
+                == f"{self._data['name']}"
+            ):
+                value = self._ctrl.data["queue"][uid][".id"]
+
+        mod_param = "disabled"
+        mod_value = True
+        self._ctrl.set_value(path, param, value, mod_param, mod_value)
+        await self._ctrl.async_update()
+
+    @property
+    def is_on(self):
+        """Return true if the queue is on."""
+        return self._data["enabled"]
