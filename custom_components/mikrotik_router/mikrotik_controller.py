@@ -56,6 +56,7 @@ class MikrotikControllerData:
             "nat": {},
             "fw-update": {},
             "script": {},
+            "queue": {},
         }
 
         self.listeners = []
@@ -69,6 +70,23 @@ class MikrotikControllerData:
         async_track_time_interval(
             self.hass, self.force_fwupdate_check, timedelta(hours=1)
         )
+
+    def _get_traffic_type_and_div(self):
+        traffic_type = self.option_traffic_type
+        if traffic_type == "Kbps":
+            traffic_div = 0.001
+        elif traffic_type == "Mbps":
+            traffic_div = 0.000001
+        elif traffic_type == "B/s":
+            traffic_div = 0.125
+        elif traffic_type == "KB/s":
+            traffic_div = 0.000125
+        elif traffic_type == "MB/s":
+            traffic_div = 0.000000125
+        else:
+            traffic_type = "bps"
+            traffic_div = 1
+        return traffic_type, traffic_div
 
     # ---------------------------
     #   force_update
@@ -171,6 +189,7 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.get_nat)
         await self.hass.async_add_executor_job(self.get_system_resource)
         await self.hass.async_add_executor_job(self.get_script)
+        await self.hass.async_add_executor_job(self.get_queue)
 
         async_dispatcher_send(self.hass, self.signal_update)
         self.lock.release()
@@ -260,20 +279,7 @@ class MikrotikControllerData:
             ],
         )
 
-        traffic_type = self.option_traffic_type
-        if traffic_type == "Kbps":
-            traffic_div = 0.001
-        elif traffic_type == "Mbps":
-            traffic_div = 0.000001
-        elif traffic_type == "B/s":
-            traffic_div = 0.125
-        elif traffic_type == "KB/s":
-            traffic_div = 0.000125
-        elif traffic_type == "MB/s":
-            traffic_div = 0.000000125
-        else:
-            traffic_type = "bps"
-            traffic_div = 1
+        traffic_type, traffic_div = self._get_traffic_type_and_div()
 
         for uid in self.data["interface"]:
             self.data["interface"][uid][
@@ -565,3 +571,61 @@ class MikrotikControllerData:
                 {"name": "run-count", "default": "unknown"},
             ],
         )
+
+    # ---------------------------
+    #   get_queue
+    # ---------------------------
+
+    def get_queue(self):
+        """Get Queue data from Mikrotik"""
+        self.data["queue"] = parse_api(
+            data=self.data["queue"],
+            source=self.api.path("/queue/simple"),
+            key="name",
+            vals=[
+                {"name": ".id"},
+                {"name": "name", "default": "unknown"},
+                {"name": "target", "default": "unknown"},
+                {"name": "max-limit", "default": "0/0"},
+                {"name": "limit-at", "default": "0/0"},
+                {"name": "burst-limit", "default": "0/0"},
+                {"name": "burst-threshold", "default": "0/0"},
+                {"name": "burst-time", "default": "0s/0s"},
+                {"name": "packet-marks", "default": "none"},
+                {"name": "parent", "default": "none"},
+                {"name": "comment"},
+                {
+                    "name": "enabled",
+                    "source": "disabled",
+                    "type": "bool",
+                    "reverse": True,
+                },
+            ]
+        )
+
+        traffic_type, traffic_div = self._get_traffic_type_and_div()
+
+        for uid in self.data["queue"]:
+            upload_max_limit_bps, download_max_limit_bps = [int(x) for x in
+                                                            self.data["queue"][uid]["max-limit"].split('/')]
+            self.data["queue"][uid]["upload-max-limit"] = f"{round(upload_max_limit_bps * traffic_div)} {traffic_type}"
+            self.data["queue"][uid]["download-max-limit"] = f"{round(download_max_limit_bps * traffic_div)} {traffic_type}"
+
+            upload_limit_at_bps, download_limit_at_bps = [int(x) for x in
+                                                          self.data["queue"][uid]["limit-at"].split('/')]
+            self.data["queue"][uid]["upload-limit-at"] = f"{round(upload_limit_at_bps * traffic_div)} {traffic_type}"
+            self.data["queue"][uid]["download-limit-at"] = f"{round(download_limit_at_bps * traffic_div)} {traffic_type}"
+
+            upload_burst_limit_bps, download_burst_limit_bps = [int(x) for x in
+                                                                self.data["queue"][uid]["burst-limit"].split('/')]
+            self.data["queue"][uid]["upload-burst-limit"] = f"{round(upload_burst_limit_bps * traffic_div)} {traffic_type}"
+            self.data["queue"][uid]["download-burst-limit"] = f"{round(download_burst_limit_bps * traffic_div)} {traffic_type}"
+
+            upload_burst_threshold_bps, download_burst_threshold_bps = [int(x) for x in
+                                                                        self.data["queue"][uid]["burst-threshold"].split('/')]
+            self.data["queue"][uid]["upload-burst-threshold"] = f"{round(upload_burst_threshold_bps * traffic_div)} {traffic_type}"
+            self.data["queue"][uid]["download-burst-threshold"] = f"{round(download_burst_threshold_bps * traffic_div)} {traffic_type}"
+
+            upload_burst_time, download_burst_time = self.data["queue"][uid]["burst-time"].split('/')
+            self.data["queue"][uid]["upload-burst-time"] = upload_burst_time
+            self.data["queue"][uid]["download-burst-time"] = download_burst_time
