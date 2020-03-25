@@ -15,7 +15,7 @@ Monitor and control your Mikrotik device from Home Assistant.
 ![Interface Sensor](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/interface_sensor.png)
 ![Script Switch](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/script_switch.png)
 ![NAT switch](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/nat.png)
-
+![Queue switch](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/queue_switch.png)
 
 Features:
  * Interface device tracker
@@ -25,7 +25,8 @@ Features:
  * System sensors (CPU, Memory, HDD)
  * Firmware update binary sensor
  * Switches to run scripts
-
+ * Enable/disable Simple Queue switches
+ 
 # Setup integration
 Setup this integration for your Mikrotik device in Home Assistant via `Configuration -> Integrations -> Add -> Mikrotik Router`.
 You can add this integration several times for different devices.
