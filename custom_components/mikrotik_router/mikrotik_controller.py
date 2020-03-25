@@ -577,6 +577,7 @@ class MikrotikControllerData:
             source=self.api.path("/queue/simple"),
             key="name",
             vals=[
+                {"name": ".id"},
                 {"name": "name", "default": "unknown"},
                 {"name": "target", "default": "unknown"},
                 {"name": "max-limit", "default": "0/0"},
