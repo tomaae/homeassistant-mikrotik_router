@@ -39,13 +39,13 @@ You can add this integration several times for different devices.
 * "Host" - Use hostname or IP
 * "Port" - Leave at 0 for defaults
 * "Name of the integration" - Friendy name for this router
-* "Unit of measurement" - Traffic sensor measurement in bps/kbps/mbps
+* "Unit of measurement" - Traffic sensor measurement (bps, Kbps, Mbps, B/s, KB/s, MB/s)
 
 # Configuration
 ![Integration options](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/integration_options.png)
 * "Show client MAC and IP" - Display connected IP and MAC address for devices connected to ports on router.
 * "Scan interval" - Scan/refresh time in seconds. HA needs to be reloaded for scan interval change to be applied.
-* "Unit of measurement" - Traffic sensor measurement in bps/kbps/mbps
+* "Unit of measurement" - Traffic sensor measurement (bps, Kbps, Mbps, B/s, KB/s, MB/s)
 
 ## List of detected devices
 ![Integration options](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/integration_devices.png)
