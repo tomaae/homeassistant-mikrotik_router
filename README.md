@@ -14,7 +14,7 @@ Features:
  * Enable/disable interface switches
  * Enable/disable NAT rule switches
  * Enable/disable Simple Queue switches
- * RX/TX traffic sensors per interface (configurable measurement in bps/kbps or mpbs)
+ * RX/TX traffic sensors per interface
  * System sensors (CPU, Memory, HDD)
  * Firmware update binary sensor
  * Switches to run scripts
