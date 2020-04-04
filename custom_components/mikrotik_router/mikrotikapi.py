@@ -167,7 +167,7 @@ class MikrotikAPI:
     # ---------------------------
     #   path
     # ---------------------------
-    def path(self, path, return_list=False) -> Optional(list):
+    def path(self, path, return_list=True) -> Optional(list):
         """Retrieve data from Mikrotik API."""
         """Returns generator object, unless return_list passed as True"""
         if not self._connected or not self._connection:
@@ -251,7 +251,7 @@ class MikrotikAPI:
             if not self.connect():
                 return False
 
-        response = self.path(path)
+        response = self.path(path, return_list=False)
         if response is None:
             return False
 
@@ -328,7 +328,7 @@ class MikrotikAPI:
             if not self.connect():
                 return False
 
-        response = self.path("/system/script")
+        response = self.path("/system/script", return_list=False)
         if response is None:
             return False
 
@@ -404,7 +404,7 @@ class MikrotikAPI:
             if not self.connect():
                 return None
 
-        response = self.path("/interface")
+        response = self.path("/interface", return_list=False)
         if response is None:
             return None
 
