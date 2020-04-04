@@ -82,8 +82,16 @@ class MikrotikAPI:
     # ---------------------------
     #   disconnect
     # ---------------------------
-    def disconnect(self):
+    def disconnect(self, location="unknown", error="unknown"):
         """Disconnect from Mikrotik device."""
+        if not self.connection_error_reported:
+            if location == "unknown":
+                _LOGGER.error("Mikrotik %s connection closed", self._host)
+            else:
+                _LOGGER.error("Mikrotik %s error while %s : %s", self._host, location, error)
+
+            self.connection_error_reported = True
+
         self._connected = False
         self._connection = None
         self._connection_epoch = 0
@@ -193,10 +201,6 @@ class MikrotikAPI:
             _LOGGER.debug("API query: %s", path)
             response = self._connection.path(path)
         except librouteros_custom.exceptions.ConnectionClosed:
-            if not self.connection_error_reported:
-                _LOGGER.error("Mikrotik %s connection closed", self._host)
-                self.connection_error_reported = True
-
             self.disconnect()
             self.lock.release()
             return None
@@ -210,19 +214,11 @@ class MikrotikAPI:
                 OSError,
                 ValueError,
         ) as api_error:
-            if not self.connection_error_reported:
-                _LOGGER.error("Mikrotik %s error while path %s", self._host, api_error)
-                self.connection_error_reported = True
-
-            self.disconnect()
+            self.disconnect("path", api_error)
             self.lock.release()
             return None
         except:
-            if not self.connection_error_reported:
-                _LOGGER.error("Mikrotik %s error while path %s", self._host, "unknown")
-                self.connection_error_reported = True
-
-            self.disconnect()
+            self.disconnect("path")
             self.lock.release()
             return None
 
@@ -230,19 +226,11 @@ class MikrotikAPI:
             try:
                 response = list(response)
             except librouteros_custom.exceptions.ConnectionClosed as api_error:
-                if not self.connection_error_reported:
-                    _LOGGER.error("Mikrotik %s error while building list for path %s", self._host, api_error)
-                    self.connection_error_reported = True
-
-                self.disconnect()
+                self.disconnect("building list for path", api_error)
                 self.lock.release()
                 return None
             except:
-                if not self.connection_error_reported:
-                    _LOGGER.error("Mikrotik %s error while building list for path %s", self._host, "unknown")
-                    self.connection_error_reported = True
-
-                self.disconnect()
+                self.disconnect("building list for path")
                 self.lock.release()
                 return None
 
@@ -277,10 +265,6 @@ class MikrotikAPI:
             try:
                 response.update(**params)
             except librouteros_custom.exceptions.ConnectionClosed:
-                if not self.connection_error_reported:
-                    _LOGGER.error("Mikrotik %s connection closed", self._host)
-                    self.connection_error_reported = True
-
                 self.disconnect()
                 self.lock.release()
                 return False
@@ -294,25 +278,11 @@ class MikrotikAPI:
                 OSError,
                 ValueError,
             ) as api_error:
-                if not self.connection_error_reported:
-                    _LOGGER.error(
-                        "Mikrotik %s error while update %s", self._host,
-                        api_error
-                    )
-                    self.connection_error_reported = True
-
-                self.disconnect()
+                self.disconnect("update", api_error)
                 self.lock.release()
                 return False
             except:
-                if not self.connection_error_reported:
-                    _LOGGER.error(
-                        "Mikrotik %s error while update %s", self._host,
-                        "unknown"
-                    )
-                    self.connection_error_reported = True
-
-                self.disconnect()
+                self.disconnect("update")
                 self.lock.release()
                 return False
 
@@ -349,10 +319,6 @@ class MikrotikAPI:
                 run = response("run", **{".id": tmp[".id"]})
                 tuple(run)
             except librouteros_custom.exceptions.ConnectionClosed:
-                if not self.connection_error_reported:
-                    _LOGGER.error("Mikrotik %s connection closed", self._host)
-                    self.connection_error_reported = True
-
                 self.disconnect()
                 self.lock.release()
                 return False
@@ -366,25 +332,11 @@ class MikrotikAPI:
                 OSError,
                 ValueError,
             ) as api_error:
-                if not self.connection_error_reported:
-                    _LOGGER.error(
-                        "Mikrotik %s error while run_script %s", self._host,
-                        api_error
-                    )
-                    self.connection_error_reported = True
-
-                self.disconnect()
+                self.disconnect("run_script", api_error)
                 self.lock.release()
                 return False
             except:
-                if not self.connection_error_reported:
-                    _LOGGER.error(
-                        "Mikrotik %s error while run_script %s", self._host,
-                        "unknown"
-                    )
-                    self.connection_error_reported = True
-
-                self.disconnect()
+                self.disconnect("run_script")
                 self.lock.release()
                 return False
 
@@ -412,14 +364,7 @@ class MikrotikAPI:
         self.lock.acquire()
         try:
             traffic = response("monitor-traffic", **args)
-            _LOGGER.debug(
-                "API response (%s): %s", "/interface/monitor-traffic", traffic
-            )
         except librouteros_custom.exceptions.ConnectionClosed:
-            if not self.connection_error_reported:
-                _LOGGER.error("Mikrotik %s connection closed", self._host)
-                self.connection_error_reported = True
-
             self.disconnect()
             self.lock.release()
             return None
@@ -433,50 +378,22 @@ class MikrotikAPI:
             OSError,
             ValueError,
         ) as api_error:
-            if not self.connection_error_reported:
-                _LOGGER.error(
-                    "Mikrotik %s error while get_traffic %s", self._host,
-                    api_error
-                )
-                self.connection_error_reported = True
-
-            self.disconnect()
+            self.disconnect("get_traffic", api_error)
             self.lock.release()
             return None
         except:
-            if not self.connection_error_reported:
-                _LOGGER.error(
-                    "Mikrotik %s error while get_traffic %s", self._host,
-                    "unknown"
-                )
-                self.connection_error_reported = True
-
-            self.disconnect()
+            self.disconnect("get_traffic")
             self.lock.release()
             return None
 
         try:
             tuple(response)
         except librouteros_custom.exceptions.ConnectionClosed as api_error:
-            if not self.connection_error_reported:
-                _LOGGER.error(
-                    "Mikrotik %s error while get_traffic %s", self._host,
-                    api_error
-                )
-                self.connection_error_reported = True
-
-            self.disconnect()
+            self.disconnect("get_traffic", api_error)
             self.lock.release()
             return None
         except:
-            if not self.connection_error_reported:
-                _LOGGER.error(
-                    "Mikrotik %s error while get_traffic %s", self._host,
-                    "unknown"
-                )
-                self.connection_error_reported = True
-
-            self.disconnect()
+            self.disconnect("get_traffic")
             self.lock.release()
             return None
 
