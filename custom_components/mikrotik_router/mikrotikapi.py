@@ -352,7 +352,6 @@ class MikrotikAPI:
     # ---------------------------
     def get_traffic(self, interfaces) -> Optional(list):
         """Get traffic stats"""
-        traffic = None
         if not self.connection_check():
             return None
 
