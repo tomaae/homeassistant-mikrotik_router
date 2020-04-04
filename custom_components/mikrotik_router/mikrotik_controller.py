@@ -437,7 +437,7 @@ class MikrotikControllerData:
         """Get NAT data from Mikrotik"""
         self.data["nat"] = parse_api(
             data=self.data["nat"],
-            source=self.api.path("/ip/firewall/nat", return_list=True, return_list=True),
+            source=self.api.path("/ip/firewall/nat", return_list=True),
             key=".id",
             vals=[
                 {"name": ".id"},
