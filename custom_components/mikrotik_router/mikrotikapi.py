@@ -363,6 +363,7 @@ class MikrotikAPI:
         args = {"interface": interfaces, "once": True}
         self.lock.acquire()
         try:
+            _LOGGER.debug("API query: %s", "/interface/monitor-traffic")
             traffic = response("monitor-traffic", **args)
         except librouteros_custom.exceptions.ConnectionClosed:
             self.disconnect()
@@ -387,7 +388,7 @@ class MikrotikAPI:
             return None
 
         try:
-            tuple(response)
+            traffic = list(traffic)
         except librouteros_custom.exceptions.ConnectionClosed as api_error:
             self.disconnect("get_traffic", api_error)
             self.lock.release()
