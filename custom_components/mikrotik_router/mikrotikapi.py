@@ -66,6 +66,20 @@ class MikrotikAPI:
             self._port = 8729 if self._use_ssl else 8728
 
     # ---------------------------
+    #   connection_check
+    # ---------------------------
+    def connection_check(self) -> bool:
+        """Check if mikrotik is connected"""
+        if not self._connected or not self._connection:
+            if self._connection_epoch > time.time() - self._connection_retry_sec:
+                return False
+
+            if not self.connect():
+                return False
+
+        return True
+
+    # ---------------------------
     #   disconnect
     # ---------------------------
     def disconnect(self):
@@ -170,12 +184,9 @@ class MikrotikAPI:
     def path(self, path, return_list=True) -> Optional(list):
         """Retrieve data from Mikrotik API."""
         """Returns generator object, unless return_list passed as True"""
-        if not self._connected or not self._connection:
-            if self._connection_epoch > time.time() - self._connection_retry_sec:
-                return None
 
-            if not self.connect():
-                return None
+        if not self.connection_check():
+            return None
 
         self.lock.acquire()
         try:
@@ -244,12 +255,9 @@ class MikrotikAPI:
     def update(self, path, param, value, mod_param, mod_value) -> bool:
         """Modify a parameter"""
         entry_found = False
-        if not self._connected or not self._connection:
-            if self._connection_epoch > time.time() - self._connection_retry_sec:
-                return False
 
-            if not self.connect():
-                return False
+        if not self.connection_check():
+            return False
 
         response = self.path(path, return_list=False)
         if response is None:
@@ -321,12 +329,8 @@ class MikrotikAPI:
     def run_script(self, name) -> bool:
         """Run script"""
         entry_found = False
-        if not self._connected or not self._connection:
-            if self._connection_epoch > time.time() - self._connection_retry_sec:
-                return False
-
-            if not self.connect():
-                return False
+        if not self.connection_check():
+            return False
 
         response = self.path("/system/script", return_list=False)
         if response is None:
@@ -397,12 +401,8 @@ class MikrotikAPI:
     def get_traffic(self, interfaces) -> Optional(list):
         """Get traffic stats"""
         traffic = None
-        if not self._connected or not self._connection:
-            if self._connection_epoch > time.time() - self._connection_retry_sec:
-                return None
-
-            if not self.connect():
-                return None
+        if not self.connection_check():
+            return None
 
         response = self.path("/interface", return_list=False)
         if response is None:
