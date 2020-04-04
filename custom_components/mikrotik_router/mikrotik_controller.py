@@ -229,7 +229,7 @@ class MikrotikControllerData:
         """Get all interfaces data from Mikrotik"""
         self.data["interface"] = parse_api(
             data=self.data["interface"],
-            source=self.api.path("/interface"),
+            source=self.api.path("/interface", return_list=True),
             key="default-name",
             vals=[
                 {"name": "default-name"},
@@ -331,7 +331,7 @@ class MikrotikControllerData:
     # ---------------------------
     def update_arp(self, mac2ip, bridge_used):
         """Get list of hosts in ARP for interface client data from Mikrotik"""
-        data = self.api.path("/ip/arp")
+        data = self.api.path("/ip/arp", return_list=True)
         if not data:
             return mac2ip, bridge_used
 
@@ -382,7 +382,7 @@ class MikrotikControllerData:
     # ---------------------------
     def update_bridge_hosts(self, mac2ip):
         """Get list of hosts in bridge for interface client data from Mikrotik"""
-        data = self.api.path("/interface/bridge/host")
+        data = self.api.path("/interface/bridge/host", return_list=True)
         if not data:
             return
 
@@ -437,7 +437,7 @@ class MikrotikControllerData:
         """Get NAT data from Mikrotik"""
         self.data["nat"] = parse_api(
             data=self.data["nat"],
-            source=self.api.path("/ip/firewall/nat"),
+            source=self.api.path("/ip/firewall/nat", return_list=True),
             key=".id",
             vals=[
                 {"name": ".id"},
@@ -473,7 +473,7 @@ class MikrotikControllerData:
         """Get routerboard data from Mikrotik"""
         self.data["routerboard"] = parse_api(
             data=self.data["routerboard"],
-            source=self.api.path("/system/routerboard"),
+            source=self.api.path("/system/routerboard", return_list=True),
             vals=[
                 {"name": "routerboard", "type": "bool"},
                 {"name": "model", "default": "unknown"},
@@ -489,7 +489,7 @@ class MikrotikControllerData:
         """Get system resources data from Mikrotik"""
         self.data["resource"] = parse_api(
             data=self.data["resource"],
-            source=self.api.path("/system/resource"),
+            source=self.api.path("/system/resource", return_list=True),
             vals=[
                 {"name": "platform", "default": "unknown"},
                 {"name": "board-name", "default": "unknown"},
@@ -538,7 +538,7 @@ class MikrotikControllerData:
         """Check for firmware update on Mikrotik"""
         self.data["fw-update"] = parse_api(
             data=self.data["fw-update"],
-            source=self.api.path("/system/package/update"),
+            source=self.api.path("/system/package/update", return_list=True),
             vals=[
                 {"name": "status"},
                 {"name": "channel", "default": "unknown"},
@@ -563,7 +563,7 @@ class MikrotikControllerData:
         """Get list of all scripts from Mikrotik"""
         self.data["script"] = parse_api(
             data=self.data["script"],
-            source=self.api.path("/system/script"),
+            source=self.api.path("/system/script", return_list=True),
             key="name",
             vals=[
                 {"name": "name"},
@@ -580,7 +580,7 @@ class MikrotikControllerData:
         """Get Queue data from Mikrotik"""
         self.data["queue"] = parse_api(
             data=self.data["queue"],
-            source=self.api.path("/queue/simple"),
+            source=self.api.path("/queue/simple", return_list=True),
             key="name",
             vals=[
                 {"name": ".id"},

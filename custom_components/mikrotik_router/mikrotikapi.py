@@ -167,8 +167,9 @@ class MikrotikAPI:
     # ---------------------------
     #   path
     # ---------------------------
-    def path(self, path) -> Optional(list):
+    def path(self, path, return_list=False) -> Optional(list):
         """Retrieve data from Mikrotik API."""
+        """Returns generator object, unless return_list passed as True"""
         if not self._connected or not self._connection:
             if self._connection_epoch > time.time() - self._connection_retry_sec:
                 return None
@@ -189,18 +190,17 @@ class MikrotikAPI:
             self.lock.release()
             return None
         except (
-            librouteros_custom.exceptions.TrapError,
-            librouteros_custom.exceptions.MultiTrapError,
-            librouteros_custom.exceptions.ProtocolError,
-            librouteros_custom.exceptions.FatalError,
-            ssl.SSLError,
-            BrokenPipeError,
-            OSError,
-            ValueError,
+                librouteros_custom.exceptions.TrapError,
+                librouteros_custom.exceptions.MultiTrapError,
+                librouteros_custom.exceptions.ProtocolError,
+                librouteros_custom.exceptions.FatalError,
+                ssl.SSLError,
+                BrokenPipeError,
+                OSError,
+                ValueError,
         ) as api_error:
             if not self.connection_error_reported:
-                _LOGGER.error("Mikrotik %s error while path %s", self._host,
-                              api_error)
+                _LOGGER.error("Mikrotik %s error while path %s", self._host, api_error)
                 self.connection_error_reported = True
 
             self.disconnect()
@@ -208,34 +208,32 @@ class MikrotikAPI:
             return None
         except:
             if not self.connection_error_reported:
-                _LOGGER.error("Mikrotik %s error while path %s", self._host,
-                              "unknown")
+                _LOGGER.error("Mikrotik %s error while path %s", self._host, "unknown")
                 self.connection_error_reported = True
 
             self.disconnect()
             self.lock.release()
             return None
 
-        try:
-            tuple(response)
-        except librouteros_custom.exceptions.ConnectionClosed as api_error:
-            if not self.connection_error_reported:
-                _LOGGER.error("Mikrotik %s error while path %s", self._host,
-                              api_error)
-                self.connection_error_reported = True
+        if return_list:
+            try:
+                response = list(response)
+            except librouteros_custom.exceptions.ConnectionClosed as api_error:
+                if not self.connection_error_reported:
+                    _LOGGER.error("Mikrotik %s error while building list for path %s", self._host, api_error)
+                    self.connection_error_reported = True
 
-            self.disconnect()
-            self.lock.release()
-            return None
-        except:
-            if not self.connection_error_reported:
-                _LOGGER.error("Mikrotik %s error while path %s", self._host,
-                              "unknown")
-                self.connection_error_reported = True
+                self.disconnect()
+                self.lock.release()
+                return None
+            except:
+                if not self.connection_error_reported:
+                    _LOGGER.error("Mikrotik %s error while building list for path %s", self._host, "unknown")
+                    self.connection_error_reported = True
 
-            self.disconnect()
-            self.lock.release()
-            return None
+                self.disconnect()
+                self.lock.release()
+                return None
 
         self.lock.release()
         return response if response else None
