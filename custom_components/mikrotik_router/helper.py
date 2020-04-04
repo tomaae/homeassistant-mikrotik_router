@@ -57,6 +57,8 @@ def parse_api(
             data = fill_defaults(data, vals)
         return data
 
+    _LOGGER.debug("Processing source %s", source)
+
     keymap = generate_keymap(data, key_search)
     for entry in source:
         if only and not matches_only(entry, only):
@@ -74,7 +76,7 @@ def parse_api(
             if uid not in data:
                 data[uid] = {}
 
-        _LOGGER.debug("Processing entry %s, entry %s", source, entry)
+        _LOGGER.debug("Processing entry %s", entry)
         if vals:
             data = fill_vals(data, entry, uid, vals)
 
