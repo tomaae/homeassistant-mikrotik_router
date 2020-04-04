@@ -365,14 +365,10 @@ class MikrotikControllerData:
             # Add data
             self.data["arp"][uid]["interface"] = uid
             self.data["arp"][uid]["mac-address"] = (
-                from_entry(entry, "mac-address")
-                if "mac-address" not in self.data["arp"][uid]
-                else "multiple"
+                from_entry(entry, "mac-address") if "mac-address" not in self.data["arp"][uid] else "multiple"
             )
             self.data["arp"][uid]["address"] = (
-                from_entry(entry, "address")
-                if "address" not in self.data["arp"][uid]
-                else "multiple"
+                from_entry(entry, "address") if "address" not in self.data["arp"][uid] else "multiple"
             )
 
         return mac2ip, bridge_used
@@ -608,23 +604,32 @@ class MikrotikControllerData:
         for uid in self.data["queue"]:
             upload_max_limit_bps, download_max_limit_bps = [int(x) for x in
                                                             self.data["queue"][uid]["max-limit"].split('/')]
-            self.data["queue"][uid]["upload-max-limit"] = f"{round(upload_max_limit_bps * traffic_div)} {traffic_type}"
-            self.data["queue"][uid]["download-max-limit"] = f"{round(download_max_limit_bps * traffic_div)} {traffic_type}"
+            self.data["queue"][uid]["upload-max-limit"] = \
+                f"{round(upload_max_limit_bps * traffic_div)} {traffic_type}"
+            self.data["queue"][uid]["download-max-limit"] = \
+                f"{round(download_max_limit_bps * traffic_div)} {traffic_type}"
 
             upload_limit_at_bps, download_limit_at_bps = [int(x) for x in
                                                           self.data["queue"][uid]["limit-at"].split('/')]
-            self.data["queue"][uid]["upload-limit-at"] = f"{round(upload_limit_at_bps * traffic_div)} {traffic_type}"
-            self.data["queue"][uid]["download-limit-at"] = f"{round(download_limit_at_bps * traffic_div)} {traffic_type}"
+            self.data["queue"][uid]["upload-limit-at"] = \
+                f"{round(upload_limit_at_bps * traffic_div)} {traffic_type}"
+            self.data["queue"][uid]["download-limit-at"] = \
+                f"{round(download_limit_at_bps * traffic_div)} {traffic_type}"
 
             upload_burst_limit_bps, download_burst_limit_bps = [int(x) for x in
                                                                 self.data["queue"][uid]["burst-limit"].split('/')]
-            self.data["queue"][uid]["upload-burst-limit"] = f"{round(upload_burst_limit_bps * traffic_div)} {traffic_type}"
-            self.data["queue"][uid]["download-burst-limit"] = f"{round(download_burst_limit_bps * traffic_div)} {traffic_type}"
+            self.data["queue"][uid]["upload-burst-limit"] = \
+                f"{round(upload_burst_limit_bps * traffic_div)} {traffic_type}"
+            self.data["queue"][uid]["download-burst-limit"] = \
+                f"{round(download_burst_limit_bps * traffic_div)} {traffic_type}"
 
-            upload_burst_threshold_bps, download_burst_threshold_bps = [int(x) for x in
-                                                                        self.data["queue"][uid]["burst-threshold"].split('/')]
-            self.data["queue"][uid]["upload-burst-threshold"] = f"{round(upload_burst_threshold_bps * traffic_div)} {traffic_type}"
-            self.data["queue"][uid]["download-burst-threshold"] = f"{round(download_burst_threshold_bps * traffic_div)} {traffic_type}"
+            upload_burst_threshold_bps,\
+                download_burst_threshold_bps = [int(x) for x in self.data["queue"][uid]["burst-threshold"].split('/')]
+
+            self.data["queue"][uid]["upload-burst-threshold"] = \
+                f"{round(upload_burst_threshold_bps * traffic_div)} {traffic_type}"
+            self.data["queue"][uid]["download-burst-threshold"] = \
+                f"{round(download_burst_threshold_bps * traffic_div)} {traffic_type}"
 
             upload_burst_time, download_burst_time = self.data["queue"][uid]["burst-time"].split('/')
             self.data["queue"][uid]["upload-burst-time"] = upload_burst_time
