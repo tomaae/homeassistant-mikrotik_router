@@ -94,7 +94,6 @@ def parse_api(
 # ---------------------------
 def get_uid(entry, key, key_search, keymap) -> Optional(str):
     """Get UID for data list"""
-    uid = None
     if not key_search:
         if key not in entry:
             return None
@@ -109,7 +108,7 @@ def get_uid(entry, key, key_search, keymap) -> Optional(str):
         else:
             return None
 
-    return uid
+    return uid if uid else None
 
 
 # ---------------------------
