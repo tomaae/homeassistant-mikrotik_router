@@ -179,8 +179,8 @@ class MikrotikAPI:
 
         self.lock.acquire()
         try:
+            _LOGGER.debug("API query: %s", path)
             response = self._connection.path(path)
-            _LOGGER.debug("API response (%s): %s", path, response)
         except librouteros_custom.exceptions.ConnectionClosed:
             if not self.connection_error_reported:
                 _LOGGER.error("Mikrotik %s connection closed", self._host)
