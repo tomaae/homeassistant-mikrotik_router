@@ -82,9 +82,8 @@ def update_items(inst, mikrotik_controller, async_add_entities, tracked):
 
     for uid in mikrotik_controller.data["interface"]:
         if mikrotik_controller.data["interface"][uid]["type"] == "ether":
-            item_id = (
-                f"{inst}-{mikrotik_controller.data['interface'][uid]['default-name']}"
-            )
+            item_id = f"{inst}-{mikrotik_controller.data['interface'][uid]['default-name']}"
+            _LOGGER.debug("Updating device_tracker %s", item_id)
             if item_id in tracked:
                 if tracked[item_id].enabled:
                     tracked[item_id].async_schedule_update_ha_state()

@@ -65,6 +65,7 @@ def update_items(inst, mikrotik_controller, async_add_entities, sensors):
 
     for sensor in SENSOR_TYPES:
         item_id = f"{inst}-{sensor}"
+        _LOGGER.debug("Updating binary_sensor %s", item_id)
         if item_id in sensors:
             if sensors[item_id].enabled:
                 sensors[item_id].async_schedule_update_ha_state()

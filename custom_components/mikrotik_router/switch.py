@@ -115,6 +115,7 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
     ):
         for uid in mikrotik_controller.data[sid]:
             item_id = f"{inst}-{sid}-{mikrotik_controller.data[sid][uid]['name']}"
+            _LOGGER.debug("Updating switch %s", item_id)
             if item_id in switches:
                 if switches[item_id].enabled:
                     switches[item_id].async_schedule_update_ha_state()
