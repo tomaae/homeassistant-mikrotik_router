@@ -6,18 +6,24 @@
 ![GitHub commits since latest release](https://img.shields.io/github/commits-since/tomaae/homeassistant-mikrotik_router/latest?style=plastic)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/tomaae/homeassistant-mikrotik_router?style=plastic)
 
+![Tracker and sensors](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/header.png)
 
 Monitor and control your Mikrotik device from Home Assistant.
 
 Features:
- * Interface device tracker
- * Enable/disable interface switches
+ * Interfaces:
+   * Enable/disable interfaces
+   * Monitor RX/TX traffic per interface
+   * Monitor device presence per interface
+   * IP, MAC, Link information per interface for connected devices
  * Enable/disable NAT rule switches
  * Enable/disable Simple Queue switches
- * RX/TX traffic sensors per interface
  * System sensors (CPU, Memory, HDD)
- * Firmware update binary sensor
- * Switches to run scripts
+ * Check firmware update
+ * Execute scripts
+ * Configurable update interval
+ * Configurable traffic unit (bps, Kbps, Mbps, B/s, KB/s, MB/s)
+ * Supports monitoring of multiple mikrotik devices simultaneously
 
 # Integration preview
 ![Tracker and sensors](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/device_tracker.png)
