@@ -765,9 +765,9 @@ class MikrotikControllerData:
 
         # Build temp accounting values dict with all known addresses
         # Also set traffic type for each item
-        accounting_values = {}
+        tmp_accounting_values = {}
         for addr in self.data['accounting']:
-            accounting_values[addr] = {
+            tmp_accounting_values[addr] = {
                 "wan-tx": 0,
                 "wan-rx": 0,
                 "lan-tx": 0,
@@ -796,40 +796,46 @@ class MikrotikControllerData:
 
                 if self._address_part_of_local_network(source_ip) and self._address_part_of_local_network(destination_ip):
                     # LAN TX/RX
-                    if source_ip in accounting_values:
-                        accounting_values[source_ip]['lan-tx'] += bits_count
-                    if destination_ip in accounting_values:
-                        accounting_values[destination_ip]['lan-rx'] += bits_count
+                    if source_ip in tmp_accounting_values:
+                        tmp_accounting_values[source_ip]['lan-tx'] += bits_count
+                    if destination_ip in tmp_accounting_values:
+                        tmp_accounting_values[destination_ip]['lan-rx'] += bits_count
                 elif self._address_part_of_local_network(source_ip) and \
                         not self._address_part_of_local_network(destination_ip):
                     # WAN TX
-                    if source_ip in accounting_values:
-                        accounting_values[source_ip]['wan-tx'] += bits_count
+                    if source_ip in tmp_accounting_values:
+                        tmp_accounting_values[source_ip]['wan-tx'] += bits_count
                 elif not self._address_part_of_local_network(source_ip) and \
                         self._address_part_of_local_network(destination_ip):
                     # WAN RX
-                    if destination_ip in accounting_values:
-                        accounting_values[destination_ip]['wan-rx'] += bits_count
+                    if destination_ip in tmp_accounting_values:
+                        tmp_accounting_values[destination_ip]['wan-rx'] += bits_count
                 else:
                     _LOGGER.debug(f"Skipping packet from {source_ip} to {destination_ip}")
                     continue
 
             # Now that we have sum of all traffic in bytes for given period
             #   calculate real throughput and transform it to appropriate unit
-            for addr in accounting_values:
+            for addr in tmp_accounting_values:
                 self.data['accounting'][addr]['wan-tx'] = round(
-                    accounting_values[addr]['wan-tx'] / time_diff * traffic_div, 2)
+                    tmp_accounting_values[addr]['wan-tx'] / time_diff * traffic_div, 2)
                 self.data['accounting'][addr]['wan-rx'] = round(
-                    accounting_values[addr]['wan-rx'] / time_diff * traffic_div, 2)
+                    tmp_accounting_values[addr]['wan-rx'] / time_diff * traffic_div, 2)
 
                 if self.api.is_accounting_local_traffic_enabled():
                     self.data['accounting'][addr]['lan-tx'] = round(
-                        accounting_values[addr]['lan-tx'] / time_diff * traffic_div, 2)
+                        tmp_accounting_values[addr]['lan-tx'] / time_diff * traffic_div, 2)
                     self.data['accounting'][addr]['lan-rx'] = round(
-                        accounting_values[addr]['lan-rx'] / time_diff * traffic_div, 2)
+                        tmp_accounting_values[addr]['lan-rx'] / time_diff * traffic_div, 2)
+                else:
+                    # If local traffic was enabled earlier and then disabled return counters for LAN traffic to 0
+                    if 'lan-tx' in self.data['accounting'][addr]:
+                        self.data['accounting'][addr]['lan-tx'] = 0.0
+                    if 'lan-rx' in self.data['accounting'][addr]:
+                        self.data['accounting'][addr]['lan-rx'] = 0.0
         else:
             # No time diff, just initialize/return counters to 0 for all
-            for addr in accounting_values:
+            for addr in tmp_accounting_values:
                 self.data['accounting'][addr]['wan-tx'] = 0.0
                 self.data['accounting'][addr]['wan-rx'] = 0.0
 
