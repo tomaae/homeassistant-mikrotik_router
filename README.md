@@ -61,6 +61,7 @@ For per-IP throughput tracking Mikrotik's accounting feature is used.
 Before setting up integration in HA, go in Winbox IP-Accounting and setup the feature. Make sure that threshold is set to resonable value to store all connections between user defined scan interval. Max value is 8192 so for piece of mind i recommend setting that value. Web Access is not needed, integration is using API access. 
 
 Integration will scan DHCP Lease table and ARP table to generate all known hosts and create two sensors for WAN traffic (mikrotik-XXX-wan-rx and mikrotik-XXX-wan-tx). If the parameter *account-local-traffic* is set in Mikrotik's accounting configuration it will also create two sensors for LAN traffic (mikrotik-XXX-lan-rx and mikrotik-XXX-lan-tx).
+
 Device's name will be determined by first available string this order:
 1. DHCP lease comment
 2. DNS static entry
