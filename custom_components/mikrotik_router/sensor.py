@@ -84,7 +84,7 @@ SENSOR_TYPES = {
         ATTR_ICON: "mdi:download-network",
         ATTR_LABEL: "LAN TX",
         ATTR_UNIT: "ps",
-        ATTR_UNIT_ATTR: "lan-wan-tx-rx-attr",
+        ATTR_UNIT_ATTR: "tx-rx-attr",
         ATTR_PATH: "accounting",
         ATTR_ATTR: "lan-tx",
     },
@@ -93,7 +93,7 @@ SENSOR_TYPES = {
         ATTR_ICON: "mdi:upload-network",
         ATTR_LABEL: "LAN RX",
         ATTR_UNIT: "ps",
-        ATTR_UNIT_ATTR: "lan-wan-tx-rx-attr",
+        ATTR_UNIT_ATTR: "tx-rx-attr",
         ATTR_PATH: "accounting",
         ATTR_ATTR: "lan-rx",
     },
@@ -102,7 +102,7 @@ SENSOR_TYPES = {
         ATTR_ICON: "mdi:download-network",
         ATTR_LABEL: "WAN TX",
         ATTR_UNIT: "ps",
-        ATTR_UNIT_ATTR: "lan-wan-tx-rx-attr",
+        ATTR_UNIT_ATTR: "tx-rx-attr",
         ATTR_PATH: "accounting",
         ATTR_ATTR: "wan-tx",
     },
@@ -111,7 +111,7 @@ SENSOR_TYPES = {
         ATTR_ICON: "mdi:upload-network",
         ATTR_LABEL: "WAN RX",
         ATTR_UNIT: "ps",
-        ATTR_UNIT_ATTR: "lan-wan-tx-rx-attr",
+        ATTR_UNIT_ATTR: "tx-rx-attr",
         ATTR_PATH: "accounting",
         ATTR_ATTR: "wan-rx",
     },
@@ -194,14 +194,16 @@ def update_items(inst, mikrotik_controller, async_add_entities, sensors):
                         sensors[item_id].async_schedule_update_ha_state()
                     continue
 
-                sensors[item_id] = MikrotikAccountingSensor(
-                    mikrotik_controller=mikrotik_controller,
-                    inst=inst,
-                    sensor=sensor,
-                    uid=uid,
-                )
-                new_sensors.append(sensors[item_id])
-
+                if SENSOR_TYPES[sensor][ATTR_ATTR] in mikrotik_controller.data['accounting'][uid].keys():
+                    sensors[item_id] = MikrotikAccountingSensor(
+                        mikrotik_controller=mikrotik_controller,
+                        inst=inst,
+                        sensor=sensor,
+                        uid=uid,
+                    )
+                    new_sensors.append(sensors[item_id])
+                else:
+                    _LOGGER.info(f"WONT CREATE {SENSOR_TYPES[sensor][ATTR_ATTR]} for {item_id}")
     if new_sensors:
         async_add_entities(new_sensors, True)
 

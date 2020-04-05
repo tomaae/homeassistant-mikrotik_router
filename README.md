@@ -18,6 +18,7 @@ Features:
  * System sensors (CPU, Memory, HDD)
  * Firmware update binary sensor
  * Switches to run scripts
+ * RX/TX traffic sensors per hosts from Mikrotik Accounting
 
 # Integration preview
 ![Tracker and sensors](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/device_tracker.png)

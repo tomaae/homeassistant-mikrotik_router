@@ -76,10 +76,12 @@ class MikrotikControllerData:
         async_track_time_interval(
             self.hass, self.force_fwupdate_check, timedelta(hours=1)
         )
+        self.account_local_traffic = False
         if self.track_accounting:
             async_track_time_interval(
                 self.hass, self.force_accounting_hosts_update, timedelta(minutes=15)
             )
+            self.account_local_traffic = self.api.is_accounting_local_traffic_enabled()
 
     def _get_traffic_type_and_div(self):
         traffic_type = self.option_traffic_type
@@ -769,13 +771,14 @@ class MikrotikControllerData:
         # Also set traffic type for each item
         accounting_values = {}
         for addr in self.data['accounting']:
-            accounting_values[addr] = {
-                "wan-tx": 0,
-                "wan-rx": 0,
-                "lan-tx": 0,
-                "lan-rx": 0
-            }
-            self.data['accounting'][addr]["lan-wan-tx-rx-attr"] = traffic_type
+            accounting_values[addr] = {}
+            accounting_values[addr]["wan-tx"] = 0
+            accounting_values[addr]["wan-rx"] = 0
+            if self.account_local_traffic:
+                accounting_values[addr]["lan-tx"] = 0
+                accounting_values[addr]["lan-rx"] = 0
+
+            self.data['accounting'][addr]["tx-rx-attr"] = traffic_type
 
         time_diff = self.api.take_accounting_snapshot()
         if time_diff:
@@ -819,13 +822,13 @@ class MikrotikControllerData:
             # Now that we have sum of all traffic in bytes for given period
             #   calculate real throughput and transform it to appropriate unit
             for addr in accounting_values:
-                self.data['accounting'][addr]['lan-tx'] = round(
-                    accounting_values[addr]['lan-tx'] / time_diff * traffic_div, 2)
-                self.data['accounting'][addr]['lan-rx'] = round(
-                    accounting_values[addr]['lan-rx'] / time_diff * traffic_div, 2)
-
                 self.data['accounting'][addr]['wan-tx'] = round(
                     accounting_values[addr]['wan-tx'] / time_diff * traffic_div, 2)
-
                 self.data['accounting'][addr]['wan-rx'] = round(
                     accounting_values[addr]['wan-rx'] / time_diff * traffic_div, 2)
+
+                if self.account_local_traffic:
+                    self.data['accounting'][addr]['lan-tx'] = round(
+                        accounting_values[addr]['lan-tx'] / time_diff * traffic_div, 2)
+                    self.data['accounting'][addr]['lan-rx'] = round(
+                        accounting_values[addr]['lan-rx'] / time_diff * traffic_div, 2)
