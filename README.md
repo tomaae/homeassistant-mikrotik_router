@@ -43,6 +43,7 @@ You can add this integration several times for different devices.
 * "Port" - Leave at 0 for defaults
 * "Name of the integration" - Friendy name for this router
 * "Unit of measurement" - Traffic sensor measurement (bps, Kbps, Mbps, B/s, KB/s, MB/s)
+* "Track accounting" - Determines if integration will track per-host throughput. Accounting must be enabled in Mikrotik first
 
 # Configuration
 ![Integration options](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/integration_options.png)
