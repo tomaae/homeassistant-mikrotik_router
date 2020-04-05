@@ -780,13 +780,12 @@ class MikrotikControllerData:
         # Also set traffic type for each item
         accounting_values = {}
         for addr in self.data['accounting']:
-            accounting_values[addr] = {}
-            accounting_values[addr]["wan-tx"] = 0
-            accounting_values[addr]["wan-rx"] = 0
-            if self.account_local_traffic:
-                accounting_values[addr]["lan-tx"] = 0
-                accounting_values[addr]["lan-rx"] = 0
-
+            accounting_values[addr] = {
+                "wan-tx": 0,
+                "wan-rx": 0,
+                "lan-tx": 0,
+                "lan-rx": 0
+            }
             self.data['accounting'][addr]["tx-rx-attr"] = traffic_type
 
         time_diff = self.api.take_accounting_snapshot()
