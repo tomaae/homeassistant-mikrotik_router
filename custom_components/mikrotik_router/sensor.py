@@ -202,8 +202,7 @@ def update_items(inst, mikrotik_controller, async_add_entities, sensors):
                         uid=uid,
                     )
                     new_sensors.append(sensors[item_id])
-                else:
-                    _LOGGER.info(f"WONT CREATE {SENSOR_TYPES[sensor][ATTR_ATTR]} for {item_id}")
+
     if new_sensors:
         async_add_entities(new_sensors, True)
 

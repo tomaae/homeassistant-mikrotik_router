@@ -810,9 +810,6 @@ class MikrotikControllerData:
                     # WAN RX
                     if destination_ip in tmp_accounting_values:
                         tmp_accounting_values[destination_ip]['wan-rx'] += bits_count
-                else:
-                    _LOGGER.debug(f"Skipping packet from {source_ip} to {destination_ip}")
-                    continue
 
             # Now that we have sum of all traffic in bytes for given period
             #   calculate real throughput and transform it to appropriate unit
