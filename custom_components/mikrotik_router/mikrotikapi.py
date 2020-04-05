@@ -514,7 +514,7 @@ class MikrotikAPI:
 
     # ---------------------------
     #   take_accounting_snapshot
-    #   Returns float -> seconds period between last run and current run
+    #   Returns float -> period in seconds between last and current run
     # ---------------------------
     def take_accounting_snapshot(self) -> float:
         """Get accounting data"""
