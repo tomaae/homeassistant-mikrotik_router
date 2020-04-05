@@ -76,12 +76,10 @@ class MikrotikControllerData:
         async_track_time_interval(
             self.hass, self.force_fwupdate_check, timedelta(hours=1)
         )
-        self.account_local_traffic = False
         if self.track_accounting:
             async_track_time_interval(
-                self.hass, self.force_accounting_hosts_update, timedelta(minutes=15)
+                self.hass, self.force_accounting_hosts_update, timedelta(minutes=5)
             )
-            self.account_local_traffic = self.api.is_accounting_local_traffic_enabled()
 
     def _get_traffic_type_and_div(self):
         traffic_type = self.option_traffic_type
@@ -667,7 +665,6 @@ class MikrotikControllerData:
 
     def build_accounting_hosts(self):
         # Build hosts from DHCP Server leases and ARP list
-
         self.data["accounting"] = parse_api(
             data=self.data["accounting"],
             source=self.api.path("/ip/dhcp-server/lease", return_list=True),
@@ -687,8 +684,6 @@ class MikrotikControllerData:
                 {"name": "mac-address"},
             ]
         )
-
-
 
         # Also retrieve all entries in ARP table. If some hosts are missing, build it here
         arp_hosts = parse_api(
@@ -718,9 +713,8 @@ class MikrotikControllerData:
                    "mac-address": arp_hosts[addr]['address']
                 }
 
-        # Build name for host. First try getting DHCP lease comment, then entry in DNS and then device's host-name.
-        # If everything fails use hosts IP address as name
-
+        # Build name for host. First try getting DHCP lease comment, then entry in DNS (only static entries)
+        #   and then device's host-name. If everything fails use hosts IP address as name
         dns_data = parse_api(
             data={},
             source=self.api.path("/ip/dns/static", return_list=True),
@@ -744,13 +738,13 @@ class MikrotikControllerData:
             # Initialize data
             self.data["accounting"][addr]["wan-tx"] = 0
             self.data["accounting"][addr]["wan-rx"] = 0
-            if self.account_local_traffic:
+            if self.api.is_accounting_local_traffic_enabled():
                 self.data["accounting"][addr]["lan-tx"] = 0
                 self.data["accounting"][addr]["lan-rx"] = 0
 
-        _LOGGER.debug(f"Generated {len(self.data['accounting'])} accounting hosts")
+        _LOGGER.debug(f"Generated {len(self.data['accounting'])} accounting devices")
 
-        # Build local networks
+        # Build list of local networks
         dhcp_networks = parse_api(
             data={},
             source=self.api.path("/ip/dhcp-server/network", return_list=True),
@@ -835,8 +829,9 @@ class MikrotikControllerData:
                 self.data['accounting'][addr]['wan-rx'] = round(
                     accounting_values[addr]['wan-rx'] / time_diff * traffic_div, 2)
 
-                if self.account_local_traffic:
+                if 'lan-tx' in self.data['accounting'][addr]:
                     self.data['accounting'][addr]['lan-tx'] = round(
                         accounting_values[addr]['lan-tx'] / time_diff * traffic_div, 2)
+                if 'lan-rx' in self.data['accounting'][addr]:
                     self.data['accounting'][addr]['lan-rx'] = round(
                         accounting_values[addr]['lan-rx'] / time_diff * traffic_div, 2)
