@@ -78,7 +78,7 @@ class MikrotikControllerData:
         )
         if self.track_accounting:
             async_track_time_interval(
-                self.hass, self.force_accounting_hosts_update, timedelta(minutes=5)
+                self.hass, self.force_accounting_hosts_update, timedelta(minutes=15)
             )
 
     def _get_traffic_type_and_div(self):
@@ -735,13 +735,6 @@ class MikrotikControllerData:
             else:
                 self.data["accounting"][addr]['name'] = self.data["accounting"][addr]['address']
 
-            # Initialize data
-            self.data["accounting"][addr]["wan-tx"] = 0
-            self.data["accounting"][addr]["wan-rx"] = 0
-            if self.api.is_accounting_local_traffic_enabled():
-                self.data["accounting"][addr]["lan-tx"] = 0
-                self.data["accounting"][addr]["lan-rx"] = 0
-
         _LOGGER.debug(f"Generated {len(self.data['accounting'])} accounting devices")
 
         # Build list of local networks
@@ -829,9 +822,17 @@ class MikrotikControllerData:
                 self.data['accounting'][addr]['wan-rx'] = round(
                     accounting_values[addr]['wan-rx'] / time_diff * traffic_div, 2)
 
-                if 'lan-tx' in self.data['accounting'][addr]:
+                if self.api.is_accounting_local_traffic_enabled():
                     self.data['accounting'][addr]['lan-tx'] = round(
                         accounting_values[addr]['lan-tx'] / time_diff * traffic_div, 2)
-                if 'lan-rx' in self.data['accounting'][addr]:
                     self.data['accounting'][addr]['lan-rx'] = round(
                         accounting_values[addr]['lan-rx'] / time_diff * traffic_div, 2)
+        else:
+            # No time diff, just initialize/return counters to 0 for all
+            for addr in accounting_values:
+                self.data['accounting'][addr]['wan-tx'] = 0.0
+                self.data['accounting'][addr]['wan-rx'] = 0.0
+
+                if self.api.is_accounting_local_traffic_enabled():
+                    self.data['accounting'][addr]['lan-tx'] = 0.0
+                    self.data['accounting'][addr]['lan-rx'] = 0.0
