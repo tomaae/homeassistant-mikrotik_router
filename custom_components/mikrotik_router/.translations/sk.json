@@ -1,0 +1,41 @@
+{
+    "config": {
+        "title": "Mikrotik Router",
+        "step": {
+            "user": {
+                "title": "Mikrotik Router",
+                "description": "Nastaviť integráciu Mikrotik Router.",
+                "data": {
+                    "name": "Názov integrácie",
+                    "host": "Zariadenie",
+                    "port": "Port",
+                    "username": "Meno užívateľa",
+                    "password": "Heslo",
+                    "ssl": "Použiť SSL",
+                    "unit_of_measurement": "Merná jednotka"
+                }
+            }
+        },
+        "error": {
+            "name_exists": "Meno už existuje.",
+            "cannot_connect": "Nedá sa pripojiť k Mikrotiku.",
+            "ssl_handshake_failure": "Zlyhanie nadviazania spojenia SSL.",
+            "connection_timeout": "Časový limit pripojenia vypršal.",
+            "wrong_login": "Nesprávne užívateľské meno alebo heslo."
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                    "data": {}
+            },
+            "device_tracker": {
+                "data": {
+                    "scan_interval": "Interval skenovania (vyžaduje sa reštart HA)",
+                    "track_arp": "Zobraziť klientske MAC a IP na rozhraniach",
+                    "unit_of_measurement": "Merná jednotka"
+                }
+            }
+        }
+    }
+}
