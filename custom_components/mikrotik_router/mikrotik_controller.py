@@ -688,16 +688,7 @@ class MikrotikControllerData:
             ]
         )
 
-        # Also retrieve static DNS entries
-        dns_data = parse_api(
-            data={},
-            source=self.api.path("/ip/dns/static", return_list=True),
-            key="address",
-            vals=[
-                {"name": "address"},
-                {"name": "name"},
-            ],
-        )
+
 
         # Also retrieve all entries in ARP table. If some hosts are missing, build it here
         arp_hosts = parse_api(
@@ -729,6 +720,17 @@ class MikrotikControllerData:
 
         # Build name for host. First try getting DHCP lease comment, then entry in DNS and then device's host-name.
         # If everything fails use hosts IP address as name
+
+        dns_data = parse_api(
+            data={},
+            source=self.api.path("/ip/dns/static", return_list=True),
+            key="address",
+            vals=[
+                {"name": "address"},
+                {"name": "name"},
+            ],
+        )
+
         for addr in self.data["accounting"]:
             if str(self.data["accounting"][addr].get('comment', '').strip()):
                 self.data["accounting"][addr]['name'] = self.data["accounting"][addr]['comment']
@@ -738,6 +740,13 @@ class MikrotikControllerData:
                 self.data["accounting"][addr]['name'] = self.data["accounting"][addr]['host-name']
             else:
                 self.data["accounting"][addr]['name'] = self.data["accounting"][addr]['address']
+
+            # Initialize data
+            self.data["accounting"][addr]["wan-tx"] = 0
+            self.data["accounting"][addr]["wan-rx"] = 0
+            if self.account_local_traffic:
+                self.data["accounting"][addr]["lan-tx"] = 0
+                self.data["accounting"][addr]["lan-rx"] = 0
 
         _LOGGER.debug(f"Generated {len(self.data['accounting'])} accounting hosts")
 
