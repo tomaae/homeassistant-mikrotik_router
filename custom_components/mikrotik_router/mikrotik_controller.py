@@ -45,6 +45,7 @@ class MikrotikControllerData:
         """Initialize MikrotikController."""
         self.name = name
         self.hass = hass
+        self.host = host
         self.config_entry = config_entry
         self.traffic_type = traffic_type
 
@@ -63,6 +64,8 @@ class MikrotikControllerData:
         self.lock = asyncio.Lock()
 
         self.api = MikrotikAPI(host, username, password, port, use_ssl)
+
+        self.nat_removed = {}
 
         async_track_time_interval(
             self.hass, self.force_update, self.option_scan_interval
@@ -461,6 +464,24 @@ class MikrotikControllerData:
             ],
             only=[{"key": "action", "value": "dst-nat"}],
         )
+
+        nat_uniq = {}
+        nat_del = {}
+        for uid in self.data["nat"]:
+            tmp_name = self.data["nat"][uid]["name"]
+            if tmp_name not in nat_uniq:
+                nat_uniq[tmp_name] = uid
+            else:
+                nat_del[uid] = 1
+                nat_del[nat_uniq[tmp_name]] = 1
+
+        for uid in nat_del:
+            if self.data["nat"][uid]["name"] not in self.nat_removed:
+                self.nat_removed[self.data["nat"][uid]["name"]] = 1
+                _LOGGER.error("Mikrotik %s duplicate NAT rule %s, entity will be unavailable.",
+                              self.host, self.data["nat"][uid]["name"])
+
+            del self.data["nat"][uid]
 
     # ---------------------------
     #   get_system_routerboard
