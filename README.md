@@ -18,6 +18,7 @@ Features:
    * IP, MAC, Link information per interface for connected devices
  * Enable/disable NAT rule switches
  * Enable/disable Simple Queue switches
+ * Device tracker for hosts in network
  * System sensors (CPU, Memory, HDD)
  * Check firmware update
  * Execute scripts
@@ -36,6 +37,8 @@ Features:
 
 ![NAT switch](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/nat.png)
 ![Queue switch](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/queue_switch.png)
+
+![Host tracker](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/host_tracker.png)
 
 # Setup integration
 Setup this integration for your Mikrotik device in Home Assistant via `Configuration -> Integrations -> Add -> Mikrotik Router`.
