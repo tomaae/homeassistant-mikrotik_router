@@ -37,12 +37,12 @@ DEVICE_ATTRIBUTES_IFACE = [
 ]
 
 DEVICE_ATTRIBUTES_HOST = [
-    "mac-address",
-    "address",
     "host-name",
+    "address",
+    "mac-address",
+    "interface",
     "status",
     "last-seen",
-    "interface",
 ]
 
 
