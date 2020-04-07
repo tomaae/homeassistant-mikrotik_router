@@ -12,7 +12,8 @@
                     "username": "Имя пользователя",
                     "password": "Пароль",
                     "ssl": "Использовать SSL",
-                    "unit_of_measurement": "Единицы измерения"
+                    "unit_of_measurement": "Единицы измерения",
+                    "track_accounting": "Отслеживание учета"
                 }
             }
         },
@@ -21,7 +22,8 @@
             "cannot_connect": "Нет связи с Mikrotik.",
             "ssl_handshake_failure": "Ошибка SSL-соединения",
             "connection_timeout": "Таймаут подключения к Mikrotik.",
-            "wrong_login": "Неверные имя пользователя или пароль."
+            "wrong_login": "Неверные имя пользователя или пароль.",
+            "accounting_disabled": "Учетная запись отключена в Mikrotik, не может отслеживать."
         }
     },
     "options": {

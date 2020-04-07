@@ -12,7 +12,8 @@
                     "username": "Username",
                     "password": "Password",
                     "ssl": "Use SSL",
-                    "unit_of_measurement": "Unit of measurement"
+                    "unit_of_measurement": "Unit of measurement",
+                    "track_accounting": "Track accounting"
                 }
             }
         },
@@ -21,7 +22,8 @@
             "cannot_connect": "Cannot connect to Mikrotik.",
             "ssl_handshake_failure": "SSL handshake failure.",
             "connection_timeout": "Mikrotik connection timeout.",
-            "wrong_login": "Invalid username or password."
+            "wrong_login": "Invalid username or password.",
+            "accounting_disabled": "Accounting disabled in Mikrotik, cannot track."
         }
     },
     "options": {
