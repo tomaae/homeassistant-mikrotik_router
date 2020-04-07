@@ -27,7 +27,6 @@ from .const import (
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_TRAFFIC_TYPE,
     TRAFFIC_TYPES,
-    CONF_TRACK_ACCOUNTING,
 )
 from .mikrotikapi import MikrotikAPI
 
@@ -52,7 +51,7 @@ def configured_instances(hass):
 class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
     """MikrotikControllerConfigFlow class"""
 
-    VERSION = 2
+    VERSION = 1
     CONNECTION_CLASS = CONN_CLASS_LOCAL_POLL
 
     def __init__(self):
@@ -86,9 +85,6 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
             )
             if not api.connect():
                 errors[CONF_HOST] = api.error
-            else:
-                if user_input[CONF_TRACK_ACCOUNTING] and not api.is_accounting_enabled():
-                    errors[CONF_HOST] = "accounting_disabled"
 
             # Save instance
             if not errors:
@@ -103,7 +99,6 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
                 port=user_input["port"],
                 name=user_input["name"],
                 use_ssl=user_input["ssl"],
-                track_accounting=user_input["track_accounting"],
                 errors=errors,
             )
 
@@ -120,7 +115,6 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
         port=0,
         name="Mikrotik",
         use_ssl=False,
-        track_accounting=False,
         errors=None,
     ):
         """Show the configuration form to edit data."""
@@ -137,7 +131,6 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
                     vol.Optional(CONF_PORT, default=port): int,
                     vol.Optional(CONF_NAME, default=name): str,
                     vol.Optional(CONF_SSL, default=use_ssl): bool,
-                    vol.Optional(CONF_TRACK_ACCOUNTING, default=track_accounting): bool,
                 }
             ),
             errors=errors,

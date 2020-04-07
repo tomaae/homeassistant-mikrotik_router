@@ -42,7 +42,6 @@ class MikrotikControllerData:
         password,
         use_ssl,
         traffic_type,
-        track_accounting,
     ):
         """Initialize MikrotikController."""
         self.name = name
@@ -50,7 +49,6 @@ class MikrotikControllerData:
         self.host = host
         self.config_entry = config_entry
         self.traffic_type = traffic_type
-        self.track_accounting = track_accounting
 
         self.data = {
             "routerboard": {},
@@ -73,6 +71,7 @@ class MikrotikControllerData:
 
         self.api = MikrotikAPI(host, username, password, port, use_ssl)
 
+        self.raw_arp_entries = []
         self.nat_removed = {}
 
         async_track_time_interval(
@@ -81,10 +80,6 @@ class MikrotikControllerData:
         async_track_time_interval(
             self.hass, self.force_fwupdate_check, timedelta(hours=1)
         )
-        # if self.track_accounting:
-        #     async_track_time_interval(
-        #         self.hass, self.force_accounting_hosts_update, timedelta(minutes=15)
-        #     )
 
     def _get_traffic_type_and_div(self):
         traffic_type = self.option_traffic_type
@@ -110,14 +105,6 @@ class MikrotikControllerData:
     async def force_update(self, _now=None):
         """Trigger update by timer"""
         await self.async_update()
-
-    # ---------------------------
-    #   force_accounting_hosts_update
-    # ---------------------------
-    # @callback
-    # async def force_accounting_hosts_update(self, _now=None):
-    #     """Trigger update by timer"""
-    #     await self.async_accounting_hosts_update()
 
     # ---------------------------
     #   force_fwupdate_check
@@ -186,19 +173,6 @@ class MikrotikControllerData:
         self.lock.release()
 
     # ---------------------------
-    #   async_accounting_hosts_update
-    # ---------------------------
-    # async def async_accounting_hosts_update(self):
-    #     """Update Mikrotik accounting hosts"""
-    #     try:
-    #         await asyncio.wait_for(self.lock.acquire(), timeout=10)
-    #     except:
-    #         return
-    #
-    #     await self.hass.async_add_executor_job(self.build_accounting_hosts)
-    #     self.lock.release()
-
-    # ---------------------------
     #   async_fwupdate_check
     # ---------------------------
     async def async_fwupdate_check(self):
@@ -227,8 +201,7 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.get_script)
         await self.hass.async_add_executor_job(self.get_queue)
         await self.hass.async_add_executor_job(self.get_dhcp)
-        if self.track_accounting:
-            await self.hass.async_add_executor_job(self.get_accounting)
+        await self.hass.async_add_executor_job(self.get_accounting)
 
         async_dispatcher_send(self.hass, self.signal_update)
         self.lock.release()
@@ -371,6 +344,7 @@ class MikrotikControllerData:
     def update_arp(self, mac2ip, bridge_used):
         """Get list of hosts in ARP for interface client data from Mikrotik"""
         data = self.api.path("/ip/arp")
+        self.raw_arp_entries = data
         if not data:
             return mac2ip, bridge_used
 
@@ -763,10 +737,38 @@ class MikrotikControllerData:
 
     def get_accounting(self):
         """Get Accounting data from Mikrotik"""
+        # Check if accounting and account-local-traffic is enabled
+        accounting_enabled, local_traffic_enabled = self.api.is_accounting_and_local_traffic_enabled()
+
+        if not accounting_enabled:
+            # If any hosts were created return counters to 0 so sensors wont get stuck on last value
+            for mac, vals in self.data["accounting"].items():
+                if 'wan-tx' in vals:
+                    self.data["accounting"]['wan-tx'] = 0.0
+                if 'wan-rx' in vals:
+                    self.data["accounting"]['wan-rx'] = 0.0
+                if 'lan-tx' in vals:
+                    self.data["accounting"]['lan-tx'] = 0.0
+                if 'lan-rx' in vals:
+                    self.data["accounting"]['lan-rx'] = 0.0
+            return
+
         # Build missing hosts from already retrieved DHCP Server leases
         for mac, vals in self.data["dhcp"].items():
             if mac not in self.data["accounting"]:
-                self.data["accounting"][mac] = vals
+                self.data["accounting"][mac] = {
+                    'address': vals['address'],
+                    'mac-address': vals['mac-address'],
+                    'host-name': vals['host-name'],
+                }
+
+        # Build missing hosts from already retrieved ARP list
+        for entry in self.raw_arp_entries:
+            if entry['mac-address'] not in self.data["accounting"]:
+                self.data["accounting"][entry['mac-address']] = {
+                    'address': entry['address'],
+                    'mac-address': entry['mac-address'],
+                }
 
         # Build name for host
         dns_data = parse_api(
@@ -855,7 +857,7 @@ class MikrotikControllerData:
                 self.data['accounting'][mac]['wan-rx'] = round(
                     tmp_accounting_values[addr]['wan-rx'] / time_diff * traffic_div, 2)
 
-                if self.api.is_accounting_local_traffic_enabled():
+                if local_traffic_enabled:
                     self.data['accounting'][mac]['lan-tx'] = round(
                         tmp_accounting_values[addr]['lan-tx'] / time_diff * traffic_div, 2)
                     self.data['accounting'][mac]['lan-rx'] = round(
@@ -877,6 +879,6 @@ class MikrotikControllerData:
                 self.data['accounting'][mac]['wan-tx'] = 0.0
                 self.data['accounting'][mac]['wan-rx'] = 0.0
 
-                if self.api.is_accounting_local_traffic_enabled():
+                if local_traffic_enabled:
                     self.data['accounting'][mac]['lan-tx'] = 0.0
                     self.data['accounting'][mac]['lan-rx'] = 0.0

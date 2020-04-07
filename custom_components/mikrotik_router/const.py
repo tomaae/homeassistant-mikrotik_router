@@ -16,5 +16,3 @@ DEFAULT_LOGIN_METHOD = "plain"
 
 DEFAULT_TRAFFIC_TYPE = "Kbps"
 TRAFFIC_TYPES = ["bps", "Kbps", "Mbps", "B/s", "KB/s", "MB/s"]
-
-CONF_TRACK_ACCOUNTING = "track_accounting"

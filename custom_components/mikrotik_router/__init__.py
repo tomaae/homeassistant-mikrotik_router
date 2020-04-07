@@ -17,7 +17,6 @@ from .const import (
     DOMAIN,
     DATA_CLIENT,
     DEFAULT_TRAFFIC_TYPE,
-    CONF_TRACK_ACCOUNTING,
 )
 from .mikrotik_controller import MikrotikControllerData
 
@@ -49,11 +48,10 @@ async def async_setup_entry(hass, config_entry):
         traffic_type = config_entry.data[CONF_UNIT_OF_MEASUREMENT]
     else:
         traffic_type = DEFAULT_TRAFFIC_TYPE
-    track_accounting = config_entry.data[CONF_TRACK_ACCOUNTING]
 
     mikrotik_controller = MikrotikControllerData(
         hass, config_entry, name, host, port, username, password, use_ssl,
-        traffic_type, track_accounting
+        traffic_type
     )
     await mikrotik_controller.hwinfo_update()
 

@@ -471,36 +471,31 @@ class MikrotikAPI:
         from time import time
         return int(round(time() * 1000))
 
-    def is_accounting_enabled(self) -> bool:
+    def is_accounting_and_local_traffic_enabled(self) -> (bool, bool):
+        # Returns:
+        #   1st bool: Is accounting enabled
+        #   2nd bool: Is account-local-traffic enabled
+
         if not self.connection_check():
-            return False
+            return False, False
 
         response = self.path("/ip/accounting")
         if response is None:
-            return False
+            return False, False
 
         for item in response:
             if 'enabled' not in item:
                 continue
-            if item['enabled']:
-                return True
+            if not item['enabled']:
+                return False, False
 
-        return False
-
-    def is_accounting_local_traffic_enabled(self) -> bool:
-        if not self.connection_check():
-            return False
-
-        accounting = self.path("/ip/accounting")
-        if accounting is None:
-            return False
-
-        for item in accounting:
+        for item in response:
             if 'account-local-traffic' not in item:
                 continue
-            if item['account-local-traffic']:
-                return True
-        return False
+            if not item['account-local-traffic']:
+                return True, False
+
+        return True, True
 
     # ---------------------------
     #   take_accounting_snapshot
