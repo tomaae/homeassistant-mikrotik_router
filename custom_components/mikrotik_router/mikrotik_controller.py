@@ -58,6 +58,8 @@ class MikrotikControllerData:
             "fw-update": {},
             "script": {},
             "queue": {},
+            "dhcp-server": {},
+            "dhcp": {},
         }
 
         self.listeners = []
@@ -193,6 +195,7 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.get_system_resource)
         await self.hass.async_add_executor_job(self.get_script)
         await self.hass.async_add_executor_job(self.get_queue)
+        await self.hass.async_add_executor_job(self.get_dhcp)
 
         async_dispatcher_send(self.hass, self.signal_update)
         self.lock.release()
@@ -655,3 +658,42 @@ class MikrotikControllerData:
             upload_burst_time, download_burst_time = self.data["queue"][uid]["burst-time"].split('/')
             self.data["queue"][uid]["upload-burst-time"] = upload_burst_time
             self.data["queue"][uid]["download-burst-time"] = download_burst_time
+
+    # ---------------------------
+    #   get_dhcp
+    # ---------------------------
+    def get_dhcp(self):
+        """Get DHCP data from Mikrotik"""
+
+        self.data["dhcp-server"] = parse_api(
+            data=self.data["dhcp-server"],
+            source=self.api.path("/ip/dhcp-server"),
+            key="name",
+            vals=[
+                {"name": "name"},
+                {"name": "interface", "default": ""},
+            ]
+        )
+
+        self.data["dhcp"] = parse_api(
+            data=self.data["dhcp"],
+            source=self.api.path("/ip/dhcp-server/lease"),
+            key="mac-address",
+            vals=[
+                {"name": "mac-address"},
+                {"name": "address", "default": "unknown"},
+                {"name": "host-name", "default": "unknown"},
+                {"name": "status", "default": "unknown"},
+                {"name": "last-seen", "default": "unknown"},
+                {"name": "server", "default": "unknown"},
+                {"name": "interface", "default": ""},
+                {"name": "available", "type": "bool", "default": False},
+            ]
+        )
+
+        for uid in self.data["dhcp"]:
+            self.data["dhcp"][uid]['interface'] = \
+                self.data["dhcp-server"][self.data["dhcp"][uid]['server']]["interface"]
+
+            self.data["dhcp"][uid]['available'] = \
+                self.api.arp_ping(self.data["dhcp"][uid]['address'], self.data["dhcp"][uid]['interface'])

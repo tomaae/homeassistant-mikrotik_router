@@ -399,3 +399,67 @@ class MikrotikAPI:
 
         self.lock.release()
         return traffic if traffic else None
+
+    # ---------------------------
+    #   arp_ping
+    # ---------------------------
+    def arp_ping(self, address, interface) -> bool:
+        """Check arp ping response traffic stats"""
+        if not self.connection_check():
+            return False
+
+        response = self.path("/ping", return_list=False)
+        if response is None:
+            return False
+
+        args = {
+            "arp-ping": "yes",
+            "interval": "100ms",
+            "count": 3,
+            "interface": interface,
+            "address": address,
+        }
+        self.lock.acquire()
+        try:
+            _LOGGER.debug("Ping host query: %s", "/ping")
+            ping = response("/ping", **args)
+        except librouteros_custom.exceptions.ConnectionClosed:
+            self.disconnect()
+            self.lock.release()
+            return False
+        except (
+            librouteros_custom.exceptions.TrapError,
+            librouteros_custom.exceptions.MultiTrapError,
+            librouteros_custom.exceptions.ProtocolError,
+            librouteros_custom.exceptions.FatalError,
+            ssl.SSLError,
+            BrokenPipeError,
+            OSError,
+            ValueError,
+        ) as api_error:
+            self.disconnect("arp_ping", api_error)
+            self.lock.release()
+            return False
+        except:
+            self.disconnect("arp_ping")
+            self.lock.release()
+            return False
+
+        try:
+            ping = list(ping)
+        except librouteros_custom.exceptions.ConnectionClosed as api_error:
+            self.disconnect("arp_ping", api_error)
+            self.lock.release()
+            return False
+        except:
+            self.disconnect("arp_ping")
+            self.lock.release()
+            return False
+
+        self.lock.release()
+
+        for tmp in ping:
+            if tmp["received"] > 0:
+                return True
+
+        return False
