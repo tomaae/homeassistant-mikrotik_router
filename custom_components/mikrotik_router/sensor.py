@@ -379,13 +379,20 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
 
     @property
     def device_info(self):
-        """Return a port description for device registry."""
+        """Return a accounting description for device registry."""
         info = {
-            "connections": {
-                (CONNECTION_NETWORK_MAC, self._data["mac-address"])},
+            "identifiers": {
+                (
+                    DOMAIN,
+                    "serial-number",
+                    self._ctrl.data["routerboard"]["serial-number"],
+                    "sensor",
+                    "Accounting"
+                )
+            },
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
-            "name": SENSOR_TYPES[ATTR_GROUP],
+            "name": self._type[ATTR_GROUP],
         }
         return info
 
