@@ -12,7 +12,7 @@
                     "username": "Username",
                     "password": "Password",
                     "ssl": "Use SSL",
-                    "unit_of_measurement": "Unit of measurement",
+                    "unit_of_measurement": "Unit of measurement"
                 }
             }
         },
@@ -21,7 +21,7 @@
             "cannot_connect": "Cannot connect to Mikrotik.",
             "ssl_handshake_failure": "SSL handshake failure",
             "connection_timeout": "Mikrotik connection timeout.",
-            "wrong_login": "Invalid user name or password.",
+            "wrong_login": "Invalid user name or password."
         }
     },
     "options": {
