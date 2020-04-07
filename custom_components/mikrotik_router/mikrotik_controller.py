@@ -788,9 +788,12 @@ class MikrotikControllerData:
             # Then static DNS entry
             elif vals['address'] in dns_data and str(dns_data[vals['address']].get('name', '').strip()):
                 self.data["accounting"][mac]['name'] = dns_data[vals['address']]['name']
-            # If everything fails use hosts DHCP lease host-name
-            else:
+            # Then DHCP lease host-name
+            elif str(vals.get('host-name', '').strip()):
                 self.data["accounting"][mac]['name'] = vals['host-name']
+            # If everything fails fallback to device's MAC address
+            else:
+                self.data["accounting"][mac]['name'] = vals['mac-address']
 
         _LOGGER.debug(f"Generated {len(self.data['accounting'])} accounting devices")
 
