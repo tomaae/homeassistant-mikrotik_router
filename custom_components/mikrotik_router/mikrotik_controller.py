@@ -81,10 +81,10 @@ class MikrotikControllerData:
         async_track_time_interval(
             self.hass, self.force_fwupdate_check, timedelta(hours=1)
         )
-        if self.track_accounting:
-            async_track_time_interval(
-                self.hass, self.force_accounting_hosts_update, timedelta(minutes=15)
-            )
+        # if self.track_accounting:
+        #     async_track_time_interval(
+        #         self.hass, self.force_accounting_hosts_update, timedelta(minutes=15)
+        #     )
 
     def _get_traffic_type_and_div(self):
         traffic_type = self.option_traffic_type
@@ -114,10 +114,10 @@ class MikrotikControllerData:
     # ---------------------------
     #   force_accounting_hosts_update
     # ---------------------------
-    @callback
-    async def force_accounting_hosts_update(self, _now=None):
-        """Trigger update by timer"""
-        await self.async_accounting_hosts_update()
+    # @callback
+    # async def force_accounting_hosts_update(self, _now=None):
+    #     """Trigger update by timer"""
+    #     await self.async_accounting_hosts_update()
 
     # ---------------------------
     #   force_fwupdate_check
@@ -188,15 +188,15 @@ class MikrotikControllerData:
     # ---------------------------
     #   async_accounting_hosts_update
     # ---------------------------
-    async def async_accounting_hosts_update(self):
-        """Update Mikrotik accounting hosts"""
-        try:
-            await asyncio.wait_for(self.lock.acquire(), timeout=10)
-        except:
-            return
-
-        await self.hass.async_add_executor_job(self.build_accounting_hosts)
-        self.lock.release()
+    # async def async_accounting_hosts_update(self):
+    #     """Update Mikrotik accounting hosts"""
+    #     try:
+    #         await asyncio.wait_for(self.lock.acquire(), timeout=10)
+    #     except:
+    #         return
+    #
+    #     await self.hass.async_add_executor_job(self.build_accounting_hosts)
+    #     self.lock.release()
 
     # ---------------------------
     #   async_fwupdate_check
@@ -708,6 +708,20 @@ class MikrotikControllerData:
             ]
         )
 
+        # Build list of local DHCP networks
+        dhcp_networks = parse_api(
+            data={},
+            source=self.api.path("/ip/dhcp-server/network"),
+            key="address",
+            vals=[
+                {"name": "address"},
+            ],
+            ensure_vals=[
+                {"name": "address"},
+            ]
+        )
+        self.local_dhcp_networks = [IPv4Network(network) for network in dhcp_networks]
+
         self.data["dhcp"] = parse_api(
             data=self.data["dhcp"],
             source=self.api.path("/ip/dhcp-server/lease"),
@@ -760,7 +774,7 @@ class MikrotikControllerData:
         #     ]
         # )
 
-        # Also retrieve all entries in ARP table. If some hosts are missing, build it here
+        # Also add hosts not found in DHCP Leases from ARP table
         arp_hosts = parse_api(
             data={},
             source=self.api.path("/ip/arp", return_list=True),
@@ -788,7 +802,7 @@ class MikrotikControllerData:
                    "mac-address": arp_hosts[mac]['address']
                 }
 
-        # Build name for host.
+        # Build name for host
         dns_data = parse_api(
             data={},
             source=self.api.path("/ip/dns/static", return_list=True),
@@ -816,20 +830,6 @@ class MikrotikControllerData:
         _LOGGER.debug(f"Generated {len(self.data['accounting'])} accounting devices")
         _LOGGER.debug(self.data['accounting'])
 
-        # Build list of local networks
-        dhcp_networks = parse_api(
-            data={},
-            source=self.api.path("/ip/dhcp-server/network", return_list=True),
-            key="address",
-            vals=[
-                {"name": "address"},
-            ],
-            ensure_vals=[
-                {"name": "address"},
-            ]
-        )
-
-        self.local_dhcp_networks = [IPv4Network(network) for network in dhcp_networks]
 
     def _address_part_of_local_network(self, address):
         address = ip_address(address)
@@ -846,6 +846,68 @@ class MikrotikControllerData:
 
     def get_accounting(self):
         """Get Accounting data from Mikrotik"""
+
+        # Build missing hosts from already retrieved DHCP Server leases
+        for mac in self.data["dhcp"]:
+            if mac not in self.data["accounting"]:
+                self.data["accounting"][mac] = self.data["dhcp"][mac]
+
+        # Also add hosts not found in DHCP Leases from ARP table
+        arp_hosts = parse_api(
+            data={},
+            source=self.api.path("/ip/arp"),
+            key="mac-address",
+            vals=[
+                {"name": "address"},
+                {"name": "mac-address"},
+                {"name": "disabled", "default": True},
+                {"name": "invalid", "default": True},
+            ],
+            only=[
+                {"key": "disabled", "value": False},
+                {"key": "invalid", "value": False}
+            ],
+            ensure_vals=[
+                {"name": "address"},
+                {"name": "mac-address"},
+            ]
+        )
+
+        for mac in arp_hosts:
+            if mac not in self.data["accounting"]:
+                self.data["accounting"][mac] = {
+                    "address": arp_hosts[mac]['address'],
+                    "mac-address": arp_hosts[mac]['mac-address']
+                }
+
+        # Build name for host
+        dns_data = parse_api(
+            data={},
+            source=self.api.path("/ip/dns/static"),
+            key="address",
+            vals=[
+                {"name": "address"},
+                {"name": "name"},
+            ],
+        )
+
+        for mac, vals in self.data["accounting"].items():
+            # First try getting DHCP lease comment
+            if str(vals.get('comment', '').strip()):
+                self.data["accounting"][mac]['name'] = vals['comment']
+            # Then entry in static DNS entry
+            elif vals['address'] in dns_data and str(dns_data[vals['address']].get('name', '').strip()):
+                self.data["accounting"][mac]['name'] = dns_data[vals['address']]['name']
+            # And then DHCP lease host-name
+            elif str(vals.get('host-name', '').strip()):
+                self.data["accounting"][mac]['name'] = vals['host-name']
+            # If everything fails use hosts IP address as name
+            else:
+                self.data["accounting"][mac]['name'] = vals['address']
+
+        _LOGGER.debug(f"Generated {len(self.data['accounting'])} accounting devices")
+        _LOGGER.debug(self.data['accounting'])
+
         traffic_type, traffic_div = self._get_traffic_type_and_div()
 
         # Build temp accounting values dict with ip address as key
