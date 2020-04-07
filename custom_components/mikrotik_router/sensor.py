@@ -83,6 +83,7 @@ SENSOR_TYPES = {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:download-network",
         ATTR_LABEL: "LAN TX",
+        ATTR_GROUP: "Accounting",
         ATTR_UNIT: "ps",
         ATTR_UNIT_ATTR: "tx-rx-attr",
         ATTR_PATH: "accounting",
@@ -92,6 +93,7 @@ SENSOR_TYPES = {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:upload-network",
         ATTR_LABEL: "LAN RX",
+        ATTR_GROUP: "Accounting",
         ATTR_UNIT: "ps",
         ATTR_UNIT_ATTR: "tx-rx-attr",
         ATTR_PATH: "accounting",
@@ -101,6 +103,7 @@ SENSOR_TYPES = {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:download-network",
         ATTR_LABEL: "WAN TX",
+        ATTR_GROUP: "Accounting",
         ATTR_UNIT: "ps",
         ATTR_UNIT_ATTR: "tx-rx-attr",
         ATTR_PATH: "accounting",
@@ -110,6 +113,7 @@ SENSOR_TYPES = {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:upload-network",
         ATTR_LABEL: "WAN RX",
+        ATTR_GROUP: "Accounting",
         ATTR_UNIT: "ps",
         ATTR_UNIT_ATTR: "tx-rx-attr",
         ATTR_PATH: "accounting",
@@ -371,7 +375,7 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
     @property
     def unique_id(self):
         """Return a unique_id for this entity."""
-        return f"{self._inst.lower()}-{self._sensor.lower()}-{self._data['address'].lower()}"
+        return f"{self._inst.lower()}-{self._sensor.lower()}-{self._data['mac-address'].lower()}"
 
     @property
     def device_info(self):
@@ -381,7 +385,7 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
                 (CONNECTION_NETWORK_MAC, self._data["mac-address"])},
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
-            "name": self._data["name"],
+            "name": SENSOR_TYPES[ATTR_GROUP],
         }
         return info
 

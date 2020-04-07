@@ -585,7 +585,7 @@ class MikrotikControllerData:
             self.data["resource"]["hdd-usage"] = "unknown"
 
     # ---------------------------
-    #   get_system_routerboard
+    #   get_firmware_update
     # ---------------------------
     def get_firmware_update(self):
         """Check for firmware update on Mikrotik"""
@@ -748,89 +748,6 @@ class MikrotikControllerData:
             self.data["dhcp"][uid]['available'] = \
                 self.api.arp_ping(self.data["dhcp"][uid]['address'], self.data["dhcp"][uid]['interface'])
 
-    def build_accounting_hosts(self):
-        # Build hosts from already retrieved DHCP Server leases
-        for mac in self.data["dhcp"]:
-            if mac not in self.data["accounting"]:
-                self.data["accounting"][mac] = self.data["dhcp"][mac]
-
-        # self.data["accounting"] = parse_api(
-        #     data=self.data["accounting"],
-        #     source=self.api.path("/ip/dhcp-server/lease", return_list=True),
-        #     key="address",
-        #     vals=[
-        #         {"name": "address"},
-        #         {"name": "mac-address"},
-        #         {"name": "host-name"},
-        #         {"name": "comment"},
-        #         {"name": "disabled", "default": True},
-        #     ],
-        #     only=[
-        #         {"key": "disabled", "value": False},
-        #     ],
-        #     ensure_vals=[
-        #         {"name": "address"},
-        #         {"name": "mac-address"},
-        #     ]
-        # )
-
-        # Also add hosts not found in DHCP Leases from ARP table
-        arp_hosts = parse_api(
-            data={},
-            source=self.api.path("/ip/arp", return_list=True),
-            key="mac-address",
-            vals=[
-                {"name": "address"},
-                {"name": "mac-address"},
-                {"name": "disabled", "default": True},
-                {"name": "invalid", "default": True},
-            ],
-            only=[
-                {"key": "disabled", "value": False},
-                {"key": "invalid", "value": False}
-            ],
-            ensure_vals=[
-                {"name": "address"},
-                {"name": "mac-address"},
-            ]
-        )
-
-        for mac in arp_hosts:
-            if mac not in self.data["accounting"]:
-                self.data["accounting"][mac] = {
-                   "address": arp_hosts[mac]['address'],
-                   "mac-address": arp_hosts[mac]['address']
-                }
-
-        # Build name for host
-        dns_data = parse_api(
-            data={},
-            source=self.api.path("/ip/dns/static", return_list=True),
-            key="address",
-            vals=[
-                {"name": "address"},
-                {"name": "name"},
-            ],
-        )
-
-        for mac, vals in self.data["accounting"].items():
-            # First try getting DHCP lease comment
-            if str(vals.get('comment', '').strip()):
-                self.data["accounting"][mac]['name'] = vals['comment']
-            # Then entry in static DNS entry
-            elif vals['address'] in dns_data and str(dns_data[vals['address']].get('name', '').strip()):
-                self.data["accounting"][mac]['name'] = dns_data[vals['address']]['name']
-            # And then DHCP lease host-name
-            elif str(vals.get('host-name', '').strip()):
-                self.data["accounting"][mac]['name'] = vals['host-name']
-            # If everything fails use hosts IP address as name
-            else:
-                self.data["accounting"][mac]['name'] = vals['address']
-
-        _LOGGER.debug(f"Generated {len(self.data['accounting'])} accounting devices")
-        _LOGGER.debug(self.data['accounting'])
-
-
     def _address_part_of_local_network(self, address):
         address = ip_address(address)
         for network in self.local_dhcp_networks:
@@ -846,39 +763,10 @@ class MikrotikControllerData:
 
     def get_accounting(self):
         """Get Accounting data from Mikrotik"""
-
         # Build missing hosts from already retrieved DHCP Server leases
-        for mac in self.data["dhcp"]:
+        for mac, vals in self.data["dhcp"].items():
             if mac not in self.data["accounting"]:
-                self.data["accounting"][mac] = self.data["dhcp"][mac]
-
-        # Also add hosts not found in DHCP Leases from ARP table
-        arp_hosts = parse_api(
-            data={},
-            source=self.api.path("/ip/arp"),
-            key="mac-address",
-            vals=[
-                {"name": "address"},
-                {"name": "mac-address"},
-                {"name": "disabled", "default": True},
-                {"name": "invalid", "default": True},
-            ],
-            only=[
-                {"key": "disabled", "value": False},
-                {"key": "invalid", "value": False}
-            ],
-            ensure_vals=[
-                {"name": "address"},
-                {"name": "mac-address"},
-            ]
-        )
-
-        for mac in arp_hosts:
-            if mac not in self.data["accounting"]:
-                self.data["accounting"][mac] = {
-                    "address": arp_hosts[mac]['address'],
-                    "mac-address": arp_hosts[mac]['mac-address']
-                }
+                self.data["accounting"][mac] = vals
 
         # Build name for host
         dns_data = parse_api(
@@ -895,18 +783,14 @@ class MikrotikControllerData:
             # First try getting DHCP lease comment
             if str(vals.get('comment', '').strip()):
                 self.data["accounting"][mac]['name'] = vals['comment']
-            # Then entry in static DNS entry
+            # Then static DNS entry
             elif vals['address'] in dns_data and str(dns_data[vals['address']].get('name', '').strip()):
                 self.data["accounting"][mac]['name'] = dns_data[vals['address']]['name']
-            # And then DHCP lease host-name
-            elif str(vals.get('host-name', '').strip()):
-                self.data["accounting"][mac]['name'] = vals['host-name']
-            # If everything fails use hosts IP address as name
+            # If everything fails use hosts DHCP lease host-name
             else:
-                self.data["accounting"][mac]['name'] = vals['address']
+                self.data["accounting"][mac]['name'] = vals['host-name']
 
         _LOGGER.debug(f"Generated {len(self.data['accounting'])} accounting devices")
-        _LOGGER.debug(self.data['accounting'])
 
         traffic_type, traffic_div = self._get_traffic_type_and_div()
 
@@ -926,7 +810,7 @@ class MikrotikControllerData:
         if time_diff:
             accounting_data = parse_api(
                 data={},
-                source=self.api.path("/ip/accounting/snapshot", return_list=True),
+                source=self.api.path("/ip/accounting/snapshot"),
                 key=".id",
                 vals=[
                     {"name": ".id"},

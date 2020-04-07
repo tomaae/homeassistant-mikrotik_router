@@ -57,9 +57,6 @@ async def async_setup_entry(hass, config_entry):
     )
     await mikrotik_controller.hwinfo_update()
 
-    #if track_accounting:
-    #    await mikrotik_controller.async_accounting_hosts_update()
-
     await mikrotik_controller.async_update()
 
     if not mikrotik_controller.data:
