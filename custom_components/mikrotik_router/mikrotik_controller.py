@@ -739,18 +739,20 @@ class MikrotikControllerData:
         """Get Accounting data from Mikrotik"""
         # Check if accounting and account-local-traffic is enabled
         accounting_enabled, local_traffic_enabled = self.api.is_accounting_and_local_traffic_enabled()
+        traffic_type, traffic_div = self._get_traffic_type_and_div()
 
         if not accounting_enabled:
             # If any hosts were created return counters to 0 so sensors wont get stuck on last value
             for mac, vals in self.data["accounting"].items():
+                self.data['accounting'][mac]["tx-rx-attr"] = traffic_type
                 if 'wan-tx' in vals:
-                    self.data["accounting"]['wan-tx'] = 0.0
+                    self.data["accounting"][mac]['wan-tx'] = 0.0
                 if 'wan-rx' in vals:
-                    self.data["accounting"]['wan-rx'] = 0.0
+                    self.data["accounting"][mac]['wan-rx'] = 0.0
                 if 'lan-tx' in vals:
-                    self.data["accounting"]['lan-tx'] = 0.0
+                    self.data["accounting"][mac]['lan-tx'] = 0.0
                 if 'lan-rx' in vals:
-                    self.data["accounting"]['lan-rx'] = 0.0
+                    self.data["accounting"][mac]['lan-rx'] = 0.0
             return
 
         # Build missing hosts from already retrieved DHCP Server leases
@@ -760,44 +762,48 @@ class MikrotikControllerData:
                     'address': vals['address'],
                     'mac-address': vals['mac-address'],
                     'host-name': vals['host-name'],
+                    'comment': vals['comment']
                 }
 
         # Build missing hosts from already retrieved ARP list
+        host_update_from_arp = False
         for entry in self.raw_arp_entries:
             if entry['mac-address'] not in self.data["accounting"]:
                 self.data["accounting"][entry['mac-address']] = {
                     'address': entry['address'],
                     'mac-address': entry['mac-address'],
+                    'host-name': '',
+                    'comment': ''
                 }
+                host_update_from_arp = True
 
-        # Build name for host
-        dns_data = parse_api(
-            data={},
-            source=self.api.path("/ip/dns/static"),
-            key="address",
-            vals=[
-                {"name": "address"},
-                {"name": "name"},
-            ],
-        )
+        # If some host was added from ARP table build new host-name for it from static DNS entry. Fallback to MAC
+        if host_update_from_arp:
+            dns_data = parse_api(
+                data={},
+                source=self.api.path("/ip/dns/static"),
+                key="address",
+                vals=[
+                    {"name": "address"},
+                    {"name": "name"},
+                ],
+            )
 
+            # Try to build hostname from DNS static entry
+            for mac, vals in self.data["accounting"].items():
+                if not str(vals.get('host-name', '')).strip() or vals['host-name'] is 'unknown':
+                    if vals['address'] in dns_data and str(dns_data[vals['address']].get('name', '')).strip():
+                        self.data["accounting"][mac]['host-name'] = dns_data[vals['address']]['name']
+
+        # Check if any host still have empty 'host-name'. Default it to MAC.
+        # Same check for 'comment' (pretty name)
         for mac, vals in self.data["accounting"].items():
-            # First try getting DHCP lease comment
-            if str(vals.get('comment', '').strip()):
-                self.data["accounting"][mac]['name'] = vals['comment']
-            # Then static DNS entry
-            elif vals['address'] in dns_data and str(dns_data[vals['address']].get('name', '').strip()):
-                self.data["accounting"][mac]['name'] = dns_data[vals['address']]['name']
-            # Then DHCP lease host-name
-            elif str(vals.get('host-name', '').strip()):
-                self.data["accounting"][mac]['name'] = vals['host-name']
-            # If everything fails fallback to device's MAC address
-            else:
-                self.data["accounting"][mac]['name'] = vals['mac-address']
+            if not str(vals.get('host-name', '')).strip() or vals['host-name'] is 'unknown':
+                self.data["accounting"][mac]['host-name'] = mac
+            if not str(vals.get('comment', '')).strip() or vals['host-name'] is 'comment':
+                self.data["accounting"][mac]['comment'] = mac
 
-        _LOGGER.debug(f"Generated {len(self.data['accounting'])} accounting devices")
-
-        traffic_type, traffic_div = self._get_traffic_type_and_div()
+        _LOGGER.debug(f"Working with {len(self.data['accounting'])} accounting devices")
 
         # Build temp accounting values dict with ip address as key
         # Also set traffic type for each item

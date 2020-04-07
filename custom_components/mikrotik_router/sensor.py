@@ -124,6 +124,7 @@ SENSOR_TYPES = {
 DEVICE_ATTRIBUTES_ACCOUNTING = [
     "address",
     "mac-address",
+    "comment"
 ]
 
 
@@ -194,7 +195,7 @@ def update_items(inst, mikrotik_controller, async_add_entities, sensors):
         if "accounting_" in sensor:
             for uid in mikrotik_controller.data["accounting"]:
 
-                item_id = f"{inst}-{sensor}-{mikrotik_controller.data['accounting'][uid]['name']}"
+                item_id = f"{inst}-{sensor}-{mikrotik_controller.data['accounting'][uid]['mac-address']}"
                 if item_id in sensors:
                     if sensors[item_id].enabled:
                         sensors[item_id].async_schedule_update_ha_state()
@@ -370,7 +371,7 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
     @property
     def name(self):
         """Return the name."""
-        return f"{self._inst} {self._data['name']} {self._type[ATTR_LABEL]}"
+        return f"{self._inst} {self._data['host-name']} {self._type[ATTR_LABEL]} "
 
     @property
     def unique_id(self):
@@ -409,8 +410,9 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
     async def async_added_to_hass(self):
         """Port entity created."""
         _LOGGER.debug(
-            "New sensor %s (%s %s)",
+            "New sensor %s (%s [%s] %s)",
             self._inst,
-            self._data["name"],
+            self._data["host-name"],
+            self._data["mac-address"],
             self._sensor,
         )
