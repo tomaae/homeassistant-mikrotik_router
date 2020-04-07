@@ -466,26 +466,32 @@ class MikrotikAPI:
 
         return False
 
-
     @staticmethod
     def _current_milliseconds():
         from time import time
         return int(round(time() * 1000))
 
     def is_accounting_enabled(self) -> bool:
-        accounting = self.path("/ip/accounting", return_list=True)
-        if accounting is None:
+        if not self.connection_check():
             return False
 
-        for item in accounting:
+        response = self.path("/ip/accounting")
+        if response is None:
+            return False
+
+        for item in response:
             if 'enabled' not in item:
                 continue
             if item['enabled']:
                 return True
+
         return False
 
     def is_accounting_local_traffic_enabled(self) -> bool:
-        accounting = self.path("/ip/accounting", return_list=True)
+        if not self.connection_check():
+            return False
+
+        accounting = self.path("/ip/accounting")
         if accounting is None:
             return False
 
@@ -502,48 +508,45 @@ class MikrotikAPI:
     # ---------------------------
     def take_accounting_snapshot(self) -> float:
         """Get accounting data"""
-        if not self._connected or not self._connection:
-            if self._connection_epoch > time.time() - self._connection_retry_sec:
-                return 0
+        if not self.connection_check():
+            return 0
 
-            if not self.connect():
-                return 0
-
-        accounting = self.path("/ip/accounting")
+        accounting = self.path("/ip/accounting", return_list=False)
 
         self.lock.acquire()
         try:
             # Prepare command
             take = accounting('snapshot/take')
-            # Run command on Mikrotik
-            tuple(take)
         except librouteros_custom.exceptions.ConnectionClosed:
-            if not self.connection_error_reported:
-                _LOGGER.error("Mikrotik %s connection closed", self._host)
-                self.connection_error_reported = True
-
             self.disconnect()
             self.lock.release()
             return 0
-            if not self.connection_error_reported:
-                _LOGGER.error(
-                    "Mikrotik %s error while take_accounting_snapshot %s -> %s - %s", self._host,
-                    type(api_error), api_error.args
-                )
-                self.connection_error_reported = True
-
-            self.disconnect()
+        except (
+                librouteros_custom.exceptions.TrapError,
+                librouteros_custom.exceptions.MultiTrapError,
+                librouteros_custom.exceptions.ProtocolError,
+                librouteros_custom.exceptions.FatalError,
+                ssl.SSLError,
+                BrokenPipeError,
+                OSError,
+                ValueError,
+        ) as api_error:
+            self.disconnect("accounting_snapshot", api_error)
             self.lock.release()
             return 0
-        except Exception as e:
-            if not self.connection_error_reported:
-                _LOGGER.error(
-                    "% -> %s error on %s host while take_accounting_snapshot",
-                    type(e), e.args, self._host,
-                )
-                self.connection_error_reported = True
+        except:
+            self.disconnect("accounting_snapshot")
+            self.lock.release()
+            return 0
 
-            self.disconnect()
+        try:
+            list(take)
+        except librouteros_custom.exceptions.ConnectionClosed as api_error:
+            self.disconnect("accounting_snapshot", api_error)
+            self.lock.release()
+            return 0
+        except:
+            self.disconnect("accounting_snapshot")
             self.lock.release()
             return 0
 
