@@ -11,6 +11,7 @@ from homeassistant.const import (
 from homeassistant.core import callback
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
+from homeassistant.util.dt import get_age
 
 from .const import (
     DOMAIN,
@@ -301,6 +302,12 @@ class MikrotikControllerHostDeviceTracker(ScannerEntity):
 
         for variable in DEVICE_ATTRIBUTES_HOST:
             if variable in self._data:
-                attributes[format_attribute(variable)] = self._data[variable]
+                if variable == "last-seen":
+                    if self._data[variable]:
+                        attributes[format_attribute(variable)] = get_age(self._data[variable])
+                    else:
+                        attributes[format_attribute(variable)] = "unknown"
+                else:
+                    attributes[format_attribute(variable)] = self._data[variable]
 
         return attributes
