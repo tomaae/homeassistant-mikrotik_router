@@ -81,7 +81,7 @@ SENSOR_TYPES = {
     },
     "accounting_lan_tx": {
         ATTR_DEVICE_CLASS: None,
-        ATTR_ICON: "mdi:download-network",
+        ATTR_ICON: "mdi:upload-network",
         ATTR_LABEL: "LAN TX",
         ATTR_GROUP: "Accounting",
         ATTR_UNIT: "ps",
@@ -91,7 +91,7 @@ SENSOR_TYPES = {
     },
     "accounting_lan_rx": {
         ATTR_DEVICE_CLASS: None,
-        ATTR_ICON: "mdi:upload-network",
+        ATTR_ICON: "mdi:download-network",
         ATTR_LABEL: "LAN RX",
         ATTR_GROUP: "Accounting",
         ATTR_UNIT: "ps",
@@ -101,7 +101,7 @@ SENSOR_TYPES = {
     },
     "accounting_wan_tx": {
         ATTR_DEVICE_CLASS: None,
-        ATTR_ICON: "mdi:download-network",
+        ATTR_ICON: "mdi:upload-network",
         ATTR_LABEL: "WAN TX",
         ATTR_GROUP: "Accounting",
         ATTR_UNIT: "ps",
@@ -111,7 +111,7 @@ SENSOR_TYPES = {
     },
     "accounting_wan_rx": {
         ATTR_DEVICE_CLASS: None,
-        ATTR_ICON: "mdi:upload-network",
+        ATTR_ICON: "mdi:download-network",
         ATTR_LABEL: "WAN RX",
         ATTR_GROUP: "Accounting",
         ATTR_UNIT: "ps",
