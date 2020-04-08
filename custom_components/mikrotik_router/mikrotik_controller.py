@@ -797,30 +797,30 @@ class MikrotikControllerData:
         for uid, vals in self.data["host"].items():
             # Add missing default values
             for key, default in zip(
-                    ["address", "mac-address", "interface", "hostname", "last-seen", "available"],
+                    ["address", "mac-address", "interface", "host-name", "last-seen", "available"],
                     ["unknown", "unknown", "unknown", "unknown", False],
             ):
                 if key not in self.data["host"][uid]:
                     self.data["host"][uid][key] = default
 
             # Resolve hostname
-            if vals["hostname"] == "unknown":
+            if vals["host-name"] == "unknown":
                 if vals["address"] != "unknown":
                     for dns_uid, dns_vals in self.data["dns"].items():
                         if dns_vals["address"] == vals["address"]:
-                            self.data["host"][uid]["hostname"] = dns_vals["name"].split('.')[0]
+                            self.data["host"][uid]["host-name"] = dns_vals["name"].split('.')[0]
                             break
 
-                if self.data["host"][uid]["hostname"] == "unknown" \
+                if self.data["host"][uid]["host-name"] == "unknown" \
                         and uid in self.data["dhcp"] and self.data["dhcp"][uid]["comment"] != "":
-                    self.data["host"][uid]["hostname"] = self.data["dhcp"][uid]["comment"]
+                    self.data["host"][uid]["host-name"] = self.data["dhcp"][uid]["comment"]
 
-                elif self.data["host"][uid]["hostname"] == "unknown" \
+                elif self.data["host"][uid]["host-name"] == "unknown" \
                         and uid in self.data["dhcp"] and self.data["dhcp"][uid]["host-name"] != "unknown":
-                    self.data["host"][uid]["hostname"] = self.data["dhcp"][uid]["host-name"]
+                    self.data["host"][uid]["host-name"] = self.data["dhcp"][uid]["host-name"]
 
-                elif self.data["host"][uid]["hostname"] == "unknown":
-                    self.data["host"][uid]["hostname"] = uid
+                elif self.data["host"][uid]["host-name"] == "unknown":
+                    self.data["host"][uid]["host-name"] = uid
 
             # Check host availability
             if vals["address"] != "unknown" and vals["interface"] != "unknown":
@@ -856,7 +856,7 @@ class MikrotikControllerData:
                 self.data["accounting"][uid] = {
                     'address': vals['address'],
                     'mac-address': vals['mac-address'],
-                    'host-name': vals['hostname'],
+                    'host-name': vals['host-name'],
                     'tx-rx-attr': traffic_type,
                     'available': False,
                     'local_accounting': False

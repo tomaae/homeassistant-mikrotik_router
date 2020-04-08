@@ -38,7 +38,7 @@ DEVICE_ATTRIBUTES_IFACE = [
 ]
 
 DEVICE_ATTRIBUTES_HOST = [
-    "hostname",
+    "host-name",
     "address",
     "mac-address",
     "interface",
@@ -234,7 +234,7 @@ class MikrotikControllerHostDeviceTracker(ScannerEntity):
         _LOGGER.debug(
             "New host tracker %s (%s - %s)",
             self._inst,
-            self._data["hostname"],
+            self._data["host-name"],
             self._data["mac-address"],
         )
 
@@ -254,7 +254,7 @@ class MikrotikControllerHostDeviceTracker(ScannerEntity):
     @property
     def name(self):
         """Return the name of the host."""
-        return f"{self._data['hostname']}"
+        return f"{self._data['host-name']}"
 
     @property
     def unique_id(self):
