@@ -775,7 +775,3 @@ class MikrotikControllerData:
             # Update last seen
             if self.data["host"][uid]["available"]:
                 self.data["host"][uid]["last-seen"] = utcnow()
-
-        # TEMP DEBUG
-        for uid, vals in self.data["host"].items():
-            _LOGGER.warning("HOST %s: %s", uid, vals)
