@@ -819,7 +819,7 @@ class MikrotikControllerData:
                 elif self.data["host"][uid]["hostname"] == "unknown":
                     self.data["host"][uid]["hostname"] = uid
 
-                    # Check host availability
+            # Check host availability
             if vals["address"] != "unknown" and vals["interface"] != "unknown":
                 self.data["host"][uid]["available"] = \
                     self.api.arp_ping(vals["address"], vals["interface"])
