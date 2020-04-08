@@ -37,11 +37,10 @@ DEVICE_ATTRIBUTES_IFACE = [
 ]
 
 DEVICE_ATTRIBUTES_HOST = [
-    "host-name",
+    "hostname",
     "address",
     "mac-address",
     "interface",
-    "status",
     "last-seen",
 ]
 
@@ -91,7 +90,7 @@ def update_items(inst, mikrotik_controller, async_add_entities, tracked):
 
     # Add switches
     for sid, sid_uid, sid_func in zip(
-        ["interface", "dhcp"],
+        ["interface", "host"],
         ["default-name", "mac-address"],
         [
             MikrotikControllerPortDeviceTracker,
@@ -218,7 +217,7 @@ class MikrotikControllerHostDeviceTracker(ScannerEntity):
         """Set up tracked port."""
         self._inst = inst
         self._ctrl = mikrotik_controller
-        self._data = mikrotik_controller.data["dhcp"][uid]
+        self._data = mikrotik_controller.data["host"][uid]
 
         self._attrs = {
             ATTR_ATTRIBUTION: ATTRIBUTION,
@@ -234,7 +233,7 @@ class MikrotikControllerHostDeviceTracker(ScannerEntity):
         _LOGGER.debug(
             "New host tracker %s (%s - %s)",
             self._inst,
-            self._data["host-name"],
+            self._data["hostname"],
             self._data["mac-address"],
         )
 
@@ -254,7 +253,7 @@ class MikrotikControllerHostDeviceTracker(ScannerEntity):
     @property
     def name(self):
         """Return the name of the host."""
-        return f"{self._inst} {self._data['host-name']}"
+        return f"{self._data['hostname']}"
 
     @property
     def unique_id(self):
