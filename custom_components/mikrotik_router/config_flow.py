@@ -21,12 +21,18 @@ from homeassistant.core import callback
 
 from .const import (
     DOMAIN,
-    CONF_TRACK_ARP,
-    DEFAULT_TRACK_ARP,
+    CONF_TRACK_IFACE_CLIENTS,
+    DEFAULT_TRACK_IFACE_CLIENTS,
     CONF_SCAN_INTERVAL,
     DEFAULT_SCAN_INTERVAL,
-    DEFAULT_TRAFFIC_TYPE,
-    TRAFFIC_TYPES,
+    LIST_UNIT_OF_MEASUREMENT,
+    DEFAULT_UNIT_OF_MEASUREMENT,
+    DEFAULT_HOST,
+    DEFAULT_USERNAME,
+    DEFAULT_PASSWORD,
+    DEFAULT_PORT,
+    DEFAULT_NAME,
+    DEFAULT_SSL,
 )
 from .mikrotikapi import MikrotikAPI
 
@@ -77,11 +83,11 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
 
             # Test connection
             api = MikrotikAPI(
-                host=user_input["host"],
-                username=user_input["username"],
-                password=user_input["password"],
-                port=user_input["port"],
-                use_ssl=user_input["ssl"]
+                host=user_input[CONF_HOST],
+                username=user_input[CONF_USERNAME],
+                password=user_input[CONF_PASSWORD],
+                port=user_input[CONF_PORT],
+                use_ssl=user_input[CONF_SSL]
             )
             if not api.connect():
                 errors[CONF_HOST] = api.error
@@ -89,48 +95,42 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
             # Save instance
             if not errors:
                 return self.async_create_entry(
-                    title=user_input[CONF_NAME], data=user_input
+                    title=user_input[CONF_NAME],
+                    data=user_input
                 )
 
             return self._show_config_form(
-                host=user_input["host"],
-                username=user_input["username"],
-                password=user_input["password"],
-                port=user_input["port"],
-                name=user_input["name"],
-                use_ssl=user_input["ssl"],
+                user_input=user_input,
                 errors=errors,
             )
 
-        return self._show_config_form(errors=errors)
+        return self._show_config_form(
+            user_input={
+                CONF_NAME: DEFAULT_NAME,
+                CONF_HOST: DEFAULT_HOST,
+                CONF_USERNAME: DEFAULT_USERNAME,
+                CONF_PASSWORD: DEFAULT_PASSWORD,
+                CONF_PORT: DEFAULT_PORT,
+                CONF_SSL: DEFAULT_SSL,
+            },
+            errors=errors
+        )
 
     # ---------------------------
     #   _show_config_form
     # ---------------------------
-    def _show_config_form(
-        self,
-        host="10.0.0.1",
-        username="admin",
-        password="admin",
-        port=0,
-        name="Mikrotik",
-        use_ssl=False,
-        errors=None,
-    ):
+    def _show_config_form(self, user_input, errors=None):
         """Show the configuration form to edit data."""
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema(
                 {
-                    vol.Required(CONF_HOST, default=host): str,
-                    vol.Required(CONF_USERNAME, default=username): str,
-                    vol.Required(CONF_PASSWORD, default=password): str,
-                    vol.Optional(
-                        CONF_UNIT_OF_MEASUREMENT, default=DEFAULT_TRAFFIC_TYPE
-                    ): vol.In(TRAFFIC_TYPES),
-                    vol.Optional(CONF_PORT, default=port): int,
-                    vol.Optional(CONF_NAME, default=name): str,
-                    vol.Optional(CONF_SSL, default=use_ssl): bool,
+                    vol.Required(CONF_NAME, default=user_input[CONF_NAME]): str,
+                    vol.Required(CONF_HOST, default=user_input[CONF_HOST]): str,
+                    vol.Required(CONF_USERNAME, default=user_input[CONF_USERNAME]): str,
+                    vol.Required(CONF_PASSWORD, default=user_input[CONF_PASSWORD]): str,
+                    vol.Optional(CONF_PORT, default=user_input[CONF_PORT]): int,
+                    vol.Optional(CONF_SSL, default=user_input[CONF_SSL]): bool,
                 }
             ),
             errors=errors,
@@ -163,9 +163,9 @@ class MikrotikControllerOptionsFlowHandler(OptionsFlow):
             data_schema=vol.Schema(
                 {
                     vol.Optional(
-                        CONF_TRACK_ARP,
+                        CONF_TRACK_IFACE_CLIENTS,
                         default=self.config_entry.options.get(
-                            CONF_TRACK_ARP, DEFAULT_TRACK_ARP
+                            CONF_TRACK_IFACE_CLIENTS, DEFAULT_TRACK_IFACE_CLIENTS
                         ),
                     ): bool,
                     vol.Optional(
@@ -177,9 +177,9 @@ class MikrotikControllerOptionsFlowHandler(OptionsFlow):
                     vol.Optional(
                         CONF_UNIT_OF_MEASUREMENT,
                         default=self.config_entry.options.get(
-                            CONF_UNIT_OF_MEASUREMENT, DEFAULT_TRAFFIC_TYPE
+                            CONF_UNIT_OF_MEASUREMENT, DEFAULT_UNIT_OF_MEASUREMENT
                         ),
-                    ): vol.In(TRAFFIC_TYPES),
+                    ): vol.In(LIST_UNIT_OF_MEASUREMENT),
                 }
             ),
         )

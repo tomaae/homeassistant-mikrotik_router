@@ -11,8 +11,7 @@
                     "port": "Port",
                     "username": "Username",
                     "password": "Password",
-                    "ssl": "Use SSL",
-                    "unit_of_measurement": "Unit of measurement"
+                    "ssl": "Use SSL"
                 }
             }
         },
@@ -32,7 +31,7 @@
             "device_tracker": {
                 "data": {
                     "scan_interval": "Scan interval (requires HA restart)",
-                    "track_arp": "Show client MAC and IP on interfaces",
+                    "track_iface_clients": "Show client MAC and IP on interfaces",
                     "unit_of_measurement": "Unit of measurement"
                 }
             }

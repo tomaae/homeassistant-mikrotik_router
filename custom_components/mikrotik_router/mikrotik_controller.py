@@ -10,14 +10,23 @@ from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.util.dt import utcnow
 
+from homeassistant.const import (
+    CONF_NAME,
+    CONF_HOST,
+    CONF_PORT,
+    CONF_UNIT_OF_MEASUREMENT,
+    CONF_USERNAME,
+    CONF_PASSWORD,
+    CONF_SSL,
+)
+
 from .const import (
     DOMAIN,
-    CONF_TRACK_ARP,
-    DEFAULT_TRACK_ARP,
+    CONF_TRACK_IFACE_CLIENTS,
+    DEFAULT_TRACK_IFACE_CLIENTS,
     CONF_SCAN_INTERVAL,
-    CONF_UNIT_OF_MEASUREMENT,
     DEFAULT_SCAN_INTERVAL,
-    DEFAULT_TRAFFIC_TYPE,
+    DEFAULT_UNIT_OF_MEASUREMENT,
 )
 from .exceptions import ApiEntryNotFound
 from .helper import from_entry, parse_api
@@ -32,24 +41,12 @@ _LOGGER = logging.getLogger(__name__)
 class MikrotikControllerData:
     """MikrotikController Class"""
 
-    def __init__(
-        self,
-        hass,
-        config_entry,
-        name,
-        host,
-        port,
-        username,
-        password,
-        use_ssl,
-        traffic_type,
-    ):
+    def __init__(self, hass, config_entry):
         """Initialize MikrotikController."""
-        self.name = name
         self.hass = hass
-        self.host = host
         self.config_entry = config_entry
-        self.traffic_type = traffic_type
+        self.name = config_entry.data[CONF_NAME]
+        self.host = config_entry.data[CONF_HOST]
 
         self.data = {
             "routerboard": {},
@@ -72,7 +69,13 @@ class MikrotikControllerData:
         self.listeners = []
         self.lock = asyncio.Lock()
 
-        self.api = MikrotikAPI(host, username, password, port, use_ssl)
+        self.api = MikrotikAPI(
+            config_entry.data[CONF_HOST],
+            config_entry.data[CONF_USERNAME],
+            config_entry.data[CONF_PASSWORD],
+            config_entry.data[CONF_PORT],
+            config_entry.data[CONF_SSL]
+        )
 
         self.nat_removed = {}
 
@@ -83,22 +86,25 @@ class MikrotikControllerData:
             self.hass, self.force_fwupdate_check, timedelta(hours=1)
         )
 
-    def _get_traffic_type_and_div(self):
-        traffic_type = self.option_traffic_type
-        if traffic_type == "Kbps":
-            traffic_div = 0.001
-        elif traffic_type == "Mbps":
-            traffic_div = 0.000001
-        elif traffic_type == "B/s":
-            traffic_div = 0.125
-        elif traffic_type == "KB/s":
-            traffic_div = 0.000125
-        elif traffic_type == "MB/s":
-            traffic_div = 0.000000125
+    # ---------------------------
+    #   _get_unit_of_measurement
+    # ---------------------------
+    def _get_unit_of_measurement(self):
+        uom_type = self.option_unit_of_measurement
+        if uom_type == "Kbps":
+            uom_div = 0.001
+        elif uom_type == "Mbps":
+            uom_div = 0.000001
+        elif uom_type == "B/s":
+            uom_div = 0.125
+        elif uom_type == "KB/s":
+            uom_div = 0.000125
+        elif uom_type == "MB/s":
+            uom_div = 0.000000125
         else:
-            traffic_type = "bps"
-            traffic_div = 1
-        return traffic_type, traffic_div
+            uom_type = "bps"
+            uom_div = 1
+        return uom_type, uom_div
 
     # ---------------------------
     #   force_update
@@ -117,12 +123,12 @@ class MikrotikControllerData:
         await self.async_fwupdate_check()
 
     # ---------------------------
-    #   option_track_arp
+    #   option_track_iface_clients
     # ---------------------------
     @property
-    def option_track_arp(self):
+    def option_track_iface_clients(self):
         """Config entry option to not track ARP."""
-        return self.config_entry.options.get(CONF_TRACK_ARP, DEFAULT_TRACK_ARP)
+        return self.config_entry.options.get(CONF_TRACK_IFACE_CLIENTS, DEFAULT_TRACK_IFACE_CLIENTS)
 
     # ---------------------------
     #   option_scan_interval
@@ -136,13 +142,13 @@ class MikrotikControllerData:
         return timedelta(seconds=scan_interval)
 
     # ---------------------------
-    #   option_traffic_type
+    #   option_unit_of_measurement
     # ---------------------------
     @property
-    def option_traffic_type(self):
+    def option_unit_of_measurement(self):
         """Config entry option to not track ARP."""
         return self.config_entry.options.get(
-            CONF_UNIT_OF_MEASUREMENT, DEFAULT_TRAFFIC_TYPE
+            CONF_UNIT_OF_MEASUREMENT, DEFAULT_UNIT_OF_MEASUREMENT
         )
 
     # ---------------------------
@@ -298,18 +304,18 @@ class MikrotikControllerData:
             ],
         )
 
-        traffic_type, traffic_div = self._get_traffic_type_and_div()
+        uom_type, uom_div = self._get_unit_of_measurement()
 
         for uid in self.data["interface"]:
             self.data["interface"][uid][
-                "rx-bits-per-second-attr"] = traffic_type
+                "rx-bits-per-second-attr"] = uom_type
             self.data["interface"][uid][
-                "tx-bits-per-second-attr"] = traffic_type
+                "tx-bits-per-second-attr"] = uom_type
             self.data["interface"][uid]["rx-bits-per-second"] = round(
-                self.data["interface"][uid]["rx-bits-per-second"] * traffic_div
+                self.data["interface"][uid]["rx-bits-per-second"] * uom_div
             )
             self.data["interface"][uid]["tx-bits-per-second"] = round(
-                self.data["interface"][uid]["tx-bits-per-second"] * traffic_div
+                self.data["interface"][uid]["tx-bits-per-second"] * uom_div
             )
 
     # ---------------------------
@@ -320,7 +326,7 @@ class MikrotikControllerData:
         self.data["arp_tmp"] = {}
 
         # Remove data if disabled
-        if not self.option_track_arp:
+        if not self.option_track_iface_clients:
             for uid in self.data["interface"]:
                 self.data["interface"][uid]["client-ip-address"] = "disabled"
                 self.data["interface"][uid]["client-mac-address"] = "disabled"
@@ -635,37 +641,37 @@ class MikrotikControllerData:
             ]
         )
 
-        traffic_type, traffic_div = self._get_traffic_type_and_div()
+        uom_type, uom_div = self._get_unit_of_measurement()
 
         for uid in self.data["queue"]:
             upload_max_limit_bps, download_max_limit_bps = [int(x) for x in
                                                             self.data["queue"][uid]["max-limit"].split('/')]
             self.data["queue"][uid]["upload-max-limit"] = \
-                f"{round(upload_max_limit_bps * traffic_div)} {traffic_type}"
+                f"{round(upload_max_limit_bps * uom_div)} {uom_type}"
             self.data["queue"][uid]["download-max-limit"] = \
-                f"{round(download_max_limit_bps * traffic_div)} {traffic_type}"
+                f"{round(download_max_limit_bps * uom_div)} {uom_type}"
 
             upload_limit_at_bps, download_limit_at_bps = [int(x) for x in
                                                           self.data["queue"][uid]["limit-at"].split('/')]
             self.data["queue"][uid]["upload-limit-at"] = \
-                f"{round(upload_limit_at_bps * traffic_div)} {traffic_type}"
+                f"{round(upload_limit_at_bps * uom_div)} {uom_type}"
             self.data["queue"][uid]["download-limit-at"] = \
-                f"{round(download_limit_at_bps * traffic_div)} {traffic_type}"
+                f"{round(download_limit_at_bps * uom_div)} {uom_type}"
 
             upload_burst_limit_bps, download_burst_limit_bps = [int(x) for x in
                                                                 self.data["queue"][uid]["burst-limit"].split('/')]
             self.data["queue"][uid]["upload-burst-limit"] = \
-                f"{round(upload_burst_limit_bps * traffic_div)} {traffic_type}"
+                f"{round(upload_burst_limit_bps * uom_div)} {uom_type}"
             self.data["queue"][uid]["download-burst-limit"] = \
-                f"{round(download_burst_limit_bps * traffic_div)} {traffic_type}"
+                f"{round(download_burst_limit_bps * uom_div)} {uom_type}"
 
             upload_burst_threshold_bps,\
                 download_burst_threshold_bps = [int(x) for x in self.data["queue"][uid]["burst-threshold"].split('/')]
 
             self.data["queue"][uid]["upload-burst-threshold"] = \
-                f"{round(upload_burst_threshold_bps * traffic_div)} {traffic_type}"
+                f"{round(upload_burst_threshold_bps * uom_div)} {uom_type}"
             self.data["queue"][uid]["download-burst-threshold"] = \
-                f"{round(download_burst_threshold_bps * traffic_div)} {traffic_type}"
+                f"{round(download_burst_threshold_bps * uom_div)} {uom_type}"
 
             upload_burst_time, download_burst_time = self.data["queue"][uid]["burst-time"].split('/')
             self.data["queue"][uid]["upload-burst-time"] = upload_burst_time
@@ -857,7 +863,7 @@ class MikrotikControllerData:
         """Get Accounting data from Mikrotik"""
         # Check if accounting and account-local-traffic is enabled
         accounting_enabled, local_traffic_enabled = self.api.is_accounting_and_local_traffic_enabled()
-        traffic_type, traffic_div = self._get_traffic_type_and_div()
+        uom_type, uom_div = self._get_unit_of_measurement()
 
         # Build missing hosts from main hosts dict
         for uid, vals in self.data["host"].items():
@@ -866,7 +872,7 @@ class MikrotikControllerData:
                     'address': vals['address'],
                     'mac-address': vals['mac-address'],
                     'host-name': vals['host-name'],
-                    'tx-rx-attr': traffic_type,
+                    'tx-rx-attr': uom_type,
                     'available': False,
                     'local_accounting': False
                 }
@@ -928,7 +934,7 @@ class MikrotikControllerData:
                 _LOGGER.warning(f"Address {addr} not found in accounting data, skipping update")
                 continue
 
-            self.data['accounting'][uid]['tx-rx-attr'] = traffic_type
+            self.data['accounting'][uid]['tx-rx-attr'] = uom_type
             self.data['accounting'][uid]['available'] = accounting_enabled
             self.data['accounting'][uid]['local_accounting'] = local_traffic_enabled
 
@@ -937,11 +943,11 @@ class MikrotikControllerData:
                 continue
 
             self.data['accounting'][uid]['wan-tx'] = round(
-                tmp_accounting_values[addr]['wan-tx'] / time_diff * traffic_div, 2) \
+                tmp_accounting_values[addr]['wan-tx'] / time_diff * uom_div, 2) \
                 if tmp_accounting_values[addr]['wan-tx'] else 0.0
 
             self.data['accounting'][uid]['wan-rx'] = round(
-                tmp_accounting_values[addr]['wan-rx'] / time_diff * traffic_div, 2) \
+                tmp_accounting_values[addr]['wan-rx'] / time_diff * uom_div, 2) \
                 if tmp_accounting_values[addr]['wan-rx'] else 0.0
 
             if not local_traffic_enabled:
@@ -949,9 +955,9 @@ class MikrotikControllerData:
                 continue
 
             self.data['accounting'][uid]['lan-tx'] = round(
-                tmp_accounting_values[addr]['lan-tx'] / time_diff * traffic_div, 2) \
+                tmp_accounting_values[addr]['lan-tx'] / time_diff * uom_div, 2) \
                 if tmp_accounting_values[addr]['lan-tx'] else 0.0
 
             self.data['accounting'][uid]['lan-rx'] = round(
-                tmp_accounting_values[addr]['lan-rx'] / time_diff * traffic_div, 2) \
+                tmp_accounting_values[addr]['lan-rx'] / time_diff * uom_div, 2) \
                 if tmp_accounting_values[addr]['lan-rx'] else 0.0

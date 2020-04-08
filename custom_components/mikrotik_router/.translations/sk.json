@@ -32,7 +32,7 @@
             "device_tracker": {
                 "data": {
                     "scan_interval": "Interval skenovania (vyžaduje sa reštart HA)",
-                    "track_arp": "Zobraziť klientske MAC a IP na rozhraniach",
+                    "track_iface_clients": "Zobraziť klientske MAC a IP na rozhraniach",
                     "unit_of_measurement": "Merná jednotka"
                 }
             }
