@@ -66,6 +66,7 @@ class MikrotikControllerData:
             "dhcp-network": {},
             "dhcp": {},
             "host": {},
+            "accounting": {}
         }
 
         self.listeners = []
@@ -205,6 +206,8 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.get_system_resource)
         await self.hass.async_add_executor_job(self.get_script)
         await self.hass.async_add_executor_job(self.get_queue)
+        # await self.hass.async_add_executor_job(self.get_dhcp)
+        await self.hass.async_add_executor_job(self.get_accounting)
 
         async_dispatcher_send(self.hass, self.signal_update)
 
@@ -561,7 +564,7 @@ class MikrotikControllerData:
             self.data["resource"]["hdd-usage"] = "unknown"
 
     # ---------------------------
-    #   get_system_routerboard
+    #   get_firmware_update
     # ---------------------------
     def get_firmware_update(self):
         """Check for firmware update on Mikrotik"""
@@ -794,30 +797,30 @@ class MikrotikControllerData:
         for uid, vals in self.data["host"].items():
             # Add missing default values
             for key, default in zip(
-                    ["address", "mac-address", "interface", "hostname", "last-seen", "available"],
+                    ["address", "mac-address", "interface", "host-name", "last-seen", "available"],
                     ["unknown", "unknown", "unknown", "unknown", False],
             ):
                 if key not in self.data["host"][uid]:
                     self.data["host"][uid][key] = default
 
             # Resolve hostname
-            if vals["hostname"] == "unknown":
+            if vals["host-name"] == "unknown":
                 if vals["address"] != "unknown":
                     for dns_uid, dns_vals in self.data["dns"].items():
                         if dns_vals["address"] == vals["address"]:
-                            self.data["host"][uid]["hostname"] = dns_vals["name"].split('.')[0]
+                            self.data["host"][uid]["host-name"] = dns_vals["name"].split('.')[0]
                             break
 
-                if self.data["host"][uid]["hostname"] == "unknown" \
+                if self.data["host"][uid]["host-name"] == "unknown" \
                         and uid in self.data["dhcp"] and self.data["dhcp"][uid]["comment"] != "":
-                    self.data["host"][uid]["hostname"] = self.data["dhcp"][uid]["comment"]
+                    self.data["host"][uid]["host-name"] = self.data["dhcp"][uid]["comment"]
 
-                elif self.data["host"][uid]["hostname"] == "unknown" \
+                elif self.data["host"][uid]["host-name"] == "unknown" \
                         and uid in self.data["dhcp"] and self.data["dhcp"][uid]["host-name"] != "unknown":
-                    self.data["host"][uid]["hostname"] = self.data["dhcp"][uid]["host-name"]
+                    self.data["host"][uid]["host-name"] = self.data["dhcp"][uid]["host-name"]
 
-                elif self.data["host"][uid]["hostname"] == "unknown":
-                    self.data["host"][uid]["hostname"] = uid
+                elif self.data["host"][uid]["host-name"] == "unknown":
+                    self.data["host"][uid]["host-name"] = uid
 
             # Check host availability
             if vals["address"] != "unknown" and vals["interface"] != "unknown":
@@ -827,3 +830,118 @@ class MikrotikControllerData:
             # Update last seen
             if self.data["host"][uid]["available"]:
                 self.data["host"][uid]["last-seen"] = utcnow()
+
+    def _address_part_of_local_network(self, address):
+        address = ip_address(address)
+        for vals in self.data["dhcp-network"].values():
+            if address in vals["IPv4Network"]:
+                return True
+        return False
+
+    def _get_accounting_uid_by_ip(self, requested_ip):
+        for mac, vals in self.data['accounting'].items():
+            if vals.get('address') is requested_ip:
+                return mac
+        return None
+
+    def get_accounting(self):
+        """Get Accounting data from Mikrotik"""
+        # Check if accounting and account-local-traffic is enabled
+        accounting_enabled, local_traffic_enabled = self.api.is_accounting_and_local_traffic_enabled()
+        traffic_type, traffic_div = self._get_traffic_type_and_div()
+
+        # Build missing hosts from main hosts dict
+        for uid, vals in self.data["host"].items():
+            if uid not in self.data["accounting"]:
+                self.data["accounting"][uid] = {
+                    'address': vals['address'],
+                    'mac-address': vals['mac-address'],
+                    'host-name': vals['host-name'],
+                    'tx-rx-attr': traffic_type,
+                    'available': False,
+                    'local_accounting': False
+                }
+
+        _LOGGER.debug(f"Working with {len(self.data['accounting'])} accounting devices")
+
+        # Build temp accounting values dict with ip address as key
+        tmp_accounting_values = {}
+        for uid, vals in self.data['accounting'].items():
+            tmp_accounting_values[vals['address']] = {
+                "wan-tx": 0,
+                "wan-rx": 0,
+                "lan-tx": 0,
+                "lan-rx": 0
+            }
+
+        time_diff = self.api.take_accounting_snapshot()
+        if time_diff:
+            accounting_data = parse_api(
+                data={},
+                source=self.api.path("/ip/accounting/snapshot"),
+                key=".id",
+                vals=[
+                    {"name": ".id"},
+                    {"name": "src-address"},
+                    {"name": "dst-address"},
+                    {"name": "bytes", "default": 0},
+                ],
+            )
+
+            for item in accounting_data.values():
+                source_ip = str(item.get('src-address')).strip()
+                destination_ip = str(item.get('dst-address')).strip()
+                bits_count = int(str(item.get('bytes')).strip()) * 8
+
+                if self._address_part_of_local_network(source_ip) and self._address_part_of_local_network(destination_ip):
+                    # LAN TX/RX
+                    if source_ip in tmp_accounting_values:
+                        tmp_accounting_values[source_ip]['lan-tx'] += bits_count
+                    if destination_ip in tmp_accounting_values:
+                        tmp_accounting_values[destination_ip]['lan-rx'] += bits_count
+                elif self._address_part_of_local_network(source_ip) and \
+                        not self._address_part_of_local_network(destination_ip):
+                    # WAN TX
+                    if source_ip in tmp_accounting_values:
+                        tmp_accounting_values[source_ip]['wan-tx'] += bits_count
+                elif not self._address_part_of_local_network(source_ip) and \
+                        self._address_part_of_local_network(destination_ip):
+                    # WAN RX
+                    if destination_ip in tmp_accounting_values:
+                        tmp_accounting_values[destination_ip]['wan-rx'] += bits_count
+
+        # Calculate real throughput and transform it to appropriate unit
+        # Also handle availability of accounting and local_accounting from Mikrotik
+        for addr in tmp_accounting_values:
+            uid = self._get_accounting_uid_by_ip(addr)
+            if not uid:
+                _LOGGER.warning(f"Address {addr} not found in accounting data, skipping update")
+                continue
+
+            self.data['accounting'][uid]['tx-rx-attr'] = traffic_type
+            self.data['accounting'][uid]['available'] = accounting_enabled
+            self.data['accounting'][uid]['local_accounting'] = local_traffic_enabled
+
+            if not accounting_enabled:
+                # Skip calculation for WAN and LAN, accounting is disabled
+                continue
+
+            self.data['accounting'][uid]['wan-tx'] = round(
+                tmp_accounting_values[addr]['wan-tx'] / time_diff * traffic_div, 2) \
+                if tmp_accounting_values[addr]['wan-tx'] else 0.0
+
+            self.data['accounting'][uid]['wan-rx'] = round(
+                tmp_accounting_values[addr]['wan-rx'] / time_diff * traffic_div, 2) \
+                if tmp_accounting_values[addr]['wan-rx'] else 0.0
+
+            if not local_traffic_enabled:
+                # Skip calculation for LAN, LAN accounting is disabled
+                continue
+
+            self.data['accounting'][uid]['lan-tx'] = round(
+                tmp_accounting_values[addr]['lan-tx'] / time_diff * traffic_div, 2) \
+                if tmp_accounting_values[addr]['lan-tx'] else 0.0
+
+            self.data['accounting'][uid]['lan-rx'] = round(
+                tmp_accounting_values[addr]['lan-rx'] / time_diff * traffic_div, 2) \
+                if tmp_accounting_values[addr]['lan-rx'] else 0.0

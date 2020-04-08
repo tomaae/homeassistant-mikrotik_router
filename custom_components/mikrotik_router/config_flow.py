@@ -81,7 +81,7 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
                 username=user_input["username"],
                 password=user_input["password"],
                 port=user_input["port"],
-                use_ssl=user_input["ssl"],
+                use_ssl=user_input["ssl"]
             )
             if not api.connect():
                 errors[CONF_HOST] = api.error

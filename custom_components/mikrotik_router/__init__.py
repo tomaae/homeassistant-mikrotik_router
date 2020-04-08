@@ -54,6 +54,7 @@ async def async_setup_entry(hass, config_entry):
         traffic_type
     )
     await mikrotik_controller.hwinfo_update()
+
     await mikrotik_controller.async_update()
 
     if not mikrotik_controller.data:
