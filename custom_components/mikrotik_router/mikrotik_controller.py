@@ -419,8 +419,7 @@ class MikrotikControllerData:
                 self.data["arp_tmp"][uid]["mac-address"] = "multiple"
                 self.data["arp_tmp"][uid]["address"] = "multiple"
             else:
-                self.data["arp_tmp"][uid]["mac-address"] = from_entry(entry,
-                                                                  "mac-address")
+                self.data["arp_tmp"][uid]["mac-address"] = from_entry(entry, "mac-address")
                 self.data["arp_tmp"][uid]["address"] = (
                     mac2ip[self.data["arp_tmp"][uid]["mac-address"]]
                     if self.data["arp_tmp"][uid]["mac-address"] in mac2ip
