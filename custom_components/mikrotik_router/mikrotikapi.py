@@ -60,6 +60,7 @@ class MikrotikAPI:
         self._connection_retry_sec = 58
         self.error = None
         self.connection_error_reported = False
+        self.accounting_last_run = None
 
         # Default ports
         if not self._port:
@@ -427,6 +428,7 @@ class MikrotikAPI:
             self.disconnect()
             self.lock.release()
             return False
+
         except (
             librouteros_custom.exceptions.TrapError,
             librouteros_custom.exceptions.MultiTrapError,
@@ -463,3 +465,95 @@ class MikrotikAPI:
                 return True
 
         return False
+
+    @staticmethod
+    def _current_milliseconds():
+        from time import time
+        return int(round(time() * 1000))
+
+    def is_accounting_and_local_traffic_enabled(self) -> (bool, bool):
+        # Returns:
+        #   1st bool: Is accounting enabled
+        #   2nd bool: Is account-local-traffic enabled
+
+        if not self.connection_check():
+            return False, False
+
+        response = self.path("/ip/accounting")
+        if response is None:
+            return False, False
+
+        for item in response:
+            if 'enabled' not in item:
+                continue
+            if not item['enabled']:
+                return False, False
+
+        for item in response:
+            if 'account-local-traffic' not in item:
+                continue
+            if not item['account-local-traffic']:
+                return True, False
+
+        return True, True
+
+    # ---------------------------
+    #   take_accounting_snapshot
+    #   Returns float -> period in seconds between last and current run
+    # ---------------------------
+    def take_accounting_snapshot(self) -> float:
+        """Get accounting data"""
+        if not self.connection_check():
+            return 0
+
+        accounting = self.path("/ip/accounting", return_list=False)
+
+        self.lock.acquire()
+        try:
+            # Prepare command
+            take = accounting('snapshot/take')
+        except librouteros_custom.exceptions.ConnectionClosed:
+            self.disconnect()
+            self.lock.release()
+            return 0
+        except (
+                librouteros_custom.exceptions.TrapError,
+                librouteros_custom.exceptions.MultiTrapError,
+                librouteros_custom.exceptions.ProtocolError,
+                librouteros_custom.exceptions.FatalError,
+                ssl.SSLError,
+                BrokenPipeError,
+                OSError,
+                ValueError,
+        ) as api_error:
+            self.disconnect("accounting_snapshot", api_error)
+            self.lock.release()
+            return 0
+        except:
+            self.disconnect("accounting_snapshot")
+            self.lock.release()
+            return 0
+
+        try:
+            list(take)
+        except librouteros_custom.exceptions.ConnectionClosed as api_error:
+            self.disconnect("accounting_snapshot", api_error)
+            self.lock.release()
+            return 0
+        except:
+            self.disconnect("accounting_snapshot")
+            self.lock.release()
+            return 0
+
+        self.lock.release()
+
+        # First request will be discarded because we cannot know when the last data was retrieved
+        # prevents spikes in data
+        if not self.accounting_last_run:
+            self.accounting_last_run = self._current_milliseconds()
+            return 0
+
+        # Calculate time difference in seconds and return
+        time_diff = self._current_milliseconds() - self.accounting_last_run
+        self.accounting_last_run = self._current_milliseconds()
+        return time_diff / 1000

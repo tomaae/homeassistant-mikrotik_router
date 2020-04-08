@@ -66,13 +66,17 @@ class MikrotikControllerData:
             "dhcp-network": {},
             "dhcp": {},
             "host": {},
+            "accounting": {}
         }
+
+        self.local_dhcp_networks = []
 
         self.listeners = []
         self.lock = asyncio.Lock()
 
         self.api = MikrotikAPI(host, username, password, port, use_ssl)
 
+        self.raw_arp_entries = []
         self.nat_removed = {}
 
         async_track_time_interval(
@@ -205,6 +209,8 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.get_system_resource)
         await self.hass.async_add_executor_job(self.get_script)
         await self.hass.async_add_executor_job(self.get_queue)
+        await self.hass.async_add_executor_job(self.get_dhcp)
+        await self.hass.async_add_executor_job(self.get_accounting)
 
         async_dispatcher_send(self.hass, self.signal_update)
 
@@ -348,6 +354,7 @@ class MikrotikControllerData:
     def update_arp(self, mac2ip, bridge_used):
         """Get list of hosts in ARP for interface client data from Mikrotik"""
         data = self.api.path("/ip/arp")
+        self.raw_arp_entries = data
         if not data:
             return mac2ip, bridge_used
 
@@ -561,7 +568,7 @@ class MikrotikControllerData:
             self.data["resource"]["hdd-usage"] = "unknown"
 
     # ---------------------------
-    #   get_system_routerboard
+    #   get_firmware_update
     # ---------------------------
     def get_firmware_update(self):
         """Check for firmware update on Mikrotik"""
@@ -736,6 +743,20 @@ class MikrotikControllerData:
             ]
         )
 
+        # Build list of local DHCP networks
+        dhcp_networks = parse_api(
+            data={},
+            source=self.api.path("/ip/dhcp-server/network"),
+            key="address",
+            vals=[
+                {"name": "address"},
+            ],
+            ensure_vals=[
+                {"name": "address"},
+            ]
+        )
+        self.local_dhcp_networks = [IPv4Network(network) for network in dhcp_networks]
+
         self.data["dhcp"] = parse_api(
             data=self.data["dhcp"],
             source=self.api.path("/ip/dhcp-server/lease"),
@@ -747,7 +768,7 @@ class MikrotikControllerData:
                 {"name": "status", "default": "unknown"},
                 {"name": "last-seen", "default": "unknown"},
                 {"name": "server", "default": "unknown"},
-                {"name": "comment", "default": ""},
+                {"name": "comment"},
             ],
             ensure_vals=[
                 {"name": "interface"},
@@ -827,3 +848,178 @@ class MikrotikControllerData:
             # Update last seen
             if self.data["host"][uid]["available"]:
                 self.data["host"][uid]["last-seen"] = utcnow()
+            self.data["dhcp"][uid]['interface'] = \
+                self.data["dhcp-server"][self.data["dhcp"][uid]['server']]["interface"]
+
+            self.data["dhcp"][uid]['available'] = \
+                self.api.arp_ping(self.data["dhcp"][uid]['address'], self.data["dhcp"][uid]['interface'])
+
+    def _address_part_of_local_network(self, address):
+        address = ip_address(address)
+        for network in self.local_dhcp_networks:
+            if address in network:
+                return True
+        return False
+
+    def _get_accounting_mac_by_ip(self, requested_ip):
+        for mac, vals in self.data['accounting'].items():
+            if vals.get('address') is requested_ip:
+                return mac
+        return None
+
+    def get_accounting(self):
+        """Get Accounting data from Mikrotik"""
+        # Check if accounting and account-local-traffic is enabled
+        accounting_enabled, local_traffic_enabled = self.api.is_accounting_and_local_traffic_enabled()
+        traffic_type, traffic_div = self._get_traffic_type_and_div()
+
+        if not accounting_enabled:
+            # If any hosts were created return counters to 0 so sensors wont get stuck on last value
+            for mac, vals in self.data["accounting"].items():
+                self.data['accounting'][mac]["tx-rx-attr"] = traffic_type
+                if 'wan-tx' in vals:
+                    self.data["accounting"][mac]['wan-tx'] = 0.0
+                if 'wan-rx' in vals:
+                    self.data["accounting"][mac]['wan-rx'] = 0.0
+                if 'lan-tx' in vals:
+                    self.data["accounting"][mac]['lan-tx'] = 0.0
+                if 'lan-rx' in vals:
+                    self.data["accounting"][mac]['lan-rx'] = 0.0
+            return
+
+        # Build missing hosts from already retrieved DHCP Server leases
+        for mac, vals in self.data["dhcp"].items():
+            if mac not in self.data["accounting"]:
+                self.data["accounting"][mac] = {
+                    'address': vals['address'],
+                    'mac-address': vals['mac-address'],
+                    'host-name': vals['host-name'],
+                    'comment': vals['comment']
+                }
+
+        # Build missing hosts from already retrieved ARP list
+        host_update_from_arp = False
+        for entry in self.raw_arp_entries:
+            if entry['mac-address'] not in self.data["accounting"]:
+                self.data["accounting"][entry['mac-address']] = {
+                    'address': entry['address'],
+                    'mac-address': entry['mac-address'],
+                    'host-name': '',
+                    'comment': ''
+                }
+                host_update_from_arp = True
+
+        # If some host was added from ARP table build new host-name for it from static DNS entry. Fallback to MAC
+        if host_update_from_arp:
+            dns_data = parse_api(
+                data={},
+                source=self.api.path("/ip/dns/static"),
+                key="address",
+                vals=[
+                    {"name": "address"},
+                    {"name": "name"},
+                ],
+            )
+
+            # Try to build hostname from DNS static entry
+            for mac, vals in self.data["accounting"].items():
+                if not str(vals.get('host-name', '')).strip() or vals['host-name'] is 'unknown':
+                    if vals['address'] in dns_data and str(dns_data[vals['address']].get('name', '')).strip():
+                        self.data["accounting"][mac]['host-name'] = dns_data[vals['address']]['name']
+
+        # Check if any host still have empty 'host-name'. Default it to MAC.
+        # Same check for 'comment' (pretty name)
+        for mac, vals in self.data["accounting"].items():
+            if not str(vals.get('host-name', '')).strip() or vals['host-name'] is 'unknown':
+                self.data["accounting"][mac]['host-name'] = mac
+            if not str(vals.get('comment', '')).strip() or vals['host-name'] is 'comment':
+                self.data["accounting"][mac]['comment'] = mac
+
+        _LOGGER.debug(f"Working with {len(self.data['accounting'])} accounting devices")
+
+        # Build temp accounting values dict with ip address as key
+        # Also set traffic type for each item
+        tmp_accounting_values = {}
+        for mac, vals in self.data['accounting'].items():
+            tmp_accounting_values[vals['address']] = {
+                "wan-tx": 0,
+                "wan-rx": 0,
+                "lan-tx": 0,
+                "lan-rx": 0
+            }
+            self.data['accounting'][mac]["tx-rx-attr"] = traffic_type
+
+        time_diff = self.api.take_accounting_snapshot()
+        if time_diff:
+            accounting_data = parse_api(
+                data={},
+                source=self.api.path("/ip/accounting/snapshot"),
+                key=".id",
+                vals=[
+                    {"name": ".id"},
+                    {"name": "src-address"},
+                    {"name": "dst-address"},
+                    {"name": "bytes", "default": 0},
+                ],
+            )
+
+            for item in accounting_data.values():
+                source_ip = str(item.get('src-address')).strip()
+                destination_ip = str(item.get('dst-address')).strip()
+                bits_count = int(str(item.get('bytes')).strip()) * 8
+
+                if self._address_part_of_local_network(source_ip) and self._address_part_of_local_network(destination_ip):
+                    # LAN TX/RX
+                    if source_ip in tmp_accounting_values:
+                        tmp_accounting_values[source_ip]['lan-tx'] += bits_count
+                    if destination_ip in tmp_accounting_values:
+                        tmp_accounting_values[destination_ip]['lan-rx'] += bits_count
+                elif self._address_part_of_local_network(source_ip) and \
+                        not self._address_part_of_local_network(destination_ip):
+                    # WAN TX
+                    if source_ip in tmp_accounting_values:
+                        tmp_accounting_values[source_ip]['wan-tx'] += bits_count
+                elif not self._address_part_of_local_network(source_ip) and \
+                        self._address_part_of_local_network(destination_ip):
+                    # WAN RX
+                    if destination_ip in tmp_accounting_values:
+                        tmp_accounting_values[destination_ip]['wan-rx'] += bits_count
+
+            # Now that we have sum of all traffic in bytes for given period
+            #   calculate real throughput and transform it to appropriate unit
+            for addr in tmp_accounting_values:
+                mac = self._get_accounting_mac_by_ip(addr)
+                if not mac:
+                    _LOGGER.debug(f"Address {addr} not found in accounting data, skipping update")
+                    continue
+
+                self.data['accounting'][mac]['wan-tx'] = round(
+                    tmp_accounting_values[addr]['wan-tx'] / time_diff * traffic_div, 2)
+                self.data['accounting'][mac]['wan-rx'] = round(
+                    tmp_accounting_values[addr]['wan-rx'] / time_diff * traffic_div, 2)
+
+                if local_traffic_enabled:
+                    self.data['accounting'][mac]['lan-tx'] = round(
+                        tmp_accounting_values[addr]['lan-tx'] / time_diff * traffic_div, 2)
+                    self.data['accounting'][mac]['lan-rx'] = round(
+                        tmp_accounting_values[addr]['lan-rx'] / time_diff * traffic_div, 2)
+                else:
+                    # If local traffic was enabled earlier and then disabled return counters for LAN traffic to 0
+                    if 'lan-tx' in self.data['accounting'][mac]:
+                        self.data['accounting'][mac]['lan-tx'] = 0.0
+                    if 'lan-rx' in self.data['accounting'][mac]:
+                        self.data['accounting'][mac]['lan-rx'] = 0.0
+        else:
+            # No time diff, just initialize/return counters to 0 for all
+            for addr in tmp_accounting_values:
+                mac = self._get_accounting_mac_by_ip(addr)
+                if not mac:
+                    _LOGGER.debug(f"Address {addr} not found in accounting data, skipping update")
+                    continue
+
+                self.data['accounting'][mac]['wan-tx'] = 0.0
+                self.data['accounting'][mac]['wan-rx'] = 0.0
+
+                if local_traffic_enabled:
+                    self.data['accounting'][mac]['lan-tx'] = 0.0
+                    self.data['accounting'][mac]['lan-rx'] = 0.0
