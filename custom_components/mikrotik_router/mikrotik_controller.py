@@ -3,6 +3,7 @@
 import asyncio
 import logging
 from datetime import timedelta
+from ipaddress import ip_address, IPv4Network
 
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_send
@@ -717,8 +718,13 @@ class MikrotikControllerData:
             ],
             ensure_vals=[
                 {"name": "address"},
+                {"name": "IPv4Network", "default": ""},
             ]
         )
+
+        for uid, vals in self.data["dhcp-network"].items():
+            if vals["IPv4Network"] == "":
+                self.data["dhcp-network"][uid]["IPv4Network"] = IPv4Network(vals["address"])
 
         self.data["dhcp-server"] = parse_api(
             data=self.data["dhcp-server"],
