@@ -58,6 +58,7 @@ class MikrotikControllerData:
             "fw-update": {},
             "script": {},
             "queue": {},
+            "dns": {},
             "dhcp-server": {},
             "dhcp": {},
             "host": {},
@@ -196,11 +197,13 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.get_system_resource)
         await self.hass.async_add_executor_job(self.get_script)
         await self.hass.async_add_executor_job(self.get_queue)
+        await self.hass.async_add_executor_job(self.get_dns)
         await self.hass.async_add_executor_job(self.get_dhcp)
 
         await self.hass.async_add_executor_job(self.process_host)
 
         async_dispatcher_send(self.hass, self.signal_update)
+
         self.lock.release()
 
     # ---------------------------
@@ -661,6 +664,21 @@ class MikrotikControllerData:
             upload_burst_time, download_burst_time = self.data["queue"][uid]["burst-time"].split('/')
             self.data["queue"][uid]["upload-burst-time"] = upload_burst_time
             self.data["queue"][uid]["download-burst-time"] = download_burst_time
+
+    # ---------------------------
+    #   get_dns
+    # ---------------------------
+    def get_dns(self):
+        """Get static DNS data from Mikrotik"""
+        self.data["dns"] = parse_api(
+            data=self.data["dns"],
+            source=self.api.path("/ip/dns/static"),
+            key="name",
+            vals=[
+                {"name": "name"},
+                {"name": "address"},
+            ],
+        )
 
     # ---------------------------
     #   get_dhcp
