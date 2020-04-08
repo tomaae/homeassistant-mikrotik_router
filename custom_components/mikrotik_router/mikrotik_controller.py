@@ -831,6 +831,9 @@ class MikrotikControllerData:
             if self.data["host"][uid]["available"]:
                 self.data["host"][uid]["last-seen"] = utcnow()
 
+    # ---------------------------
+    #   _address_part_of_local_network
+    # ---------------------------
     def _address_part_of_local_network(self, address):
         address = ip_address(address)
         for vals in self.data["dhcp-network"].values():
@@ -838,12 +841,18 @@ class MikrotikControllerData:
                 return True
         return False
 
+    # ---------------------------
+    #   _get_accounting_uid_by_ip
+    # ---------------------------
     def _get_accounting_uid_by_ip(self, requested_ip):
         for mac, vals in self.data['accounting'].items():
             if vals.get('address') is requested_ip:
                 return mac
         return None
 
+    # ---------------------------
+    #   get_accounting
+    # ---------------------------
     def get_accounting(self):
         """Get Accounting data from Mikrotik"""
         # Check if accounting and account-local-traffic is enabled
@@ -893,7 +902,8 @@ class MikrotikControllerData:
                 destination_ip = str(item.get('dst-address')).strip()
                 bits_count = int(str(item.get('bytes')).strip()) * 8
 
-                if self._address_part_of_local_network(source_ip) and self._address_part_of_local_network(destination_ip):
+                if self._address_part_of_local_network(source_ip) and \
+                        self._address_part_of_local_network(destination_ip):
                     # LAN TX/RX
                     if source_ip in tmp_accounting_values:
                         tmp_accounting_values[source_ip]['lan-tx'] += bits_count
