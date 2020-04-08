@@ -55,6 +55,7 @@ class MikrotikControllerData:
             "resource": {},
             "interface": {},
             "arp": {},
+            "arp_tmp": {},
             "nat": {},
             "fw-update": {},
             "script": {},
@@ -311,7 +312,7 @@ class MikrotikControllerData:
     # ---------------------------
     def get_interface_client(self):
         """Get ARP data from Mikrotik"""
-        self.data["arp"] = {}
+        self.data["arp_tmp"] = {}
 
         # Remove data if disabled
         if not self.option_track_arp:
@@ -329,14 +330,14 @@ class MikrotikControllerData:
 
         # Map ARP to ifaces
         for uid in self.data["interface"]:
-            if uid not in self.data["arp"]:
+            if uid not in self.data["arp_tmp"]:
                 continue
 
             self.data["interface"][uid]["client-ip-address"] = from_entry(
-                self.data["arp"][uid], "address"
+                self.data["arp_tmp"][uid], "address"
             )
             self.data["interface"][uid]["client-mac-address"] = from_entry(
-                self.data["arp"][uid], "mac-address"
+                self.data["arp_tmp"][uid], "mac-address"
             )
 
     # ---------------------------
@@ -372,16 +373,16 @@ class MikrotikControllerData:
 
             _LOGGER.debug("Processing entry %s, entry %s", "/ip/arp", entry)
             # Create uid arp dict
-            if uid not in self.data["arp"]:
-                self.data["arp"][uid] = {}
+            if uid not in self.data["arp_tmp"]:
+                self.data["arp_tmp"][uid] = {}
 
             # Add data
-            self.data["arp"][uid]["interface"] = uid
-            self.data["arp"][uid]["mac-address"] = (
-                from_entry(entry, "mac-address") if "mac-address" not in self.data["arp"][uid] else "multiple"
+            self.data["arp_tmp"][uid]["interface"] = uid
+            self.data["arp_tmp"][uid]["mac-address"] = (
+                from_entry(entry, "mac-address") if "mac-address" not in self.data["arp_tmp"][uid] else "multiple"
             )
-            self.data["arp"][uid]["address"] = (
-                from_entry(entry, "address") if "address" not in self.data["arp"][uid] else "multiple"
+            self.data["arp_tmp"][uid]["address"] = (
+                from_entry(entry, "address") if "address" not in self.data["arp_tmp"][uid] else "multiple"
             )
 
         return mac2ip, bridge_used
@@ -409,20 +410,20 @@ class MikrotikControllerData:
                 "Processing entry %s, entry %s", "/interface/bridge/host", entry
             )
             # Create uid arp dict
-            if uid not in self.data["arp"]:
-                self.data["arp"][uid] = {}
+            if uid not in self.data["arp_tmp"]:
+                self.data["arp_tmp"][uid] = {}
 
             # Add data
-            self.data["arp"][uid]["interface"] = uid
-            if "mac-address" in self.data["arp"][uid]:
-                self.data["arp"][uid]["mac-address"] = "multiple"
-                self.data["arp"][uid]["address"] = "multiple"
+            self.data["arp_tmp"][uid]["interface"] = uid
+            if "mac-address" in self.data["arp_tmp"][uid]:
+                self.data["arp_tmp"][uid]["mac-address"] = "multiple"
+                self.data["arp_tmp"][uid]["address"] = "multiple"
             else:
-                self.data["arp"][uid]["mac-address"] = from_entry(entry,
+                self.data["arp_tmp"][uid]["mac-address"] = from_entry(entry,
                                                                   "mac-address")
-                self.data["arp"][uid]["address"] = (
-                    mac2ip[self.data["arp"][uid]["mac-address"]]
-                    if self.data["arp"][uid]["mac-address"] in mac2ip
+                self.data["arp_tmp"][uid]["address"] = (
+                    mac2ip[self.data["arp_tmp"][uid]["mac-address"]]
+                    if self.data["arp_tmp"][uid]["mac-address"] in mac2ip
                     else ""
                 )
 
