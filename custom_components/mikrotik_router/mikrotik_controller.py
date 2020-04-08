@@ -707,6 +707,7 @@ class MikrotikControllerData:
                 {"name": "status", "default": "unknown"},
                 {"name": "last-seen", "default": "unknown"},
                 {"name": "server", "default": "unknown"},
+                {"name": "comment", "default": ""},
             ],
             ensure_vals=[
                 {"name": "interface"},
