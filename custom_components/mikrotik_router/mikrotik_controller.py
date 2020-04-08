@@ -193,6 +193,10 @@ class MikrotikControllerData:
             await self.async_fwupdate_check()
 
         await self.hass.async_add_executor_job(self.get_interface)
+        await self.hass.async_add_executor_job(self.get_arp)
+        await self.hass.async_add_executor_job(self.get_dns)
+        await self.hass.async_add_executor_job(self.get_dhcp)
+        await self.hass.async_add_executor_job(self.process_host)
         await self.hass.async_add_executor_job(self.get_interface_traffic)
         await self.hass.async_add_executor_job(self.get_interface_client)
         await self.hass.async_add_executor_job(self.get_nat)
