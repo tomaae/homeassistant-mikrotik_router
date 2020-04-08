@@ -383,7 +383,7 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
         """Return if controller and accounting feature in Mikrotik is available.
            Additional check for lan-tx/rx sensors
         """
-        if self._attr in ['lan-tx, lan-rx']:
+        if self._attr in ['lan-tx', 'lan-rx']:
             return self._ctrl.connected() and self._data['available'] and self._data['local_accounting']
         else:
             return self._ctrl.connected() and self._data['available']
