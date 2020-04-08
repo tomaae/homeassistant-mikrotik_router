@@ -199,10 +199,6 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.get_system_resource)
         await self.hass.async_add_executor_job(self.get_script)
         await self.hass.async_add_executor_job(self.get_queue)
-        await self.hass.async_add_executor_job(self.get_dns)
-        await self.hass.async_add_executor_job(self.get_dhcp)
-
-        await self.hass.async_add_executor_job(self.process_host)
 
         async_dispatcher_send(self.hass, self.signal_update)
 
@@ -666,6 +662,22 @@ class MikrotikControllerData:
             upload_burst_time, download_burst_time = self.data["queue"][uid]["burst-time"].split('/')
             self.data["queue"][uid]["upload-burst-time"] = upload_burst_time
             self.data["queue"][uid]["download-burst-time"] = download_burst_time
+
+    # ---------------------------
+    #   get_arp
+    # ---------------------------
+    def get_arp(self):
+        """Get ARP data from Mikrotik"""
+        self.data["arp"] = parse_api(
+            data=self.data["arp"],
+            source=self.api.path("/ip/arp"),
+            key="mac-address",
+            vals=[
+                {"name": "mac-address"},
+                {"name": "address"},
+                {"name": "interface"},
+            ],
+        )
 
     # ---------------------------
     #   get_dns
