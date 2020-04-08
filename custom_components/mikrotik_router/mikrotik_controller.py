@@ -8,6 +8,7 @@ from ipaddress import ip_address, IPv4Network
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval
+from homeassistant.util.dt import utcnow
 
 from .const import (
     DOMAIN,
@@ -55,12 +56,16 @@ class MikrotikControllerData:
             "resource": {},
             "interface": {},
             "arp": {},
+            "arp_tmp": {},
             "nat": {},
             "fw-update": {},
             "script": {},
             "queue": {},
+            "dns": {},
             "dhcp-server": {},
+            "dhcp-network": {},
             "dhcp": {},
+            "host": {},
             "accounting": {}
         }
 
@@ -194,6 +199,10 @@ class MikrotikControllerData:
             await self.async_fwupdate_check()
 
         await self.hass.async_add_executor_job(self.get_interface)
+        await self.hass.async_add_executor_job(self.get_arp)
+        await self.hass.async_add_executor_job(self.get_dns)
+        await self.hass.async_add_executor_job(self.get_dhcp)
+        await self.hass.async_add_executor_job(self.process_host)
         await self.hass.async_add_executor_job(self.get_interface_traffic)
         await self.hass.async_add_executor_job(self.get_interface_client)
         await self.hass.async_add_executor_job(self.get_nat)
@@ -204,6 +213,7 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.get_accounting)
 
         async_dispatcher_send(self.hass, self.signal_update)
+
         self.lock.release()
 
     # ---------------------------
@@ -310,7 +320,7 @@ class MikrotikControllerData:
     # ---------------------------
     def get_interface_client(self):
         """Get ARP data from Mikrotik"""
-        self.data["arp"] = {}
+        self.data["arp_tmp"] = {}
 
         # Remove data if disabled
         if not self.option_track_arp:
@@ -328,14 +338,14 @@ class MikrotikControllerData:
 
         # Map ARP to ifaces
         for uid in self.data["interface"]:
-            if uid not in self.data["arp"]:
+            if uid not in self.data["arp_tmp"]:
                 continue
 
             self.data["interface"][uid]["client-ip-address"] = from_entry(
-                self.data["arp"][uid], "address"
+                self.data["arp_tmp"][uid], "address"
             )
             self.data["interface"][uid]["client-mac-address"] = from_entry(
-                self.data["arp"][uid], "mac-address"
+                self.data["arp_tmp"][uid], "mac-address"
             )
 
     # ---------------------------
@@ -372,16 +382,16 @@ class MikrotikControllerData:
 
             _LOGGER.debug("Processing entry %s, entry %s", "/ip/arp", entry)
             # Create uid arp dict
-            if uid not in self.data["arp"]:
-                self.data["arp"][uid] = {}
+            if uid not in self.data["arp_tmp"]:
+                self.data["arp_tmp"][uid] = {}
 
             # Add data
-            self.data["arp"][uid]["interface"] = uid
-            self.data["arp"][uid]["mac-address"] = (
-                from_entry(entry, "mac-address") if "mac-address" not in self.data["arp"][uid] else "multiple"
+            self.data["arp_tmp"][uid]["interface"] = uid
+            self.data["arp_tmp"][uid]["mac-address"] = (
+                from_entry(entry, "mac-address") if "mac-address" not in self.data["arp_tmp"][uid] else "multiple"
             )
-            self.data["arp"][uid]["address"] = (
-                from_entry(entry, "address") if "address" not in self.data["arp"][uid] else "multiple"
+            self.data["arp_tmp"][uid]["address"] = (
+                from_entry(entry, "address") if "address" not in self.data["arp_tmp"][uid] else "multiple"
             )
 
         return mac2ip, bridge_used
@@ -409,20 +419,19 @@ class MikrotikControllerData:
                 "Processing entry %s, entry %s", "/interface/bridge/host", entry
             )
             # Create uid arp dict
-            if uid not in self.data["arp"]:
-                self.data["arp"][uid] = {}
+            if uid not in self.data["arp_tmp"]:
+                self.data["arp_tmp"][uid] = {}
 
             # Add data
-            self.data["arp"][uid]["interface"] = uid
-            if "mac-address" in self.data["arp"][uid]:
-                self.data["arp"][uid]["mac-address"] = "multiple"
-                self.data["arp"][uid]["address"] = "multiple"
+            self.data["arp_tmp"][uid]["interface"] = uid
+            if "mac-address" in self.data["arp_tmp"][uid]:
+                self.data["arp_tmp"][uid]["mac-address"] = "multiple"
+                self.data["arp_tmp"][uid]["address"] = "multiple"
             else:
-                self.data["arp"][uid]["mac-address"] = from_entry(entry,
-                                                                  "mac-address")
-                self.data["arp"][uid]["address"] = (
-                    mac2ip[self.data["arp"][uid]["mac-address"]]
-                    if self.data["arp"][uid]["mac-address"] in mac2ip
+                self.data["arp_tmp"][uid]["mac-address"] = from_entry(entry, "mac-address")
+                self.data["arp_tmp"][uid]["address"] = (
+                    mac2ip[self.data["arp_tmp"][uid]["mac-address"]]
+                    if self.data["arp_tmp"][uid]["mac-address"] in mac2ip
                     else ""
                 )
 
@@ -667,10 +676,62 @@ class MikrotikControllerData:
             self.data["queue"][uid]["download-burst-time"] = download_burst_time
 
     # ---------------------------
+    #   get_arp
+    # ---------------------------
+    def get_arp(self):
+        """Get ARP data from Mikrotik"""
+        self.data["arp"] = parse_api(
+            data=self.data["arp"],
+            source=self.api.path("/ip/arp"),
+            key="mac-address",
+            vals=[
+                {"name": "mac-address"},
+                {"name": "address"},
+                {"name": "interface"},
+            ],
+        )
+
+    # ---------------------------
+    #   get_dns
+    # ---------------------------
+    def get_dns(self):
+        """Get static DNS data from Mikrotik"""
+        self.data["dns"] = parse_api(
+            data=self.data["dns"],
+            source=self.api.path("/ip/dns/static"),
+            key="name",
+            vals=[
+                {"name": "name"},
+                {"name": "address"},
+            ],
+        )
+
+    # ---------------------------
     #   get_dhcp
     # ---------------------------
     def get_dhcp(self):
         """Get DHCP data from Mikrotik"""
+
+        self.data["dhcp-network"] = parse_api(
+            data=self.data["dhcp-network"],
+            source=self.api.path("/ip/dhcp-server/network"),
+            key="address",
+            vals=[
+                {"name": "address"},
+                {"name": "gateway", "default": ""},
+                {"name": "netmask", "default": ""},
+                {"name": "dns-server", "default": ""},
+                {"name": "domain", "default": ""},
+            ],
+            ensure_vals=[
+                {"name": "address"},
+                {"name": "IPv4Network", "default": ""},
+            ]
+        )
+
+        for uid, vals in self.data["dhcp-network"].items():
+            if vals["IPv4Network"] == "":
+                self.data["dhcp-network"][uid]["IPv4Network"] = IPv4Network(vals["address"])
 
         self.data["dhcp-server"] = parse_api(
             data=self.data["dhcp-server"],
@@ -716,6 +777,77 @@ class MikrotikControllerData:
         )
 
         for uid in self.data["dhcp"]:
+            self.data["dhcp"][uid]["interface"] = \
+                self.data["dhcp-server"][self.data["dhcp"][uid]["server"]]["interface"]
+
+    # ---------------------------
+    #   process_host
+    # ---------------------------
+    def process_host(self):
+        """Get host tracking data"""
+        # Add hosts from DHCP
+        for uid, vals in self.data["dhcp"].items():
+            if uid not in self.data["host"]:
+                self.data["host"][uid] = {}
+                self.data["host"][uid]["source"] = "dhcp"
+
+                for key, key_data in zip(
+                        ["address", "mac-address", "interface"],
+                        ["address", "mac-address", "interface"],
+                ):
+                    if key not in self.data["host"][uid] or self.data["host"][uid][key] == "unknown":
+                        self.data["host"][uid][key] = vals[key_data]
+
+        # Add hosts from ARP
+        for uid, vals in self.data["arp"].items():
+            if uid not in self.data["host"]:
+                self.data["host"][uid] = {}
+                self.data["host"][uid]["source"] = "arp"
+
+                for key, key_data in zip(
+                        ["address", "mac-address", "interface"],
+                        ["address", "mac-address", "interface"],
+                ):
+                    if key not in self.data["host"][uid] or self.data["host"][uid][key] == "unknown":
+                        self.data["host"][uid][key] = vals[key_data]
+
+        # Process hosts
+        for uid, vals in self.data["host"].items():
+            # Add missing default values
+            for key, default in zip(
+                    ["address", "mac-address", "interface", "hostname", "last-seen", "available"],
+                    ["unknown", "unknown", "unknown", "unknown", False],
+            ):
+                if key not in self.data["host"][uid]:
+                    self.data["host"][uid][key] = default
+
+            # Resolve hostname
+            if vals["hostname"] == "unknown":
+                if vals["address"] != "unknown":
+                    for dns_uid, dns_vals in self.data["dns"].items():
+                        if dns_vals["address"] == vals["address"]:
+                            self.data["host"][uid]["hostname"] = dns_vals["name"].split('.')[0]
+                            break
+
+                if self.data["host"][uid]["hostname"] == "unknown" \
+                        and uid in self.data["dhcp"] and self.data["dhcp"][uid]["comment"] != "":
+                    self.data["host"][uid]["hostname"] = self.data["dhcp"][uid]["comment"]
+
+                elif self.data["host"][uid]["hostname"] == "unknown" \
+                        and uid in self.data["dhcp"] and self.data["dhcp"][uid]["host-name"] != "unknown":
+                    self.data["host"][uid]["hostname"] = self.data["dhcp"][uid]["host-name"]
+
+                elif self.data["host"][uid]["hostname"] == "unknown":
+                    self.data["host"][uid]["hostname"] = uid
+
+            # Check host availability
+            if vals["address"] != "unknown" and vals["interface"] != "unknown":
+                self.data["host"][uid]["available"] = \
+                    self.api.arp_ping(vals["address"], vals["interface"])
+
+            # Update last seen
+            if self.data["host"][uid]["available"]:
+                self.data["host"][uid]["last-seen"] = utcnow()
             self.data["dhcp"][uid]['interface'] = \
                 self.data["dhcp-server"][self.data["dhcp"][uid]['server']]["interface"]
 
