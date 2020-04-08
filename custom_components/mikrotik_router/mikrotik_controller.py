@@ -62,6 +62,7 @@ class MikrotikControllerData:
             "queue": {},
             "dns": {},
             "dhcp-server": {},
+            "dhcp-network": {},
             "dhcp": {},
             "host": {},
         }
@@ -702,6 +703,22 @@ class MikrotikControllerData:
     # ---------------------------
     def get_dhcp(self):
         """Get DHCP data from Mikrotik"""
+
+        self.data["dhcp-network"] = parse_api(
+            data=self.data["dhcp-network"],
+            source=self.api.path("/ip/dhcp-server/network"),
+            key="address",
+            vals=[
+                {"name": "address"},
+                {"name": "gateway", "default": ""},
+                {"name": "netmask", "default": ""},
+                {"name": "dns-server", "default": ""},
+                {"name": "domain", "default": ""},
+            ],
+            ensure_vals=[
+                {"name": "address"},
+            ]
+        )
 
         self.data["dhcp-server"] = parse_api(
             data=self.data["dhcp-server"],
