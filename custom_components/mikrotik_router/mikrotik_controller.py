@@ -753,7 +753,6 @@ class MikrotikControllerData:
                 if vals["address"] != "unknown":
                     for dns_uid, dns_vals in self.data["dns"].items():
                         if dns_vals["address"] == vals["address"]:
-                            _LOGGER.warning("DNS %s: %s", dns_vals["name"], dns_vals["name"].split('.')[0])
                             self.data["host"][uid]["hostname"] = dns_vals["name"].split('.')[0]
                             break
 
