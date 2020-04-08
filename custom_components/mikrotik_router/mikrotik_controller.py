@@ -7,6 +7,7 @@ from datetime import timedelta
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval
+from homeassistant.util.dt import utcnow
 
 from .const import (
     DOMAIN,
@@ -724,8 +725,54 @@ class MikrotikControllerData:
     # ---------------------------
     def process_host(self):
         """Get host tracking data"""
+        # Add hosts from DHCP
+        for uid, vals in self.data["dhcp"].items():
+            if uid not in self.data["host"]:
+                self.data["host"][uid] = {}
+                self.data["host"][uid]["source"] = "dhcp"
 
-        for uid in self.data["dhcp"]:
-            # TODO: set last-seen to now
-            self.data["dhcp"][uid]["available"] = \
-                self.api.arp_ping(self.data["dhcp"][uid]["address"], self.data["dhcp"][uid]["interface"])
+            for key, key_data in zip(
+                    ["address", "mac-address", "interface"],
+                    ["address", "mac-address", "interface"],
+            ):
+                if key not in self.data["host"][uid] or self.data["host"][uid][key] == "unknown":
+                    self.data["host"][uid][key] = vals[key_data]
+
+        # Process hosts
+        for uid, vals in self.data["host"].items():
+            # Add missing default values
+            for key, default in zip(
+                    ["address", "mac-address", "interface", "hostname", "last-seen", "available"],
+                    ["unknown", "unknown", "unknown", "unknown", False],
+            ):
+                if key not in self.data["host"][uid]:
+                    self.data["host"][uid][key] = default
+
+            # Resolve hostname
+            if vals["hostname"] == "unknown":
+                if vals["address"] != "unknown":
+                    for dns_uid, dns_vals in self.data["dns"].items():
+                        if dns_vals["address"] == vals["address"]:
+                            _LOGGER.warning("DNS %s: %s", dns_vals["name"], dns_vals["name"].split('.')[0])
+                            self.data["host"][uid]["hostname"] = dns_vals["name"].split('.')[0]
+                            break
+
+                if self.data["host"][uid]["hostname"] == "unknown" \
+                        and uid in self.data["dhcp"] and self.data["dhcp"][uid]["comment"] != "":
+                    self.data["host"][uid]["hostname"] = self.data["dhcp"][uid]["comment"]
+
+                elif self.data["host"][uid]["hostname"] == "unknown" \
+                        and uid in self.data["dhcp"] and self.data["dhcp"][uid]["host-name"] != "unknown":
+                    self.data["host"][uid]["hostname"] = self.data["dhcp"][uid]["host-name"]
+
+                elif self.data["host"][uid]["hostname"] == "unknown":
+                    self.data["host"][uid]["hostname"] = uid
+
+                    # Check host availability
+            if vals["address"] != "unknown" and vals["interface"] != "unknown":
+                self.data["host"][uid]["available"] = \
+                    self.api.arp_ping(vals["address"], vals["interface"])
+
+            # Update last seen
+            if self.data["host"][uid]["available"]:
+                self.data["host"][uid]["last-seen"] = utcnow()
