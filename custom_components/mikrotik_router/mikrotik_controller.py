@@ -770,12 +770,25 @@ class MikrotikControllerData:
                 self.data["host"][uid] = {}
                 self.data["host"][uid]["source"] = "dhcp"
 
-            for key, key_data in zip(
-                    ["address", "mac-address", "interface"],
-                    ["address", "mac-address", "interface"],
-            ):
-                if key not in self.data["host"][uid] or self.data["host"][uid][key] == "unknown":
-                    self.data["host"][uid][key] = vals[key_data]
+                for key, key_data in zip(
+                        ["address", "mac-address", "interface"],
+                        ["address", "mac-address", "interface"],
+                ):
+                    if key not in self.data["host"][uid] or self.data["host"][uid][key] == "unknown":
+                        self.data["host"][uid][key] = vals[key_data]
+
+        # Add hosts from ARP
+        for uid, vals in self.data["arp"].items():
+            if uid not in self.data["host"]:
+                self.data["host"][uid] = {}
+                self.data["host"][uid]["source"] = "arp"
+
+                for key, key_data in zip(
+                        ["address", "mac-address", "interface"],
+                        ["address", "mac-address", "interface"],
+                ):
+                    if key not in self.data["host"][uid] or self.data["host"][uid][key] == "unknown":
+                        self.data["host"][uid][key] = vals[key_data]
 
         # Process hosts
         for uid, vals in self.data["host"].items():
@@ -814,3 +827,7 @@ class MikrotikControllerData:
             # Update last seen
             if self.data["host"][uid]["available"]:
                 self.data["host"][uid]["last-seen"] = utcnow()
+
+        # TEMP DEBUG
+        for uid, vals in self.data["host"].items():
+            _LOGGER.warning("HOST %s: %s", uid, vals)
