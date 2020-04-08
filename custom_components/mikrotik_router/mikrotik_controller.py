@@ -60,6 +60,7 @@ class MikrotikControllerData:
             "queue": {},
             "dhcp-server": {},
             "dhcp": {},
+            "host": {},
         }
 
         self.listeners = []
@@ -196,6 +197,8 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.get_script)
         await self.hass.async_add_executor_job(self.get_queue)
         await self.hass.async_add_executor_job(self.get_dhcp)
+
+        await self.hass.async_add_executor_job(self.process_host)
 
         async_dispatcher_send(self.hass, self.signal_update)
         self.lock.release()
@@ -694,8 +697,16 @@ class MikrotikControllerData:
         )
 
         for uid in self.data["dhcp"]:
-            self.data["dhcp"][uid]['interface'] = \
-                self.data["dhcp-server"][self.data["dhcp"][uid]['server']]["interface"]
+            self.data["dhcp"][uid]["interface"] = \
+                self.data["dhcp-server"][self.data["dhcp"][uid]["server"]]["interface"]
 
-            self.data["dhcp"][uid]['available'] = \
-                self.api.arp_ping(self.data["dhcp"][uid]['address'], self.data["dhcp"][uid]['interface'])
+    # ---------------------------
+    #   process_host
+    # ---------------------------
+    def process_host(self):
+        """Get host tracking data"""
+
+        for uid in self.data["dhcp"]:
+            # TODO: set last-seen to now
+            self.data["dhcp"][uid]["available"] = \
+                self.api.arp_ping(self.data["dhcp"][uid]["address"], self.data["dhcp"][uid]["interface"])
