@@ -750,7 +750,7 @@ class MikrotikControllerData:
                 {"name": "status", "default": "unknown"},
                 {"name": "last-seen", "default": "unknown"},
                 {"name": "server", "default": "unknown"},
-                {"name": "comment"},
+                {"name": "comment", "default": ""},
             ],
             ensure_vals=[
                 {"name": "interface"},
@@ -830,14 +830,6 @@ class MikrotikControllerData:
             # Update last seen
             if self.data["host"][uid]["available"]:
                 self.data["host"][uid]["last-seen"] = utcnow()
-
-            # Update interface and availability for hosts present in DHCP leases
-            if uid in self.data["dhcp"]:
-                self.data["dhcp"][uid]['interface'] = \
-                    self.data["dhcp-server"][self.data["dhcp"][uid]['server']]["interface"]
-
-                self.data["dhcp"][uid]['available'] = \
-                    self.api.arp_ping(self.data["dhcp"][uid]['address'], self.data["dhcp"][uid]['interface'])
 
     def _address_part_of_local_network(self, address):
         address = ip_address(address)
