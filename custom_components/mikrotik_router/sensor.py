@@ -124,7 +124,7 @@ SENSOR_TYPES = {
 DEVICE_ATTRIBUTES_ACCOUNTING = [
     "address",
     "mac-address",
-    "comment"
+    "host-name"
 ]
 
 
