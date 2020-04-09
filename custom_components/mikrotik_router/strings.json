@@ -32,7 +32,9 @@
                 "data": {
                     "scan_interval": "Scan interval (requires HA restart)",
                     "track_iface_clients": "Show client MAC and IP on interfaces",
-                    "unit_of_measurement": "Unit of measurement"
+                    "unit_of_measurement": "Unit of measurement",
+                    "track_network_clients": "Track network devices",
+                    "scan_interval": "Scan interval (requires HA restart)"
                 }
             }
         }

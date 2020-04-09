@@ -890,6 +890,9 @@ class MikrotikControllerData:
         if self.support_wireless:
             wireless_detected = {}
             for uid, vals in self.data["wireless_hosts"].items():
+                if vals["ap"] == "yes":
+                    continue
+
                 if uid not in self.data["host"]:
                     self.data["host"][uid] = {}
 
