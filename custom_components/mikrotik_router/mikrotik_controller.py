@@ -513,6 +513,7 @@ class MikrotikControllerData:
     #   get_system_routerboard
     # ---------------------------
     def get_system_routerboard(self):
+        # TODO: run only when firmware update changes from available to not available
         """Get routerboard data from Mikrotik"""
         self.data["routerboard"] = parse_api(
             data=self.data["routerboard"],
@@ -603,6 +604,7 @@ class MikrotikControllerData:
     #   get_script
     # ---------------------------
     def get_script(self):
+        # TODO: run less often
         """Get list of all scripts from Mikrotik"""
         self.data["script"] = parse_api(
             data=self.data["script"],
@@ -619,6 +621,7 @@ class MikrotikControllerData:
     #   get_queue
     # ---------------------------
     def get_queue(self):
+        # TODO: run less often and on demand
         """Get Queue data from Mikrotik"""
         self.data["queue"] = parse_api(
             data=self.data["queue"],
@@ -702,6 +705,7 @@ class MikrotikControllerData:
     # ---------------------------
     def get_dns(self):
         """Get static DNS data from Mikrotik"""
+        # TODO: run less often or on demand
         self.data["dns"] = parse_api(
             data=self.data["dns"],
             source=self.api.path("/ip/dns/static"),
@@ -717,7 +721,7 @@ class MikrotikControllerData:
     # ---------------------------
     def get_dhcp(self):
         """Get DHCP data from Mikrotik"""
-
+        # TODO: run only on demand
         self.data["dhcp-network"] = parse_api(
             data=self.data["dhcp-network"],
             source=self.api.path("/ip/dhcp-server/network"),
@@ -739,6 +743,7 @@ class MikrotikControllerData:
             if vals["IPv4Network"] == "":
                 self.data["dhcp-network"][uid]["IPv4Network"] = IPv4Network(vals["address"])
 
+        # TODO: run only on demand
         self.data["dhcp-server"] = parse_api(
             data=self.data["dhcp-server"],
             source=self.api.path("/ip/dhcp-server"),
@@ -839,11 +844,13 @@ class MikrotikControllerData:
             # Update IP and interface (DHCP/returned host)
             if uid in self.data["dhcp"] and "." in self.data["dhcp"][uid]["address"]:
                 if self.data["dhcp"][uid]["address"] != self.data["host"][uid]["address"]:
+                    self.data["host"][uid]["source"] = "dhcp"
                     self.data["host"][uid]["address"] = self.data["dhcp"][uid]["address"]
                     self.data["host"][uid]["interface"] = self.data["dhcp"][uid]["interface"]
 
             elif uid in self.data["arp"] and "." in self.data["arp"][uid]["address"] \
-                    and self.data["arp"][uid]["address"] != self.data["host"][uid]["address"]:
+                    and self.data["arp"][uid]["arp"] != self.data["host"][uid]["address"]:
+                self.data["host"][uid]["source"] = "dhcp"
                 self.data["host"][uid]["address"] = self.data["arp"][uid]["address"]
                 self.data["host"][uid]["interface"] = self.data["arp"][uid]["interface"]
 
