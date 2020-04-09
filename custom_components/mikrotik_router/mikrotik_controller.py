@@ -9,6 +9,7 @@ from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.util.dt import utcnow
+from homeassistant.components.device_tracker import DOMAIN as DEVICE_TRACKER_DOMAIN
 
 from homeassistant.const import (
     CONF_NAME,
@@ -63,6 +64,7 @@ class MikrotikControllerData:
             "dhcp-network": {},
             "dhcp": {},
             "host": {},
+            "host_hass": {},
             "accounting": {}
         }
 
@@ -78,6 +80,7 @@ class MikrotikControllerData:
         )
 
         self.nat_removed = {}
+        self.host_hass_recovered = False
 
         async_track_time_interval(
             self.hass, self.force_update, self.option_scan_interval
@@ -201,6 +204,9 @@ class MikrotikControllerData:
         if "available" not in self.data["fw-update"]:
             await self.async_fwupdate_check()
 
+        if not self.data["host_hass"]:
+            await self.process_host_hass()
+
         await self.hass.async_add_executor_job(self.get_interface)
         await self.hass.async_add_executor_job(self.get_arp)
         await self.hass.async_add_executor_job(self.get_dns)
@@ -212,7 +218,6 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.get_system_resource)
         await self.hass.async_add_executor_job(self.get_script)
         await self.hass.async_add_executor_job(self.get_queue)
-        # await self.hass.async_add_executor_job(self.get_dhcp)
         await self.hass.async_add_executor_job(self.get_accounting)
 
         async_dispatcher_send(self.hass, self.signal_update)
@@ -760,13 +765,26 @@ class MikrotikControllerData:
             ],
             ensure_vals=[
                 {"name": "interface"},
-                {"name": "available", "type": "bool", "default": False},
             ]
         )
 
         for uid in self.data["dhcp"]:
             self.data["dhcp"][uid]["interface"] = \
                 self.data["dhcp-server"][self.data["dhcp"][uid]["server"]]["interface"]
+
+    # ---------------------------
+    #   process_host_hass
+    # ---------------------------
+    async def process_host_hass(self):
+        """Get host data from HA entity registry"""
+        registry = await self.hass.helpers.entity_registry.async_get_registry()
+        for entity in registry.entities.values():
+            if entity.config_entry_id == self.config_entry.entry_id \
+                    and entity.domain == DEVICE_TRACKER_DOMAIN \
+                    and "-" in entity.unique_id:
+                _, tracker_id, mac = entity.unique_id.split("-", 3)
+                if tracker_id == "host":
+                    self.data["host_hass"][mac] = entity.original_name
 
     # ---------------------------
     #   process_host
@@ -798,6 +816,17 @@ class MikrotikControllerData:
                 ):
                     if key not in self.data["host"][uid] or self.data["host"][uid][key] == "unknown":
                         self.data["host"][uid][key] = vals[key_data]
+
+        # Restore from hass registry
+        if not self.host_hass_recovered:
+            for uid in self.data["host_hass"]:
+                if uid not in self.data["host"]:
+                    self.data["host"][uid] = {}
+                    self.data["host"][uid]["source"] = "restored"
+                    self.data["host"][uid]["mac-address"] = uid
+                    self.data["host"][uid]["host-name"] = self.data["host_hass"][uid]
+
+            self.host_hass_recovered = True
 
         # Process hosts
         for uid, vals in self.data["host"].items():
