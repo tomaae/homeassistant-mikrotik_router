@@ -838,6 +838,17 @@ class MikrotikControllerData:
                 if key not in self.data["host"][uid]:
                     self.data["host"][uid][key] = default
 
+            # Update IP and interface (DHCP/returned host)
+            if uid in self.data["dhcp"] and "." in self.data["dhcp"][uid]["address"]:
+                if self.data["dhcp"][uid]["address"] != self.data["host"][uid]["address"]:
+                    self.data["host"][uid]["address"] = self.data["dhcp"][uid]["address"]
+                    self.data["host"][uid]["interface"] = self.data["dhcp"][uid]["interface"]
+
+            elif uid in self.data["arp"] and "." in self.data["arp"][uid]["address"] \
+                    and self.data["arp"][uid]["address"] != self.data["host"][uid]["address"]:
+                self.data["host"][uid]["address"] = self.data["arp"][uid]["address"]
+                self.data["host"][uid]["interface"] = self.data["arp"][uid]["interface"]
+
             # Resolve hostname
             if vals["host-name"] == "unknown":
                 if vals["address"] != "unknown":
