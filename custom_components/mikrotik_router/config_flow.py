@@ -35,7 +35,7 @@ from .const import (
     DEFAULT_USERNAME,
     DEFAULT_PASSWORD,
     DEFAULT_PORT,
-    DEFAULT_NAME,
+    DEFAULT_DEVICE_NAME,
     DEFAULT_SSL,
 )
 from .mikrotikapi import MikrotikAPI
@@ -110,7 +110,7 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
 
         return self._show_config_form(
             user_input={
-                CONF_NAME: DEFAULT_NAME,
+                CONF_NAME: DEFAULT_DEVICE_NAME,
                 CONF_HOST: DEFAULT_HOST,
                 CONF_USERNAME: DEFAULT_USERNAME,
                 CONF_PASSWORD: DEFAULT_PASSWORD,
