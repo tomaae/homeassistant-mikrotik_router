@@ -804,7 +804,7 @@ class MikrotikControllerData:
             # Add missing default values
             for key, default in zip(
                     ["address", "mac-address", "interface", "host-name", "last-seen", "available"],
-                    ["unknown", "unknown", "unknown", "unknown", False],
+                    ["unknown", "unknown", "unknown", "unknown", False, False],
             ):
                 if key not in self.data["host"][uid]:
                     self.data["host"][uid][key] = default
