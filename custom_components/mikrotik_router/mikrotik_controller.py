@@ -82,6 +82,9 @@ class MikrotikControllerData:
         self.nat_removed = {}
         self.host_hass_recovered = False
 
+        self.support_capsman = False
+        self.support_wireless = False
+
         async_track_time_interval(
             self.hass, self.force_update, self.option_scan_interval
         )
@@ -179,6 +182,7 @@ class MikrotikControllerData:
         except:
             return
 
+        await self.hass.async_add_executor_job(self.capability_update)
         await self.hass.async_add_executor_job(self.get_system_routerboard)
         await self.hass.async_add_executor_job(self.get_system_resource)
         self.lock.release()
@@ -190,6 +194,33 @@ class MikrotikControllerData:
         """Update Mikrotik data"""
         await self.hass.async_add_executor_job(self.get_firmware_update)
         async_dispatcher_send(self.hass, self.signal_update)
+
+    # ---------------------------
+    #   capability_update
+    # ---------------------------
+    def capability_update(self):
+        """Update Mikrotik data"""
+        packages = parse_api(
+            data={},
+            source=self.api.path("/system/package"),
+            key="name",
+            vals=[
+                {"name": "name"},
+                {
+                    "name": "enabled",
+                    "source": "disabled",
+                    "type": "bool",
+                    "reverse": True,
+                },
+            ],
+        )
+
+        if "wireless" in packages:
+            self.support_capsman = packages["wireless"]["enabled"]
+            self.support_wireless = packages["wireless"]["enabled"]
+        else:
+            self.support_wireless = False
+            self.support_capsman = False
 
     # ---------------------------
     #   async_update
