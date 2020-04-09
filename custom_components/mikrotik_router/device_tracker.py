@@ -1,6 +1,7 @@
 """Support for the Mikrotik Router device tracker."""
 
 import logging
+from datetime import timedelta
 
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
 from homeassistant.components.device_tracker.const import SOURCE_TYPE_ROUTER
@@ -11,12 +12,16 @@ from homeassistant.const import (
 from homeassistant.core import callback
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
-from homeassistant.util.dt import get_age
+from homeassistant.util.dt import get_age, utcnow
 
 from .const import (
     DOMAIN,
     DATA_CLIENT,
     ATTRIBUTION,
+    CONF_TRACK_HOSTS,
+    DEFAULT_TRACK_HOSTS,
+    CONF_TRACK_HOSTS_TIMEOUT,
+    DEFAULT_TRACK_HOST_TIMEOUT,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -42,6 +47,7 @@ DEVICE_ATTRIBUTES_HOST = [
     "address",
     "mac-address",
     "interface",
+    "source",
     "last-seen",
 ]
 
@@ -59,6 +65,18 @@ def format_attribute(attr):
 
 
 # ---------------------------
+#   format_value
+# ---------------------------
+def format_value(res):
+    res = res.replace("dhcp", "DHCP")
+    res = res.replace("dns", "DNS")
+    res = res.replace("capsman", "CAPsMAN")
+    res = res.replace("wireless", "Wireless")
+    res = res.replace("restored", "Restored")
+    return res
+
+
+# ---------------------------
 #   async_setup_entry
 # ---------------------------
 async def async_setup_entry(hass, config_entry, async_add_entities):
@@ -70,7 +88,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     @callback
     def update_controller():
         """Update the values of the controller."""
-        update_items(inst, mikrotik_controller, async_add_entities, tracked)
+        update_items(inst, config_entry, mikrotik_controller, async_add_entities, tracked)
 
     mikrotik_controller.listeners.append(
         async_dispatcher_connect(
@@ -85,7 +103,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 #   update_items
 # ---------------------------
 @callback
-def update_items(inst, mikrotik_controller, async_add_entities, tracked):
+def update_items(inst, config_entry, mikrotik_controller, async_add_entities, tracked):
     """Update tracked device state from the controller."""
     new_tracked = []
 
@@ -106,7 +124,7 @@ def update_items(inst, mikrotik_controller, async_add_entities, tracked):
                     tracked[item_id].async_schedule_update_ha_state()
                 continue
 
-            tracked[item_id] = sid_func(inst, uid, mikrotik_controller)
+            tracked[item_id] = sid_func(inst, uid, mikrotik_controller, config_entry)
             new_tracked.append(tracked[item_id])
 
     if new_tracked:
@@ -119,7 +137,7 @@ def update_items(inst, mikrotik_controller, async_add_entities, tracked):
 class MikrotikControllerPortDeviceTracker(ScannerEntity):
     """Representation of a network port."""
 
-    def __init__(self, inst, uid, mikrotik_controller):
+    def __init__(self, inst, uid, mikrotik_controller, _):
         """Set up tracked port."""
         self._inst = inst
         self._ctrl = mikrotik_controller
@@ -200,7 +218,6 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
     def device_state_attributes(self):
         """Return the port state attributes."""
         attributes = self._attrs
-
         for variable in DEVICE_ATTRIBUTES_IFACE:
             if variable in self._data:
                 attributes[format_attribute(variable)] = self._data[variable]
@@ -214,15 +231,29 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
 class MikrotikControllerHostDeviceTracker(ScannerEntity):
     """Representation of a network device."""
 
-    def __init__(self, inst, uid, mikrotik_controller):
+    def __init__(self, inst, uid, mikrotik_controller, config_entry):
         """Set up tracked port."""
         self._inst = inst
         self._ctrl = mikrotik_controller
         self._data = mikrotik_controller.data["host"][uid]
+        self._config_entry = config_entry
 
         self._attrs = {
             ATTR_ATTRIBUTION: ATTRIBUTION,
         }
+
+    @property
+    def option_track_network_hosts(self):
+        """Config entry option to not track ARP."""
+        return self._config_entry.options.get(CONF_TRACK_HOSTS, DEFAULT_TRACK_HOSTS)
+
+    @property
+    def option_track_network_hosts_timeout(self):
+        """Config entry option scan interval."""
+        track_network_hosts_timeout = self._config_entry.options.get(
+            CONF_TRACK_HOSTS_TIMEOUT, DEFAULT_TRACK_HOST_TIMEOUT
+        )
+        return timedelta(seconds=track_network_hosts_timeout)
 
     @property
     def entity_registry_enabled_default(self):
@@ -244,7 +275,16 @@ class MikrotikControllerHostDeviceTracker(ScannerEntity):
     @property
     def is_connected(self):
         """Return true if the host is connected to the network."""
-        return self._data["available"]
+        if self._data["source"] in ["capsman", "wireless"]:
+            return self._data["available"]
+
+        if (
+            self._data["last-seen"]
+            and (utcnow() - self._data["last-seen"])
+            < self.option_track_network_hosts_timeout
+        ):
+            return True
+        return False
 
     @property
     def source_type(self):
@@ -264,17 +304,27 @@ class MikrotikControllerHostDeviceTracker(ScannerEntity):
     @property
     def available(self) -> bool:
         """Return if controller is available."""
+        if not self.option_track_network_hosts:
+            return False
+
         return self._ctrl.connected()
 
     @property
     def icon(self):
         """Return the icon."""
-        if self._data["available"]:
-            icon = "mdi:lan-connect"
-        else:
-            icon = "mdi:lan-disconnect"
+        if self._data["source"] in ["capsman", "wireless"]:
+            if self._data["available"]:
+                return "mdi:lan-connect"
+            else:
+                return "mdi:lan-disconnect"
 
-        return icon
+        if (
+            self._data["last-seen"]
+            and (utcnow() - self._data["last-seen"])
+            < self.option_track_network_hosts_timeout
+        ):
+            return "mdi:lan-connect"
+        return "mdi:lan-disconnect"
 
     @property
     def device_info(self):
@@ -299,7 +349,6 @@ class MikrotikControllerHostDeviceTracker(ScannerEntity):
     def device_state_attributes(self):
         """Return the host state attributes."""
         attributes = self._attrs
-
         for variable in DEVICE_ATTRIBUTES_HOST:
             if variable in self._data:
                 if variable == "last-seen":
@@ -308,6 +357,9 @@ class MikrotikControllerHostDeviceTracker(ScannerEntity):
                     else:
                         attributes[format_attribute(variable)] = "unknown"
                 else:
-                    attributes[format_attribute(variable)] = self._data[variable]
+                    if self._data[variable] in ["dhcp", "dns", "capsman", "wireless", "restored"]:
+                        attributes[format_attribute(variable)] = format_value(self._data[variable])
+                    else:
+                        attributes[format_attribute(variable)] = self._data[variable]
 
         return attributes
