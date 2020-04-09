@@ -25,6 +25,10 @@ from .const import (
     DEFAULT_TRACK_IFACE_CLIENTS,
     CONF_SCAN_INTERVAL,
     DEFAULT_SCAN_INTERVAL,
+    CONF_TRACK_HOSTS,
+    DEFAULT_TRACK_HOSTS,
+    CONF_TRACK_HOSTS_TIMEOUT,
+    DEFAULT_TRACK_HOST_TIMEOUT,
     LIST_UNIT_OF_MEASUREMENT,
     DEFAULT_UNIT_OF_MEASUREMENT,
     DEFAULT_HOST,
@@ -163,12 +167,6 @@ class MikrotikControllerOptionsFlowHandler(OptionsFlow):
             data_schema=vol.Schema(
                 {
                     vol.Optional(
-                        CONF_TRACK_IFACE_CLIENTS,
-                        default=self.config_entry.options.get(
-                            CONF_TRACK_IFACE_CLIENTS, DEFAULT_TRACK_IFACE_CLIENTS
-                        ),
-                    ): bool,
-                    vol.Optional(
                         CONF_SCAN_INTERVAL,
                         default=self.config_entry.options.get(
                             CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
@@ -180,6 +178,24 @@ class MikrotikControllerOptionsFlowHandler(OptionsFlow):
                             CONF_UNIT_OF_MEASUREMENT, DEFAULT_UNIT_OF_MEASUREMENT
                         ),
                     ): vol.In(LIST_UNIT_OF_MEASUREMENT),
+                    vol.Optional(
+                        CONF_TRACK_IFACE_CLIENTS,
+                        default=self.config_entry.options.get(
+                            CONF_TRACK_IFACE_CLIENTS, DEFAULT_TRACK_IFACE_CLIENTS
+                        ),
+                    ): bool,
+                    vol.Optional(
+                        CONF_TRACK_HOSTS,
+                        default=self.config_entry.options.get(
+                            CONF_TRACK_HOSTS, DEFAULT_TRACK_HOSTS
+                        ),
+                    ): bool,
+                    vol.Optional(
+                        CONF_TRACK_HOSTS_TIMEOUT,
+                        default=self.config_entry.options.get(
+                            CONF_TRACK_HOSTS_TIMEOUT, DEFAULT_TRACK_HOST_TIMEOUT
+                        ),
+                    ): int
                 }
             ),
         )
