@@ -852,9 +852,9 @@ class MikrotikControllerData:
             key="mac-address",
             vals=[
                 {"name": "mac-address"},
+                {"name": "address", "default": "unknown"},
                 {"name": "interface", "default": "unknown"},
-                {"name": "radio-name", "default": "unknown"},
-                {"name": "ap", "default": "no"},
+                {"name": "ap", "type": "bool"},
             ]
         )
 
@@ -888,8 +888,8 @@ class MikrotikControllerData:
                         ["mac-address", "interface"],
                         ["mac-address", "interface"],
                 ):
-                    if key not in self.data["host"][uid] or self.data["capsman_hosts"][uid][key] == "unknown":
-                        self.data["capsman_hosts"][uid][key] = vals[key_data]
+                    if key not in self.data["host"][uid] or self.data["host"][uid][key] == "unknown":
+                        self.data["host"][uid][key] = vals[key_data]
 
                 # Update last seen
                 capsman_detected[uid] = True
@@ -900,7 +900,7 @@ class MikrotikControllerData:
         if self.support_wireless:
             wireless_detected = {}
             for uid, vals in self.data["wireless_hosts"].items():
-                if vals["ap"] == "yes":
+                if vals["ap"]:
                     continue
 
                 if uid not in self.data["host"]:
@@ -908,11 +908,11 @@ class MikrotikControllerData:
 
                 self.data["host"][uid]["source"] = "wireless"
                 for key, key_data in zip(
-                        ["mac-address", "interface"],
-                        ["mac-address", "interface"],
+                        ["mac-address", "address", "interface"],
+                        ["mac-address", "address", "interface"],
                 ):
-                    if key not in self.data["host"][uid] or self.data["wireless_hosts"][uid][key] == "unknown":
-                        self.data["wireless_hosts"][uid][key] = vals[key_data]
+                    if key not in self.data["host"][uid] or self.data["host"][uid][key] == "unknown":
+                        self.data["host"][uid][key] = vals[key_data]
 
                 # Update last seen
                 wireless_detected[uid] = True
