@@ -618,7 +618,6 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_queue
     # ---------------------------
-
     def get_queue(self):
         """Get Queue data from Mikrotik"""
         self.data["queue"] = parse_api(
@@ -781,7 +780,7 @@ class MikrotikControllerData:
         for entity in registry.entities.values():
             if entity.config_entry_id == self.config_entry.entry_id \
                     and entity.domain == DEVICE_TRACKER_DOMAIN \
-                    and "-" in entity.unique_id:
+                    and "-host-" in entity.unique_id:
                 _, tracker_id, mac = entity.unique_id.split("-", 3)
                 if tracker_id == "host":
                     self.data["host_hass"][mac] = entity.original_name
