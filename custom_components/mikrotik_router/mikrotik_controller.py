@@ -781,9 +781,8 @@ class MikrotikControllerData:
             if entity.config_entry_id == self.config_entry.entry_id \
                     and entity.domain == DEVICE_TRACKER_DOMAIN \
                     and "-host-" in entity.unique_id:
-                _, tracker_id, mac = entity.unique_id.split("-", 3)
-                if tracker_id == "host":
-                    self.data["host_hass"][mac] = entity.original_name
+                _, _, mac = entity.unique_id.split("-", 3)
+                self.data["host_hass"][mac] = entity.original_name
 
     # ---------------------------
     #   process_host
