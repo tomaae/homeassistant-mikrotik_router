@@ -831,7 +831,7 @@ class MikrotikControllerData:
     def get_capsman_hosts(self):
         """Get CAPS-MAN hosts data from Mikrotik"""
         self.data["capsman_hosts"] = parse_api(
-            data=self.data["capsman_hosts"],
+            data={},
             source=self.api.path("/caps-man/registration-table"),
             key="mac-address",
             vals=[
@@ -847,14 +847,14 @@ class MikrotikControllerData:
     def get_wireless_hosts(self):
         """Get wireless hosts data from Mikrotik"""
         self.data["wireless_hosts"] = parse_api(
-            data=self.data["wireless_hosts"],
+            data={},
             source=self.api.path("/interface/wireless/registration-table"),
             key="mac-address",
             vals=[
                 {"name": "mac-address"},
-                {"name": "address", "default": "unknown"},
                 {"name": "interface", "default": "unknown"},
                 {"name": "ap", "type": "bool"},
+                {"name": "uptime"},
             ]
         )
 
@@ -908,8 +908,8 @@ class MikrotikControllerData:
 
                 self.data["host"][uid]["source"] = "wireless"
                 for key, key_data in zip(
-                        ["mac-address", "address", "interface"],
-                        ["mac-address", "address", "interface"],
+                        ["mac-address", "interface"],
+                        ["mac-address", "interface"],
                 ):
                     if key not in self.data["host"][uid] or self.data["host"][uid][key] == "unknown":
                         self.data["host"][uid][key] = vals[key_data]
