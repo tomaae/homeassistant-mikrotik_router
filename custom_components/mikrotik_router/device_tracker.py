@@ -164,7 +164,7 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
     @property
     def unique_id(self):
         """Return a unique identifier for this port."""
-        return f"{self._inst.lower()}-{self._data['port-mac-address']}"
+        return f"{self._inst.lower()}-interface-{self._data['port-mac-address']}"
 
     @property
     def available(self) -> bool:
@@ -259,7 +259,7 @@ class MikrotikControllerHostDeviceTracker(ScannerEntity):
     @property
     def unique_id(self):
         """Return a unique identifier for this host."""
-        return f"{self._inst.lower()}-{self._data['mac-address']}"
+        return f"{self._inst.lower()}-host-{self._data['mac-address']}"
 
     @property
     def available(self) -> bool:
