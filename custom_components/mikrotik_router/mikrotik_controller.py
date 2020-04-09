@@ -63,7 +63,8 @@ class MikrotikControllerData:
             "dhcp-server": {},
             "dhcp-network": {},
             "dhcp": {},
-            "capsman": {},
+            "capsman_hosts": {},
+            "wireless_hosts": {},
             "host": {},
             "host_hass": {},
             "accounting": {}
@@ -220,8 +221,8 @@ class MikrotikControllerData:
             self.support_capsman = packages["wireless"]["enabled"]
             self.support_wireless = packages["wireless"]["enabled"]
         else:
-            self.support_wireless = False
             self.support_capsman = False
+            self.support_wireless = False
 
     # ---------------------------
     #   async_update
@@ -240,7 +241,10 @@ class MikrotikControllerData:
             await self.process_host_hass()
 
         if self.support_capsman:
-            await self.hass.async_add_executor_job(self.get_capsman)
+            await self.hass.async_add_executor_job(self.get_capsman_hosts)
+
+        if self.support_wireless:
+            await self.hass.async_add_executor_job(self.get_wireless_hosts)
 
         await self.hass.async_add_executor_job(self.get_interface)
         await self.hass.async_add_executor_job(self.get_arp)
@@ -812,18 +816,35 @@ class MikrotikControllerData:
                 self.data["dhcp-server"][self.data["dhcp"][uid]["server"]]["interface"]
 
     # ---------------------------
-    #   get_capsman
+    #   get_capsman_hosts
     # ---------------------------
-    def get_capsman(self):
-        """Get CAPS-MAN data from Mikrotik"""
-        self.data["capsman"] = parse_api(
-            data=self.data["capsman"],
+    def get_capsman_hosts(self):
+        """Get CAPS-MAN hosts data from Mikrotik"""
+        self.data["capsman_hosts"] = parse_api(
+            data=self.data["capsman_hosts"],
             source=self.api.path("/caps-man/registration-table"),
             key="mac-address",
             vals=[
                 {"name": "mac-address"},
                 {"name": "interface", "default": "unknown"},
                 {"name": "ssid", "default": "unknown"},
+            ]
+        )
+
+    # ---------------------------
+    #   get_wireless_hosts
+    # ---------------------------
+    def get_wireless_hosts(self):
+        """Get wireless hosts data from Mikrotik"""
+        self.data["wireless_hosts"] = parse_api(
+            data=self.data["wireless_hosts"],
+            source=self.api.path("/interface/wireless/registration-table"),
+            key="mac-address",
+            vals=[
+                {"name": "mac-address"},
+                {"name": "interface", "default": "unknown"},
+                {"name": "radio-name", "default": "unknown"},
+                {"name": "ap", "default": "no"},
             ]
         )
 
@@ -848,7 +869,7 @@ class MikrotikControllerData:
         # Add hosts from CAPS-MAN
         if self.support_capsman:
             capsman_detected = {}
-            for uid, vals in self.data["capsman"].items():
+            for uid, vals in self.data["capsman_hosts"].items():
                 if uid not in self.data["host"]:
                     self.data["host"][uid] = {}
 
@@ -857,11 +878,31 @@ class MikrotikControllerData:
                         ["mac-address", "interface"],
                         ["mac-address", "interface"],
                 ):
-                    if key not in self.data["host"][uid] or self.data["capsman"][uid][key] == "unknown":
-                        self.data["capsman"][uid][key] = vals[key_data]
+                    if key not in self.data["host"][uid] or self.data["capsman_hosts"][uid][key] == "unknown":
+                        self.data["capsman_hosts"][uid][key] = vals[key_data]
 
                 # Update last seen
                 capsman_detected[uid] = True
+                self.data["host"][uid]["available"] = True
+                self.data["host"][uid]["last-seen"] = utcnow()
+
+        # Add hosts from wireless
+        if self.support_wireless:
+            wireless_detected = {}
+            for uid, vals in self.data["wireless_hosts"].items():
+                if uid not in self.data["host"]:
+                    self.data["host"][uid] = {}
+
+                self.data["host"][uid]["source"] = "wireless"
+                for key, key_data in zip(
+                        ["mac-address", "interface"],
+                        ["mac-address", "interface"],
+                ):
+                    if key not in self.data["host"][uid] or self.data["wireless_hosts"][uid][key] == "unknown":
+                        self.data["wireless_hosts"][uid][key] = vals[key_data]
+
+                # Update last seen
+                wireless_detected[uid] = True
                 self.data["host"][uid]["available"] = True
                 self.data["host"][uid]["last-seen"] = utcnow()
 
@@ -916,21 +957,24 @@ class MikrotikControllerData:
             if vals["source"] == "capsman" and uid not in capsman_detected:
                 self.data["host"][uid]["available"] = False
 
+            # Wireless
+            if vals["source"] == "wireless" and uid not in wireless_detected:
+                self.data["host"][uid]["available"] = False
+
             # Update IP and interface (DHCP/returned host)
             if uid in self.data["dhcp"] and "." in self.data["dhcp"][uid]["address"]:
                 if self.data["dhcp"][uid]["address"] != self.data["host"][uid]["address"]:
-                    if vals["source"] != "capsman":
+                    if vals["source"] not in ["capsman", "wireless"]:
                         self.data["host"][uid]["source"] = "dhcp"
                         self.data["host"][uid]["interface"] = self.data["dhcp"][uid]["interface"]
                     self.data["host"][uid]["address"] = self.data["dhcp"][uid]["address"]
 
             elif uid in self.data["arp"] and "." in self.data["arp"][uid]["address"] \
                     and self.data["arp"][uid]["address"] != self.data["host"][uid]["address"]:
-                if vals["source"] != "capsman":
+                if vals["source"] not in ["capsman", "wireless"]:
                     self.data["host"][uid]["source"] = "dhcp"
                     self.data["host"][uid]["interface"] = self.data["arp"][uid]["interface"]
                 self.data["host"][uid]["address"] = self.data["arp"][uid]["address"]
-
 
             # Resolve hostname
             if vals["host-name"] == "unknown":
@@ -952,7 +996,8 @@ class MikrotikControllerData:
                     self.data["host"][uid]["host-name"] = uid
 
             # Check host availability
-            if vals["source"] != "capsman" and vals["address"] != "unknown" and vals["interface"] != "unknown":
+            if vals["source"] not in ["capsman", "wireless"] \
+                    and vals["address"] != "unknown" and vals["interface"] != "unknown":
                 self.data["host"][uid]["available"] = \
                     self.api.arp_ping(vals["address"], vals["interface"])
 
