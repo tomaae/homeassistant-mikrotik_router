@@ -27,8 +27,6 @@ from .const import (
     DEFAULT_TRACK_IFACE_CLIENTS,
     CONF_TRACK_HOSTS,
     DEFAULT_TRACK_HOSTS,
-    CONF_TRACK_HOSTS_TIMEOUT,
-    DEFAULT_TRACK_HOST_TIMEOUT,
     CONF_SCAN_INTERVAL,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_UNIT_OF_MEASUREMENT,
@@ -160,17 +158,6 @@ class MikrotikControllerData:
             CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
         )
         return timedelta(seconds=scan_interval)
-
-    # ---------------------------
-    #   option_track_network_hosts_timeout
-    # ---------------------------
-    @property
-    def option_track_network_hosts_timeout(self):
-        """Config entry option scan interval."""
-        track_network_hosts_timeout = self.config_entry.options.get(
-            CONF_TRACK_HOSTS_TIMEOUT, DEFAULT_TRACK_HOST_TIMEOUT
-        )
-        return timedelta(seconds=track_network_hosts_timeout)
 
     # ---------------------------
     #   option_unit_of_measurement
