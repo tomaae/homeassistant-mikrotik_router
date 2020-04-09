@@ -53,9 +53,11 @@ You can add this integration several times for different devices.
 
 # Configuration
 ![Integration options](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/integration_options.png)
-* "Show client MAC and IP" - Display connected IP and MAC address for devices connected to ports on router.
 * "Scan interval" - Scan/refresh time in seconds. HA needs to be reloaded for scan interval change to be applied.
 * "Unit of measurement" - Traffic sensor measurement (bps, Kbps, Mbps, B/s, KB/s, MB/s)
+* "Show client MAC and IP on interfaces" - Display connected IP and MAC address for devices connected to ports on router.
+* "Track network devices" - Enable device tracker
+* "Track network devices timeout" - Tracked devices will be marked as away after timeout (does not apply to Mikrotik wireless and caps-man)
 
 ## List of detected devices
 ![Integration options](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/integration_devices.png)
