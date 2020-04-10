@@ -275,6 +275,9 @@ class MikrotikControllerHostDeviceTracker(ScannerEntity):
     @property
     def is_connected(self):
         """Return true if the host is connected to the network."""
+        if not self.option_track_network_hosts:
+            return False
+
         if self._data["source"] in ["capsman", "wireless"]:
             return self._data["available"]
 
