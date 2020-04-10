@@ -391,6 +391,8 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
     def device_info(self):
         """Return a accounting description for device registry."""
         info = {
+            "connections": {
+                (CONNECTION_NETWORK_MAC, self._data["mac-address"])},
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
             "name": f"{self._inst} {self._data['host-name']}",
