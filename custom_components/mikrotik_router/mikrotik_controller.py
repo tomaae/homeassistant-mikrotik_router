@@ -55,6 +55,7 @@ class MikrotikControllerData:
             "routerboard": {},
             "resource": {},
             "interface": {},
+            "bridge_host": {},
             "arp": {},
             "arp_tmp": {},
             "nat": {},
@@ -278,6 +279,7 @@ class MikrotikControllerData:
             await self.hass.async_add_executor_job(self.get_wireless_hosts)
 
         await self.hass.async_add_executor_job(self.get_interface)
+        await self.hass.async_add_executor_job(self.get_bridge_host)
         await self.hass.async_add_executor_job(self.get_arp)
         await self.hass.async_add_executor_job(self.get_dns)
         await self.hass.async_add_executor_job(self.get_dhcp)
@@ -364,6 +366,29 @@ class MikrotikControllerData:
             self.data["interface"][uid]["tx-bits-per-second"] = round(
                 self.data["interface"][uid]["tx-bits-per-second"] * uom_div
             )
+
+    # ---------------------------
+    #   get_bridge_host
+    # ---------------------------
+    def get_bridge_host(self):
+        """Get system resources data from Mikrotik"""
+        self.data["bridge_host"] = parse_api(
+            data=self.data["bridge_host"],
+            source=self.api.path("/interface/bridge/host"),
+            key="mac-address",
+            vals=[
+                {"name": "mac-address"},
+                {"name": "interface", "default": "unknown"},
+                {"name": "bridge", "default": "unknown"},
+                {
+                    "name": "enabled",
+                    "source": "disabled",
+                    "type": "bool",
+                    "reverse": True,
+                },
+            ],
+            only=[{"key": "local", "value": False}],
+        )
 
     # ---------------------------
     #   get_interface_client
