@@ -122,19 +122,21 @@ class MikrotikControllerBinarySensor(BinarySensorDevice):
     def device_info(self):
         """Return a port description for device registry."""
         info = {
-            "identifiers": {
+            "manufacturer": self._ctrl.data["resource"]["platform"],
+            "model": self._ctrl.data["resource"]["board-name"],
+            "name": f"{self._inst} {self._type[ATTR_GROUP]}",
+        }
+        if ATTR_GROUP in self._type:
+            info["identifiers"] = {
                 (
                     DOMAIN,
                     "serial-number",
                     self._ctrl.data["routerboard"]["serial-number"],
                     "switch",
-                    "PORT",
+                    self._type[ATTR_GROUP],
                 )
-            },
-            "manufacturer": self._ctrl.data["resource"]["platform"],
-            "model": self._ctrl.data["resource"]["board-name"],
-            "name": self._type[ATTR_GROUP],
-        }
+            }
+
         return info
 
     async def async_update(self):

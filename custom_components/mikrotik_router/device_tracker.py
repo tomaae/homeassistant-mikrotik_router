@@ -210,7 +210,7 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
                 (CONNECTION_NETWORK_MAC, self._data["port-mac-address"])},
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
-            "name": self._data["default-name"],
+            "name": f"{self._inst} {self._data['default-name']}",
         }
         return info
 
@@ -332,18 +332,9 @@ class MikrotikControllerHostDeviceTracker(ScannerEntity):
         info = {
             "connections": {
                 (CONNECTION_NETWORK_MAC, self._data["mac-address"])},
-            "identifiers": {
-                (
-                    DOMAIN,
-                    "serial-number",
-                    self._ctrl.data["routerboard"]["serial-number"],
-                    "switch",
-                    "Hosts",
-                )
-            },
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
-            "name": "Hosts",
+            "name": f"{self._inst} {self._data['host-name']}",
         }
         return info
 

@@ -86,7 +86,6 @@ SENSOR_TYPES = {
         ATTR_GROUP: "Accounting",
         ATTR_UNIT: "ps",
         ATTR_UNIT_ATTR: "tx-rx-attr",
-        ATTR_PATH: "accounting",
         ATTR_ATTR: "lan-tx",
     },
     "accounting_lan_rx": {
@@ -96,7 +95,6 @@ SENSOR_TYPES = {
         ATTR_GROUP: "Accounting",
         ATTR_UNIT: "ps",
         ATTR_UNIT_ATTR: "tx-rx-attr",
-        ATTR_PATH: "accounting",
         ATTR_ATTR: "lan-rx",
     },
     "accounting_wan_tx": {
@@ -106,7 +104,6 @@ SENSOR_TYPES = {
         ATTR_GROUP: "Accounting",
         ATTR_UNIT: "ps",
         ATTR_UNIT_ATTR: "tx-rx-attr",
-        ATTR_PATH: "accounting",
         ATTR_ATTR: "wan-tx",
     },
     "accounting_wan_rx": {
@@ -116,7 +113,6 @@ SENSOR_TYPES = {
         ATTR_GROUP: "Accounting",
         ATTR_UNIT: "ps",
         ATTR_UNIT_ATTR: "tx-rx-attr",
-        ATTR_PATH: "accounting",
         ATTR_ATTR: "wan-rx",
     },
 }
@@ -288,19 +284,21 @@ class MikrotikControllerSensor(Entity):
     def device_info(self):
         """Return a port description for device registry."""
         info = {
-            "identifiers": {
+            "manufacturer": self._ctrl.data["resource"]["platform"],
+            "model": self._ctrl.data["resource"]["board-name"],
+            "name": f"{self._inst} {self._type[ATTR_GROUP]}",
+        }
+        if ATTR_GROUP in self._type:
+            info["identifiers"] = {
                 (
                     DOMAIN,
                     "serial-number",
                     self._ctrl.data["routerboard"]["serial-number"],
                     "switch",
-                    "PORT",
+                    self._type[ATTR_GROUP],
                 )
-            },
-            "manufacturer": self._ctrl.data["resource"]["platform"],
-            "model": self._ctrl.data["resource"]["board-name"],
-            "name": self._type[ATTR_GROUP],
-        }
+            }
+
         return info
 
     async def async_update(self):
@@ -342,8 +340,9 @@ class MikrotikControllerTrafficSensor(MikrotikControllerSensor):
                 (CONNECTION_NETWORK_MAC, self._data["port-mac-address"])},
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
-            "name": self._data["default-name"],
+            "name": f"{self._inst} {self._data['default-name']}",
         }
+
         return info
 
     async def async_added_to_hass(self):
@@ -392,18 +391,9 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
     def device_info(self):
         """Return a accounting description for device registry."""
         info = {
-            "identifiers": {
-                (
-                    DOMAIN,
-                    "serial-number",
-                    self._ctrl.data["routerboard"]["serial-number"],
-                    "sensor",
-                    "Accounting"
-                )
-            },
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
-            "name": self._type[ATTR_GROUP],
+            "name": f"{self._inst} {self._data['host-name']}",
         }
         return info
 

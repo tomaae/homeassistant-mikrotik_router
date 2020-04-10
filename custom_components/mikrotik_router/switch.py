@@ -208,7 +208,7 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
                 (CONNECTION_NETWORK_MAC, self._data["port-mac-address"])},
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
-            "name": self._data["default-name"],
+            "name": f"{self._inst} {self._data['default-name']}",
         }
         return info
 
@@ -303,7 +303,7 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
             },
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
-            "name": "NAT",
+            "name": f"{self._inst} NAT",
         }
         return info
 
@@ -408,7 +408,7 @@ class MikrotikControllerScriptSwitch(MikrotikControllerSwitch):
             },
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
-            "name": "Scripts",
+            "name": f"{self._inst} Scripts",
         }
         return info
 
@@ -438,7 +438,7 @@ class MikrotikControllerScriptSwitch(MikrotikControllerSwitch):
 
 
 # ---------------------------
-#   MikrotikControllerNATSwitch
+#   MikrotikControllerQueueSwitch
 # ---------------------------
 class MikrotikControllerQueueSwitch(MikrotikControllerSwitch):
     """Representation of a queue switch."""
@@ -491,7 +491,7 @@ class MikrotikControllerQueueSwitch(MikrotikControllerSwitch):
             },
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
-            "name": "Queue",
+            "name": f"{self._inst} Queue",
         }
         return info
 
