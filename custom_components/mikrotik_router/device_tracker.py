@@ -330,6 +330,8 @@ class MikrotikControllerHostDeviceTracker(ScannerEntity):
     def device_info(self):
         """Return a host description for device registry."""
         info = {
+            "connections": {
+                (CONNECTION_NETWORK_MAC, self._data["mac-address"])},
             "identifiers": {
                 (
                     DOMAIN,
