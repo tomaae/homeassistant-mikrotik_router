@@ -289,8 +289,7 @@ class MikrotikAPI:
 
         self.lock.release()
         if not entry_found:
-            error = f'Parameter "{param}" with value "{value}" not found'
-            raise ApiEntryNotFound(error)
+            _LOGGER.error("Mikrotik %s Update parameter %s with value %s not found", self._host, param, value)
 
         return True
 
@@ -343,8 +342,7 @@ class MikrotikAPI:
 
         self.lock.release()
         if not entry_found:
-            error = f'Script "{name}" not found'
-            raise ApiEntryNotFound(error)
+            _LOGGER.error("Mikrotik %s Script %s not found", self._host, name)
 
         return True
 
@@ -461,7 +459,7 @@ class MikrotikAPI:
         self.lock.release()
 
         for tmp in ping:
-            if tmp["received"] > 0:
+            if "received" in tmp and tmp["received"] > 0:
                 return True
 
         return False
