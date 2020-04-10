@@ -395,7 +395,7 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
                 (CONNECTION_NETWORK_MAC, self._data["mac-address"])},
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
-            "name": f"{self._inst} {self._data['host-name']}",
+            "name": self._data['host-name'],
         }
         return info
 
