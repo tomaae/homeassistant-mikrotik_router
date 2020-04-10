@@ -248,7 +248,7 @@ class MikrotikControllerData:
             await self.async_fwupdate_check()
 
         if not self.data["host_hass"]:
-            await self.process_host_hass()
+            await self.async_get_host_hass()
 
         if self.support_capsman:
             await self.hass.async_add_executor_job(self.get_capsman_hosts)
@@ -432,7 +432,7 @@ class MikrotikControllerData:
                 continue
 
             # Get iface default-name from custom name
-            uid = self.get_iface_from_entry(entry)
+            uid = self._get_iface_from_entry(entry)
             if not uid:
                 continue
 
@@ -467,7 +467,7 @@ class MikrotikControllerData:
                 continue
 
             # Get iface default-name from custom name
-            uid = self.get_iface_from_entry(entry)
+            uid = self._get_iface_from_entry(entry)
             if not uid:
                 continue
 
@@ -492,9 +492,9 @@ class MikrotikControllerData:
                 )
 
     # ---------------------------
-    #   get_iface_from_entry
+    #   _get_iface_from_entry
     # ---------------------------
-    def get_iface_from_entry(self, entry):
+    def _get_iface_from_entry(self, entry):
         """Get interface default-name using name from interface dict"""
         uid = None
         for ifacename in self.data["interface"]:
@@ -540,6 +540,7 @@ class MikrotikControllerData:
             only=[{"key": "action", "value": "dst-nat"}],
         )
 
+        # Remove duplicate NAT entries to prevent crash
         nat_uniq = {}
         nat_del = {}
         for uid in self.data["nat"]:
@@ -698,38 +699,36 @@ class MikrotikControllerData:
         )
 
         uom_type, uom_div = self._get_unit_of_measurement()
-
-        for uid in self.data["queue"]:
-            upload_max_limit_bps, download_max_limit_bps = [int(x) for x in
-                                                            self.data["queue"][uid]["max-limit"].split('/')]
+        for uid, vals in self.data["queue"].items():
+            upload_max_limit_bps, download_max_limit_bps = \
+                [int(x) for x in vals["max-limit"].split('/')]
             self.data["queue"][uid]["upload-max-limit"] = \
                 f"{round(upload_max_limit_bps * uom_div)} {uom_type}"
             self.data["queue"][uid]["download-max-limit"] = \
                 f"{round(download_max_limit_bps * uom_div)} {uom_type}"
 
-            upload_limit_at_bps, download_limit_at_bps = [int(x) for x in
-                                                          self.data["queue"][uid]["limit-at"].split('/')]
+            upload_limit_at_bps, download_limit_at_bps = \
+                [int(x) for x in vals["limit-at"].split('/')]
             self.data["queue"][uid]["upload-limit-at"] = \
                 f"{round(upload_limit_at_bps * uom_div)} {uom_type}"
             self.data["queue"][uid]["download-limit-at"] = \
                 f"{round(download_limit_at_bps * uom_div)} {uom_type}"
 
-            upload_burst_limit_bps, download_burst_limit_bps = [int(x) for x in
-                                                                self.data["queue"][uid]["burst-limit"].split('/')]
+            upload_burst_limit_bps, download_burst_limit_bps = \
+                [int(x) for x in vals["burst-limit"].split('/')]
             self.data["queue"][uid]["upload-burst-limit"] = \
                 f"{round(upload_burst_limit_bps * uom_div)} {uom_type}"
             self.data["queue"][uid]["download-burst-limit"] = \
                 f"{round(download_burst_limit_bps * uom_div)} {uom_type}"
 
-            upload_burst_threshold_bps,\
-                download_burst_threshold_bps = [int(x) for x in self.data["queue"][uid]["burst-threshold"].split('/')]
-
+            upload_burst_threshold_bps, download_burst_threshold_bps = \
+                [int(x) for x in vals["burst-threshold"].split('/')]
             self.data["queue"][uid]["upload-burst-threshold"] = \
                 f"{round(upload_burst_threshold_bps * uom_div)} {uom_type}"
             self.data["queue"][uid]["download-burst-threshold"] = \
                 f"{round(download_burst_threshold_bps * uom_div)} {uom_type}"
 
-            upload_burst_time, download_burst_time = self.data["queue"][uid]["burst-time"].split('/')
+            upload_burst_time, download_burst_time = vals["burst-time"].split('/')
             self.data["queue"][uid]["upload-burst-time"] = upload_burst_time
             self.data["queue"][uid]["download-burst-time"] = download_burst_time
 
@@ -859,9 +858,9 @@ class MikrotikControllerData:
         )
 
     # ---------------------------
-    #   process_host_hass
+    #   async_get_host_hass
     # ---------------------------
-    async def process_host_hass(self):
+    async def async_get_host_hass(self):
         """Get host data from HA entity registry"""
         registry = await self.hass.helpers.entity_registry.async_get_registry()
         for entity in registry.entities.values():
@@ -884,17 +883,12 @@ class MikrotikControllerData:
                     self.data["host"][uid] = {}
 
                 self.data["host"][uid]["source"] = "capsman"
-                for key, key_data in zip(
-                        ["mac-address", "interface"],
-                        ["mac-address", "interface"],
-                ):
-                    if key not in self.data["host"][uid] or self.data["host"][uid][key] == "unknown":
-                        self.data["host"][uid][key] = vals[key_data]
-
-                # Update last seen
                 capsman_detected[uid] = True
                 self.data["host"][uid]["available"] = True
                 self.data["host"][uid]["last-seen"] = utcnow()
+                for key in ["mac-address", "interface"]:
+                    if key not in self.data["host"][uid] or self.data["host"][uid][key] == "unknown":
+                        self.data["host"][uid][key] = vals[key]
 
         # Add hosts from wireless
         if self.support_wireless:
@@ -907,54 +901,40 @@ class MikrotikControllerData:
                     self.data["host"][uid] = {}
 
                 self.data["host"][uid]["source"] = "wireless"
-                for key, key_data in zip(
-                        ["mac-address", "interface"],
-                        ["mac-address", "interface"],
-                ):
-                    if key not in self.data["host"][uid] or self.data["host"][uid][key] == "unknown":
-                        self.data["host"][uid][key] = vals[key_data]
-
-                # Update last seen
                 wireless_detected[uid] = True
                 self.data["host"][uid]["available"] = True
                 self.data["host"][uid]["last-seen"] = utcnow()
+                for key in ["mac-address", "interface"]:
+                    if key not in self.data["host"][uid] or self.data["host"][uid][key] == "unknown":
+                        self.data["host"][uid][key] = vals[key]
 
         # Add hosts from DHCP
         for uid, vals in self.data["dhcp"].items():
             if uid not in self.data["host"]:
                 self.data["host"][uid] = {}
                 self.data["host"][uid]["source"] = "dhcp"
-
-                for key, key_data in zip(
-                        ["address", "mac-address", "interface"],
-                        ["address", "mac-address", "interface"],
-                ):
+                for key in ["address", "mac-address", "interface"]:
                     if key not in self.data["host"][uid] or self.data["host"][uid][key] == "unknown":
-                        self.data["host"][uid][key] = vals[key_data]
+                        self.data["host"][uid][key] = vals[key]
 
         # Add hosts from ARP
         for uid, vals in self.data["arp"].items():
             if uid not in self.data["host"]:
                 self.data["host"][uid] = {}
                 self.data["host"][uid]["source"] = "arp"
-
-                for key, key_data in zip(
-                        ["address", "mac-address", "interface"],
-                        ["address", "mac-address", "interface"],
-                ):
+                for key in ["address", "mac-address", "interface"]:
                     if key not in self.data["host"][uid] or self.data["host"][uid][key] == "unknown":
-                        self.data["host"][uid][key] = vals[key_data]
+                        self.data["host"][uid][key] = vals[key]
 
-        # Restore from hass registry
+        # Add restored hosts from hass registry
         if not self.host_hass_recovered:
+            self.host_hass_recovered = True
             for uid in self.data["host_hass"]:
                 if uid not in self.data["host"]:
                     self.data["host"][uid] = {}
                     self.data["host"][uid]["source"] = "restored"
                     self.data["host"][uid]["mac-address"] = uid
                     self.data["host"][uid]["host-name"] = self.data["host_hass"][uid]
-
-            self.host_hass_recovered = True
 
         # Process hosts
         for uid, vals in self.data["host"].items():
@@ -966,45 +946,45 @@ class MikrotikControllerData:
                 if key not in self.data["host"][uid]:
                     self.data["host"][uid][key] = default
 
-            # CAPS-MAN
+            # CAPS-MAN availability
             if vals["source"] == "capsman" and uid not in capsman_detected:
                 self.data["host"][uid]["available"] = False
 
-            # Wireless
+            # Wireless availability
             if vals["source"] == "wireless" and uid not in wireless_detected:
                 self.data["host"][uid]["available"] = False
 
             # Update IP and interface (DHCP/returned host)
             if uid in self.data["dhcp"] and "." in self.data["dhcp"][uid]["address"]:
                 if self.data["dhcp"][uid]["address"] != self.data["host"][uid]["address"]:
+                    self.data["host"][uid]["address"] = self.data["dhcp"][uid]["address"]
                     if vals["source"] not in ["capsman", "wireless"]:
                         self.data["host"][uid]["source"] = "dhcp"
                         self.data["host"][uid]["interface"] = self.data["dhcp"][uid]["interface"]
-                    self.data["host"][uid]["address"] = self.data["dhcp"][uid]["address"]
 
             elif uid in self.data["arp"] and "." in self.data["arp"][uid]["address"] \
                     and self.data["arp"][uid]["address"] != self.data["host"][uid]["address"]:
-                if vals["source"] not in ["capsman", "wireless"]:
-                    self.data["host"][uid]["source"] = "dhcp"
-                    self.data["host"][uid]["interface"] = self.data["arp"][uid]["interface"]
                 self.data["host"][uid]["address"] = self.data["arp"][uid]["address"]
+                if vals["source"] not in ["capsman", "wireless"]:
+                    self.data["host"][uid]["source"] = "arp"
+                    self.data["host"][uid]["interface"] = self.data["arp"][uid]["interface"]
 
-            # Resolve hostname
             if vals["host-name"] == "unknown":
+                # Resolve hostname from static DNS
                 if vals["address"] != "unknown":
                     for dns_uid, dns_vals in self.data["dns"].items():
                         if dns_vals["address"] == vals["address"]:
                             self.data["host"][uid]["host-name"] = dns_vals["name"].split('.')[0]
                             break
-
+                # Resolve hostname from DHCP comment
                 if self.data["host"][uid]["host-name"] == "unknown" \
                         and uid in self.data["dhcp"] and self.data["dhcp"][uid]["comment"] != "":
                     self.data["host"][uid]["host-name"] = self.data["dhcp"][uid]["comment"]
-
+                # Resolve hostname from DHCP hostname
                 elif self.data["host"][uid]["host-name"] == "unknown" \
                         and uid in self.data["dhcp"] and self.data["dhcp"][uid]["host-name"] != "unknown":
                     self.data["host"][uid]["host-name"] = self.data["dhcp"][uid]["host-name"]
-
+                # Fallback to mac address for hostname
                 elif self.data["host"][uid]["host-name"] == "unknown":
                     self.data["host"][uid]["host-name"] = uid
 
@@ -1109,7 +1089,7 @@ class MikrotikControllerData:
 
         # Calculate real throughput and transform it to appropriate unit
         # Also handle availability of accounting and local_accounting from Mikrotik
-        for addr in tmp_accounting_values:
+        for addr, vals in tmp_accounting_values.items():
             uid = self._get_accounting_uid_by_ip(addr)
             if not uid:
                 _LOGGER.warning(f"Address {addr} not found in accounting data, skipping update")
@@ -1120,25 +1100,19 @@ class MikrotikControllerData:
             self.data['accounting'][uid]['local_accounting'] = local_traffic_enabled
 
             if not accounting_enabled:
-                # Skip calculation for WAN and LAN, accounting is disabled
+                # Skip calculation for WAN and LAN if accounting is disabled
                 continue
 
-            self.data['accounting'][uid]['wan-tx'] = round(
-                tmp_accounting_values[addr]['wan-tx'] / time_diff * uom_div, 2) \
-                if tmp_accounting_values[addr]['wan-tx'] else 0.0
-
-            self.data['accounting'][uid]['wan-rx'] = round(
-                tmp_accounting_values[addr]['wan-rx'] / time_diff * uom_div, 2) \
-                if tmp_accounting_values[addr]['wan-rx'] else 0.0
+            self.data['accounting'][uid]['wan-tx'] = \
+                round(vals['wan-tx'] / time_diff * uom_div, 2) if vals['wan-tx'] else 0.0
+            self.data['accounting'][uid]['wan-rx'] = \
+                round(vals['wan-rx'] / time_diff * uom_div, 2) if vals['wan-rx'] else 0.0
 
             if not local_traffic_enabled:
-                # Skip calculation for LAN, LAN accounting is disabled
+                # Skip calculation for LAN if LAN accounting is disabled
                 continue
 
-            self.data['accounting'][uid]['lan-tx'] = round(
-                tmp_accounting_values[addr]['lan-tx'] / time_diff * uom_div, 2) \
-                if tmp_accounting_values[addr]['lan-tx'] else 0.0
-
-            self.data['accounting'][uid]['lan-rx'] = round(
-                tmp_accounting_values[addr]['lan-rx'] / time_diff * uom_div, 2) \
-                if tmp_accounting_values[addr]['lan-rx'] else 0.0
+            self.data['accounting'][uid]['lan-tx'] = \
+                round(vals['lan-tx'] / time_diff * uom_div, 2) if vals['lan-tx'] else 0.0
+            self.data['accounting'][uid]['lan-rx'] = \
+                round(vals['lan-rx'] / time_diff * uom_div, 2) if vals['lan-rx'] else 0.0
