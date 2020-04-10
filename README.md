@@ -43,6 +43,13 @@ Features:
 ![Accounting sensor](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/accounting_sensor.png)
 
 # Setup integration
+Create user for homeassistant on your mikrotik router with following permissions:
+* read, write, api, test
+
+If you want to be able to execute scripts on your mikrotik router from HA, script needs to have only following policies:
+* read, write, test
+or check "Don't Require Permissions" option
+
 Setup this integration for your Mikrotik device in Home Assistant via `Configuration -> Integrations -> Add -> Mikrotik Router`.
 You can add this integration several times for different devices.
 
