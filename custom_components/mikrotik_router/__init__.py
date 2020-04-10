@@ -29,7 +29,7 @@ async def async_setup(hass, _config):
 async def async_setup_entry(hass, config_entry):
     """Set up Mikrotik Router as config entry."""
     mikrotik_controller = MikrotikControllerData(hass, config_entry)
-    await mikrotik_controller.hwinfo_update()
+    await mikrotik_controller.async_hwinfo_update()
 
     await mikrotik_controller.async_update()
 

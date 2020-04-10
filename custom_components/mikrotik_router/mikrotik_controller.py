@@ -97,42 +97,6 @@ class MikrotikControllerData:
         )
 
     # ---------------------------
-    #   _get_unit_of_measurement
-    # ---------------------------
-    def _get_unit_of_measurement(self):
-        uom_type = self.option_unit_of_measurement
-        if uom_type == "Kbps":
-            uom_div = 0.001
-        elif uom_type == "Mbps":
-            uom_div = 0.000001
-        elif uom_type == "B/s":
-            uom_div = 0.125
-        elif uom_type == "KB/s":
-            uom_div = 0.000125
-        elif uom_type == "MB/s":
-            uom_div = 0.000000125
-        else:
-            uom_type = "bps"
-            uom_div = 1
-        return uom_type, uom_div
-
-    # ---------------------------
-    #   force_update
-    # ---------------------------
-    @callback
-    async def force_update(self, _now=None):
-        """Trigger update by timer"""
-        await self.async_update()
-
-    # ---------------------------
-    #   force_fwupdate_check
-    # ---------------------------
-    @callback
-    async def force_fwupdate_check(self, _now=None):
-        """Trigger hourly update by timer"""
-        await self.async_fwupdate_check()
-
-    # ---------------------------
     #   option_track_iface_clients
     # ---------------------------
     @property
@@ -178,6 +142,17 @@ class MikrotikControllerData:
         return f"{DOMAIN}-update-{self.name}"
 
     # ---------------------------
+    #   async_reset
+    # ---------------------------
+    async def async_reset(self):
+        """Reset dispatchers"""
+        for unsub_dispatcher in self.listeners:
+            unsub_dispatcher()
+
+        self.listeners = []
+        return True
+
+    # ---------------------------
     #   connected
     # ---------------------------
     def connected(self):
@@ -185,32 +160,26 @@ class MikrotikControllerData:
         return self.api.connected()
 
     # ---------------------------
-    #   hwinfo_update
+    #   set_value
     # ---------------------------
-    async def hwinfo_update(self):
-        """Update Mikrotik hardware info"""
+    def set_value(self, path, param, value, mod_param, mod_value):
+        """Change value using Mikrotik API"""
+        return self.api.update(path, param, value, mod_param, mod_value)
+
+    # ---------------------------
+    #   run_script
+    # ---------------------------
+    def run_script(self, name):
+        """Run script using Mikrotik API"""
         try:
-            await asyncio.wait_for(self.lock.acquire(), timeout=10)
-        except:
-            return
-
-        await self.hass.async_add_executor_job(self.capability_update)
-        await self.hass.async_add_executor_job(self.get_system_routerboard)
-        await self.hass.async_add_executor_job(self.get_system_resource)
-        self.lock.release()
+            self.api.run_script(name)
+        except ApiEntryNotFound as error:
+            _LOGGER.error("Failed to run script: %s", error)
 
     # ---------------------------
-    #   async_fwupdate_check
+    #   get_capabilities
     # ---------------------------
-    async def async_fwupdate_check(self):
-        """Update Mikrotik data"""
-        await self.hass.async_add_executor_job(self.get_firmware_update)
-        async_dispatcher_send(self.hass, self.signal_update)
-
-    # ---------------------------
-    #   capability_update
-    # ---------------------------
-    def capability_update(self):
+    def get_capabilities(self):
         """Update Mikrotik data"""
         packages = parse_api(
             data={},
@@ -233,6 +202,58 @@ class MikrotikControllerData:
         else:
             self.support_capsman = False
             self.support_wireless = False
+
+    # ---------------------------
+    #   async_get_host_hass
+    # ---------------------------
+    async def async_get_host_hass(self):
+        """Get host data from HA entity registry"""
+        registry = await self.hass.helpers.entity_registry.async_get_registry()
+        for entity in registry.entities.values():
+            if entity.config_entry_id == self.config_entry.entry_id \
+                    and entity.domain == DEVICE_TRACKER_DOMAIN \
+                    and "-host-" in entity.unique_id:
+                _, mac = entity.unique_id.split("-host-", 2)
+                self.data["host_hass"][mac] = entity.original_name
+
+    # ---------------------------
+    #   async_hwinfo_update
+    # ---------------------------
+    async def async_hwinfo_update(self):
+        """Update Mikrotik hardware info"""
+        try:
+            await asyncio.wait_for(self.lock.acquire(), timeout=10)
+        except:
+            return
+
+        await self.hass.async_add_executor_job(self.get_capabilities)
+        await self.hass.async_add_executor_job(self.get_system_routerboard)
+        await self.hass.async_add_executor_job(self.get_system_resource)
+        self.lock.release()
+
+    # ---------------------------
+    #   force_fwupdate_check
+    # ---------------------------
+    @callback
+    async def force_fwupdate_check(self, _now=None):
+        """Trigger hourly update by timer"""
+        await self.async_fwupdate_check()
+
+    # ---------------------------
+    #   async_fwupdate_check
+    # ---------------------------
+    async def async_fwupdate_check(self):
+        """Update Mikrotik data"""
+        await self.hass.async_add_executor_job(self.get_firmware_update)
+        async_dispatcher_send(self.hass, self.signal_update)
+
+    # ---------------------------
+    #   force_update
+    # ---------------------------
+    @callback
+    async def force_update(self, _now=None):
+        """Trigger update by timer"""
+        await self.async_update()
 
     # ---------------------------
     #   async_update
@@ -267,39 +288,11 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.get_system_resource)
         await self.hass.async_add_executor_job(self.get_script)
         await self.hass.async_add_executor_job(self.get_queue)
-        await self.hass.async_add_executor_job(self.get_accounting)
+        await self.hass.async_add_executor_job(self.process_accounting)
 
         async_dispatcher_send(self.hass, self.signal_update)
 
         self.lock.release()
-
-    # ---------------------------
-    #   async_reset
-    # ---------------------------
-    async def async_reset(self):
-        """Reset dispatchers"""
-        for unsub_dispatcher in self.listeners:
-            unsub_dispatcher()
-
-        self.listeners = []
-        return True
-
-    # ---------------------------
-    #   set_value
-    # ---------------------------
-    def set_value(self, path, param, value, mod_param, mod_value):
-        """Change value using Mikrotik API"""
-        return self.api.update(path, param, value, mod_param, mod_value)
-
-    # ---------------------------
-    #   run_script
-    # ---------------------------
-    def run_script(self, name):
-        """Run script using Mikrotik API"""
-        try:
-            self.api.run_script(name)
-        except ApiEntryNotFound as error:
-            _LOGGER.error("Failed to run script: %s", error)
 
     # ---------------------------
     #   get_interface
@@ -490,19 +483,6 @@ class MikrotikControllerData:
                     if self.data["arp_tmp"][uid]["mac-address"] in mac2ip
                     else ""
                 )
-
-    # ---------------------------
-    #   _get_iface_from_entry
-    # ---------------------------
-    def _get_iface_from_entry(self, entry):
-        """Get interface default-name using name from interface dict"""
-        uid = None
-        for ifacename in self.data["interface"]:
-            if self.data["interface"][ifacename]["name"] == entry["interface"]:
-                uid = ifacename
-                break
-
-        return uid
 
     # ---------------------------
     #   get_nat
@@ -858,19 +838,6 @@ class MikrotikControllerData:
         )
 
     # ---------------------------
-    #   async_get_host_hass
-    # ---------------------------
-    async def async_get_host_hass(self):
-        """Get host data from HA entity registry"""
-        registry = await self.hass.helpers.entity_registry.async_get_registry()
-        for entity in registry.entities.values():
-            if entity.config_entry_id == self.config_entry.entry_id \
-                    and entity.domain == DEVICE_TRACKER_DOMAIN \
-                    and "-host-" in entity.unique_id:
-                _, mac = entity.unique_id.split("-host-", 2)
-                self.data["host_hass"][mac] = entity.original_name
-
-    # ---------------------------
     #   process_host
     # ---------------------------
     def process_host(self):
@@ -999,28 +966,9 @@ class MikrotikControllerData:
                 self.data["host"][uid]["last-seen"] = utcnow()
 
     # ---------------------------
-    #   _address_part_of_local_network
+    #   process_accounting
     # ---------------------------
-    def _address_part_of_local_network(self, address):
-        address = ip_address(address)
-        for vals in self.data["dhcp-network"].values():
-            if address in vals["IPv4Network"]:
-                return True
-        return False
-
-    # ---------------------------
-    #   _get_accounting_uid_by_ip
-    # ---------------------------
-    def _get_accounting_uid_by_ip(self, requested_ip):
-        for mac, vals in self.data['accounting'].items():
-            if vals.get('address') is requested_ip:
-                return mac
-        return None
-
-    # ---------------------------
-    #   get_accounting
-    # ---------------------------
-    def get_accounting(self):
+    def process_accounting(self):
         """Get Accounting data from Mikrotik"""
         # Check if accounting and account-local-traffic is enabled
         accounting_enabled, local_traffic_enabled = self.api.is_accounting_and_local_traffic_enabled()
@@ -1082,10 +1030,10 @@ class MikrotikControllerData:
                     if source_ip in tmp_accounting_values:
                         tmp_accounting_values[source_ip]['wan-tx'] += bits_count
                 elif not self._address_part_of_local_network(source_ip) and \
-                        self._address_part_of_local_network(destination_ip):
+                        self._address_part_of_local_network(destination_ip) and \
+                        destination_ip in tmp_accounting_values:
                     # WAN RX
-                    if destination_ip in tmp_accounting_values:
-                        tmp_accounting_values[destination_ip]['wan-rx'] += bits_count
+                    tmp_accounting_values[destination_ip]['wan-rx'] += bits_count
 
         # Calculate real throughput and transform it to appropriate unit
         # Also handle availability of accounting and local_accounting from Mikrotik
@@ -1116,3 +1064,55 @@ class MikrotikControllerData:
                 round(vals['lan-tx'] / time_diff * uom_div, 2) if vals['lan-tx'] else 0.0
             self.data['accounting'][uid]['lan-rx'] = \
                 round(vals['lan-rx'] / time_diff * uom_div, 2) if vals['lan-rx'] else 0.0
+
+    # ---------------------------
+    #   _get_unit_of_measurement
+    # ---------------------------
+    def _get_unit_of_measurement(self):
+        uom_type = self.option_unit_of_measurement
+        if uom_type == "Kbps":
+            uom_div = 0.001
+        elif uom_type == "Mbps":
+            uom_div = 0.000001
+        elif uom_type == "B/s":
+            uom_div = 0.125
+        elif uom_type == "KB/s":
+            uom_div = 0.000125
+        elif uom_type == "MB/s":
+            uom_div = 0.000000125
+        else:
+            uom_type = "bps"
+            uom_div = 1
+        return uom_type, uom_div
+
+    # ---------------------------
+    #   _address_part_of_local_network
+    # ---------------------------
+    def _address_part_of_local_network(self, address):
+        address = ip_address(address)
+        for vals in self.data["dhcp-network"].values():
+            if address in vals["IPv4Network"]:
+                return True
+        return False
+
+    # ---------------------------
+    #   _get_accounting_uid_by_ip
+    # ---------------------------
+    def _get_accounting_uid_by_ip(self, requested_ip):
+        for mac, vals in self.data['accounting'].items():
+            if vals.get('address') is requested_ip:
+                return mac
+        return None
+
+    # ---------------------------
+    #   _get_iface_from_entry
+    # ---------------------------
+    def _get_iface_from_entry(self, entry):
+        """Get interface default-name using name from interface dict"""
+        uid = None
+        for ifacename in self.data["interface"]:
+            if self.data["interface"][ifacename]["name"] == entry["interface"]:
+                uid = ifacename
+                break
+
+        return uid
