@@ -59,9 +59,6 @@ You can add this integration several times for different devices.
 * "Track network devices" - Enable device tracker
 * "Track network devices timeout" - Tracked devices will be marked as away after timeout (does not apply to Mikrotik wireless and caps-man)
 
-## List of detected devices
-![Integration options](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/integration_devices.png)
-
 ## Accounting
 For per-IP throughput tracking Mikrotik's accounting feature is used.
 
@@ -70,3 +67,12 @@ For per-IP throughput tracking Mikrotik's accounting feature is used.
 Feature will be automatically used if accounting is enabled in Mikrotik. Feature is present in Winbox IP-Accounting. Make sure that threshold is set to reasonable value to store all connections between user defined scan interval. Max value is 8192 so for piece of mind I recommend setting that value. Web Access is not needed, integration is using API access. 
 
 Integration will scan DHCP Lease table and ARP table to generate all known hosts. For every host aleast two sensors for WAN traffic (mikrotik-XXX-wan-rx and mikrotik-XXX-wan-tx) are created. If the parameter *account-local-traffic* is set in Mikrotik's accounting configuration it will also create two sensors for LAN traffic (mikrotik-XXX-lan-rx and mikrotik-XXX-lan-tx).
+
+## Enabling debug
+To enable debug for Mikrotik router integration, add following to your configuration.yaml:
+```
+logger:
+  default: info
+  logs:
+    custom_components.mikrotik_router: debug
+```
