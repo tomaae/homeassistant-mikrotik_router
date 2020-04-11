@@ -284,7 +284,7 @@ class MikrotikControllerData:
         except:
             return
 
-        for uid, vals in self.data["host"].items():
+        for uid in list(self.data["host"]):
             if not self.host_tracking_initialized:
                 # Add missing default values
                 for key, default in zip(
@@ -303,14 +303,16 @@ class MikrotikControllerData:
 
             # Check host availability
             if (
-                vals["source"] not in ["capsman", "wireless"]
-                and vals["address"] != "unknown"
-                and vals["interface"] != "unknown"
+                self.data["host"][uid]["source"] not in ["capsman", "wireless"]
+                and self.data["host"][uid]["address"] != "unknown"
+                and self.data["host"][uid]["interface"] != "unknown"
             ):
                 self.data["host"][uid][
                     "available"
                 ] = await self.hass.async_add_executor_job(
-                    self.api_ping.arp_ping, vals["address"], vals["interface"]
+                    self.api_ping.arp_ping,
+                    self.data["host"][uid]["address"],
+                    self.data["host"][uid]["interface"]
                 )
 
             # Update last seen
