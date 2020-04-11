@@ -50,8 +50,7 @@ _LOGGER = logging.getLogger(__name__)
 def configured_instances(hass):
     """Return a set of configured instances."""
     return set(
-        entry.data[CONF_NAME] for entry in
-        hass.config_entries.async_entries(DOMAIN)
+        entry.data[CONF_NAME] for entry in hass.config_entries.async_entries(DOMAIN)
     )
 
 
@@ -91,7 +90,7 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
                 username=user_input[CONF_USERNAME],
                 password=user_input[CONF_PASSWORD],
                 port=user_input[CONF_PORT],
-                use_ssl=user_input[CONF_SSL]
+                use_ssl=user_input[CONF_SSL],
             )
             if not api.connect():
                 errors[CONF_HOST] = api.error
@@ -99,14 +98,10 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
             # Save instance
             if not errors:
                 return self.async_create_entry(
-                    title=user_input[CONF_NAME],
-                    data=user_input
+                    title=user_input[CONF_NAME], data=user_input
                 )
 
-            return self._show_config_form(
-                user_input=user_input,
-                errors=errors,
-            )
+            return self._show_config_form(user_input=user_input, errors=errors)
 
         return self._show_config_form(
             user_input={
@@ -117,7 +112,7 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
                 CONF_PORT: DEFAULT_PORT,
                 CONF_SSL: DEFAULT_SSL,
             },
-            errors=errors
+            errors=errors,
         )
 
     # ---------------------------
@@ -195,7 +190,7 @@ class MikrotikControllerOptionsFlowHandler(OptionsFlow):
                         default=self.config_entry.options.get(
                             CONF_TRACK_HOSTS_TIMEOUT, DEFAULT_TRACK_HOST_TIMEOUT
                         ),
-                    ): int
+                    ): int,
                 }
             ),
         )

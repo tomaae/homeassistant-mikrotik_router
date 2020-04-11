@@ -2,13 +2,13 @@
 import logging
 
 from homeassistant.components.switch import SwitchDevice
-from homeassistant.const import (CONF_NAME, ATTR_ATTRIBUTION)
+from homeassistant.const import CONF_NAME, ATTR_ATTRIBUTION
 from homeassistant.core import callback
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.restore_state import RestoreEntity
 
-from .const import (DOMAIN, DATA_CLIENT, ATTRIBUTION)
+from .const import DOMAIN, DATA_CLIENT, ATTRIBUTION
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -204,8 +204,7 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
     def device_info(self):
         """Return a port description for device registry."""
         info = {
-            "connections": {
-                (CONNECTION_NETWORK_MAC, self._data["port-mac-address"])},
+            "connections": {(CONNECTION_NETWORK_MAC, self._data["port-mac-address"])},
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
             "name": f"{self._inst} {self._data['default-name']}",
@@ -375,8 +374,7 @@ class MikrotikControllerScriptSwitch(MikrotikControllerSwitch):
 
     async def async_added_to_hass(self):
         """Script switch entity created."""
-        _LOGGER.debug("New script switch %s (%s)", self._inst,
-                      self._data["name"])
+        _LOGGER.debug("New script switch %s (%s)", self._inst, self._data["name"])
 
     @property
     def name(self) -> str:
@@ -512,10 +510,7 @@ class MikrotikControllerQueueSwitch(MikrotikControllerSwitch):
         param = ".id"
         value = None
         for uid in self._ctrl.data["queue"]:
-            if (
-                self._ctrl.data["queue"][uid]["name"]
-                == f"{self._data['name']}"
-            ):
+            if self._ctrl.data["queue"][uid]["name"] == f"{self._data['name']}":
                 value = self._ctrl.data["queue"][uid][".id"]
 
         mod_param = "disabled"
@@ -529,10 +524,7 @@ class MikrotikControllerQueueSwitch(MikrotikControllerSwitch):
         param = ".id"
         value = None
         for uid in self._ctrl.data["queue"]:
-            if (
-                self._ctrl.data["queue"][uid]["name"]
-                == f"{self._data['name']}"
-            ):
+            if self._ctrl.data["queue"][uid]["name"] == f"{self._data['name']}":
                 value = self._ctrl.data["queue"][uid][".id"]
 
         mod_param = "disabled"

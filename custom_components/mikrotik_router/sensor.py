@@ -2,13 +2,13 @@
 
 import logging
 
-from homeassistant.const import (CONF_NAME, ATTR_ATTRIBUTION, ATTR_DEVICE_CLASS)
+from homeassistant.const import CONF_NAME, ATTR_ATTRIBUTION, ATTR_DEVICE_CLASS
 from homeassistant.core import callback
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity
 
-from .const import (DOMAIN, DATA_CLIENT, ATTRIBUTION)
+from .const import DOMAIN, DATA_CLIENT, ATTRIBUTION
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -117,11 +117,7 @@ SENSOR_TYPES = {
     },
 }
 
-DEVICE_ATTRIBUTES_ACCOUNTING = [
-    "address",
-    "mac-address",
-    "host-name"
-]
+DEVICE_ATTRIBUTES_ACCOUNTING = ["address", "mac-address", "host-name"]
 
 
 # ---------------------------
@@ -165,8 +161,7 @@ def update_items(inst, mikrotik_controller, async_add_entities, sensors):
                 continue
 
             sensors[item_id] = MikrotikControllerSensor(
-                mikrotik_controller=mikrotik_controller, inst=inst,
-                sensor=sensor
+                mikrotik_controller=mikrotik_controller, inst=inst, sensor=sensor
             )
             new_sensors.append(sensors[item_id])
 
@@ -197,7 +192,10 @@ def update_items(inst, mikrotik_controller, async_add_entities, sensors):
                         sensors[item_id].async_schedule_update_ha_state()
                     continue
 
-                if SENSOR_TYPES[sensor][ATTR_ATTR] in mikrotik_controller.data['accounting'][uid].keys():
+                if (
+                    SENSOR_TYPES[sensor][ATTR_ATTR]
+                    in mikrotik_controller.data["accounting"][uid].keys()
+                ):
                     sensors[item_id] = MikrotikAccountingSensor(
                         mikrotik_controller=mikrotik_controller,
                         inst=inst,
@@ -319,8 +317,7 @@ class MikrotikControllerTrafficSensor(MikrotikControllerSensor):
         """Initialize."""
         super().__init__(mikrotik_controller, inst, sensor)
         self._uid = uid
-        self._data = mikrotik_controller.data[SENSOR_TYPES[sensor][ATTR_PATH]][
-            uid]
+        self._data = mikrotik_controller.data[SENSOR_TYPES[sensor][ATTR_PATH]][uid]
 
     @property
     def name(self):
@@ -336,8 +333,7 @@ class MikrotikControllerTrafficSensor(MikrotikControllerSensor):
     def device_info(self):
         """Return a port description for device registry."""
         info = {
-            "connections": {
-                (CONNECTION_NETWORK_MAC, self._data["port-mac-address"])},
+            "connections": {(CONNECTION_NETWORK_MAC, self._data["port-mac-address"])},
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
             "name": f"{self._inst} {self._data['default-name']}",
@@ -382,20 +378,23 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
         """Return if controller and accounting feature in Mikrotik is available.
            Additional check for lan-tx/rx sensors
         """
-        if self._attr in ['lan-tx', 'lan-rx']:
-            return self._ctrl.connected() and self._data['available'] and self._data['local_accounting']
+        if self._attr in ["lan-tx", "lan-rx"]:
+            return (
+                self._ctrl.connected()
+                and self._data["available"]
+                and self._data["local_accounting"]
+            )
         else:
-            return self._ctrl.connected() and self._data['available']
+            return self._ctrl.connected() and self._data["available"]
 
     @property
     def device_info(self):
         """Return a accounting description for device registry."""
         info = {
-            "connections": {
-                (CONNECTION_NETWORK_MAC, self._data["mac-address"])},
+            "connections": {(CONNECTION_NETWORK_MAC, self._data["mac-address"])},
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
-            "name": self._data['host-name'],
+            "name": self._data["host-name"],
         }
         return info
 

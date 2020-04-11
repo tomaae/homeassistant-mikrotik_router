@@ -1,11 +1,9 @@
 """Mikrotik API for Mikrotik Router."""
 
-import importlib
 import logging
-import os
 import ssl
-import sys
 import time
+from time import time
 from threading import Lock
 
 from voluptuous import Optional
@@ -65,7 +63,7 @@ class MikrotikAPI:
     def connection_check(self) -> bool:
         """Check if mikrotik is connected"""
         if not self._connected or not self._connection:
-            if self._connection_epoch > time.time() - self._connection_retry_sec:
+            if self._connection_epoch > time() - self._connection_retry_sec:
                 return False
 
             if not self.connect():
@@ -76,13 +74,18 @@ class MikrotikAPI:
     # ---------------------------
     #   disconnect
     # ---------------------------
-    def disconnect(self, location="unknown", error="unknown"):
+    def disconnect(self, location="unknown", error=None):
         """Disconnect from Mikrotik device."""
+        if not error:
+            error = "unknown"
+
         if not self.connection_error_reported:
             if location == "unknown":
                 _LOGGER.error("Mikrotik %s connection closed", self._host)
             else:
-                _LOGGER.error("Mikrotik %s error while %s : %s", self._host, location, error)
+                _LOGGER.error(
+                    "Mikrotik %s error while %s : %s", self._host, location, error
+                )
 
             self.connection_error_reported = True
 
@@ -97,7 +100,7 @@ class MikrotikAPI:
         """Connect to Mikrotik device."""
         self.error = ""
         self._connected = None
-        self._connection_epoch = time.time()
+        self._connection_epoch = time()
 
         kwargs = {
             "encoding": self._encoding,
@@ -129,8 +132,7 @@ class MikrotikAPI:
         ) as api_error:
             if not self.connection_error_reported:
                 _LOGGER.error(
-                    "Mikrotik %s error while connecting: %s", self._host,
-                    api_error
+                    "Mikrotik %s error while connecting: %s", self._host, api_error
                 )
                 self.connection_error_reported = True
 
@@ -141,8 +143,7 @@ class MikrotikAPI:
         except:
             if not self.connection_error_reported:
                 _LOGGER.error(
-                    "Mikrotik %s error while connecting: %s", self._host,
-                    "Unknown"
+                    "Mikrotik %s error while connecting: %s", self._host, "Unknown"
                 )
                 self.connection_error_reported = True
 
@@ -199,14 +200,14 @@ class MikrotikAPI:
             self.lock.release()
             return None
         except (
-                librouteros.exceptions.TrapError,
-                librouteros.exceptions.MultiTrapError,
-                librouteros.exceptions.ProtocolError,
-                librouteros.exceptions.FatalError,
-                ssl.SSLError,
-                BrokenPipeError,
-                OSError,
-                ValueError,
+            librouteros.exceptions.TrapError,
+            librouteros.exceptions.MultiTrapError,
+            librouteros.exceptions.ProtocolError,
+            librouteros.exceptions.FatalError,
+            ssl.SSLError,
+            BrokenPipeError,
+            OSError,
+            ValueError,
         ) as api_error:
             self.disconnect("path", api_error)
             self.lock.release()
@@ -282,7 +283,12 @@ class MikrotikAPI:
 
         self.lock.release()
         if not entry_found:
-            _LOGGER.error("Mikrotik %s Update parameter %s with value %s not found", self._host, param, value)
+            _LOGGER.error(
+                "Mikrotik %s Update parameter %s with value %s not found",
+                self._host,
+                param,
+                value,
+            )
 
         return True
 
@@ -459,7 +465,6 @@ class MikrotikAPI:
 
     @staticmethod
     def _current_milliseconds():
-        from time import time
         return int(round(time() * 1000))
 
     def is_accounting_and_local_traffic_enabled(self) -> (bool, bool):
@@ -475,15 +480,15 @@ class MikrotikAPI:
             return False, False
 
         for item in response:
-            if 'enabled' not in item:
+            if "enabled" not in item:
                 continue
-            if not item['enabled']:
+            if not item["enabled"]:
                 return False, False
 
         for item in response:
-            if 'account-local-traffic' not in item:
+            if "account-local-traffic" not in item:
                 continue
-            if not item['account-local-traffic']:
+            if not item["account-local-traffic"]:
                 return True, False
 
         return True, True
@@ -502,20 +507,20 @@ class MikrotikAPI:
         self.lock.acquire()
         try:
             # Prepare command
-            take = accounting('snapshot/take')
+            take = accounting("snapshot/take")
         except librouteros.exceptions.ConnectionClosed:
             self.disconnect()
             self.lock.release()
             return 0
         except (
-                librouteros.exceptions.TrapError,
-                librouteros.exceptions.MultiTrapError,
-                librouteros.exceptions.ProtocolError,
-                librouteros.exceptions.FatalError,
-                ssl.SSLError,
-                BrokenPipeError,
-                OSError,
-                ValueError,
+            librouteros.exceptions.TrapError,
+            librouteros.exceptions.MultiTrapError,
+            librouteros.exceptions.ProtocolError,
+            librouteros.exceptions.FatalError,
+            ssl.SSLError,
+            BrokenPipeError,
+            OSError,
+            ValueError,
         ) as api_error:
             self.disconnect("accounting_snapshot", api_error)
             self.lock.release()

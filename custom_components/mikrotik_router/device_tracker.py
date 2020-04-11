@@ -88,7 +88,9 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     @callback
     def update_controller():
         """Update the values of the controller."""
-        update_items(inst, config_entry, mikrotik_controller, async_add_entities, tracked)
+        update_items(
+            inst, config_entry, mikrotik_controller, async_add_entities, tracked
+        )
 
     mikrotik_controller.listeners.append(
         async_dispatcher_connect(
@@ -111,10 +113,7 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, tr
     for sid, sid_uid, sid_func in zip(
         ["interface", "host"],
         ["default-name", "mac-address"],
-        [
-            MikrotikControllerPortDeviceTracker,
-            MikrotikControllerHostDeviceTracker,
-        ],
+        [MikrotikControllerPortDeviceTracker, MikrotikControllerHostDeviceTracker],
     ):
         for uid in mikrotik_controller.data[sid]:
             item_id = f"{inst}-{sid}-{mikrotik_controller.data[sid][uid][sid_uid]}"
@@ -206,8 +205,7 @@ class MikrotikControllerPortDeviceTracker(ScannerEntity):
     def device_info(self):
         """Return a port description for device registry."""
         info = {
-            "connections": {
-                (CONNECTION_NETWORK_MAC, self._data["port-mac-address"])},
+            "connections": {(CONNECTION_NETWORK_MAC, self._data["port-mac-address"])},
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
             "name": f"{self._inst} {self._data['default-name']}",
@@ -333,11 +331,10 @@ class MikrotikControllerHostDeviceTracker(ScannerEntity):
     def device_info(self):
         """Return a host description for device registry."""
         info = {
-            "connections": {
-                (CONNECTION_NETWORK_MAC, self._data["mac-address"])},
+            "connections": {(CONNECTION_NETWORK_MAC, self._data["mac-address"])},
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
-            "name": self._data['host-name'],
+            "name": self._data["host-name"],
         }
         return info
 
@@ -349,12 +346,22 @@ class MikrotikControllerHostDeviceTracker(ScannerEntity):
             if variable in self._data:
                 if variable == "last-seen":
                     if self._data[variable]:
-                        attributes[format_attribute(variable)] = get_age(self._data[variable])
+                        attributes[format_attribute(variable)] = get_age(
+                            self._data[variable]
+                        )
                     else:
                         attributes[format_attribute(variable)] = "unknown"
                 else:
-                    if self._data[variable] in ["dhcp", "dns", "capsman", "wireless", "restored"]:
-                        attributes[format_attribute(variable)] = format_value(self._data[variable])
+                    if self._data[variable] in [
+                        "dhcp",
+                        "dns",
+                        "capsman",
+                        "wireless",
+                        "restored",
+                    ]:
+                        attributes[format_attribute(variable)] = format_value(
+                            self._data[variable]
+                        )
                     else:
                         attributes[format_attribute(variable)] = self._data[variable]
 

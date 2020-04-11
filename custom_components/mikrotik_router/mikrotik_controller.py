@@ -32,7 +32,7 @@ from .const import (
     DEFAULT_UNIT_OF_MEASUREMENT,
 )
 from .exceptions import ApiEntryNotFound
-from .helper import from_entry, parse_api
+from .helper import parse_api
 from .mikrotikapi import MikrotikAPI
 
 _LOGGER = logging.getLogger(__name__)
@@ -70,7 +70,7 @@ class MikrotikControllerData:
             "wireless_hosts": {},
             "host": {},
             "host_hass": {},
-            "accounting": {}
+            "accounting": {},
         }
 
         self.listeners = []
@@ -82,7 +82,7 @@ class MikrotikControllerData:
             config_entry.data[CONF_USERNAME],
             config_entry.data[CONF_PASSWORD],
             config_entry.data[CONF_PORT],
-            config_entry.data[CONF_SSL]
+            config_entry.data[CONF_SSL],
         )
 
         self.api_ping = MikrotikAPI(
@@ -90,7 +90,7 @@ class MikrotikControllerData:
             config_entry.data[CONF_USERNAME],
             config_entry.data[CONF_PASSWORD],
             config_entry.data[CONF_PORT],
-            config_entry.data[CONF_SSL]
+            config_entry.data[CONF_SSL],
         )
 
         self.nat_removed = {}
@@ -121,7 +121,9 @@ class MikrotikControllerData:
     @property
     def option_track_iface_clients(self):
         """Config entry option to not track ARP."""
-        return self.config_entry.options.get(CONF_TRACK_IFACE_CLIENTS, DEFAULT_TRACK_IFACE_CLIENTS)
+        return self.config_entry.options.get(
+            CONF_TRACK_IFACE_CLIENTS, DEFAULT_TRACK_IFACE_CLIENTS
+        )
 
     # ---------------------------
     #   option_track_network_hosts
@@ -229,9 +231,11 @@ class MikrotikControllerData:
         """Get host data from HA entity registry"""
         registry = await self.hass.helpers.entity_registry.async_get_registry()
         for entity in registry.entities.values():
-            if entity.config_entry_id == self.config_entry.entry_id \
-                    and entity.domain == DEVICE_TRACKER_DOMAIN \
-                    and "-host-" in entity.unique_id:
+            if (
+                entity.config_entry_id == self.config_entry.entry_id
+                and entity.domain == DEVICE_TRACKER_DOMAIN
+                and "-host-" in entity.unique_id
+            ):
                 _, mac = entity.unique_id.split("-host-", 2)
                 self.data["host_hass"][mac] = entity.original_name
 
@@ -283,17 +287,30 @@ class MikrotikControllerData:
         for uid, vals in self.data["host"].items():
             # Add missing default values
             for key, default in zip(
-                    ["address", "mac-address", "interface", "host-name", "last-seen", "available"],
-                    ["unknown", "unknown", "unknown", "unknown", False, False],
+                [
+                    "address",
+                    "mac-address",
+                    "interface",
+                    "host-name",
+                    "last-seen",
+                    "available",
+                ],
+                ["unknown", "unknown", "unknown", "unknown", False, False],
             ):
                 if key not in self.data["host"][uid]:
                     self.data["host"][uid][key] = default
 
             # Check host availability
-            if vals["source"] not in ["capsman", "wireless"] \
-                    and vals["address"] != "unknown" and vals["interface"] != "unknown":
-                self.data["host"][uid]["available"] = \
-                    await self.hass.async_add_executor_job(self.api_ping.arp_ping, vals["address"], vals["interface"])
+            if (
+                vals["source"] not in ["capsman", "wireless"]
+                and vals["address"] != "unknown"
+                and vals["interface"] != "unknown"
+            ):
+                self.data["host"][uid][
+                    "available"
+                ] = await self.hass.async_add_executor_job(
+                    self.api_ping.arp_ping, vals["address"], vals["interface"]
+                )
 
             # Update last seen
             if self.data["host"][uid]["available"]:
@@ -409,10 +426,8 @@ class MikrotikControllerData:
         uom_type, uom_div = self._get_unit_of_measurement()
 
         for uid in self.data["interface"]:
-            self.data["interface"][uid][
-                "rx-bits-per-second-attr"] = uom_type
-            self.data["interface"][uid][
-                "tx-bits-per-second-attr"] = uom_type
+            self.data["interface"][uid]["rx-bits-per-second-attr"] = uom_type
+            self.data["interface"][uid]["tx-bits-per-second-attr"] = uom_type
             self.data["interface"][uid]["rx-bits-per-second"] = round(
                 self.data["interface"][uid]["rx-bits-per-second"] * uom_div
             )
@@ -440,7 +455,9 @@ class MikrotikControllerData:
                     "reverse": True,
                 },
             ],
-            only=[{"key": "local", "value": False}],
+            only=[
+                {"key": "local", "value": False}
+            ],
         )
 
         for uid, vals in self.data["bridge_host"].items():
@@ -465,12 +482,16 @@ class MikrotikControllerData:
                     continue
 
                 if self.data["interface"][uid]["client-ip-address"] == "":
-                    self.data["interface"][uid]["client-ip-address"] = arp_vals["address"]
+                    self.data["interface"][uid]["client-ip-address"] = arp_vals[
+                        "address"
+                    ]
                 else:
                     self.data["interface"][uid]["client-ip-address"] = "multiple"
 
                 if self.data["interface"][uid]["client-mac-address"] == "":
-                    self.data["interface"][uid]["client-mac-address"] = arp_vals["mac-address"]
+                    self.data["interface"][uid]["client-mac-address"] = arp_vals[
+                        "mac-address"
+                    ]
                 else:
                     self.data["interface"][uid]["client-mac-address"] = "multiple"
 
@@ -513,7 +534,9 @@ class MikrotikControllerData:
                     {"key": "dst-port"},
                 ]
             ],
-            only=[{"key": "action", "value": "dst-nat"}],
+            only=[
+                {"key": "action", "value": "dst-nat"}
+            ],
         )
 
         # Remove duplicate NAT entries to prevent crash
@@ -530,8 +553,11 @@ class MikrotikControllerData:
         for uid in nat_del:
             if self.data["nat"][uid]["name"] not in self.nat_removed:
                 self.nat_removed[self.data["nat"][uid]["name"]] = 1
-                _LOGGER.error("Mikrotik %s duplicate NAT rule %s, entity will be unavailable.",
-                              self.host, self.data["nat"][uid]["name"])
+                _LOGGER.error(
+                    "Mikrotik %s duplicate NAT rule %s, entity will be unavailable.",
+                    self.host,
+                    self.data["nat"][uid]["name"],
+                )
 
             del self.data["nat"][uid]
 
@@ -619,8 +645,8 @@ class MikrotikControllerData:
 
         if "status" in self.data["fw-update"]:
             self.data["fw-update"]["available"] = (
-                True if self.data["fw-update"][
-                            "status"] == "New version is available"
+                True
+                if self.data["fw-update"]["status"] == "New version is available"
                 else False
             )
         else:
@@ -671,40 +697,52 @@ class MikrotikControllerData:
                     "type": "bool",
                     "reverse": True,
                 },
-            ]
+            ],
         )
 
         uom_type, uom_div = self._get_unit_of_measurement()
         for uid, vals in self.data["queue"].items():
-            upload_max_limit_bps, download_max_limit_bps = \
-                [int(x) for x in vals["max-limit"].split('/')]
-            self.data["queue"][uid]["upload-max-limit"] = \
-                f"{round(upload_max_limit_bps * uom_div)} {uom_type}"
-            self.data["queue"][uid]["download-max-limit"] = \
-                f"{round(download_max_limit_bps * uom_div)} {uom_type}"
+            upload_max_limit_bps, download_max_limit_bps = [
+                int(x) for x in vals["max-limit"].split("/")
+            ]
+            self.data["queue"][uid][
+                "upload-max-limit"
+            ] = f"{round(upload_max_limit_bps * uom_div)} {uom_type}"
+            self.data["queue"][uid][
+                "download-max-limit"
+            ] = f"{round(download_max_limit_bps * uom_div)} {uom_type}"
 
-            upload_limit_at_bps, download_limit_at_bps = \
-                [int(x) for x in vals["limit-at"].split('/')]
-            self.data["queue"][uid]["upload-limit-at"] = \
-                f"{round(upload_limit_at_bps * uom_div)} {uom_type}"
-            self.data["queue"][uid]["download-limit-at"] = \
-                f"{round(download_limit_at_bps * uom_div)} {uom_type}"
+            upload_limit_at_bps, download_limit_at_bps = [
+                int(x) for x in vals["limit-at"].split("/")
+            ]
+            self.data["queue"][uid][
+                "upload-limit-at"
+            ] = f"{round(upload_limit_at_bps * uom_div)} {uom_type}"
+            self.data["queue"][uid][
+                "download-limit-at"
+            ] = f"{round(download_limit_at_bps * uom_div)} {uom_type}"
 
-            upload_burst_limit_bps, download_burst_limit_bps = \
-                [int(x) for x in vals["burst-limit"].split('/')]
-            self.data["queue"][uid]["upload-burst-limit"] = \
-                f"{round(upload_burst_limit_bps * uom_div)} {uom_type}"
-            self.data["queue"][uid]["download-burst-limit"] = \
-                f"{round(download_burst_limit_bps * uom_div)} {uom_type}"
+            upload_burst_limit_bps, download_burst_limit_bps = [
+                int(x) for x in vals["burst-limit"].split("/")
+            ]
+            self.data["queue"][uid][
+                "upload-burst-limit"
+            ] = f"{round(upload_burst_limit_bps * uom_div)} {uom_type}"
+            self.data["queue"][uid][
+                "download-burst-limit"
+            ] = f"{round(download_burst_limit_bps * uom_div)} {uom_type}"
 
-            upload_burst_threshold_bps, download_burst_threshold_bps = \
-                [int(x) for x in vals["burst-threshold"].split('/')]
-            self.data["queue"][uid]["upload-burst-threshold"] = \
-                f"{round(upload_burst_threshold_bps * uom_div)} {uom_type}"
-            self.data["queue"][uid]["download-burst-threshold"] = \
-                f"{round(download_burst_threshold_bps * uom_div)} {uom_type}"
+            upload_burst_threshold_bps, download_burst_threshold_bps = [
+                int(x) for x in vals["burst-threshold"].split("/")
+            ]
+            self.data["queue"][uid][
+                "upload-burst-threshold"
+            ] = f"{round(upload_burst_threshold_bps * uom_div)} {uom_type}"
+            self.data["queue"][uid][
+                "download-burst-threshold"
+            ] = f"{round(download_burst_threshold_bps * uom_div)} {uom_type}"
 
-            upload_burst_time, download_burst_time = vals["burst-time"].split('/')
+            upload_burst_time, download_burst_time = vals["burst-time"].split("/")
             self.data["queue"][uid]["upload-burst-time"] = upload_burst_time
             self.data["queue"][uid]["download-burst-time"] = download_burst_time
 
@@ -724,13 +762,18 @@ class MikrotikControllerData:
             ],
             ensure_vals=[
                 {"name": "bridge", "default": ""},
-            ]
+            ],
         )
 
         for uid, vals in self.data["arp"].items():
-            if vals["interface"] in self.data["bridge"] and uid in self.data["bridge_host"]:
+            if (
+                vals["interface"] in self.data["bridge"]
+                and uid in self.data["bridge_host"]
+            ):
                 self.data["arp"][uid]["bridge"] = vals["interface"]
-                self.data["arp"][uid]["interface"] = self.data["bridge_host"][uid]["interface"]
+                self.data["arp"][uid]["interface"] = self.data["bridge_host"][uid][
+                    "interface"
+                ]
 
     # ---------------------------
     #   get_dns
@@ -768,12 +811,14 @@ class MikrotikControllerData:
             ensure_vals=[
                 {"name": "address"},
                 {"name": "IPv4Network", "default": ""},
-            ]
+            ],
         )
 
         for uid, vals in self.data["dhcp-network"].items():
             if vals["IPv4Network"] == "":
-                self.data["dhcp-network"][uid]["IPv4Network"] = IPv4Network(vals["address"])
+                self.data["dhcp-network"][uid]["IPv4Network"] = IPv4Network(
+                    vals["address"]
+                )
 
         # TODO: run only on demand
         self.data["dhcp-server"] = parse_api(
@@ -783,7 +828,7 @@ class MikrotikControllerData:
             vals=[
                 {"name": "name"},
                 {"name": "interface", "default": ""},
-            ]
+            ],
         )
 
         self.data["dhcp"] = parse_api(
@@ -801,12 +846,13 @@ class MikrotikControllerData:
             ],
             ensure_vals=[
                 {"name": "interface"},
-            ]
+            ],
         )
 
         for uid in self.data["dhcp"]:
-            self.data["dhcp"][uid]["interface"] = \
-                self.data["dhcp-server"][self.data["dhcp"][uid]["server"]]["interface"]
+            self.data["dhcp"][uid]["interface"] = self.data["dhcp-server"][
+                self.data["dhcp"][uid]["server"]
+            ]["interface"]
 
     # ---------------------------
     #   get_capsman_hosts
@@ -821,7 +867,7 @@ class MikrotikControllerData:
                 {"name": "mac-address"},
                 {"name": "interface", "default": "unknown"},
                 {"name": "ssid", "default": "unknown"},
-            ]
+            ],
         )
 
     # ---------------------------
@@ -838,7 +884,7 @@ class MikrotikControllerData:
                 {"name": "interface", "default": "unknown"},
                 {"name": "ap", "type": "bool"},
                 {"name": "uptime"},
-            ]
+            ],
         )
 
     # ---------------------------
@@ -847,8 +893,8 @@ class MikrotikControllerData:
     async def async_process_host(self):
         """Get host tracking data"""
         # Add hosts from CAPS-MAN
+        capsman_detected = {}
         if self.support_capsman:
-            capsman_detected = {}
             for uid, vals in self.data["capsman_hosts"].items():
                 if uid not in self.data["host"]:
                     self.data["host"][uid] = {}
@@ -858,12 +904,15 @@ class MikrotikControllerData:
                 self.data["host"][uid]["available"] = True
                 self.data["host"][uid]["last-seen"] = utcnow()
                 for key in ["mac-address", "interface"]:
-                    if key not in self.data["host"][uid] or self.data["host"][uid][key] == "unknown":
+                    if (
+                        key not in self.data["host"][uid]
+                        or self.data["host"][uid][key] == "unknown"
+                    ):
                         self.data["host"][uid][key] = vals[key]
 
         # Add hosts from wireless
+        wireless_detected = {}
         if self.support_wireless:
-            wireless_detected = {}
             for uid, vals in self.data["wireless_hosts"].items():
                 if vals["ap"]:
                     continue
@@ -876,7 +925,10 @@ class MikrotikControllerData:
                 self.data["host"][uid]["available"] = True
                 self.data["host"][uid]["last-seen"] = utcnow()
                 for key in ["mac-address", "interface"]:
-                    if key not in self.data["host"][uid] or self.data["host"][uid][key] == "unknown":
+                    if (
+                        key not in self.data["host"][uid]
+                        or self.data["host"][uid][key] == "unknown"
+                    ):
                         self.data["host"][uid][key] = vals[key]
 
         # Add hosts from DHCP
@@ -885,7 +937,10 @@ class MikrotikControllerData:
                 self.data["host"][uid] = {}
                 self.data["host"][uid]["source"] = "dhcp"
                 for key in ["address", "mac-address", "interface"]:
-                    if key not in self.data["host"][uid] or self.data["host"][uid][key] == "unknown":
+                    if (
+                        key not in self.data["host"][uid]
+                        or self.data["host"][uid][key] == "unknown"
+                    ):
                         self.data["host"][uid][key] = vals[key]
 
         # Add hosts from ARP
@@ -894,7 +949,10 @@ class MikrotikControllerData:
                 self.data["host"][uid] = {}
                 self.data["host"][uid]["source"] = "arp"
                 for key in ["address", "mac-address", "interface"]:
-                    if key not in self.data["host"][uid] or self.data["host"][uid][key] == "unknown":
+                    if (
+                        key not in self.data["host"][uid]
+                        or self.data["host"][uid][key] == "unknown"
+                    ):
                         self.data["host"][uid][key] = vals[key]
 
         # Add restored hosts from hass registry
@@ -922,34 +980,59 @@ class MikrotikControllerData:
 
             # Update IP and interface (DHCP/returned host)
             if uid in self.data["dhcp"] and "." in self.data["dhcp"][uid]["address"]:
-                if self.data["dhcp"][uid]["address"] != self.data["host"][uid]["address"]:
-                    self.data["host"][uid]["address"] = self.data["dhcp"][uid]["address"]
+                if (
+                    self.data["dhcp"][uid]["address"]
+                    != self.data["host"][uid]["address"]
+                ):
+                    self.data["host"][uid]["address"] = self.data["dhcp"][uid][
+                        "address"
+                    ]
                     if vals["source"] not in ["capsman", "wireless"]:
                         self.data["host"][uid]["source"] = "dhcp"
-                        self.data["host"][uid]["interface"] = self.data["dhcp"][uid]["interface"]
+                        self.data["host"][uid]["interface"] = self.data["dhcp"][uid][
+                            "interface"
+                        ]
 
-            elif uid in self.data["arp"] and "." in self.data["arp"][uid]["address"] \
-                    and self.data["arp"][uid]["address"] != self.data["host"][uid]["address"]:
+            elif (
+                uid in self.data["arp"]
+                and "." in self.data["arp"][uid]["address"]
+                and self.data["arp"][uid]["address"]
+                != self.data["host"][uid]["address"]
+            ):
                 self.data["host"][uid]["address"] = self.data["arp"][uid]["address"]
                 if vals["source"] not in ["capsman", "wireless"]:
                     self.data["host"][uid]["source"] = "arp"
-                    self.data["host"][uid]["interface"] = self.data["arp"][uid]["interface"]
+                    self.data["host"][uid]["interface"] = self.data["arp"][uid][
+                        "interface"
+                    ]
 
             if vals["host-name"] == "unknown":
                 # Resolve hostname from static DNS
                 if vals["address"] != "unknown":
                     for dns_uid, dns_vals in self.data["dns"].items():
                         if dns_vals["address"] == vals["address"]:
-                            self.data["host"][uid]["host-name"] = dns_vals["name"].split('.')[0]
+                            self.data["host"][uid]["host-name"] = dns_vals[
+                                "name"
+                            ].split(".")[0]
                             break
                 # Resolve hostname from DHCP comment
-                if self.data["host"][uid]["host-name"] == "unknown" \
-                        and uid in self.data["dhcp"] and self.data["dhcp"][uid]["comment"] != "":
-                    self.data["host"][uid]["host-name"] = self.data["dhcp"][uid]["comment"]
+                if (
+                    self.data["host"][uid]["host-name"] == "unknown"
+                    and uid in self.data["dhcp"]
+                    and self.data["dhcp"][uid]["comment"] != ""
+                ):
+                    self.data["host"][uid]["host-name"] = self.data["dhcp"][uid][
+                        "comment"
+                    ]
                 # Resolve hostname from DHCP hostname
-                elif self.data["host"][uid]["host-name"] == "unknown" \
-                        and uid in self.data["dhcp"] and self.data["dhcp"][uid]["host-name"] != "unknown":
-                    self.data["host"][uid]["host-name"] = self.data["dhcp"][uid]["host-name"]
+                elif (
+                    self.data["host"][uid]["host-name"] == "unknown"
+                    and uid in self.data["dhcp"]
+                    and self.data["dhcp"][uid]["host-name"] != "unknown"
+                ):
+                    self.data["host"][uid]["host-name"] = self.data["dhcp"][uid][
+                        "host-name"
+                    ]
                 # Fallback to mac address for hostname
                 elif self.data["host"][uid]["host-name"] == "unknown":
                     self.data["host"][uid]["host-name"] = uid
@@ -960,31 +1043,34 @@ class MikrotikControllerData:
     def process_accounting(self):
         """Get Accounting data from Mikrotik"""
         # Check if accounting and account-local-traffic is enabled
-        accounting_enabled, local_traffic_enabled = self.api.is_accounting_and_local_traffic_enabled()
+        (
+            accounting_enabled,
+            local_traffic_enabled,
+        ) = self.api.is_accounting_and_local_traffic_enabled()
         uom_type, uom_div = self._get_unit_of_measurement()
 
         # Build missing hosts from main hosts dict
         for uid, vals in self.data["host"].items():
             if uid not in self.data["accounting"]:
                 self.data["accounting"][uid] = {
-                    'address': vals['address'],
-                    'mac-address': vals['mac-address'],
-                    'host-name': vals['host-name'],
-                    'tx-rx-attr': uom_type,
-                    'available': False,
-                    'local_accounting': False
+                    "address": vals["address"],
+                    "mac-address": vals["mac-address"],
+                    "host-name": vals["host-name"],
+                    "tx-rx-attr": uom_type,
+                    "available": False,
+                    "local_accounting": False,
                 }
 
         _LOGGER.debug(f"Working with {len(self.data['accounting'])} accounting devices")
 
         # Build temp accounting values dict with ip address as key
         tmp_accounting_values = {}
-        for uid, vals in self.data['accounting'].items():
-            tmp_accounting_values[vals['address']] = {
+        for uid, vals in self.data["accounting"].items():
+            tmp_accounting_values[vals["address"]] = {
                 "wan-tx": 0,
                 "wan-rx": 0,
                 "lan-tx": 0,
-                "lan-rx": 0
+                "lan-rx": 0,
             }
 
         time_diff = self.api.take_accounting_snapshot()
@@ -1002,57 +1088,75 @@ class MikrotikControllerData:
             )
 
             for item in accounting_data.values():
-                source_ip = str(item.get('src-address')).strip()
-                destination_ip = str(item.get('dst-address')).strip()
-                bits_count = int(str(item.get('bytes')).strip()) * 8
+                source_ip = str(item.get("src-address")).strip()
+                destination_ip = str(item.get("dst-address")).strip()
+                bits_count = int(str(item.get("bytes")).strip()) * 8
 
-                if self._address_part_of_local_network(source_ip) and \
-                        self._address_part_of_local_network(destination_ip):
+                if self._address_part_of_local_network(
+                    source_ip
+                ) and self._address_part_of_local_network(destination_ip):
                     # LAN TX/RX
                     if source_ip in tmp_accounting_values:
-                        tmp_accounting_values[source_ip]['lan-tx'] += bits_count
+                        tmp_accounting_values[source_ip]["lan-tx"] += bits_count
                     if destination_ip in tmp_accounting_values:
-                        tmp_accounting_values[destination_ip]['lan-rx'] += bits_count
-                elif self._address_part_of_local_network(source_ip) and \
-                        not self._address_part_of_local_network(destination_ip):
+                        tmp_accounting_values[destination_ip]["lan-rx"] += bits_count
+                elif self._address_part_of_local_network(
+                    source_ip
+                ) and not self._address_part_of_local_network(destination_ip):
                     # WAN TX
                     if source_ip in tmp_accounting_values:
-                        tmp_accounting_values[source_ip]['wan-tx'] += bits_count
-                elif not self._address_part_of_local_network(source_ip) and \
-                        self._address_part_of_local_network(destination_ip) and \
-                        destination_ip in tmp_accounting_values:
+                        tmp_accounting_values[source_ip]["wan-tx"] += bits_count
+                elif (
+                    not self._address_part_of_local_network(source_ip)
+                    and self._address_part_of_local_network(destination_ip)
+                    and destination_ip in tmp_accounting_values
+                ):
                     # WAN RX
-                    tmp_accounting_values[destination_ip]['wan-rx'] += bits_count
+                    tmp_accounting_values[destination_ip]["wan-rx"] += bits_count
 
         # Calculate real throughput and transform it to appropriate unit
         # Also handle availability of accounting and local_accounting from Mikrotik
         for addr, vals in tmp_accounting_values.items():
             uid = self._get_accounting_uid_by_ip(addr)
             if not uid:
-                _LOGGER.warning(f"Address {addr} not found in accounting data, skipping update")
+                _LOGGER.warning(
+                    f"Address {addr} not found in accounting data, skipping update"
+                )
                 continue
 
-            self.data['accounting'][uid]['tx-rx-attr'] = uom_type
-            self.data['accounting'][uid]['available'] = accounting_enabled
-            self.data['accounting'][uid]['local_accounting'] = local_traffic_enabled
+            self.data["accounting"][uid]["tx-rx-attr"] = uom_type
+            self.data["accounting"][uid]["available"] = accounting_enabled
+            self.data["accounting"][uid]["local_accounting"] = local_traffic_enabled
 
             if not accounting_enabled:
                 # Skip calculation for WAN and LAN if accounting is disabled
                 continue
 
-            self.data['accounting'][uid]['wan-tx'] = \
-                round(vals['wan-tx'] / time_diff * uom_div, 2) if vals['wan-tx'] else 0.0
-            self.data['accounting'][uid]['wan-rx'] = \
-                round(vals['wan-rx'] / time_diff * uom_div, 2) if vals['wan-rx'] else 0.0
+            self.data["accounting"][uid]["wan-tx"] = (
+                round(vals["wan-tx"] / time_diff * uom_div, 2)
+                if vals["wan-tx"]
+                else 0.0
+            )
+            self.data["accounting"][uid]["wan-rx"] = (
+                round(vals["wan-rx"] / time_diff * uom_div, 2)
+                if vals["wan-rx"]
+                else 0.0
+            )
 
             if not local_traffic_enabled:
                 # Skip calculation for LAN if LAN accounting is disabled
                 continue
 
-            self.data['accounting'][uid]['lan-tx'] = \
-                round(vals['lan-tx'] / time_diff * uom_div, 2) if vals['lan-tx'] else 0.0
-            self.data['accounting'][uid]['lan-rx'] = \
-                round(vals['lan-rx'] / time_diff * uom_div, 2) if vals['lan-rx'] else 0.0
+            self.data["accounting"][uid]["lan-tx"] = (
+                round(vals["lan-tx"] / time_diff * uom_div, 2)
+                if vals["lan-tx"]
+                else 0.0
+            )
+            self.data["accounting"][uid]["lan-rx"] = (
+                round(vals["lan-rx"] / time_diff * uom_div, 2)
+                if vals["lan-rx"]
+                else 0.0
+            )
 
     # ---------------------------
     #   _get_unit_of_measurement
@@ -1088,8 +1192,8 @@ class MikrotikControllerData:
     #   _get_accounting_uid_by_ip
     # ---------------------------
     def _get_accounting_uid_by_ip(self, requested_ip):
-        for mac, vals in self.data['accounting'].items():
-            if vals.get('address') is requested_ip:
+        for mac, vals in self.data["accounting"].items():
+            if vals.get("address") is requested_ip:
                 return mac
         return None
 
