@@ -285,20 +285,21 @@ class MikrotikControllerData:
             return
 
         for uid, vals in self.data["host"].items():
-            # Add missing default values
-            for key, default in zip(
-                [
-                    "address",
-                    "mac-address",
-                    "interface",
-                    "host-name",
-                    "last-seen",
-                    "available",
-                ],
-                ["unknown", "unknown", "unknown", "unknown", False, False],
-            ):
-                if key not in self.data["host"][uid]:
-                    self.data["host"][uid][key] = default
+            if not self.host_tracking_initialized:
+                # Add missing default values
+                for key, default in zip(
+                    [
+                        "address",
+                        "mac-address",
+                        "interface",
+                        "host-name",
+                        "last-seen",
+                        "available",
+                    ],
+                    ["unknown", "unknown", "unknown", "unknown", False, False],
+                ):
+                    if key not in self.data["host"][uid]:
+                        self.data["host"][uid][key] = default
 
             # Check host availability
             if (
@@ -964,6 +965,22 @@ class MikrotikControllerData:
                     self.data["host"][uid]["source"] = "restored"
                     self.data["host"][uid]["mac-address"] = uid
                     self.data["host"][uid]["host-name"] = self.data["host_hass"][uid]
+
+        for uid, vals in self.data["host"].items():
+            # Add missing default values
+            for key, default in zip(
+                [
+                    "address",
+                    "mac-address",
+                    "interface",
+                    "host-name",
+                    "last-seen",
+                    "available",
+                ],
+                ["unknown", "unknown", "unknown", "unknown", False, False],
+            ):
+                if key not in self.data["host"][uid]:
+                    self.data["host"][uid][key] = default
 
         if not self.host_tracking_initialized:
             await self.async_ping_tracked_hosts(utcnow())
