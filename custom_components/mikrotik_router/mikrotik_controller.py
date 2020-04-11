@@ -58,7 +58,6 @@ class MikrotikControllerData:
             "bridge": {},
             "bridge_host": {},
             "arp": {},
-            "arp_tmp": {},
             "nat": {},
             "fw-update": {},
             "script": {},
@@ -286,7 +285,7 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.get_dhcp)
         await self.hass.async_add_executor_job(self.process_host)
         await self.hass.async_add_executor_job(self.get_interface_traffic)
-        await self.hass.async_add_executor_job(self.get_interface_client)
+        await self.hass.async_add_executor_job(self.process_interface_client)
         await self.hass.async_add_executor_job(self.get_nat)
         await self.hass.async_add_executor_job(self.get_system_resource)
         await self.hass.async_add_executor_job(self.get_script)
@@ -395,12 +394,9 @@ class MikrotikControllerData:
             self.data["bridge"][vals["bridge"]] = True
 
     # ---------------------------
-    #   get_interface_client
+    #   process_interface_client
     # ---------------------------
-    def get_interface_client(self):
-        """Get ARP data from Mikrotik"""
-        self.data["arp_tmp"] = {}
-
+    def process_interface_client(self):
         # Remove data if disabled
         if not self.option_track_iface_clients:
             for uid in self.data["interface"]:
@@ -408,110 +404,28 @@ class MikrotikControllerData:
                 self.data["interface"][uid]["client-mac-address"] = "disabled"
             return
 
-        mac2ip = {}
-        bridge_used = False
-        mac2ip, bridge_used = self.update_arp(mac2ip, bridge_used)
+        for uid, vals in self.data["interface"].items():
+            self.data["interface"][uid]["client-ip-address"] = ""
+            self.data["interface"][uid]["client-mac-address"] = ""
+            for arp_uid, arp_vals in self.data["arp"].items():
+                if arp_vals["interface"] != vals["name"]:
+                    continue
 
-        if bridge_used:
-            self.update_bridge_hosts(mac2ip)
+                if self.data["interface"][uid]["client-ip-address"] == "":
+                    self.data["interface"][uid]["client-ip-address"] = arp_vals["address"]
+                else:
+                    self.data["interface"][uid]["client-ip-address"] = "multiple"
 
-        # Map ARP to ifaces
-        for uid in self.data["interface"]:
-            if uid not in self.data["arp_tmp"]:
-                continue
+                if self.data["interface"][uid]["client-mac-address"] == "":
+                    self.data["interface"][uid]["client-mac-address"] = arp_vals["mac-address"]
+                else:
+                    self.data["interface"][uid]["client-mac-address"] = "multiple"
 
-            self.data["interface"][uid]["client-ip-address"] = from_entry(
-                self.data["arp_tmp"][uid], "address"
-            )
-            self.data["interface"][uid]["client-mac-address"] = from_entry(
-                self.data["arp_tmp"][uid], "mac-address"
-            )
+            if self.data["interface"][uid]["client-ip-address"] == "":
+                self.data["interface"][uid]["client-ip-address"] = "none"
 
-    # ---------------------------
-    #   update_arp
-    # ---------------------------
-    def update_arp(self, mac2ip, bridge_used):
-        """Get list of hosts in ARP for interface client data from Mikrotik"""
-        data = self.api.path("/ip/arp")
-        if not data:
-            return mac2ip, bridge_used
-
-        for entry in data:
-            # Ignore invalid entries
-            if entry["invalid"]:
-                continue
-
-            if "interface" not in entry:
-                continue
-
-            # Do not add ARP detected on bridge
-            if entry["interface"] == "bridge":
-                bridge_used = True
-                # Build address table on bridge
-                if "mac-address" in entry and "address" in entry:
-                    mac2ip[entry["mac-address"]] = entry["address"]
-
-                continue
-
-            # Get iface default-name from custom name
-            uid = self._get_iface_from_entry(entry)
-            if not uid:
-                continue
-
-            _LOGGER.debug("Processing entry %s, entry %s", "/ip/arp", entry)
-            # Create uid arp dict
-            if uid not in self.data["arp_tmp"]:
-                self.data["arp_tmp"][uid] = {}
-
-            # Add data
-            self.data["arp_tmp"][uid]["interface"] = uid
-            self.data["arp_tmp"][uid]["mac-address"] = (
-                from_entry(entry, "mac-address") if "mac-address" not in self.data["arp_tmp"][uid] else "multiple"
-            )
-            self.data["arp_tmp"][uid]["address"] = (
-                from_entry(entry, "address") if "address" not in self.data["arp_tmp"][uid] else "multiple"
-            )
-
-        return mac2ip, bridge_used
-
-    # ---------------------------
-    #   update_bridge_hosts
-    # ---------------------------
-    def update_bridge_hosts(self, mac2ip):
-        """Get list of hosts in bridge for interface client data from Mikrotik"""
-        data = self.api.path("/interface/bridge/host")
-        if not data:
-            return
-
-        for entry in data:
-            # Ignore port MAC
-            if entry["local"]:
-                continue
-
-            # Get iface default-name from custom name
-            uid = self._get_iface_from_entry(entry)
-            if not uid:
-                continue
-
-            _LOGGER.debug(
-                "Processing entry %s, entry %s", "/interface/bridge/host", entry
-            )
-            # Create uid arp dict
-            if uid not in self.data["arp_tmp"]:
-                self.data["arp_tmp"][uid] = {}
-
-            # Add data
-            self.data["arp_tmp"][uid]["interface"] = uid
-            if "mac-address" in self.data["arp_tmp"][uid]:
-                self.data["arp_tmp"][uid]["mac-address"] = "multiple"
-                self.data["arp_tmp"][uid]["address"] = "multiple"
-            else:
-                self.data["arp_tmp"][uid]["mac-address"] = from_entry(entry, "mac-address")
-                self.data["arp_tmp"][uid]["address"] = (
-                    mac2ip[self.data["arp_tmp"][uid]["mac-address"]]
-                    if self.data["arp_tmp"][uid]["mac-address"] in mac2ip
-                    else ""
-                )
+            if self.data["interface"][uid]["client-mac-address"] == "":
+                self.data["interface"][uid]["client-mac-address"] = "none"
 
     # ---------------------------
     #   get_nat
