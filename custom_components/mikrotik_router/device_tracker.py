@@ -116,6 +116,11 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, tr
         [MikrotikControllerPortDeviceTracker, MikrotikControllerHostDeviceTracker],
     ):
         for uid in mikrotik_controller.data[sid]:
+            if (
+                not config_entry.options.get(CONF_TRACK_HOSTS, DEFAULT_TRACK_HOSTS)
+                and sid == "host"
+            ):
+                continue
             item_id = f"{inst}-{sid}-{mikrotik_controller.data[sid][uid][sid_uid]}"
             _LOGGER.debug("Updating device_tracker %s", item_id)
             if item_id in tracked:
