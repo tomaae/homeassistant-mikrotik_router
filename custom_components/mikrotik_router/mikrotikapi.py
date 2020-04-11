@@ -14,6 +14,7 @@ from .const import (
 )
 
 import librouteros
+from socket import error as socket_error, timeout as socket_timeout
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -126,6 +127,8 @@ class MikrotikAPI:
             librouteros.exceptions.ConnectionClosed,
             librouteros.exceptions.ProtocolError,
             librouteros.exceptions.FatalError,
+            socket_timeout,
+            socket_error,
             ssl.SSLError,
             BrokenPipeError,
             OSError,
@@ -204,6 +207,8 @@ class MikrotikAPI:
             librouteros.exceptions.MultiTrapError,
             librouteros.exceptions.ProtocolError,
             librouteros.exceptions.FatalError,
+            socket_timeout,
+            socket_error,
             ssl.SSLError,
             BrokenPipeError,
             OSError,
@@ -268,6 +273,8 @@ class MikrotikAPI:
                 librouteros.exceptions.MultiTrapError,
                 librouteros.exceptions.ProtocolError,
                 librouteros.exceptions.FatalError,
+                socket_timeout,
+                socket_error,
                 ssl.SSLError,
                 BrokenPipeError,
                 OSError,
@@ -326,6 +333,8 @@ class MikrotikAPI:
                 librouteros.exceptions.MultiTrapError,
                 librouteros.exceptions.ProtocolError,
                 librouteros.exceptions.FatalError,
+                socket_timeout,
+                socket_error,
                 ssl.SSLError,
                 BrokenPipeError,
                 OSError,
@@ -372,6 +381,8 @@ class MikrotikAPI:
             librouteros.exceptions.ProtocolError,
             librouteros.exceptions.FatalError,
             ssl.SSLError,
+            socket_timeout,
+            socket_error,
             BrokenPipeError,
             OSError,
             ValueError,
@@ -431,6 +442,8 @@ class MikrotikAPI:
             librouteros.exceptions.MultiTrapError,
             librouteros.exceptions.ProtocolError,
             librouteros.exceptions.FatalError,
+            socket_timeout,
+            socket_error,
             ssl.SSLError,
             BrokenPipeError,
             OSError,
@@ -517,6 +530,8 @@ class MikrotikAPI:
             librouteros.exceptions.MultiTrapError,
             librouteros.exceptions.ProtocolError,
             librouteros.exceptions.FatalError,
+            socket_timeout,
+            socket_error,
             ssl.SSLError,
             BrokenPipeError,
             OSError,
