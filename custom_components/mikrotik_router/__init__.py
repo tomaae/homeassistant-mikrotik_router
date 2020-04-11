@@ -36,6 +36,7 @@ async def async_setup_entry(hass, config_entry):
     if not mikrotik_controller.data:
         raise ConfigEntryNotReady()
 
+    await mikrotik_controller.async_init()
     hass.data[DOMAIN][DATA_CLIENT][config_entry.entry_id] = mikrotik_controller
 
     hass.async_create_task(

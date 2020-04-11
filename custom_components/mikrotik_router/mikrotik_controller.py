@@ -75,6 +75,7 @@ class MikrotikControllerData:
 
         self.listeners = []
         self.lock = asyncio.Lock()
+        self.lock_ping = asyncio.Lock()
 
         self.api = MikrotikAPI(
             config_entry.data[CONF_HOST],
@@ -84,17 +85,34 @@ class MikrotikControllerData:
             config_entry.data[CONF_SSL]
         )
 
+        self.api_ping = MikrotikAPI(
+            config_entry.data[CONF_HOST],
+            config_entry.data[CONF_USERNAME],
+            config_entry.data[CONF_PASSWORD],
+            config_entry.data[CONF_PORT],
+            config_entry.data[CONF_SSL]
+        )
+
         self.nat_removed = {}
         self.host_hass_recovered = False
+        self.host_tracking_initialized = False
 
         self.support_capsman = False
         self.support_wireless = False
 
-        async_track_time_interval(
+        self._force_update_callback = None
+        self._force_fwupdate_check_callback = None
+        self._async_ping_tracked_hosts_callback = None
+
+    async def async_init(self):
+        self._force_update_callback = async_track_time_interval(
             self.hass, self.force_update, self.option_scan_interval
         )
-        async_track_time_interval(
+        self._force_fwupdate_check_callback = async_track_time_interval(
             self.hass, self.force_fwupdate_check, timedelta(hours=1)
+        )
+        self._async_ping_tracked_hosts_callback = async_track_time_interval(
+            self.hass, self.async_ping_tracked_hosts, timedelta(seconds=15)
         )
 
     # ---------------------------
@@ -249,6 +267,42 @@ class MikrotikControllerData:
         async_dispatcher_send(self.hass, self.signal_update)
 
     # ---------------------------
+    #   async_ping_tracked_hosts
+    # ---------------------------
+    @callback
+    async def async_ping_tracked_hosts(self, _now=None):
+        """Trigger update by timer"""
+        if not self.option_track_network_hosts:
+            return
+
+        try:
+            await asyncio.wait_for(self.lock_ping.acquire(), timeout=3)
+        except:
+            return
+
+        for uid, vals in self.data["host"].items():
+            # Add missing default values
+            for key, default in zip(
+                    ["address", "mac-address", "interface", "host-name", "last-seen", "available"],
+                    ["unknown", "unknown", "unknown", "unknown", False, False],
+            ):
+                if key not in self.data["host"][uid]:
+                    self.data["host"][uid][key] = default
+
+            # Check host availability
+            if vals["source"] not in ["capsman", "wireless"] \
+                    and vals["address"] != "unknown" and vals["interface"] != "unknown":
+                self.data["host"][uid]["available"] = \
+                    await self.hass.async_add_executor_job(self.api_ping.arp_ping, vals["address"], vals["interface"])
+
+            # Update last seen
+            if self.data["host"][uid]["available"]:
+                self.data["host"][uid]["last-seen"] = utcnow()
+
+        self.host_tracking_initialized = True
+        self.lock_ping.release()
+
+    # ---------------------------
     #   force_update
     # ---------------------------
     @callback
@@ -283,7 +337,7 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.get_arp)
         await self.hass.async_add_executor_job(self.get_dns)
         await self.hass.async_add_executor_job(self.get_dhcp)
-        await self.hass.async_add_executor_job(self.process_host)
+        await self.async_process_host()
         await self.hass.async_add_executor_job(self.get_interface_traffic)
         await self.hass.async_add_executor_job(self.process_interface_client)
         await self.hass.async_add_executor_job(self.get_nat)
@@ -293,7 +347,6 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.process_accounting)
 
         async_dispatcher_send(self.hass, self.signal_update)
-
         self.lock.release()
 
     # ---------------------------
@@ -789,9 +842,9 @@ class MikrotikControllerData:
         )
 
     # ---------------------------
-    #   process_host
+    #   async_process_host
     # ---------------------------
-    def process_host(self):
+    async def async_process_host(self):
         """Get host tracking data"""
         # Add hosts from CAPS-MAN
         if self.support_capsman:
@@ -854,16 +907,11 @@ class MikrotikControllerData:
                     self.data["host"][uid]["mac-address"] = uid
                     self.data["host"][uid]["host-name"] = self.data["host_hass"][uid]
 
+        if not self.host_tracking_initialized:
+            await self.async_ping_tracked_hosts(utcnow())
+
         # Process hosts
         for uid, vals in self.data["host"].items():
-            # Add missing default values
-            for key, default in zip(
-                    ["address", "mac-address", "interface", "host-name", "last-seen", "available"],
-                    ["unknown", "unknown", "unknown", "unknown", False, False],
-            ):
-                if key not in self.data["host"][uid]:
-                    self.data["host"][uid][key] = default
-
             # CAPS-MAN availability
             if vals["source"] == "capsman" and uid not in capsman_detected:
                 self.data["host"][uid]["available"] = False
@@ -905,16 +953,6 @@ class MikrotikControllerData:
                 # Fallback to mac address for hostname
                 elif self.data["host"][uid]["host-name"] == "unknown":
                     self.data["host"][uid]["host-name"] = uid
-
-            # Check host availability
-            if vals["source"] not in ["capsman", "wireless"] \
-                    and vals["address"] != "unknown" and vals["interface"] != "unknown":
-                self.data["host"][uid]["available"] = \
-                    self.api.arp_ping(vals["address"], vals["interface"])
-
-            # Update last seen
-            if self.data["host"][uid]["available"]:
-                self.data["host"][uid]["last-seen"] = utcnow()
 
     # ---------------------------
     #   process_accounting
