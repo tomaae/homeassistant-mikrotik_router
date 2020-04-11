@@ -14,15 +14,8 @@ from .const import (
     DEFAULT_LOGIN_METHOD,
     DEFAULT_ENCODING,
 )
-from .exceptions import ApiEntryNotFound
 
-MODULE_PATH = os.path.join(os.path.dirname(__file__), "librouteros_custom",
-                           "__init__.py")
-MODULE_NAME = "librouteros_custom"
-spec = importlib.util.spec_from_file_location(MODULE_NAME, MODULE_PATH)
-librouteros_custom = importlib.util.module_from_spec(spec)
-sys.modules[spec.name] = librouteros_custom
-spec.loader.exec_module(librouteros_custom)
+import librouteros
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -121,15 +114,15 @@ class MikrotikAPI:
             kwargs["ssl_wrapper"] = self._ssl_wrapper
         self.lock.acquire()
         try:
-            self._connection = librouteros_custom.connect(
+            self._connection = librouteros.connect(
                 self._host, self._username, self._password, **kwargs
             )
         except (
-            librouteros_custom.exceptions.TrapError,
-            librouteros_custom.exceptions.MultiTrapError,
-            librouteros_custom.exceptions.ConnectionClosed,
-            librouteros_custom.exceptions.ProtocolError,
-            librouteros_custom.exceptions.FatalError,
+            librouteros.exceptions.TrapError,
+            librouteros.exceptions.MultiTrapError,
+            librouteros.exceptions.ConnectionClosed,
+            librouteros.exceptions.ProtocolError,
+            librouteros.exceptions.FatalError,
             ssl.SSLError,
             BrokenPipeError,
             OSError,
@@ -201,15 +194,15 @@ class MikrotikAPI:
         try:
             _LOGGER.debug("API query: %s", path)
             response = self._connection.path(path)
-        except librouteros_custom.exceptions.ConnectionClosed:
+        except librouteros.exceptions.ConnectionClosed:
             self.disconnect()
             self.lock.release()
             return None
         except (
-                librouteros_custom.exceptions.TrapError,
-                librouteros_custom.exceptions.MultiTrapError,
-                librouteros_custom.exceptions.ProtocolError,
-                librouteros_custom.exceptions.FatalError,
+                librouteros.exceptions.TrapError,
+                librouteros.exceptions.MultiTrapError,
+                librouteros.exceptions.ProtocolError,
+                librouteros.exceptions.FatalError,
                 ssl.SSLError,
                 BrokenPipeError,
                 OSError,
@@ -226,7 +219,7 @@ class MikrotikAPI:
         if return_list:
             try:
                 response = list(response)
-            except librouteros_custom.exceptions.ConnectionClosed as api_error:
+            except librouteros.exceptions.ConnectionClosed as api_error:
                 self.disconnect("building list for path", api_error)
                 self.lock.release()
                 return None
@@ -265,15 +258,15 @@ class MikrotikAPI:
             self.lock.acquire()
             try:
                 response.update(**params)
-            except librouteros_custom.exceptions.ConnectionClosed:
+            except librouteros.exceptions.ConnectionClosed:
                 self.disconnect()
                 self.lock.release()
                 return False
             except (
-                librouteros_custom.exceptions.TrapError,
-                librouteros_custom.exceptions.MultiTrapError,
-                librouteros_custom.exceptions.ProtocolError,
-                librouteros_custom.exceptions.FatalError,
+                librouteros.exceptions.TrapError,
+                librouteros.exceptions.MultiTrapError,
+                librouteros.exceptions.ProtocolError,
+                librouteros.exceptions.FatalError,
                 ssl.SSLError,
                 BrokenPipeError,
                 OSError,
@@ -318,15 +311,15 @@ class MikrotikAPI:
             try:
                 run = response("run", **{".id": tmp[".id"]})
                 tuple(run)
-            except librouteros_custom.exceptions.ConnectionClosed:
+            except librouteros.exceptions.ConnectionClosed:
                 self.disconnect()
                 self.lock.release()
                 return False
             except (
-                librouteros_custom.exceptions.TrapError,
-                librouteros_custom.exceptions.MultiTrapError,
-                librouteros_custom.exceptions.ProtocolError,
-                librouteros_custom.exceptions.FatalError,
+                librouteros.exceptions.TrapError,
+                librouteros.exceptions.MultiTrapError,
+                librouteros.exceptions.ProtocolError,
+                librouteros.exceptions.FatalError,
                 ssl.SSLError,
                 BrokenPipeError,
                 OSError,
@@ -363,15 +356,15 @@ class MikrotikAPI:
         try:
             _LOGGER.debug("API query: %s", "/interface/monitor-traffic")
             traffic = response("monitor-traffic", **args)
-        except librouteros_custom.exceptions.ConnectionClosed:
+        except librouteros.exceptions.ConnectionClosed:
             self.disconnect()
             self.lock.release()
             return None
         except (
-            librouteros_custom.exceptions.TrapError,
-            librouteros_custom.exceptions.MultiTrapError,
-            librouteros_custom.exceptions.ProtocolError,
-            librouteros_custom.exceptions.FatalError,
+            librouteros.exceptions.TrapError,
+            librouteros.exceptions.MultiTrapError,
+            librouteros.exceptions.ProtocolError,
+            librouteros.exceptions.FatalError,
             ssl.SSLError,
             BrokenPipeError,
             OSError,
@@ -387,7 +380,7 @@ class MikrotikAPI:
 
         try:
             traffic = list(traffic)
-        except librouteros_custom.exceptions.ConnectionClosed as api_error:
+        except librouteros.exceptions.ConnectionClosed as api_error:
             self.disconnect("get_traffic", api_error)
             self.lock.release()
             return None
@@ -422,16 +415,16 @@ class MikrotikAPI:
         try:
             _LOGGER.debug("Ping host query: %s", "/ping")
             ping = response("/ping", **args)
-        except librouteros_custom.exceptions.ConnectionClosed:
+        except librouteros.exceptions.ConnectionClosed:
             self.disconnect()
             self.lock.release()
             return False
 
         except (
-            librouteros_custom.exceptions.TrapError,
-            librouteros_custom.exceptions.MultiTrapError,
-            librouteros_custom.exceptions.ProtocolError,
-            librouteros_custom.exceptions.FatalError,
+            librouteros.exceptions.TrapError,
+            librouteros.exceptions.MultiTrapError,
+            librouteros.exceptions.ProtocolError,
+            librouteros.exceptions.FatalError,
             ssl.SSLError,
             BrokenPipeError,
             OSError,
@@ -447,7 +440,7 @@ class MikrotikAPI:
 
         try:
             ping = list(ping)
-        except librouteros_custom.exceptions.ConnectionClosed as api_error:
+        except librouteros.exceptions.ConnectionClosed as api_error:
             self.disconnect("arp_ping", api_error)
             self.lock.release()
             return False
@@ -510,15 +503,15 @@ class MikrotikAPI:
         try:
             # Prepare command
             take = accounting('snapshot/take')
-        except librouteros_custom.exceptions.ConnectionClosed:
+        except librouteros.exceptions.ConnectionClosed:
             self.disconnect()
             self.lock.release()
             return 0
         except (
-                librouteros_custom.exceptions.TrapError,
-                librouteros_custom.exceptions.MultiTrapError,
-                librouteros_custom.exceptions.ProtocolError,
-                librouteros_custom.exceptions.FatalError,
+                librouteros.exceptions.TrapError,
+                librouteros.exceptions.MultiTrapError,
+                librouteros.exceptions.ProtocolError,
+                librouteros.exceptions.FatalError,
                 ssl.SSLError,
                 BrokenPipeError,
                 OSError,
@@ -534,7 +527,7 @@ class MikrotikAPI:
 
         try:
             list(take)
-        except librouteros_custom.exceptions.ConnectionClosed as api_error:
+        except librouteros.exceptions.ConnectionClosed as api_error:
             self.disconnect("accounting_snapshot", api_error)
             self.lock.release()
             return 0
