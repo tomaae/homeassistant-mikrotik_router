@@ -55,6 +55,7 @@ class MikrotikControllerData:
             "routerboard": {},
             "resource": {},
             "interface": {},
+            "bridge": {},
             "bridge_host": {},
             "arp": {},
             "arp_tmp": {},
@@ -279,7 +280,7 @@ class MikrotikControllerData:
             await self.hass.async_add_executor_job(self.get_wireless_hosts)
 
         await self.hass.async_add_executor_job(self.get_interface)
-        await self.hass.async_add_executor_job(self.get_bridge_host)
+        await self.hass.async_add_executor_job(self.get_bridge)
         await self.hass.async_add_executor_job(self.get_arp)
         await self.hass.async_add_executor_job(self.get_dns)
         await self.hass.async_add_executor_job(self.get_dhcp)
@@ -368,9 +369,9 @@ class MikrotikControllerData:
             )
 
     # ---------------------------
-    #   get_bridge_host
+    #   get_bridge
     # ---------------------------
-    def get_bridge_host(self):
+    def get_bridge(self):
         """Get system resources data from Mikrotik"""
         self.data["bridge_host"] = parse_api(
             data=self.data["bridge_host"],
@@ -389,6 +390,9 @@ class MikrotikControllerData:
             ],
             only=[{"key": "local", "value": False}],
         )
+
+        for uid, vals in self.data["bridge_host"].items():
+            self.data["bridge"][vals["bridge"]] = True
 
     # ---------------------------
     #   get_interface_client
@@ -751,7 +755,15 @@ class MikrotikControllerData:
                 {"name": "address"},
                 {"name": "interface"},
             ],
+            ensure_vals=[
+                {"name": "bridge", "default": ""},
+            ]
         )
+
+        for uid, vals in self.data["arp"].items():
+            if vals["interface"] in self.data["bridge"] and uid in self.data["bridge_host"]:
+                self.data["arp"][uid]["bridge"] = vals["interface"]
+                self.data["arp"][uid]["interface"] = self.data["bridge_host"][uid]["interface"]
 
     # ---------------------------
     #   get_dns
