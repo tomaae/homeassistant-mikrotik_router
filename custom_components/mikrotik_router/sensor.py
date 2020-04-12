@@ -366,7 +366,7 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
     @property
     def name(self):
         """Return the name."""
-        return f"{self._inst} {self._data['host-name']} {self._type[ATTR_LABEL]} "
+        return f"{self._data['host-name']} {self._type[ATTR_LABEL]} "
 
     @property
     def unique_id(self):
