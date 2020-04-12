@@ -307,12 +307,16 @@ class MikrotikControllerData:
                 and self.data["host"][uid]["address"] != "unknown"
                 and self.data["host"][uid]["interface"] != "unknown"
             ):
+                tmp_interface = self.data["host"][uid]["interface"]
+                if uid in self.data["arp"] and self.data["arp"][uid]["bridge"] != "":
+                    tmp_interface = self.data["arp"][uid]["bridge"]
+
                 self.data["host"][uid][
                     "available"
                 ] = await self.hass.async_add_executor_job(
                     self.api_ping.arp_ping,
                     self.data["host"][uid]["address"],
-                    self.data["host"][uid]["interface"],
+                    tmp_interface,
                 )
 
             # Update last seen
