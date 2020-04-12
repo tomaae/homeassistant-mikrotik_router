@@ -312,7 +312,7 @@ class MikrotikControllerData:
                 ] = await self.hass.async_add_executor_job(
                     self.api_ping.arp_ping,
                     self.data["host"][uid]["address"],
-                    self.data["host"][uid]["interface"]
+                    self.data["host"][uid]["interface"],
                 )
 
             # Update last seen
@@ -458,9 +458,7 @@ class MikrotikControllerData:
                     "reverse": True,
                 },
             ],
-            only=[
-                {"key": "local", "value": False}
-            ],
+            only=[{"key": "local", "value": False}],
         )
 
         for uid, vals in self.data["bridge_host"].items():
@@ -537,9 +535,7 @@ class MikrotikControllerData:
                     {"key": "dst-port"},
                 ]
             ],
-            only=[
-                {"key": "action", "value": "dst-nat"}
-            ],
+            only=[{"key": "action", "value": "dst-nat"}],
         )
 
         # Remove duplicate NAT entries to prevent crash
@@ -758,14 +754,8 @@ class MikrotikControllerData:
             data=self.data["arp"],
             source=self.api.path("/ip/arp"),
             key="mac-address",
-            vals=[
-                {"name": "mac-address"},
-                {"name": "address"},
-                {"name": "interface"},
-            ],
-            ensure_vals=[
-                {"name": "bridge", "default": ""},
-            ],
+            vals=[{"name": "mac-address"}, {"name": "address"}, {"name": "interface"},],
+            ensure_vals=[{"name": "bridge", "default": ""},],
         )
 
         for uid, vals in self.data["arp"].items():
@@ -788,10 +778,7 @@ class MikrotikControllerData:
             data=self.data["dns"],
             source=self.api.path("/ip/dns/static"),
             key="name",
-            vals=[
-                {"name": "name"},
-                {"name": "address"},
-            ],
+            vals=[{"name": "name"}, {"name": "address"},],
         )
 
     # ---------------------------
@@ -811,10 +798,7 @@ class MikrotikControllerData:
                 {"name": "dns-server", "default": ""},
                 {"name": "domain", "default": ""},
             ],
-            ensure_vals=[
-                {"name": "address"},
-                {"name": "IPv4Network", "default": ""},
-            ],
+            ensure_vals=[{"name": "address"}, {"name": "IPv4Network", "default": ""},],
         )
 
         for uid, vals in self.data["dhcp-network"].items():
@@ -828,10 +812,7 @@ class MikrotikControllerData:
             data=self.data["dhcp-server"],
             source=self.api.path("/ip/dhcp-server"),
             key="name",
-            vals=[
-                {"name": "name"},
-                {"name": "interface", "default": ""},
-            ],
+            vals=[{"name": "name"}, {"name": "interface", "default": ""},],
         )
 
         self.data["dhcp"] = parse_api(
@@ -847,9 +828,7 @@ class MikrotikControllerData:
                 {"name": "server", "default": "unknown"},
                 {"name": "comment", "default": ""},
             ],
-            ensure_vals=[
-                {"name": "interface"},
-            ],
+            ensure_vals=[{"name": "interface"},],
         )
 
         for uid in self.data["dhcp"]:
