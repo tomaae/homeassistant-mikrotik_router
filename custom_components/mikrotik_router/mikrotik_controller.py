@@ -249,15 +249,25 @@ class MikrotikControllerData:
         except:
             return
 
-        _LOGGER.warning("Running async_hwinfo_update")
-
         await self.hass.async_add_executor_job(self.get_capabilities)
-        await self.hass.async_add_executor_job(self.get_system_routerboard)
-        await self.hass.async_add_executor_job(self.get_system_resource)
-        await self.hass.async_add_executor_job(self.get_script)
-        await self.hass.async_add_executor_job(self.get_dhcp_network)
-        await self.hass.async_add_executor_job(self.get_dns)
-        await self.hass.async_add_executor_job(self.get_queue)
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_system_routerboard)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_system_resource)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_script)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_dhcp_network)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_dns)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_queue)
+
         self.lock.release()
 
     # ---------------------------
@@ -353,28 +363,46 @@ class MikrotikControllerData:
         except:
             return
 
-        if "available" not in self.data["fw-update"]:
+        await self.hass.async_add_executor_job(self.get_interface)
+
+        if self.api.connected() and "available" not in self.data["fw-update"]:
             await self.async_fwupdate_check()
 
-        if not self.data["host_hass"]:
+        if self.api.connected() and not self.data["host_hass"]:
             await self.async_get_host_hass()
 
-        if self.support_capsman:
+        if self.api.connected() and self.support_capsman:
             await self.hass.async_add_executor_job(self.get_capsman_hosts)
 
-        if self.support_wireless:
+        if self.api.connected() and self.support_wireless:
             await self.hass.async_add_executor_job(self.get_wireless_hosts)
 
-        await self.hass.async_add_executor_job(self.get_interface)
-        await self.hass.async_add_executor_job(self.get_bridge)
-        await self.hass.async_add_executor_job(self.get_arp)
-        await self.hass.async_add_executor_job(self.get_dhcp)
-        await self.async_process_host()
-        await self.hass.async_add_executor_job(self.get_interface_traffic)
-        await self.hass.async_add_executor_job(self.process_interface_client)
-        await self.hass.async_add_executor_job(self.get_nat)
-        await self.hass.async_add_executor_job(self.get_system_resource)
-        await self.hass.async_add_executor_job(self.process_accounting)
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_bridge)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_arp)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_dhcp)
+
+        if self.api.connected():
+            await self.async_process_host()
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_interface_traffic)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.process_interface_client)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_nat)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_system_resource)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.process_accounting)
 
         async_dispatcher_send(self.hass, self.signal_update)
         self.lock.release()
