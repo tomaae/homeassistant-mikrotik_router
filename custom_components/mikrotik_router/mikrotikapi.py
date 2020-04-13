@@ -2,7 +2,6 @@
 
 import logging
 import ssl
-import time
 from time import time
 from threading import Lock
 
