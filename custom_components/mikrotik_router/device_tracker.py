@@ -116,6 +116,14 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, tr
         [MikrotikControllerPortDeviceTracker, MikrotikControllerHostDeviceTracker],
     ):
         for uid in mikrotik_controller.data[sid]:
+
+            # No device tracker for wlan
+            if (
+                sid == "interface"
+                and mikrotik_controller.data[sid][uid]["type"] == "wlan"
+            ):
+                continue
+
             if (
                 not config_entry.options.get(CONF_TRACK_HOSTS, DEFAULT_TRACK_HOSTS)
                 and sid == "host"
