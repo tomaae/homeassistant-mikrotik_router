@@ -808,12 +808,7 @@ class MikrotikControllerData:
         dhcpserver_query = False
         for uid in self.data["dhcp"]:
             if not dhcpserver_query and self.data["dhcp"][uid]["server"] not in self.data["dhcp-server"]:
-                self.data["dhcp-server"] = parse_api(
-                    data=self.data["dhcp-server"],
-                    source=self.api.path("/ip/dhcp-server"),
-                    key="name",
-                    vals=[{"name": "name"}, {"name": "interface", "default": "unknown"}, ],
-                )
+                self.get_dhcp_server()
                 dhcpserver_query = True
 
             if self.data["dhcp"][uid]["server"] in self.data["dhcp-server"]:
@@ -829,6 +824,18 @@ class MikrotikControllerData:
                     self.data["dhcp"][uid]["interface"] = self.data["arp"][uid][
                         "interface"
                     ]
+
+    # ---------------------------
+    #   get_dhcp_server
+    # ---------------------------
+    def get_dhcp_server(self):
+        """Get DHCP server data from Mikrotik"""
+        self.data["dhcp-server"] = parse_api(
+            data=self.data["dhcp-server"],
+            source=self.api.path("/ip/dhcp-server"),
+            key="name",
+            vals=[{"name": "name"}, {"name": "interface", "default": "unknown"}, ],
+        )
 
     # ---------------------------
     #   get_dhcp_network
