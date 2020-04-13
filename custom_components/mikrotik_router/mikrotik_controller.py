@@ -811,14 +811,6 @@ class MikrotikControllerData:
                     vals["address"]
                 )
 
-        # TODO: run only on demand
-        self.data["dhcp-server"] = parse_api(
-            data=self.data["dhcp-server"],
-            source=self.api.path("/ip/dhcp-server"),
-            key="name",
-            vals=[{"name": "name"}, {"name": "interface", "default": ""},],
-        )
-
         self.data["dhcp"] = parse_api(
             data=self.data["dhcp"],
             source=self.api.path("/ip/dhcp-server/lease"),
@@ -835,7 +827,18 @@ class MikrotikControllerData:
             ensure_vals=[{"name": "interface", "default": "unknown"},],
         )
 
+        dhcpserver_query = False
         for uid in self.data["dhcp"]:
+            if not dhcpserver_query and self.data["dhcp"][uid]["server"] not in self.data["dhcp-server"]:
+                _LOGGER.error("Query dhcp-server %s", self.data["dhcp-server"])
+                self.data["dhcp-server"] = parse_api(
+                    data=self.data["dhcp-server"],
+                    source=self.api.path("/ip/dhcp-server"),
+                    key="name",
+                    vals=[{"name": "name"}, {"name": "interface", "default": "unknown"}, ],
+                )
+                dhcpserver_query = True
+
             if self.data["dhcp"][uid]["server"] in self.data["dhcp-server"]:
                 self.data["dhcp"][uid]["interface"] = self.data["dhcp-server"][
                     self.data["dhcp"][uid]["server"]
