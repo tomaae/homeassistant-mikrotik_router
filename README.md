@@ -42,6 +42,11 @@ Features:
 ![Host tracker](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/host_tracker.png)
 ![Accounting sensor](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/accounting_sensor.png)
 
+# Install integration
+This integration is distributed using [HACS](https://hacs.xyz/).
+
+You can find it under "Integrations", named "Mikrotik Router"
+
 # Setup integration
 Create user for homeassistant on your mikrotik router with following permissions:
 * read, write, api, test
@@ -52,6 +57,8 @@ or check "Don't Require Permissions" option
 
 Setup this integration for your Mikrotik device in Home Assistant via `Configuration -> Integrations -> Add -> Mikrotik Router`.
 You can add this integration several times for different devices.
+
+NOTE: Do not mistake "Mikrotik Router" integration with HA build-in integration named "Mikrotik".
 
 ![Add Integration](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/setup_integration.png)
 * "Name of the integration" - Friendly name for this router
