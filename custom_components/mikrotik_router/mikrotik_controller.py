@@ -254,6 +254,7 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.get_system_resource)
         await self.hass.async_add_executor_job(self.get_script)
         await self.hass.async_add_executor_job(self.get_dhcp_network)
+        await self.hass.async_add_executor_job(self.get_dns)
         self.lock.release()
 
     # ---------------------------
@@ -361,7 +362,6 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.get_interface)
         await self.hass.async_add_executor_job(self.get_bridge)
         await self.hass.async_add_executor_job(self.get_arp)
-        await self.hass.async_add_executor_job(self.get_dns)
         await self.hass.async_add_executor_job(self.get_dhcp)
         await self.async_process_host()
         await self.hass.async_add_executor_job(self.get_interface_traffic)
@@ -776,7 +776,6 @@ class MikrotikControllerData:
     # ---------------------------
     def get_dns(self):
         """Get static DNS data from Mikrotik"""
-        # TODO: run less often or on demand
         self.data["dns"] = parse_api(
             data=self.data["dns"],
             source=self.api.path("/ip/dns/static"),
