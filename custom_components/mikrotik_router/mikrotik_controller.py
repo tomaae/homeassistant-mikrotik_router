@@ -253,6 +253,7 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.get_system_routerboard)
         await self.hass.async_add_executor_job(self.get_system_resource)
         await self.hass.async_add_executor_job(self.get_script)
+        await self.hass.async_add_executor_job(self.get_dhcp_network)
         self.lock.release()
 
     # ---------------------------
@@ -361,7 +362,6 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.get_bridge)
         await self.hass.async_add_executor_job(self.get_arp)
         await self.hass.async_add_executor_job(self.get_dns)
-        await self.hass.async_add_executor_job(self.get_dhcp_network)
         await self.hass.async_add_executor_job(self.get_dhcp)
         await self.async_process_host()
         await self.hass.async_add_executor_job(self.get_interface_traffic)
@@ -841,8 +841,7 @@ class MikrotikControllerData:
     #   get_dhcp_network
     # ---------------------------
     def get_dhcp_network(self):
-        """Get DHCP data from Mikrotik"""
-        # TODO: run only on demand
+        """Get DHCP network data from Mikrotik"""
         self.data["dhcp-network"] = parse_api(
             data=self.data["dhcp-network"],
             source=self.api.path("/ip/dhcp-server/network"),
