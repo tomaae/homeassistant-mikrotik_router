@@ -48,6 +48,7 @@ class MikrotikAPI:
 
         self._connection = None
         self._connected = False
+        self._reconnected = False
         self._connection_epoch = 0
         self._connection_retry_sec = 58
         self.error = None
@@ -57,6 +58,17 @@ class MikrotikAPI:
         # Default ports
         if not self._port:
             self._port = 8729 if self._use_ssl else 8728
+
+    # ---------------------------
+    #   has_reconnected
+    # ---------------------------
+    def has_reconnected(self) -> bool:
+        """Check if mikrotik has reconnected"""
+        if self._reconnected:
+            self._reconnected = False
+            return True
+
+        return False
 
     # ---------------------------
     #   connection_check
@@ -90,17 +102,18 @@ class MikrotikAPI:
 
             self.connection_error_reported = True
 
+        self._reconnected = False
         self._connected = False
         self._connection = None
         self._connection_epoch = 0
-
+        
     # ---------------------------
     #   connect
     # ---------------------------
     def connect(self) -> bool:
         """Connect to Mikrotik device."""
         self.error = ""
-        self._connected = None
+        self._connected = False
         self._connection_epoch = time()
 
         kwargs = {
@@ -161,6 +174,7 @@ class MikrotikAPI:
                 _LOGGER.debug("Mikrotik Connected to %s", self._host)
 
             self._connected = True
+            self._reconnected = True
             self.lock.release()
 
         return self._connected

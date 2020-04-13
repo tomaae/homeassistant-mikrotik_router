@@ -245,9 +245,11 @@ class MikrotikControllerData:
     async def async_hwinfo_update(self):
         """Update Mikrotik hardware info"""
         try:
-            await asyncio.wait_for(self.lock.acquire(), timeout=10)
+            await asyncio.wait_for(self.lock.acquire(), timeout=30)
         except:
             return
+
+        _LOGGER.warning("Running async_hwinfo_update")
 
         await self.hass.async_add_executor_job(self.get_capabilities)
         await self.hass.async_add_executor_job(self.get_system_routerboard)
@@ -343,6 +345,9 @@ class MikrotikControllerData:
     # ---------------------------
     async def async_update(self):
         """Update Mikrotik data"""
+        if self.api.has_reconnected():
+            await self.async_hwinfo_update()
+
         try:
             await asyncio.wait_for(self.lock.acquire(), timeout=10)
         except:
