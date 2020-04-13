@@ -255,6 +255,7 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.get_script)
         await self.hass.async_add_executor_job(self.get_dhcp_network)
         await self.hass.async_add_executor_job(self.get_dns)
+        await self.hass.async_add_executor_job(self.get_queue)
         self.lock.release()
 
     # ---------------------------
@@ -368,7 +369,6 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.process_interface_client)
         await self.hass.async_add_executor_job(self.get_nat)
         await self.hass.async_add_executor_job(self.get_system_resource)
-        await self.hass.async_add_executor_job(self.get_queue)
         await self.hass.async_add_executor_job(self.process_accounting)
 
         async_dispatcher_send(self.hass, self.signal_update)
@@ -675,7 +675,6 @@ class MikrotikControllerData:
     #   get_queue
     # ---------------------------
     def get_queue(self):
-        # TODO: run less often and on demand
         """Get Queue data from Mikrotik"""
         self.data["queue"] = parse_api(
             data=self.data["queue"],
