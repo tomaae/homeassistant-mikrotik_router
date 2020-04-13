@@ -832,13 +832,23 @@ class MikrotikControllerData:
                 {"name": "server", "default": "unknown"},
                 {"name": "comment", "default": ""},
             ],
-            ensure_vals=[{"name": "interface"},],
+            ensure_vals=[{"name": "interface", "default": "unknown"},],
         )
 
         for uid in self.data["dhcp"]:
-            self.data["dhcp"][uid]["interface"] = self.data["dhcp-server"][
-                self.data["dhcp"][uid]["server"]
-            ]["interface"]
+            if self.data["dhcp"][uid]["server"] in self.data["dhcp-server"]:
+                self.data["dhcp"][uid]["interface"] = self.data["dhcp-server"][
+                    self.data["dhcp"][uid]["server"]
+                ]["interface"]
+            elif uid in self.data["arp"]:
+                if self.data["arp"][uid]["bridge"] != "unknown":
+                    self.data["dhcp"][uid]["interface"] = self.data["arp"][uid][
+                        "bridge"
+                    ]
+                else:
+                    self.data["dhcp"][uid]["interface"] = self.data["arp"][uid][
+                        "interface"
+                    ]
 
     # ---------------------------
     #   get_capsman_hosts
