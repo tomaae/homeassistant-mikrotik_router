@@ -44,6 +44,7 @@ def parse_api(
     data=None,
     source=None,
     key=None,
+    key_secondary=None,
     key_search=None,
     vals=None,
     val_proc=None,
@@ -69,7 +70,7 @@ def parse_api(
 
         uid = None
         if key or key_search:
-            uid = get_uid(entry, key, key_search, keymap)
+            uid = get_uid(entry, key, key_secondary, key_search, keymap)
             if not uid:
                 continue
 
@@ -92,16 +93,27 @@ def parse_api(
 # ---------------------------
 #   get_uid
 # ---------------------------
-def get_uid(entry, key, key_search, keymap) -> Optional(str):
+def get_uid(entry, key, key_secondary, key_search, keymap) -> Optional(str):
     """Get UID for data list"""
+    uid = None
     if not key_search:
+        key_primary_found = True
         if key not in entry:
+            key_primary_found = False
+
+        if key_primary_found and key not in entry and not entry[key]:
             return None
 
-        if not entry[key]:
-            return None
+        if key_primary_found:
+            uid = entry[key]
+        elif key_secondary:
+            if key_secondary not in entry:
+                return None
 
-        uid = entry[key]
+            if not entry[key_secondary]:
+                return None
+
+            uid = entry[key_secondary]
     else:
         if keymap and key_search in entry and entry[key_search] in keymap:
             uid = keymap[entry[key_search]]

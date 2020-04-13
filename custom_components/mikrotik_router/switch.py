@@ -226,6 +226,8 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
         """Turn on the switch."""
         path = "/interface"
         param = "default-name"
+        if "-" in self._data["port-mac-address"]:
+            param = "name"
         value = self._data[param]
         mod_param = "disabled"
         mod_value = False
@@ -236,6 +238,8 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
         """Turn on the switch."""
         path = "/interface"
         param = "default-name"
+        if "-" in self._data["port-mac-address"]:
+            param = "name"
         value = self._data[param]
         mod_param = "disabled"
         mod_value = True

@@ -416,6 +416,7 @@ class MikrotikControllerData:
             data=self.data["interface"],
             source=self.api.path("/interface"),
             key="default-name",
+            key_secondary="name",
             vals=[
                 {"name": "default-name"},
                 {"name": "name", "default_val": "default-name"},
@@ -441,7 +442,16 @@ class MikrotikControllerData:
                 {"name": "rx-bits-per-second", "default": 0},
                 {"name": "tx-bits-per-second", "default": 0},
             ],
+            skip=[{"name": "type", "value": "bridge"}],
         )
+
+        # Udpate virtual interfaces
+        for uid, vals in self.data["interface"].items():
+            if vals["default-name"] == "":
+                self.data["interface"][uid]["default-name"] = vals["name"]
+                self.data["interface"][uid][
+                    "port-mac-address"
+                ] = f"{vals['port-mac-address']}-{vals['name']}"
 
     # ---------------------------
     #   get_interface_traffic
