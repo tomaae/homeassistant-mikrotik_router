@@ -8,12 +8,6 @@ jobs:
     name: Label Issue
     runs-on: ubuntu-latest
     steps:
-      - name: help wanted
-        uses: Naturalclar/issue-action@v1.0.0
-        with:
-          keywords: '["help", "wanted"]'
-          labels: '["help wanted"]'
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
       - name: bug
         uses: Naturalclar/issue-action@v1.0.0
         with:
