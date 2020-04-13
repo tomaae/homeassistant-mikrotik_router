@@ -361,6 +361,7 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.get_bridge)
         await self.hass.async_add_executor_job(self.get_arp)
         await self.hass.async_add_executor_job(self.get_dns)
+        await self.hass.async_add_executor_job(self.get_dhcp_network)
         await self.hass.async_add_executor_job(self.get_dhcp)
         await self.async_process_host()
         await self.hass.async_add_executor_job(self.get_interface_traffic)
@@ -788,27 +789,6 @@ class MikrotikControllerData:
     # ---------------------------
     def get_dhcp(self):
         """Get DHCP data from Mikrotik"""
-        # TODO: run only on demand
-        self.data["dhcp-network"] = parse_api(
-            data=self.data["dhcp-network"],
-            source=self.api.path("/ip/dhcp-server/network"),
-            key="address",
-            vals=[
-                {"name": "address"},
-                {"name": "gateway", "default": ""},
-                {"name": "netmask", "default": ""},
-                {"name": "dns-server", "default": ""},
-                {"name": "domain", "default": ""},
-            ],
-            ensure_vals=[{"name": "address"}, {"name": "IPv4Network", "default": ""},],
-        )
-
-        for uid, vals in self.data["dhcp-network"].items():
-            if vals["IPv4Network"] == "":
-                self.data["dhcp-network"][uid]["IPv4Network"] = IPv4Network(
-                    vals["address"]
-                )
-
         self.data["dhcp"] = parse_api(
             data=self.data["dhcp"],
             source=self.api.path("/ip/dhcp-server/lease"),
@@ -849,6 +829,32 @@ class MikrotikControllerData:
                     self.data["dhcp"][uid]["interface"] = self.data["arp"][uid][
                         "interface"
                     ]
+
+    # ---------------------------
+    #   get_dhcp_network
+    # ---------------------------
+    def get_dhcp_network(self):
+        """Get DHCP data from Mikrotik"""
+        # TODO: run only on demand
+        self.data["dhcp-network"] = parse_api(
+            data=self.data["dhcp-network"],
+            source=self.api.path("/ip/dhcp-server/network"),
+            key="address",
+            vals=[
+                {"name": "address"},
+                {"name": "gateway", "default": ""},
+                {"name": "netmask", "default": ""},
+                {"name": "dns-server", "default": ""},
+                {"name": "domain", "default": ""},
+            ],
+            ensure_vals=[{"name": "address"}, {"name": "IPv4Network", "default": ""},],
+        )
+
+        for uid, vals in self.data["dhcp-network"].items():
+            if vals["IPv4Network"] == "":
+                self.data["dhcp-network"][uid]["IPv4Network"] = IPv4Network(
+                    vals["address"]
+                )
 
     # ---------------------------
     #   get_capsman_hosts
