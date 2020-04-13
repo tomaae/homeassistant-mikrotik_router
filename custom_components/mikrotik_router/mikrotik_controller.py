@@ -252,6 +252,7 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.get_capabilities)
         await self.hass.async_add_executor_job(self.get_system_routerboard)
         await self.hass.async_add_executor_job(self.get_system_resource)
+        await self.hass.async_add_executor_job(self.get_script)
         self.lock.release()
 
     # ---------------------------
@@ -366,7 +367,6 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.process_interface_client)
         await self.hass.async_add_executor_job(self.get_nat)
         await self.hass.async_add_executor_job(self.get_system_resource)
-        await self.hass.async_add_executor_job(self.get_script)
         await self.hass.async_add_executor_job(self.get_queue)
         await self.hass.async_add_executor_job(self.process_accounting)
 
@@ -568,7 +568,6 @@ class MikrotikControllerData:
     #   get_system_routerboard
     # ---------------------------
     def get_system_routerboard(self):
-        # TODO: run only when firmware update changes from available to not available
         """Get routerboard data from Mikrotik"""
         self.data["routerboard"] = parse_api(
             data=self.data["routerboard"],
@@ -659,7 +658,6 @@ class MikrotikControllerData:
     #   get_script
     # ---------------------------
     def get_script(self):
-        # TODO: run less often
         """Get list of all scripts from Mikrotik"""
         self.data["script"] = parse_api(
             data=self.data["script"],
