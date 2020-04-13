@@ -106,7 +106,7 @@ class MikrotikAPI:
         self._connected = False
         self._connection = None
         self._connection_epoch = 0
-        
+
     # ---------------------------
     #   connect
     # ---------------------------
