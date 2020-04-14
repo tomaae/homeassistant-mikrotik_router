@@ -70,6 +70,8 @@ def get_integration_commits(github, skip=True):
                 continue
             if " workflow" in msg:
                 continue
+            if " test" in msg:
+                continue
             if "docs" in msg:
                 continue
             if "dev debug" in msg:

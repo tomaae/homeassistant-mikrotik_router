@@ -30,6 +30,7 @@ from .const import (
     CONF_SCAN_INTERVAL,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_UNIT_OF_MEASUREMENT,
+    CONF_TRACK_HOSTS_TIMEOUT,
 )
 from .exceptions import ApiEntryNotFound
 from .helper import parse_api
