@@ -1,0 +1,96 @@
+{
+    "config": {
+        "title": {
+            "translation": "Mikrotik Router",
+            "notes": ""
+        },
+        "step": {
+            "user": {
+                "title": {
+                    "translation": "Mikrotik Router",
+                    "notes": ""
+                },
+                "description": {
+                    "translation": "Nastaviť integráciu Mikrotik Router.",
+                    "notes": ""
+                },
+                "data": {
+                    "name": {
+                        "translation": "Názov integrácie",
+                        "notes": ""
+                    },
+                    "host": {
+                        "translation": "Zariadenie",
+                        "notes": ""
+                    },
+                    "port": {
+                        "translation": "Port",
+                        "notes": ""
+                    },
+                    "username": {
+                        "translation": "Meno užívateľa",
+                        "notes": ""
+                    },
+                    "password": {
+                        "translation": "Heslo",
+                        "notes": ""
+                    },
+                    "ssl": {
+                        "translation": "Použiť SSL",
+                        "notes": ""
+                    }
+                }
+            }
+        },
+        "error": {
+            "name_exists": {
+                "translation": "Meno už existuje.",
+                "notes": ""
+            },
+            "cannot_connect": {
+                "translation": "Nedá sa pripojiť k Mikrotiku.",
+                "notes": ""
+            },
+            "ssl_handshake_failure": {
+                "translation": "Zlyhanie nadviazania spojenia SSL.",
+                "notes": ""
+            },
+            "connection_timeout": {
+                "translation": "Časový limit pripojenia vypršal.",
+                "notes": ""
+            },
+            "wrong_login": {
+                "translation": "Nesprávne užívateľské meno alebo heslo.",
+                "notes": ""
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "device_tracker": {
+                "data": {
+                    "scan_interval": {
+                        "translation": "Interval skenovania (vyžaduje sa reštart HA)",
+                        "notes": ""
+                    },
+                    "track_iface_clients": {
+                        "translation": "Zobraziť klientske MAC a IP na rozhraniach",
+                        "notes": ""
+                    },
+                    "unit_of_measurement": {
+                        "translation": "Merná jednotka",
+                        "notes": ""
+                    },
+                    "track_network_hosts": {
+                        "translation": "Sledovanie sieťových zariadení",
+                        "notes": ""
+                    },
+                    "track_network_hosts_timeout": {
+                        "translation": "Časový limit sledovania sieťových zariadení (sekundy)",
+                        "notes": ""
+                    }
+                }
+            }
+        }
+    }
+}
