@@ -1,0 +1,96 @@
+{
+    "config": {
+        "title": {
+            "translation": "Mikrotik Router",
+            "notes": ""
+        },
+        "step": {
+            "user": {
+                "title": {
+                    "translation": "Mikrotik Router",
+                    "notes": ""
+                },
+                "description": {
+                    "translation": "Set up Mikrotik Router integration.",
+                    "notes": ""
+                },
+                "data": {
+                    "name": {
+                        "translation": "Name of the integration",
+                        "notes": ""
+                    },
+                    "host": {
+                        "translation": "Host",
+                        "notes": ""
+                    },
+                    "port": {
+                        "translation": "Port",
+                        "notes": ""
+                    },
+                    "username": {
+                        "translation": "Username",
+                        "notes": ""
+                    },
+                    "password": {
+                        "translation": "Password",
+                        "notes": ""
+                    },
+                    "ssl": {
+                        "translation": "Use SSL",
+                        "notes": ""
+                    }
+                }
+            }
+        },
+        "error": {
+            "name_exists": {
+                "translation": "Name already exists.",
+                "notes": ""
+            },
+            "cannot_connect": {
+                "translation": "Cannot connect to Mikrotik.",
+                "notes": ""
+            },
+            "ssl_handshake_failure": {
+                "translation": "SSL handshake failure",
+                "notes": ""
+            },
+            "connection_timeout": {
+                "translation": "Mikrotik connection timeout.",
+                "notes": ""
+            },
+            "wrong_login": {
+                "translation": "Invalid user name or password.",
+                "notes": ""
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "device_tracker": {
+                "data": {
+                    "scan_interval": {
+                        "translation": "Scan interval (requires HA restart)",
+                        "notes": ""
+                    },
+                    "track_iface_clients": {
+                        "translation": "Show client MAC and IP on interfaces",
+                        "notes": ""
+                    },
+                    "unit_of_measurement": {
+                        "translation": "Unit of measurement",
+                        "notes": ""
+                    },
+                    "track_network_hosts": {
+                        "translation": "Track network devices",
+                        "notes": ""
+                    },
+                    "track_network_hosts_timeout": {
+                        "translation": "Track network devices timeout (seconds)",
+                        "notes": ""
+                    }
+                }
+            }
+        }
+    }
+}
