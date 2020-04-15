@@ -1,0 +1,96 @@
+{
+    "config": {
+        "title": {
+            "translation": "Роутер Mikrotik",
+            "notes": ""
+        },
+        "step": {
+            "user": {
+                "title": {
+                    "translation": "Роутер Mikrotik",
+                    "notes": ""
+                },
+                "description": {
+                    "translation": "Настройка интеграции роутера Mikrotik.",
+                    "notes": ""
+                },
+                "data": {
+                    "name": {
+                        "translation": "Название интеграции",
+                        "notes": ""
+                    },
+                    "host": {
+                        "translation": "Хост",
+                        "notes": ""
+                    },
+                    "port": {
+                        "translation": "Порт",
+                        "notes": ""
+                    },
+                    "username": {
+                        "translation": "Имя пользователя",
+                        "notes": ""
+                    },
+                    "password": {
+                        "translation": "Пароль",
+                        "notes": ""
+                    },
+                    "ssl": {
+                        "translation": "Использовать SSL",
+                        "notes": ""
+                    }
+                }
+            }
+        },
+        "error": {
+            "name_exists": {
+                "translation": "Имя уже используется.",
+                "notes": ""
+            },
+            "cannot_connect": {
+                "translation": "Нет связи с Mikrotik.",
+                "notes": ""
+            },
+            "ssl_handshake_failure": {
+                "translation": "Ошибка SSL-соединения",
+                "notes": ""
+            },
+            "connection_timeout": {
+                "translation": "Таймаут подключения к Mikrotik.",
+                "notes": ""
+            },
+            "wrong_login": {
+                "translation": "Неверные имя пользователя или пароль.",
+                "notes": ""
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "device_tracker": {
+                "data": {
+                    "scan_interval": {
+                        "translation": "Период сканирования (требуется перезагрузка HA)",
+                        "notes": ""
+                    },
+                    "track_iface_clients": {
+                        "translation": "Показывать в интерфейсе MAC и IP клиентов",
+                        "notes": ""
+                    },
+                    "unit_of_measurement": {
+                        "translation": "Единицы измерения",
+                        "notes": ""
+                    },
+                    "track_network_hosts": {
+                        "translation": "",
+                        "notes": ""
+                    },
+                    "track_network_hosts_timeout": {
+                        "translation": "",
+                        "notes": ""
+                    }
+                }
+            }
+        }
+    }
+}
