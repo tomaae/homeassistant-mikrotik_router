@@ -6,6 +6,50 @@ on:
 
 jobs:
 
+  release_zip:
+    name: Prepare release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Download Lokalise CLI
+        run: |
+          curl -sSL \
+            "https://s3-eu-west-1.amazonaws.com/lokalise-assets/cli/lokalise-0.721-linux-amd64.tgz" \
+            -o ./lokalise.tgz
+          tar -xvzf ./lokalise.tgz
+
+      - name: Downloading translations
+        run: |
+          ./lokalise \
+              --token "${{ secrets.LOKALISE_TOKEN }}" \
+              export "581188395e9778a6060128.17699416" \
+              --type json \
+              --unzip_to  /tmp/lokalise \
+              --filter last_reviewed_only \
+              --export_empty skip \
+              --export_sort a_z
+
+      - name: Move new translations
+        run: |
+          mkdir -p /home/runner/work/homeassistant-mikrotik_router/homeassistant-mikrotik_router/custom_components/mikrotik_router/.translations/
+          cp /tmp/lokalise/locale/* /home/runner/work/homeassistant-mikrotik_router/homeassistant-mikrotik_router/custom_components/mikrotik_router/.translations/
+
+      - name: Zip mikrotik_router dir
+        run: |
+          cd /home/runner/work/homeassistant-mikrotik_router/homeassistant-mikrotik_router/custom_components/mikrotik_router
+          zip mikrotik_router.zip -r ./
+      - name: Upload zip to release
+        uses: svenstaro/upload-release-action@v1-release
+
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: /home/runner/work/homeassistant-mikrotik_router/homeassistant-mikrotik_router/custom_components/mikrotik_router/mikrotik_router.zip
+          asset_name: mikrotik_router.zip
+          tag: ${{ github.ref }}
+          overwrite: true
+
   releasenotes:
     name: Prepare releasenotes
     runs-on: ubuntu-latest

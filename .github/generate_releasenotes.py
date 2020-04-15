@@ -25,6 +25,7 @@ import sys
 from github import Github
 
 BODY = """
+[![Downloads for this release](https://img.shields.io/github/downloads/tomaae/homeassistant-mikrotik_router/{version}/total.svg)](https://github.com/tomaae/homeassistant-mikrotik_router/releases/{version})
 
 {changes}
 """
