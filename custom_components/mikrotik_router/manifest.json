@@ -2,6 +2,11 @@
     "domain": "mikrotik_router",
     "name": "Mikrotik Router",
     "config_flow": true,
+    "ssdp": [
+        {
+            "st": "urn:schemas-upnp-org:device:InternetGatewayDevice:1"
+        }
+    ],
     "documentation": "https://github.com/tomaae/homeassistant-mikrotik_router",
     "dependencies": [],
     "requirements": [

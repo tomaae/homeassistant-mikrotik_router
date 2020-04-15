@@ -11,7 +11,7 @@
                     "port": "Port",
                     "username": "Meno užívateľa",
                     "password": "Heslo",
-                    "ssl": "Použiť SSL",
+                    "ssl": "Použiť SSL"
                 }
             }
         },
