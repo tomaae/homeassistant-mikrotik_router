@@ -1,0 +1,96 @@
+{
+    "config": {
+        "title": {
+            "translation": "Mikrotik Router",
+            "notes": ""
+        },
+        "step": {
+            "user": {
+                "title": {
+                    "translation": "Mikrotik Router",
+                    "notes": ""
+                },
+                "description": {
+                    "translation": "Nastavte integraci Mikrotik Router.",
+                    "notes": ""
+                },
+                "data": {
+                    "name": {
+                        "translation": "Název integrace",
+                        "notes": ""
+                    },
+                    "host": {
+                        "translation": "Zařízení",
+                        "notes": ""
+                    },
+                    "port": {
+                        "translation": "Port",
+                        "notes": ""
+                    },
+                    "username": {
+                        "translation": "Jméno",
+                        "notes": ""
+                    },
+                    "password": {
+                        "translation": "Heslo",
+                        "notes": ""
+                    },
+                    "ssl": {
+                        "translation": "Použití SSL",
+                        "notes": ""
+                    }
+                }
+            }
+        },
+        "error": {
+            "name_exists": {
+                "translation": "Název již existuje.",
+                "notes": ""
+            },
+            "cannot_connect": {
+                "translation": "Nelze se připojit k Mikrotiku.",
+                "notes": ""
+            },
+            "ssl_handshake_failure": {
+                "translation": "Selhání handshake SSL",
+                "notes": ""
+            },
+            "connection_timeout": {
+                "translation": "Časový limit připojení vypršel.",
+                "notes": ""
+            },
+            "wrong_login": {
+                "translation": "Neplatné uživatelské jméno nebo heslo.",
+                "notes": ""
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "device_tracker": {
+                "data": {
+                    "scan_interval": {
+                        "translation": "Interval skenování (vyžaduje restartování HA)",
+                        "notes": ""
+                    },
+                    "track_iface_clients": {
+                        "translation": "Zobrazit klientské MAC a IP na rozhraních",
+                        "notes": ""
+                    },
+                    "unit_of_measurement": {
+                        "translation": "Jednotka měření",
+                        "notes": ""
+                    },
+                    "track_network_hosts": {
+                        "translation": "Sledování síťových zařízení",
+                        "notes": ""
+                    },
+                    "track_network_hosts_timeout": {
+                        "translation": "Časový limit sledování síťových zařízení (v sekundách)",
+                        "notes": ""
+                    }
+                }
+            }
+        }
+    }
+}
