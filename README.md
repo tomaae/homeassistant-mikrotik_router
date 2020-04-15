@@ -82,7 +82,15 @@ Feature will be automatically used if accounting is enabled in Mikrotik. Feature
 
 Integration will scan DHCP Lease table and ARP table to generate all known hosts. For every host aleast two sensors for WAN traffic (mikrotik-XXX-wan-rx and mikrotik-XXX-wan-tx) are created. If the parameter *account-local-traffic* is set in Mikrotik's accounting configuration it will also create two sensors for LAN traffic (mikrotik-XXX-lan-rx and mikrotik-XXX-lan-tx).
 
-## Enabling debug
+## Development
+
+### Translation
+To help out with the translation you need an account on Lokalise, the easiest way to get one is to [click here](https://lokalise.com/login/) then select "Log in with GitHub".
+After you have created your account [click here to join Mikrotik Router project on Lokalise](https://app.lokalise.com/public/581188395e9778a6060128.17699416/)
+
+If you want to add translations for a language that is not listed please [open a Feature request](https://github.com/tomaae/homeassistant-mikrotik_router/issues/new?labels=enhancement&title=%5BLokalise%5D%20Add%20new%20translations%20language)
+
+### Enabling debug
 To enable debug for Mikrotik router integration, add following to your configuration.yaml:
 ```
 logger:
