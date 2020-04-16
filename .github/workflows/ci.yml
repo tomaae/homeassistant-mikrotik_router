@@ -50,6 +50,7 @@ jobs:
         pytest
   sonarcloud:
     name: SonarCloud
+    needs: [black, tests]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
