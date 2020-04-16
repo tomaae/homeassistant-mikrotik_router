@@ -6,9 +6,7 @@ on:
       - dev
       - master
   pull_request:
-    branches:
-      - dev
-      - master
+    types: [opened, synchronize, reopened]
 
 jobs:
   black:
