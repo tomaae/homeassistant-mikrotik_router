@@ -2,11 +2,14 @@ name: CI
 
 on:
   push:
-    branches:
-      - dev
-      - master
+    paths:
+      - 'custom_components/**'
+      - 'tests/**'
   pull_request:
     types: [opened, synchronize, reopened]
+    paths:
+      - 'custom_components/**'
+      - 'tests/**'
 
 jobs:
   black:
