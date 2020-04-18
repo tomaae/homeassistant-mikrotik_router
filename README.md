@@ -18,6 +18,7 @@ Features:
    * IP, MAC, Link information per interface for connected devices
  * Enable/disable NAT rule switches
  * Enable/disable Simple Queue switches
+ * Mikrotik Accounting traffic sensors per hosts for RX/TX WAN/LAN
  * Device tracker for hosts in network
  * System sensors (CPU, Memory, HDD)
  * Check firmware update
@@ -25,8 +26,7 @@ Features:
  * Configurable update interval
  * Configurable traffic unit (bps, Kbps, Mbps, B/s, KB/s, MB/s)
  * Supports monitoring of multiple mikrotik devices simultaneously
- * RX/TX WAN/LAN traffic sensors per hosts from Mikrotik Accounting feature
- 
+
 # Integration preview
 ![Tracker and sensors](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/device_tracker.png)
 
@@ -69,7 +69,7 @@ NOTE: Do not mistake "Mikrotik Router" integration with HA build-in integration 
 ![Integration options](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/integration_options.png)
 * "Scan interval" - Scan/refresh time in seconds. HA needs to be reloaded for scan interval change to be applied.
 * "Unit of measurement" - Traffic sensor measurement (bps, Kbps, Mbps, B/s, KB/s, MB/s)
-* "Show client MAC and IP on interfaces" - Display connected IP and MAC address for devices connected to ports on router.
+* "Show client MAC and IP on interfaces" - Display connected IP and MAC address for devices connected to ports on router
 * "Track network devices" - Enable device tracker
 * "Track network devices timeout" - Tracked devices will be marked as away after timeout (does not apply to Mikrotik wireless and caps-man)
 
@@ -86,7 +86,7 @@ Integration will scan DHCP Lease table and ARP table to generate all known hosts
 
 ### Translation
 To help out with the translation you need an account on Lokalise, the easiest way to get one is to [click here](https://lokalise.com/login/) then select "Log in with GitHub".
-After you have created your account [click here to join Mikrotik Router project on Lokalise](https://app.lokalise.com/public/581188395e9778a6060128.17699416/)
+After you have created your account [click here to join Mikrotik Router project on Lokalise](https://app.lokalise.com/public/581188395e9778a6060128.17699416/).
 
 If you want to add translations for a language that is not listed please [open a Feature request](https://github.com/tomaae/homeassistant-mikrotik_router/issues/new?labels=enhancement&title=%5BLokalise%5D%20Add%20new%20translations%20language)
 
