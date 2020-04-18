@@ -2,7 +2,13 @@ name: Validate with hassfest
 
 on:
   push:
+    paths:
+      - 'custom_components/**'
+      - 'tests/**'
   pull_request:
+    paths:
+      - 'custom_components/**'
+      - 'tests/**'
   schedule:
     - cron:  '0 0 * * *'
 
