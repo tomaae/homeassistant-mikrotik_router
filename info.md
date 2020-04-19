@@ -1,3 +1,9 @@
+{% if installed %}
+{% if version_installed.replace("v", "").replace(".","") | int < 15  %}
+**IMPORTANT: Integration needs to be re-added to take advantage of all new features.**
+{% endif %}
+{% endif %}
+
 Monitor and control your Mikrotik device from Home Assistant.
 
 ![Mikrotik Logo](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/header.png)
