@@ -7,26 +7,48 @@ assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## Describe the issue
+<!--
+A clear and concise description of what the issue is.
+-->
 
-**To Reproduce**
+
+## How to reproduce the issue
+<!--
 Steps to reproduce the behavior:
 1. Go to '...'
 2. Click on '....'
 3. See error
+-->
 
-**Expected behavior**
+
+## Expected behavior
+<!--
 A clear and concise description of what you expected to happen.
+-->
 
-**Screenshots**
+
+## Screenshots
+<!--
 If applicable, add screenshots to help explain your problem.
+-->
 
-**Software (please complete the following information):**
- - Hass.io / Home Assistant version: [e.g. Hassio v192/ HA v0.102.3]
- - HA Mikrotik Router integration version: [e.g. v1.0.0]
- - Mikrotik Hardware: [e.g. RB4011iGS+]
- - Mikrotik Software version: [e.g. v6.45]
+## Software versions
+<!--
+All fields in this sections are required.
+-->
+ - Home Assistant version: <!-- e.g. HA v0.108.3 -->
+ - Mikrotik Router integration version: <!-- e.g. v1.0.0 -->
+ - Mikrotik Hardware: <!-- e.g. RB4011iGS+ -->
+ - RouterOS version: <!-- e.g. v6.45 -->
 
-**Additional context**
+## Traceback/Error logs
+<!--
+  If you come across any trace or error logs, please provide them.
+-->
+
+
+## Additional context
+<!--
 Add any other context about the problem here.
+-->
