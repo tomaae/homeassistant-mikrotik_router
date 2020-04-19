@@ -3,7 +3,6 @@
     "homeassistant": "0.102.0",
     "iot_class": "local_poll",
     "domains": ["device_tracker", "switch", "sensor", "binary_sensor"],
-    "render_readme": true,
     "zip_release": true,
     "filename": "mikrotik_router.zip"
 }
