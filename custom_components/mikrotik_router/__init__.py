@@ -5,7 +5,6 @@ import voluptuous as vol
 
 import homeassistant.helpers.config_validation as cv
 from homeassistant.exceptions import ConfigEntryNotReady
-from homeassistant.const import CONF_NAME
 from .const import (
     DOMAIN,
     DATA_CLIENT,
@@ -15,7 +14,9 @@ from .mikrotik_controller import MikrotikControllerData
 
 _LOGGER = logging.getLogger(__name__)
 
-SCRIPT_SCHEMA = vol.Schema({vol.Required(CONF_NAME): cv.string})
+SCRIPT_SCHEMA = vol.Schema(
+    {vol.Required("router"): cv.string, vol.Required("script"): cv.string}
+)
 
 
 # ---------------------------
