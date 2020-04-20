@@ -1,0 +1,6 @@
+run_script:
+  description: Run script on Mikrotik
+  fields:
+    name:
+      description: Name of the script
+      example: "MyScript"
