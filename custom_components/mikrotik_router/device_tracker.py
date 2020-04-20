@@ -167,10 +167,10 @@ class MikrotikControllerDeviceTracker(ScannerEntity):
 
     def __init__(self, inst, uid, mikrotik_controller, config_entry, sid_data):
         """Set up a device tracker."""
-        self.sid_data = sid_data
+        self._sid_data = sid_data
         self._inst = inst
         self._ctrl = mikrotik_controller
-        self._data = mikrotik_controller.data[self.sid_data["sid"]][uid]
+        self._data = mikrotik_controller.data[self._sid_data["sid"]][uid]
         self._config_entry = config_entry
 
         self._attrs = {
@@ -187,8 +187,8 @@ class MikrotikControllerDeviceTracker(ScannerEntity):
         _LOGGER.debug(
             "New device tracker %s (%s %s)",
             self._inst,
-            self.sid_data["sid"],
-            self._data[self.sid_data["sid_uid"]],
+            self._sid_data["sid"],
+            self._data[self._sid_data["sid_uid"]],
         )
 
     async def async_update(self):
@@ -202,15 +202,15 @@ class MikrotikControllerDeviceTracker(ScannerEntity):
     @property
     def name(self):
         """Return the name of the port."""
-        if self.sid_data["sid"] == "interface":
-            return f"{self._inst} {self._data[self.sid_data['sid_name']]}"
+        if self._sid_data["sid"] == "interface":
+            return f"{self._inst} {self._data[self._sid_data['sid_name']]}"
 
-        return f"{self._data[self.sid_data['sid_name']]}"
+        return f"{self._data[self._sid_data['sid_name']]}"
 
     @property
     def unique_id(self):
         """Return a unique identifier for this port."""
-        return f"{self._inst.lower()}-{self.sid_data['sid']}-{self._data[self.sid_data['sid_ref']]}"
+        return f"{self._inst.lower()}-{self._sid_data['sid']}-{self._data[self._sid_data['sid_ref']]}"
 
     @property
     def available(self) -> bool:
@@ -222,11 +222,11 @@ class MikrotikControllerDeviceTracker(ScannerEntity):
         """Return a description for device registry."""
         info = {
             "connections": {
-                (CONNECTION_NETWORK_MAC, self._data[self.sid_data["sid_ref"]])
+                (CONNECTION_NETWORK_MAC, self._data[self._sid_data["sid_ref"]])
             },
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
-            "name": f"{self._inst} {self._data[self.sid_data['sid_name']]}",
+            "name": f"{self._inst} {self._data[self._sid_data['sid_name']]}",
         }
         return info
 
