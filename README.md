@@ -36,7 +36,7 @@ Monitor and control your Mikrotik device from Home Assistant.
  * Device tracker for hosts in network
  * System sensors (CPU, Memory, HDD)
  * Check firmware update
- * Execute scripts
+ * Execute scripts using switches or services
  * Configurable update interval
  * Configurable traffic unit (bps, Kbps, Mbps, B/s, KB/s, MB/s)
  * Supports monitoring of multiple mikrotik devices simultaneously
@@ -74,6 +74,7 @@ NOTE: Host Tracking is disabled by default and has to be enabled in integration 
 
 ## Scripts
 Execute Mikrotik Router scripts.
+You can execute scripts by automatically created switches or using services.
 
 ![Script Switch](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/script_switch.png)
 
