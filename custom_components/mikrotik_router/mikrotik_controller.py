@@ -193,6 +193,18 @@ class MikrotikControllerData:
     # ---------------------------
     def run_script(self, name):
         """Run script using Mikrotik API"""
+        if type(name) != str:
+            if "router" not in name.data:
+                return
+
+            if self.config_entry.data["name"] != name.data.get("router"):
+                return
+
+            if "script" in name.data:
+                name = name.data.get("script")
+            else:
+                return
+
         try:
             self.api.run_script(name)
         except ApiEntryNotFound as error:

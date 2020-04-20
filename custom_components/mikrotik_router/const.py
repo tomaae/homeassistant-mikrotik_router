@@ -5,6 +5,8 @@ DEFAULT_NAME = "Mikrotik Router"
 DATA_CLIENT = "client"
 ATTRIBUTION = "Data provided by Mikrotik"
 
+RUN_SCRIPT_COMMAND = "run_script"
+
 DEFAULT_ENCODING = "ISO-8859-1"
 DEFAULT_LOGIN_METHOD = "plain"
 
