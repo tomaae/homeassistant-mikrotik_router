@@ -325,6 +325,7 @@ class MikrotikAPI:
         if response is None:
             return False
 
+        self.lock.acquire()
         for tmp in response:
             if "name" not in tmp:
                 continue
@@ -333,7 +334,6 @@ class MikrotikAPI:
                 continue
 
             entry_found = True
-            self.lock.acquire()
             try:
                 run = response("run", **{".id": tmp[".id"]})
                 tuple(run)
