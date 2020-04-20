@@ -185,7 +185,6 @@ def update_items(inst, mikrotik_controller, async_add_entities, sensors):
 
         if "accounting_" in sensor:
             for uid in mikrotik_controller.data["accounting"]:
-
                 item_id = f"{inst}-{sensor}-{mikrotik_controller.data['accounting'][uid]['mac-address']}"
                 if item_id in sensors:
                     if sensors[item_id].enabled:
@@ -366,7 +365,7 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
     @property
     def name(self):
         """Return the name."""
-        return f"{self._data['host-name']} {self._type[ATTR_LABEL]} "
+        return f"{self._data['host-name']} {self._type[ATTR_LABEL]}"
 
     @property
     def unique_id(self):
