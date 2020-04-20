@@ -104,8 +104,23 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
     new_switches = []
 
     # Add switches
-    for sid, sid_func in zip(
+    for sid, sid_uid, sid_name, sid_ref, sid_attr, sid_func in zip(
+        # Data point name
         ["interface", "nat", "script", "queue"],
+        # Data point unique id
+        ["name", "name", "name", "name"],
+        # Entry Name
+        ["name", "name", "name", "name"],
+        # Entry Unique id
+        ["port-mac-address", "name", "name", "name"],
+        # Attr
+        [
+            DEVICE_ATTRIBUTES_IFACE,
+            DEVICE_ATTRIBUTES_NAT,
+            DEVICE_ATTRIBUTES_SCRIPT,
+            DEVICE_ATTRIBUTES_QUEUE,
+        ],
+        # Switch function
         [
             MikrotikControllerPortSwitch,
             MikrotikControllerNATSwitch,
@@ -114,14 +129,22 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
         ],
     ):
         for uid in mikrotik_controller.data[sid]:
-            item_id = f"{inst}-{sid}-{mikrotik_controller.data[sid][uid]['name']}"
+            item_id = f"{inst}-{sid}-{mikrotik_controller.data[sid][uid][sid_uid]}"
             _LOGGER.debug("Updating switch %s", item_id)
             if item_id in switches:
                 if switches[item_id].enabled:
                     switches[item_id].async_schedule_update_ha_state()
                 continue
 
-            switches[item_id] = sid_func(inst, uid, mikrotik_controller)
+            # Create new entity
+            sid_data = {
+                "sid": sid,
+                "sid_uid": sid_uid,
+                "sid_name": sid_name,
+                "sid_ref": sid_ref,
+                "sid_attr": sid_attr,
+            }
+            switches[item_id] = sid_func(inst, uid, mikrotik_controller, sid_data)
             new_switches.append(switches[item_id])
 
     if new_switches:
@@ -134,15 +157,25 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
 class MikrotikControllerSwitch(SwitchDevice, RestoreEntity):
     """Representation of a switch."""
 
-    def __init__(self, inst, uid, mikrotik_controller):
+    def __init__(self, inst, uid, mikrotik_controller, sid_data):
         """Set up switch."""
+        self._sid_data = sid_data
         self._inst = inst
-        self._uid = uid
         self._ctrl = mikrotik_controller
+        self._data = mikrotik_controller.data[self._sid_data["sid"]][uid]
+
+        self._attrs = {
+            ATTR_ATTRIBUTION: ATTRIBUTION,
+        }
 
     async def async_added_to_hass(self):
-        """Switch entity created."""
-        _LOGGER.debug("New switch %s (%s)", self._inst, self._uid)
+        """Device tracker entity created."""
+        _LOGGER.debug(
+            "New switch %s (%s %s)",
+            self._inst,
+            self._sid_data["sid"],
+            self._data[self._sid_data["sid_uid"]],
+        )
 
     async def async_update(self):
         """Synchronize state with controller."""
@@ -152,6 +185,32 @@ class MikrotikControllerSwitch(SwitchDevice, RestoreEntity):
         """Return if controller is available."""
         return self._ctrl.connected()
 
+    @property
+    def name(self) -> str:
+        """Return the name of the port."""
+        return f"{self._inst} {self._sid_data['sid']} {self._data[self._sid_data['sid_name']]}"
+
+    @property
+    def unique_id(self) -> str:
+        """Return a unique identifier for this port."""
+        return f"{self._inst.lower()}-{self._sid_data['sid']}_switch-{self._data[self._sid_data['sid_ref']]}"
+
+    @property
+    def is_on(self):
+        """Return true if the queue is on."""
+        return self._data["enabled"]
+
+    @property
+    def device_state_attributes(self):
+        """Return the port state attributes."""
+        attributes = self._attrs
+
+        for variable in self._sid_data["sid_attr"]:
+            if variable in self._data:
+                attributes[format_attribute(variable)] = self._data[variable]
+
+        return attributes
+
 
 # ---------------------------
 #   MikrotikControllerPortSwitch
@@ -159,28 +218,14 @@ class MikrotikControllerSwitch(SwitchDevice, RestoreEntity):
 class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
     """Representation of a network port switch."""
 
-    def __init__(self, inst, uid, mikrotik_controller):
+    def __init__(self, inst, uid, mikrotik_controller, sid_data):
         """Set up tracked port."""
-        super().__init__(inst, uid, mikrotik_controller)
-
-        self._data = mikrotik_controller.data["interface"][self._uid]
-        self._attrs = {
-            ATTR_ATTRIBUTION: ATTRIBUTION,
-        }
-
-    async def async_added_to_hass(self):
-        """Port entity created."""
-        _LOGGER.debug(
-            "New port switch %s (%s %s)",
-            self._inst,
-            self._data["default-name"],
-            self._data["port-mac-address"],
-        )
+        super().__init__(inst, uid, mikrotik_controller, sid_data)
 
     @property
     def name(self) -> str:
         """Return the name of the port."""
-        return f"{self._inst} port {self._data['default-name']}"
+        return f"{self._inst} port {self._data[self._sid_data['sid_name']]}"
 
     @property
     def unique_id(self) -> str:
@@ -211,17 +256,6 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
         }
         return info
 
-    @property
-    def device_state_attributes(self):
-        """Return the port state attributes."""
-        attributes = self._attrs
-
-        for variable in DEVICE_ATTRIBUTES_IFACE:
-            if variable in self._data:
-                attributes[format_attribute(variable)] = self._data[variable]
-
-        return attributes
-
     async def async_turn_on(self):
         """Turn on the switch."""
         path = "/interface"
@@ -246,11 +280,6 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
         self._ctrl.set_value(path, param, value, mod_param, mod_value)
         await self._ctrl.async_update()
 
-    @property
-    def is_on(self):
-        """Return true if device is on."""
-        return self._data["enabled"]
-
 
 # ---------------------------
 #   MikrotikControllerNATSwitch
@@ -258,28 +287,14 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
 class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
     """Representation of a NAT switch."""
 
-    def __init__(self, inst, uid, mikrotik_controller):
+    def __init__(self, inst, uid, mikrotik_controller, sid_data):
         """Set up NAT switch."""
-        super().__init__(inst, uid, mikrotik_controller)
-
-        self._data = mikrotik_controller.data["nat"][self._uid]
-        self._attrs = {
-            ATTR_ATTRIBUTION: ATTRIBUTION,
-        }
-
-    async def async_added_to_hass(self):
-        """NAT switch entity created."""
-        _LOGGER.debug("New port switch %s (%s)", self._inst, self._data["name"])
+        super().__init__(inst, uid, mikrotik_controller, sid_data)
 
     @property
     def name(self) -> str:
         """Return the name of the NAT switch."""
         return f"{self._inst} NAT {self._data['name']}"
-
-    @property
-    def unique_id(self) -> str:
-        """Return a unique identifier for this NAT switch."""
-        return f"{self._inst.lower()}-nat_switch-{self._data['name']}"
 
     @property
     def icon(self):
@@ -310,17 +325,6 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
         }
         return info
 
-    @property
-    def device_state_attributes(self):
-        """Return the NAT switch state attributes."""
-        attributes = self._attrs
-
-        for variable in DEVICE_ATTRIBUTES_NAT:
-            if variable in self._data:
-                attributes[format_attribute(variable)] = self._data[variable]
-
-        return attributes
-
     async def async_turn_on(self):
         """Turn on the switch."""
         path = "/ip/firewall/nat"
@@ -355,11 +359,6 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
         self._ctrl.set_value(path, param, value, mod_param, mod_value)
         await self._ctrl.async_update()
 
-    @property
-    def is_on(self):
-        """Return true if device is on."""
-        return self._data["enabled"]
-
 
 # ---------------------------
 #   MikrotikControllerScriptSwitch
@@ -367,28 +366,9 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
 class MikrotikControllerScriptSwitch(MikrotikControllerSwitch):
     """Representation of a script switch."""
 
-    def __init__(self, inst, uid, mikrotik_controller):
+    def __init__(self, inst, uid, mikrotik_controller, sid_data):
         """Set up script switch."""
-        super().__init__(inst, uid, mikrotik_controller)
-
-        self._data = mikrotik_controller.data["script"][self._uid]
-        self._attrs = {
-            ATTR_ATTRIBUTION: ATTRIBUTION,
-        }
-
-    async def async_added_to_hass(self):
-        """Script switch entity created."""
-        _LOGGER.debug("New script switch %s (%s)", self._inst, self._data["name"])
-
-    @property
-    def name(self) -> str:
-        """Return the name of the script switch."""
-        return f"{self._inst} script {self._data['name']}"
-
-    @property
-    def unique_id(self) -> str:
-        """Return a unique identifier for this script switch."""
-        return f"{self._inst.lower()}-script_switch-{self._data['name']}"
+        super().__init__(inst, uid, mikrotik_controller, sid_data)
 
     @property
     def icon(self):
@@ -414,17 +394,6 @@ class MikrotikControllerScriptSwitch(MikrotikControllerSwitch):
         }
         return info
 
-    @property
-    def device_state_attributes(self):
-        """Return the script switch state attributes."""
-        attributes = self._attrs
-
-        for variable in DEVICE_ATTRIBUTES_SCRIPT:
-            if variable in self._data:
-                attributes[format_attribute(variable)] = self._data[variable]
-
-        return attributes
-
     async def async_turn_on(self):
         """Turn on the switch."""
         self._ctrl.run_script(self._data["name"])
@@ -445,28 +414,9 @@ class MikrotikControllerScriptSwitch(MikrotikControllerSwitch):
 class MikrotikControllerQueueSwitch(MikrotikControllerSwitch):
     """Representation of a queue switch."""
 
-    def __init__(self, inst, uid, mikrotik_controller):
+    def __init__(self, inst, uid, mikrotik_controller, sid_data):
         """Set up queue switch."""
-        super().__init__(inst, uid, mikrotik_controller)
-
-        self._data = mikrotik_controller.data["queue"][self._uid]
-        self._attrs = {
-            ATTR_ATTRIBUTION: ATTRIBUTION,
-        }
-
-    async def async_added_to_hass(self):
-        """Queue switch entity created."""
-        _LOGGER.debug("New queue switch %s (%s)", self._inst, self._data["name"])
-
-    @property
-    def name(self) -> str:
-        """Return the name of the queue switch."""
-        return f"{self._inst} Queue {self._data['name']}"
-
-    @property
-    def unique_id(self) -> str:
-        """Return a unique identifier for this queue switch."""
-        return f"{self._inst.lower()}-queue_switch-{self._data['name']}"
+        super().__init__(inst, uid, mikrotik_controller, sid_data)
 
     @property
     def icon(self):
@@ -497,17 +447,6 @@ class MikrotikControllerQueueSwitch(MikrotikControllerSwitch):
         }
         return info
 
-    @property
-    def device_state_attributes(self):
-        """Return the queue switch state attributes."""
-        attributes = self._attrs
-
-        for variable in DEVICE_ATTRIBUTES_QUEUE:
-            if variable in self._data:
-                attributes[format_attribute(variable)] = self._data[variable]
-
-        return attributes
-
     async def async_turn_on(self):
         """Turn on the queue switch."""
         path = "/queue/simple"
@@ -535,8 +474,3 @@ class MikrotikControllerQueueSwitch(MikrotikControllerSwitch):
         mod_value = True
         self._ctrl.set_value(path, param, value, mod_param, mod_value)
         await self._ctrl.async_update()
-
-    @property
-    def is_on(self):
-        """Return true if the queue is on."""
-        return self._data["enabled"]
