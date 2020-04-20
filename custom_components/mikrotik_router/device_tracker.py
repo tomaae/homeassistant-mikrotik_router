@@ -116,7 +116,7 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, tr
         # Data point unique id
         ["default-name", "mac-address"],
         # Entry Name
-        ["default-name", "host-name"],
+        ["name", "host-name"],
         # Entry Unique id
         ["port-mac-address", "mac-address"],
         # Tracker function
@@ -226,8 +226,10 @@ class MikrotikControllerDeviceTracker(ScannerEntity):
             },
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
-            "name": f"{self._inst} {self._data[self._sid_data['sid_name']]}",
+            "name": self._data[self._sid_data["sid_name"]],
         }
+        if self._sid_data["sid"] == "interface":
+            info["name"] = f"{self._inst} {self._data[self._sid_data['sid_name']]}"
         return info
 
     @property
