@@ -740,6 +740,7 @@ class MikrotikControllerData:
                 {"name": ".id"},
                 {"name": "name", "default": "unknown"},
                 {"name": "target", "default": "unknown"},
+                {"name": "rate", "default": "0/0"},
                 {"name": "max-limit", "default": "0/0"},
                 {"name": "limit-at", "default": "0/0"},
                 {"name": "burst-limit", "default": "0/0"},
@@ -768,6 +769,16 @@ class MikrotikControllerData:
             self.data["queue"][uid][
                 "download-max-limit"
             ] = f"{round(download_max_limit_bps * uom_div)} {uom_type}"
+
+            upload_rate_bps, download_rate_bps = [
+                int(x) for x in vals["rate"].split("/")
+            ]
+            self.data["queue"][uid][
+                "upload-rate"
+            ] = f"{round(upload_rate_bps * uom_div)} {uom_type}"
+            self.data["queue"][uid][
+                "download-rate"
+            ] = f"{round(download_rate_bps * uom_div)} {uom_type}"
 
             upload_limit_at_bps, download_limit_at_bps = [
                 int(x) for x in vals["limit-at"].split("/")

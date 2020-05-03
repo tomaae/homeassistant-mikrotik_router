@@ -44,6 +44,8 @@ DEVICE_ATTRIBUTES_SCRIPT = [
 
 DEVICE_ATTRIBUTES_QUEUE = [
     "target",
+    "download-rate",
+    "upload-rate",
     "download-max-limit",
     "upload-max-limit",
     "upload-limit-at",
