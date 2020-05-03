@@ -278,9 +278,6 @@ class MikrotikControllerData:
         if self.api.connected():
             await self.hass.async_add_executor_job(self.get_dns)
 
-        if self.api.connected():
-            await self.hass.async_add_executor_job(self.get_queue)
-
         self.lock.release()
 
     # ---------------------------
@@ -416,6 +413,9 @@ class MikrotikControllerData:
 
         if self.api.connected():
             await self.hass.async_add_executor_job(self.process_accounting)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_queue)
 
         async_dispatcher_send(self.hass, self.signal_update)
         self.lock.release()
