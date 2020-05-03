@@ -33,8 +33,8 @@ jobs:
 
       - name: Move new translations
         run: |
-          mkdir -p /home/runner/work/homeassistant-mikrotik_router/homeassistant-mikrotik_router/custom_components/mikrotik_router/.translations/
-          cp /tmp/lokalise/locale/* /home/runner/work/homeassistant-mikrotik_router/homeassistant-mikrotik_router/custom_components/mikrotik_router/.translations/
+          mkdir -p /home/runner/work/homeassistant-mikrotik_router/homeassistant-mikrotik_router/custom_components/mikrotik_router/translations/
+          cp /tmp/lokalise/locale/* /home/runner/work/homeassistant-mikrotik_router/homeassistant-mikrotik_router/custom_components/mikrotik_router/translations/
 
       - name: Zip mikrotik_router dir
         run: |
