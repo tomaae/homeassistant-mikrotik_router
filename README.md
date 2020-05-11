@@ -87,6 +87,8 @@ Feature is present in Winbox IP-Accounting. Make sure that threshold is set to r
 
 More information about Accounting can be found on [Mikrotik support page](https://wiki.mikrotik.com/wiki/Manual:IP/Accounting).
 
+NOTE: Accounting does not count in FastTracked packets.
+
 ![Accounting sensor](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/accounting_sensor.png)
 
 # Install integration
