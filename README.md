@@ -65,6 +65,8 @@ Control simple queues.
 
 More information about simple queues can be found on [Mikrotik support page](https://wiki.mikrotik.com/wiki/Manual:Queue#Simple_Queues).
 
+NOTE: FastTracked packets are not processed by Simple Queues.
+
 ![Queue switch](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/queue_switch.png)
 
 ## Host Tracking
