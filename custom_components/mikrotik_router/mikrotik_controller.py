@@ -1179,18 +1179,18 @@ class MikrotikControllerData:
                 ],
             )
 
-            threshold = self.api.path("/ip/accounting")[0].get('threshold')
+            threshold = self.api.path("/ip/accounting")[0].get("threshold")
             entry_count = len(accounting_data)
 
             if entry_count is threshold:
-                _LOGGER.warning(f'Accounting entries count reached the threshold of {threshold}!'
-                                ' Some entries were not saved by Mikrotik so accounting calculation won\'t be correct.'
-                                ' Consider shortening update interval or'
-                                ' increasing the accounting threshold value in Mikrotik.')
+                _LOGGER.warning(f"Accounting entries count reached the threshold of {threshold}!"
+                                " Some entries were not saved by Mikrotik so accounting calculation won't be correct."
+                                " Consider shortening update interval or"
+                                " increasing the accounting threshold value in Mikrotik.")
             elif entry_count > threshold * 0.9:
-                _LOGGER.info(f'Accounting entries count ({entry_count} reached 90% of the threshold,'
-                             f' currently set to {threshold}! Consider shortening update interval or'
-                             ' increasing the accounting threshold value in Mikrotik.')
+                _LOGGER.info(f"Accounting entries count ({entry_count} reached 90% of the threshold,"
+                             f" currently set to {threshold}! Consider shortening update interval or"
+                             " increasing the accounting threshold value in Mikrotik.")
 
             for item in accounting_data.values():
                 source_ip = str(item.get("src-address")).strip()
