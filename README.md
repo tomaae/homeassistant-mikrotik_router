@@ -65,6 +65,8 @@ Control simple queues.
 
 More information about simple queues can be found on [Mikrotik support page](https://wiki.mikrotik.com/wiki/Manual:Queue#Simple_Queues).
 
+NOTE: FastTracked packets are not processed by Simple Queues.
+
 ![Queue switch](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/queue_switch.png)
 
 ## Host Tracking
@@ -86,6 +88,8 @@ Monitor per-IP throughput tracking based on Mikrotik Accounting.
 Feature is present in Winbox IP-Accounting. Make sure that threshold is set to reasonable value to store all connections between user defined scan interval. Max value is 8192 so for piece of mind I recommend setting that value.
 
 More information about Accounting can be found on [Mikrotik support page](https://wiki.mikrotik.com/wiki/Manual:IP/Accounting).
+
+NOTE: Accounting does not count in FastTracked packets.
 
 ![Accounting sensor](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/accounting_sensor.png)
 
