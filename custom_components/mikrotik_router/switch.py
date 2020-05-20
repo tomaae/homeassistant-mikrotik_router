@@ -1,7 +1,7 @@
 """Support for the Mikrotik Router switches."""
 import logging
 
-from homeassistant.components.switch import SwitchDevice
+from homeassistant.components.switch import SwitchEntity
 from homeassistant.const import CONF_NAME, ATTR_ATTRIBUTION
 from homeassistant.core import callback
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
@@ -156,7 +156,7 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
 # ---------------------------
 #   MikrotikControllerSwitch
 # ---------------------------
-class MikrotikControllerSwitch(SwitchDevice, RestoreEntity):
+class MikrotikControllerSwitch(SwitchEntity, RestoreEntity):
     """Representation of a switch."""
 
     def __init__(self, inst, uid, mikrotik_controller, sid_data):
