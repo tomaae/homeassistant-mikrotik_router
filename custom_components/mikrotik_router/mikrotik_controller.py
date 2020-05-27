@@ -55,6 +55,7 @@ class MikrotikControllerData:
         self.data = {
             "routerboard": {},
             "resource": {},
+            "health": {},
             "interface": {},
             "bridge": {},
             "bridge_host": {},
@@ -268,6 +269,9 @@ class MikrotikControllerData:
 
         if self.api.connected():
             await self.hass.async_add_executor_job(self.get_system_resource)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_system_health)
 
         if self.api.connected():
             await self.hass.async_add_executor_job(self.get_script)
@@ -635,6 +639,17 @@ class MikrotikControllerData:
                 {"name": "serial-number", "default": "unknown"},
                 {"name": "firmware", "default": "unknown"},
             ],
+        )
+
+    # ---------------------------
+    #   get_system_health
+    # ---------------------------
+    def get_system_health(self):
+        """Get routerboard data from Mikrotik"""
+        self.data["health"] = parse_api(
+            data=self.data["health"],
+            source=self.api.path("/system/health"),
+            vals=[{"name": "temperature", "default": "unknown"}],
         )
 
     # ---------------------------

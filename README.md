@@ -36,7 +36,7 @@ Monitor and control your Mikrotik device from Home Assistant.
  * Enable/disable Simple Queue switches
  * Mikrotik Accounting traffic sensors per hosts for RX/TX WAN/LAN
  * Device tracker for hosts in network
- * System sensors (CPU, Memory, HDD)
+ * System sensors (CPU, Memory, HDD, Temperature)
  * Check firmware update
  * Execute scripts using switches or services
  * Configurable update interval

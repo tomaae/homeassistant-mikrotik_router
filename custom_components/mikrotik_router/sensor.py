@@ -2,7 +2,12 @@
 
 import logging
 
-from homeassistant.const import CONF_NAME, ATTR_ATTRIBUTION, ATTR_DEVICE_CLASS
+from homeassistant.const import (
+    CONF_NAME,
+    ATTR_ATTRIBUTION,
+    ATTR_DEVICE_CLASS,
+    TEMP_CELSIUS,
+)
 from homeassistant.core import callback
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -34,6 +39,15 @@ ATTR_PATH = "data_path"
 ATTR_ATTR = "data_attr"
 
 SENSOR_TYPES = {
+    "system_temperature": {
+        ATTR_DEVICE_CLASS: None,
+        ATTR_ICON: "mdi:thermometer",
+        ATTR_LABEL: "Temperature",
+        ATTR_UNIT: TEMP_CELSIUS,
+        ATTR_GROUP: "System",
+        ATTR_PATH: "health",
+        ATTR_ATTR: "temperature",
+    },
     "system_cpu-load": {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:speedometer",
