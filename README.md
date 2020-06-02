@@ -98,6 +98,10 @@ This integration is distributed using [HACS](https://hacs.xyz/).
 
 You can find it under "Integrations", named "Mikrotik Router"
 
+Minimum requirements:
+* RouterOS v6.43
+* Home Assistant 0.110.0
+
 ## Setup integration
 1. Create user for homeassistant on your mikrotik router with following permissions:
    * read, write, api, test
