@@ -181,7 +181,7 @@ def update_items(inst, mikrotik_controller, async_add_entities, sensors):
 
         if "traffic_" in sensor:
             for uid in mikrotik_controller.data["interface"]:
-                if mikrotik_controller.data["interface"][uid]["type"] == "ether":
+                if mikrotik_controller.data["interface"][uid]["type"] != "bridge":
                     item_id = f"{inst}-{sensor}-{mikrotik_controller.data['interface'][uid]['default-name']}"
                     _LOGGER.debug("Updating sensor %s", item_id)
                     if item_id in sensors:
