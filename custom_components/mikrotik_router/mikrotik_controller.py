@@ -459,7 +459,14 @@ class MikrotikControllerData:
                 {"name": "rx-bits-per-second", "default": 0},
                 {"name": "tx-bits-per-second", "default": 0},
             ],
-            skip=[{"name": "type", "value": "bridge"}],
+            skip=[
+                {"name": "type", "value": "bridge"},
+                {"name": "type", "value": "ppp-in"},
+                {"name": "type", "value": "pptp-in"},
+                {"name": "type", "value": "sstp-in"},
+                {"name": "type", "value": "l2tp-in"},
+                {"name": "type", "value": "pppoe-in"},
+            ],
         )
 
         # Udpate virtual interfaces
