@@ -466,6 +466,7 @@ class MikrotikControllerData:
                 {"name": "type", "value": "sstp-in"},
                 {"name": "type", "value": "l2tp-in"},
                 {"name": "type", "value": "pppoe-in"},
+                {"name": "type", "value": "ovpn-in"},
             ],
         )
 
