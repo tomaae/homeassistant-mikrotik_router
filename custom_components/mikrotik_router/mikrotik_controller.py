@@ -416,7 +416,17 @@ class MikrotikControllerData:
             await self.hass.async_add_executor_job(self.get_system_resource)
 
         if self.api.connected():
-            await self.hass.async_add_executor_job(self.process_accounting)
+            major_fw_version = None
+            try:
+                major_fw_version = int(self.data['routerboard'].get('firmware').split('.')[0])
+            except Exception as e:
+                _LOGGER.error(f"Cannot determine major FW version "
+                              f"from [{self.data['routerboard'].get('firmware')}]! ({type(e)}")
+
+            if major_fw_version and major_fw_version < 7:
+                await self.hass.async_add_executor_job(self.process_accounting)
+            else:
+                _LOGGER.warning("Accounting not available on this device (fw check failed or fw version is 7.* +)")
 
         if self.api.connected():
             await self.hass.async_add_executor_job(self.get_queue)
@@ -645,7 +655,7 @@ class MikrotikControllerData:
                 {"name": "routerboard", "type": "bool"},
                 {"name": "model", "default": "unknown"},
                 {"name": "serial-number", "default": "unknown"},
-                {"name": "firmware", "default": "unknown"},
+                {"name": "firmware", "source": "current-firmware", "default": "unknown"},
             ],
         )
 
