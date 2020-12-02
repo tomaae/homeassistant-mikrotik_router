@@ -383,3 +383,18 @@ class MikrotikControllerHostDeviceTracker(MikrotikControllerDeviceTracker):
                     attributes[format_attribute(variable)] = self._data[variable]
 
         return attributes
+
+    @property
+    def device_info(self):
+        """Return a description for device registry."""
+        info = {
+            "connections": {
+                (CONNECTION_NETWORK_MAC, self._data[self._sid_data["sid_ref"]])
+            },
+            #"manufacturer": self._ctrl.data["resource"]["platform"],
+            #"model": self._ctrl.data["resource"]["board-name"],
+            "default_name": self._data[self._sid_data["sid_name"]],
+        }
+        if self._sid_data["sid"] == "interface":
+            info["name"] = f"{self._inst} {self._data[self._sid_data['sid_name']]}"
+        return info
