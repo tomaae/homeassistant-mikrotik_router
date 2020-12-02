@@ -260,6 +260,11 @@ class MikrotikControllerPortDeviceTracker(MikrotikControllerDeviceTracker):
         return self._data["running"]
 
     @property
+    def unique_id(self):
+        """Return a unique identifier for this port."""
+        return f"{self._inst.lower()}-{self._sid_data['sid']}-{self._data['port-mac-address']}_{self._data['default-name']}"
+
+    @property
     def icon(self):
         """Return the icon."""
         if self._data["running"]:

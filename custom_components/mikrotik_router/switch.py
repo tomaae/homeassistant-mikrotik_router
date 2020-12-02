@@ -233,7 +233,7 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
     @property
     def unique_id(self) -> str:
         """Return a unique identifier for this port."""
-        return f"{self._inst.lower()}-enable_switch-{self._data['port-mac-address']}"
+        return f"{self._inst.lower()}-enable_switch-{self._data['port-mac-address']}_{self._data['default-name']}"
 
     @property
     def icon(self):
