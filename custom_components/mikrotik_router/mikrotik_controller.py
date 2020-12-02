@@ -74,6 +74,7 @@ class MikrotikControllerData:
             "host": {},
             "host_hass": {},
             "accounting": {},
+            "environment": {},
         }
 
         self.listeners = []
@@ -423,6 +424,9 @@ class MikrotikControllerData:
 
         if self.api.connected():
             await self.hass.async_add_executor_job(self.get_queue)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_environment)
 
         async_dispatcher_send(self.hass, self.signal_update)
         self.lock.release()
@@ -794,6 +798,21 @@ class MikrotikControllerData:
                 {"name": "name"},
                 {"name": "last-started", "default": "unknown"},
                 {"name": "run-count", "default": "unknown"},
+            ],
+        )
+
+    # ---------------------------
+    #   get_environment
+    # ---------------------------
+    def get_environment(self):
+        """Get list of all environment variables from Mikrotik"""
+        self.data["environment"] = parse_api(
+            data={},
+            source=self.api.path("/system/script/environment"),
+            key="name",
+            vals=[
+                {"name": "name"},
+                {"name": "value"},
             ],
         )
 

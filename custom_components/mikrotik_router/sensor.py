@@ -226,6 +226,22 @@ def update_items(inst, mikrotik_controller, async_add_entities, sensors):
                     )
                     new_sensors.append(sensors[item_id])
 
+    for uid in mikrotik_controller.data["environment"]:
+        item_id = f"{inst}-{sensor}-{mikrotik_controller.data['environment'][uid]['name']}"
+        _LOGGER.debug("Updating sensor %s", item_id)
+        if item_id in sensors:
+            if sensors[item_id].enabled:
+                sensors[item_id].async_schedule_update_ha_state()
+            continue
+
+        sensors[item_id] = MikrotikControllerEnvironmentSensor(
+            mikrotik_controller=mikrotik_controller,
+            inst=inst,
+            sensor=sensor,
+            uid=uid,
+        )
+        new_sensors.append(sensors[item_id])
+
     if new_sensors:
         async_add_entities(new_sensors, True)
 
@@ -437,5 +453,76 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
             self._inst,
             self._data["host-name"],
             self._data["mac-address"],
+            self._sensor,
+        )
+
+# ---------------------------
+#   MikrotikControllerEnvironmentSensor
+# ---------------------------
+class MikrotikControllerEnvironmentSensor(MikrotikControllerSensor):
+    """Define an Mikrotik Controller sensor."""
+
+    def __init__(self, mikrotik_controller, inst, sensor, uid):
+        """Initialize."""
+        super().__init__(mikrotik_controller, inst, sensor)
+        self._uid = uid
+        self._data = mikrotik_controller.data['environment'][uid]
+        self._attr = "value"
+
+    @property
+    def name(self):
+        """Return the name."""
+        return f"{self._inst} {self._data['name']}"
+
+    @property
+    def unit_of_measurement(self):
+        """Return the unit the value is expressed in."""
+
+    @property
+    def unique_id(self):
+        """Return a unique_id for this entity."""
+        return f"{self._inst.lower()}-environment-{self._uid}"
+
+    @property
+    def state(self):
+        """Return the state."""
+        val = "unknown"
+        if self._attr in self._data:
+            val = self._data[self._attr]
+
+        return val
+
+    @property
+    def icon(self):
+        """Return the icon."""
+        self._icon = "mdi:clipboard-list"
+        return self._icon
+
+    @property
+    def device_info(self):
+        """Return a port description for device registry."""
+        info = {
+            "manufacturer": self._ctrl.data["resource"]["platform"],
+            "model": self._ctrl.data["resource"]["board-name"],
+            "name": f"{self._inst} Environment",
+            "identifiers": {
+                (
+                    DOMAIN,
+                    "serial-number",
+                    self._ctrl.data["routerboard"]["serial-number"],
+                    "switch",
+                    "environment",
+                )
+            },
+        }
+
+        return info
+
+    async def async_added_to_hass(self):
+        """Port entity created."""
+        _LOGGER.debug(
+            "New sensor %s (%s %s)",
+            self._inst,
+            self._data['name'],
             self._sensor,
         )
