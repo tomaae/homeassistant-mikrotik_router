@@ -102,6 +102,8 @@ class MikrotikControllerData:
         self.support_capsman = False
         self.support_wireless = False
 
+        self.major_fw_version = 0
+
         self._force_update_callback = None
         self._force_fwupdate_check_callback = None
         self._async_ping_tracked_hosts_callback = None
@@ -415,7 +417,7 @@ class MikrotikControllerData:
         if self.api.connected():
             await self.hass.async_add_executor_job(self.get_system_resource)
 
-        if self.api.connected():
+        if self.api.connected() and 0 < self.major_fw_version < 7:
             await self.hass.async_add_executor_job(self.process_accounting)
 
         if self.api.connected():
@@ -666,9 +668,19 @@ class MikrotikControllerData:
                 {"name": "routerboard", "type": "bool"},
                 {"name": "model", "default": "unknown"},
                 {"name": "serial-number", "default": "unknown"},
-                {"name": "firmware", "default": "unknown"},
+                {"name": "firmware", "source": "current-firmware", "default": "unknown"},
             ],
         )
+
+        if self.data["routerboard"]["firmware"] != "unknown":
+            try:
+                self.major_fw_version = int(self.data['routerboard'].get('firmware').split('.')[0])
+            except Exception as e:
+                _LOGGER.error(
+                    "Mikrotik %s unable to determine major FW version (%s).",
+                    self.host,
+                    self.data['routerboard'].get('firmware'),
+                )
 
     # ---------------------------
     #   get_system_health
