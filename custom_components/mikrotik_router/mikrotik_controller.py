@@ -673,18 +673,24 @@ class MikrotikControllerData:
                 {"name": "routerboard", "type": "bool"},
                 {"name": "model", "default": "unknown"},
                 {"name": "serial-number", "default": "unknown"},
-                {"name": "firmware", "source": "current-firmware", "default": "unknown"},
+                {
+                    "name": "firmware",
+                    "source": "current-firmware",
+                    "default": "unknown",
+                },
             ],
         )
 
         if self.data["routerboard"]["firmware"] != "unknown":
             try:
-                self.major_fw_version = int(self.data['routerboard'].get('firmware').split('.')[0])
+                self.major_fw_version = int(
+                    self.data["routerboard"].get("firmware").split(".")[0]
+                )
             except Exception as e:
                 _LOGGER.error(
                     "Mikrotik %s unable to determine major FW version (%s).",
                     self.host,
-                    self.data['routerboard'].get('firmware'),
+                    self.data["routerboard"].get("firmware"),
                 )
 
     # ---------------------------

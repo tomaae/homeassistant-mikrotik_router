@@ -227,7 +227,9 @@ def update_items(inst, mikrotik_controller, async_add_entities, sensors):
                     new_sensors.append(sensors[item_id])
 
     for uid in mikrotik_controller.data["environment"]:
-        item_id = f"{inst}-{sensor}-{mikrotik_controller.data['environment'][uid]['name']}"
+        item_id = (
+            f"{inst}-{sensor}-{mikrotik_controller.data['environment'][uid]['name']}"
+        )
         _LOGGER.debug("Updating sensor %s", item_id)
         if item_id in sensors:
             if sensors[item_id].enabled:
@@ -414,7 +416,7 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
     @property
     def available(self) -> bool:
         """Return if controller and accounting feature in Mikrotik is available.
-           Additional check for lan-tx/rx sensors
+        Additional check for lan-tx/rx sensors
         """
         if self._attr in ["lan-tx", "lan-rx"]:
             return (
@@ -430,8 +432,8 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
         """Return a accounting description for device registry."""
         info = {
             "connections": {(CONNECTION_NETWORK_MAC, self._data["mac-address"])},
-            #"manufacturer": self._ctrl.data["resource"]["platform"],
-            #"model": self._ctrl.data["resource"]["board-name"],
+            # "manufacturer": self._ctrl.data["resource"]["platform"],
+            # "model": self._ctrl.data["resource"]["board-name"],
             "default_name": self._data["host-name"],
         }
         return info
@@ -456,6 +458,7 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
             self._sensor,
         )
 
+
 # ---------------------------
 #   MikrotikControllerEnvironmentSensor
 # ---------------------------
@@ -466,7 +469,7 @@ class MikrotikControllerEnvironmentSensor(MikrotikControllerSensor):
         """Initialize."""
         super().__init__(mikrotik_controller, inst, sensor)
         self._uid = uid
-        self._data = mikrotik_controller.data['environment'][uid]
+        self._data = mikrotik_controller.data["environment"][uid]
         self._attr = "value"
 
     @property
@@ -523,6 +526,6 @@ class MikrotikControllerEnvironmentSensor(MikrotikControllerSensor):
         _LOGGER.debug(
             "New sensor %s (%s %s)",
             self._inst,
-            self._data['name'],
+            self._data["name"],
             self._sensor,
         )
