@@ -39,6 +39,15 @@ ATTR_PATH = "data_path"
 ATTR_ATTR = "data_attr"
 
 SENSOR_TYPES = {
+    "system_uptime": {
+        ATTR_DEVICE_CLASS: None,
+        ATTR_ICON: "mdi:clock-outline",
+        ATTR_LABEL: "Uptime",
+        ATTR_UNIT: "s",
+        ATTR_GROUP: "System",
+        ATTR_PATH: "resource",
+        ATTR_ATTR: "uptime",
+    },
     "system_temperature": {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:thermometer",

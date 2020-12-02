@@ -1,5 +1,6 @@
 """Mikrotik Controller for Mikrotik Router."""
 
+import re
 import asyncio
 import logging
 from datetime import timedelta
@@ -705,14 +706,27 @@ class MikrotikControllerData:
                 {"name": "platform", "default": "unknown"},
                 {"name": "board-name", "default": "unknown"},
                 {"name": "version", "default": "unknown"},
-                {"name": "uptime", "default": "unknown"},
+                {"name": "uptime_str", "source": "uptime", "default": "unknown"},
                 {"name": "cpu-load", "default": "unknown"},
                 {"name": "free-memory", "default": 0},
                 {"name": "total-memory", "default": 0},
                 {"name": "free-hdd-space", "default": 0},
                 {"name": "total-hdd-space", "default": 0},
             ],
+            ensure_vals=[
+                {"name": "uptime", "default": 0},
+            ],
         )
+
+        l = list(map(int, re.split('[whms]', self.data["resource"]["uptime_str"])[:-1]))
+        if len(l) == 4:
+            self.data["resource"]["uptime"] =  l[0] * 604800 + l[1] * 3600 + l[2] * 60 + l[3]
+        elif len(l) == 3:
+            self.data["resource"]["uptime"] =  l[0] * 3600 + l[1] * 60 + l[2]
+        elif len(l) == 2:
+            self.data["resource"]["uptime"] =  l[0] * 60 + l[1]
+        else:
+            self.data["resource"]["uptime"] = l[0]
 
         if self.data["resource"]["total-memory"] > 0:
             self.data["resource"]["memory-usage"] = round(
