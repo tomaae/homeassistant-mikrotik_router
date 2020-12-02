@@ -269,6 +269,11 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
         mod_param = "disabled"
         mod_value = False
         self._ctrl.set_value(path, param, value, mod_param, mod_value)
+
+        if self._data["poe-out"] == "off":
+            path = "/interface/ethernet"
+            self._ctrl.set_value(path, param, value, "poe-out", "auto-on")
+
         await self._ctrl.force_update()
 
     async def async_turn_off(self):
@@ -281,6 +286,12 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
         mod_param = "disabled"
         mod_value = True
         self._ctrl.set_value(path, param, value, mod_param, mod_value)
+
+
+        if self._data["poe-out"] == "auto-on":
+            path = "/interface/ethernet"
+            self._ctrl.set_value(path, param, value, "poe-out", "off")
+
         await self._ctrl.async_update()
 
 # ---------------------------
