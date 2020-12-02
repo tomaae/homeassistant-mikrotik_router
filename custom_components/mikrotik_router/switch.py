@@ -26,6 +26,7 @@ DEVICE_ATTRIBUTES_IFACE = [
     "type",
     "name",
     "default-name",
+    "poe-out",
 ]
 
 DEVICE_ATTRIBUTES_NAT = [
@@ -281,7 +282,6 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
         mod_value = True
         self._ctrl.set_value(path, param, value, mod_param, mod_value)
         await self._ctrl.async_update()
-
 
 # ---------------------------
 #   MikrotikControllerNATSwitch

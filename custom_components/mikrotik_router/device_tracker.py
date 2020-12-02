@@ -40,6 +40,7 @@ DEVICE_ATTRIBUTES_IFACE = [
     "type",
     "name",
     "default-name",
+    "poe-out",
 ]
 
 DEVICE_ATTRIBUTES_HOST = [

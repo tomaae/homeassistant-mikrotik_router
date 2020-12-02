@@ -470,6 +470,27 @@ class MikrotikControllerData:
             ],
         )
 
+        self.data["interface"] = parse_api(
+            data=self.data["interface"],
+            source=self.api.path("/interface/ethernet"),
+            key="default-name",
+            key_secondary="name",
+            vals=[
+                {"name": "default-name"},
+                {"name": "name", "default_val": "default-name"},
+                {"name": "poe-out", "default": "N/A"},
+            ],
+            skip=[
+                {"name": "type", "value": "bridge"},
+                {"name": "type", "value": "ppp-in"},
+                {"name": "type", "value": "pptp-in"},
+                {"name": "type", "value": "sstp-in"},
+                {"name": "type", "value": "l2tp-in"},
+                {"name": "type", "value": "pppoe-in"},
+                {"name": "type", "value": "ovpn-in"},
+            ],
+        )
+
         # Udpate virtual interfaces
         for uid, vals in self.data["interface"].items():
             if vals["default-name"] == "":
