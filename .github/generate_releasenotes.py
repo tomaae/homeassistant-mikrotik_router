@@ -134,7 +134,9 @@ else:
             title=f"Create release {VERSION}?",
             labels=["New release"],
             assignee="tomaae",
-            body=CHANGES.format(integration_changes=integration_changes,),
+            body=CHANGES.format(
+                integration_changes=integration_changes,
+            ),
         )
     else:
         print("Not enough changes for a release.")
