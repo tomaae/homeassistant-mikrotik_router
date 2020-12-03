@@ -391,10 +391,12 @@ class MikrotikControllerHostDeviceTracker(MikrotikControllerDeviceTracker):
             "connections": {
                 (CONNECTION_NETWORK_MAC, self._data[self._sid_data["sid_ref"]])
             },
-            # "manufacturer": self._ctrl.data["resource"]["platform"],
-            # "model": self._ctrl.data["resource"]["board-name"],
             "default_name": self._data[self._sid_data["sid_name"]],
         }
+        if self._data["manufacturer"] != "":
+            info["manufacturer"] = self._data["manufacturer"]
+
         if self._sid_data["sid"] == "interface":
             info["name"] = f"{self._inst} {self._data[self._sid_data['sid_name']]}"
+
         return info

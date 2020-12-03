@@ -432,10 +432,11 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
         """Return a accounting description for device registry."""
         info = {
             "connections": {(CONNECTION_NETWORK_MAC, self._data["mac-address"])},
-            # "manufacturer": self._ctrl.data["resource"]["platform"],
-            # "model": self._ctrl.data["resource"]["board-name"],
             "default_name": self._data["host-name"],
         }
+        if self._data["manufacturer"] != "":
+            info["manufacturer"] = self._data["manufacturer"]
+
         return info
 
     @property

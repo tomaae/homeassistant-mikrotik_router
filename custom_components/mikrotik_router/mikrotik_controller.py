@@ -5,6 +5,7 @@ import asyncio
 import logging
 from datetime import timedelta
 from ipaddress import ip_address, IPv4Network
+from mac_vendor_lookup import AsyncMacLookup
 
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_send
@@ -109,6 +110,9 @@ class MikrotikControllerData:
         self._force_update_callback = None
         self._force_fwupdate_check_callback = None
         self._async_ping_tracked_hosts_callback = None
+
+        self.async_mac_lookup = AsyncMacLookup()
+        # self.async_mac_lookup.update_vendors()
 
     async def async_init(self):
         self._force_update_callback = async_track_time_interval(
@@ -686,7 +690,7 @@ class MikrotikControllerData:
                 self.major_fw_version = int(
                     self.data["routerboard"].get("firmware").split(".")[0]
                 )
-            except Exception as e:
+            except:
                 _LOGGER.error(
                     "Mikrotik %s unable to determine major FW version (%s).",
                     self.host,
@@ -1144,10 +1148,11 @@ class MikrotikControllerData:
                     "mac-address",
                     "interface",
                     "host-name",
+                    "manufacturer",
                     "last-seen",
                     "available",
                 ],
-                ["unknown", "unknown", "unknown", "unknown", False, False],
+                ["unknown", "unknown", "unknown", "unknown", "detect", False, False],
             ):
                 if key not in self.data["host"][uid]:
                     self.data["host"][uid][key] = default
@@ -1223,6 +1228,20 @@ class MikrotikControllerData:
                 # Fallback to mac address for hostname
                 elif self.data["host"][uid]["host-name"] == "unknown":
                     self.data["host"][uid]["host-name"] = uid
+
+            # Resolve manufacturer
+            if vals["manufacturer"] == "detect" and vals["address"] != "unknown":
+                try:
+                    self.data["host"][uid][
+                        "manufacturer"
+                    ] = await self.async_mac_lookup.lookup(vals["mac-address"])
+                    print(
+                        "MAC address {} is assigned to {}".format(
+                            vals["mac-address"], self.data["host"][uid]["manufacturer"]
+                        )
+                    )
+                except:
+                    self.data["host"][uid]["manufacturer"] = ""
 
     # ---------------------------
     #   process_accounting
