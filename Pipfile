@@ -25,3 +25,4 @@ responses = "==0.10.6"
 
 [packages]
 librouteros = "==3.0.0"
+mac-vendor-lookup = "==0.1.11"
