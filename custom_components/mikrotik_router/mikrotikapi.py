@@ -435,7 +435,7 @@ class MikrotikAPI:
             return False
 
         args = {
-            "arp-ping": "yes",
+            "arp-ping": "no",
             "interval": "100ms",
             "count": 3,
             "interface": interface,
@@ -443,7 +443,7 @@ class MikrotikAPI:
         }
         self.lock.acquire()
         try:
-            _LOGGER.debug("Ping host query: %s", "/ping")
+            # _LOGGER.debug("Ping host query: %s", args["address"])
             ping = response("/ping", **args)
         except librouteros.exceptions.ConnectionClosed:
             self.disconnect()
@@ -485,8 +485,10 @@ class MikrotikAPI:
 
         for tmp in ping:
             if "received" in tmp and tmp["received"] > 0:
+                _LOGGER.debug("Ping host success: %s", args["address"])
                 return True
 
+        _LOGGER.debug("Ping host failure: %s", args["address"])
         return False
 
     @staticmethod
