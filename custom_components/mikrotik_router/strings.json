@@ -1,41 +1,43 @@
 {
     "config": {
-        "title": "Mikrotik Router",
+        "error": {
+            "cannot_connect": "Cannot connect to Mikrotik.",
+            "connection_timeout": "Mikrotik connection timeout.",
+            "name_exists": "Name already exists.",
+            "ssl_handshake_failure": "SSL handshake failure",
+            "wrong_login": "Invalid user name or password."
+        },
         "step": {
             "user": {
-                "title": "Mikrotik Router",
-                "description": "Set up Mikrotik Router integration.",
                 "data": {
-                    "name": "Name of the integration",
                     "host": "Host",
-                    "port": "Port",
-                    "username": "Username",
+                    "name": "Name of the integration",
                     "password": "Password",
-                    "ssl": "Use SSL"
-                }
+                    "port": "Port",
+                    "ssl": "Use SSL",
+                    "username": "Username"
+                },
+                "description": "Set up Mikrotik Router integration.",
+                "title": "Mikrotik Router"
             }
-        },
-        "error": {
-            "name_exists": "Name already exists.",
-            "cannot_connect": "Cannot connect to Mikrotik.",
-            "ssl_handshake_failure": "SSL handshake failure",
-            "connection_timeout": "Mikrotik connection timeout.",
-            "wrong_login": "Invalid user name or password."
         }
     },
     "options": {
         "step": {
-            "init": {
-                    "data": {}
-            },
-            "device_tracker": {
+            "basic_options": {
                 "data": {
                     "scan_interval": "Scan interval (requires HA restart)",
                     "track_iface_clients": "Show client MAC and IP on interfaces",
-                    "unit_of_measurement": "Unit of measurement",
+                    "unit_of_measurement": "Unit of measurement"
+                },
+                "title": "Basic options"
+            },
+            "device_tracker": {
+                "data": {
                     "track_network_hosts": "Track network devices",
                     "track_network_hosts_timeout": "Track network devices timeout (seconds)"
-                }
+                },
+                "title": "Device tracking options"
             }
         }
     }

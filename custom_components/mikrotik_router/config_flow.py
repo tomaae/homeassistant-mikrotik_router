@@ -149,16 +149,16 @@ class MikrotikControllerOptionsFlowHandler(OptionsFlow):
 
     async def async_step_init(self, user_input=None):
         """Manage the options."""
-        return await self.async_step_device_tracker(user_input)
+        return await self.async_step_basic_options(user_input)
 
-    async def async_step_device_tracker(self, user_input=None):
-        """Manage the device tracker options."""
+    async def async_step_basic_options(self, user_input=None):
+        """Manage the basic options options."""
         if user_input is not None:
             self.options.update(user_input)
-            return self.async_create_entry(title="", data=self.options)
+            return await self.async_step_device_tracker()
 
         return self.async_show_form(
-            step_id="device_tracker",
+            step_id="basic_options",
             data_schema=vol.Schema(
                 {
                     vol.Optional(
@@ -179,6 +179,20 @@ class MikrotikControllerOptionsFlowHandler(OptionsFlow):
                             CONF_TRACK_IFACE_CLIENTS, DEFAULT_TRACK_IFACE_CLIENTS
                         ),
                     ): bool,
+                }
+            ),
+        )
+
+    async def async_step_device_tracker(self, user_input=None):
+        """Manage the device tracker options."""
+        if user_input is not None:
+            self.options.update(user_input)
+            return self.async_create_entry(title="", data=self.options)
+
+        return self.async_show_form(
+            step_id="device_tracker",
+            data_schema=vol.Schema(
+                {
                     vol.Optional(
                         CONF_TRACK_HOSTS,
                         default=self.config_entry.options.get(
