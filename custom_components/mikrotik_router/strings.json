@@ -28,16 +28,23 @@
                 "data": {
                     "scan_interval": "Scan interval (requires HA restart)",
                     "track_iface_clients": "Show client MAC and IP on interfaces",
-                    "unit_of_measurement": "Unit of measurement"
+                    "unit_of_measurement": "Unit of measurement",
+                    "track_network_hosts_timeout": "Track network devices timeout (seconds)"
                 },
                 "title": "Basic options"
             },
-            "device_tracker": {
+            "sensor_select": {
                 "data": {
+                    "sensor_port_tracker": "Port tracker",
+                    "sensor_port_traffic": "Port traffic",
                     "track_network_hosts": "Track network devices",
-                    "track_network_hosts_timeout": "Track network devices timeout (seconds)"
+                    "sensor_client_traffic": "Client traffic",
+                    "sensor_simple_queues": "Simple queues",
+                    "sensor_nat": "NAT",
+                    "sensor_scripts": "Scripts",
+                    "sensor_environment": "Environment variables"
                 },
-                "title": "Device tracking options"
+                "title": "Sensor selection"
             }
         }
     }
