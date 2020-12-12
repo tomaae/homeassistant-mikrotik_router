@@ -1271,11 +1271,6 @@ class MikrotikControllerData:
                     self.data["host"][uid][
                         "manufacturer"
                     ] = await self.async_mac_lookup.lookup(vals["mac-address"])
-                    print(
-                        "MAC address {} is assigned to {}".format(
-                            vals["mac-address"], self.data["host"][uid]["manufacturer"]
-                        )
-                    )
                 except:
                     self.data["host"][uid]["manufacturer"] = ""
 
