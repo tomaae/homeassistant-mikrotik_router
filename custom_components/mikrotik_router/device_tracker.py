@@ -22,6 +22,8 @@ from .const import (
     DEFAULT_TRACK_HOSTS,
     CONF_TRACK_HOSTS_TIMEOUT,
     DEFAULT_TRACK_HOST_TIMEOUT,
+    CONF_SENSOR_PORT_TRACKER,
+    DEFAULT_SENSOR_PORT_TRACKER,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -123,6 +125,14 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, tr
         # Tracker function
         [MikrotikControllerPortDeviceTracker, MikrotikControllerHostDeviceTracker],
     ):
+        if (
+            sid_func == MikrotikControllerPortDeviceTracker
+            and not config_entry.options.get(
+                CONF_SENSOR_PORT_TRACKER, DEFAULT_SENSOR_PORT_TRACKER
+            )
+        ):
+            continue
+
         for uid in mikrotik_controller.data[sid]:
             if (
                 # Skip if interface is wlan
