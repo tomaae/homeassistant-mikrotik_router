@@ -466,7 +466,7 @@ class MikrotikControllerData:
         ):
             await self.hass.async_add_executor_job(self.process_accounting)
 
-        if self.api.connected():
+        if self.api.connected() and self.option_sensor_simple_queues:
             await self.hass.async_add_executor_job(self.get_queue)
 
         if self.api.connected():
