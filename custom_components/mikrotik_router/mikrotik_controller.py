@@ -43,6 +43,8 @@ from .const import (
     DEFAULT_SENSOR_NAT,
     CONF_SENSOR_SCRIPTS,
     DEFAULT_SENSOR_SCRIPTS,
+    CONF_SENSOR_ENVIRONMENT,
+    DEFAULT_SENSOR_ENVIRONMENT,
 )
 from .exceptions import ApiEntryNotFound
 from .helper import parse_api
@@ -199,6 +201,16 @@ class MikrotikControllerData:
         """Config entry option to not track ARP."""
         return self.config_entry.options.get(
             CONF_SENSOR_SCRIPTS, DEFAULT_SENSOR_SCRIPTS
+        )
+
+    # ---------------------------
+    #   option_sensor_environment
+    # ---------------------------
+    @property
+    def option_sensor_environment(self):
+        """Config entry option to not track ARP."""
+        return self.config_entry.options.get(
+            CONF_SENSOR_ENVIRONMENT, DEFAULT_SENSOR_ENVIRONMENT
         )
 
     # ---------------------------
@@ -491,7 +503,7 @@ class MikrotikControllerData:
         if self.api.connected() and self.option_sensor_simple_queues:
             await self.hass.async_add_executor_job(self.get_queue)
 
-        if self.api.connected():
+        if self.api.connected() and self.option_sensor_environment:
             await self.hass.async_add_executor_job(self.get_environment)
 
         async_dispatcher_send(self.hass, self.signal_update)
