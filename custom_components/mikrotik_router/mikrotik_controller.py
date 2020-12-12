@@ -39,6 +39,8 @@ from .const import (
     DEFAULT_SENSOR_CLIENT_TRAFFIC,
     CONF_SENSOR_SIMPLE_QUEUES,
     DEFAULT_SENSOR_SIMPLE_QUEUES,
+    CONF_SENSOR_NAT,
+    DEFAULT_SENSOR_NAT,
     CONF_SENSOR_SCRIPTS,
     DEFAULT_SENSOR_SCRIPTS,
 )
@@ -180,6 +182,14 @@ class MikrotikControllerData:
         return self.config_entry.options.get(
             CONF_SENSOR_SIMPLE_QUEUES, DEFAULT_SENSOR_SIMPLE_QUEUES
         )
+
+    # ---------------------------
+    #   option_sensor_nat
+    # ---------------------------
+    @property
+    def option_sensor_nat(self):
+        """Config entry option to not track ARP."""
+        return self.config_entry.options.get(CONF_SENSOR_NAT, DEFAULT_SENSOR_NAT)
 
     # ---------------------------
     #   option_sensor_scripts
@@ -465,7 +475,7 @@ class MikrotikControllerData:
         if self.api.connected():
             await self.hass.async_add_executor_job(self.process_interface_client)
 
-        if self.api.connected():
+        if self.api.connected() and self.option_sensor_nat:
             await self.hass.async_add_executor_job(self.get_nat)
 
         if self.api.connected():
