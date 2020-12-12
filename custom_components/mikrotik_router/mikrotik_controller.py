@@ -33,6 +33,12 @@ from .const import (
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_UNIT_OF_MEASUREMENT,
     CONF_TRACK_HOSTS_TIMEOUT,
+    CONF_SENSOR_PORT_TRAFFIC,
+    DEFAULT_SENSOR_PORT_TRAFFIC,
+    CONF_SENSOR_CLIENT_TRAFFIC,
+    DEFAULT_SENSOR_CLIENT_TRAFFIC,
+    CONF_SENSOR_SIMPLE_QUEUES,
+    DEFAULT_SENSOR_SIMPLE_QUEUES,
 )
 from .exceptions import ApiEntryNotFound
 from .helper import parse_api
@@ -142,6 +148,36 @@ class MikrotikControllerData:
     def option_track_network_hosts(self):
         """Config entry option to not track ARP."""
         return self.config_entry.options.get(CONF_TRACK_HOSTS, DEFAULT_TRACK_HOSTS)
+
+    # ---------------------------
+    #   option_sensor_port_traffic
+    # ---------------------------
+    @property
+    def option_sensor_port_traffic(self):
+        """Config entry option to not track ARP."""
+        return self.config_entry.options.get(
+            CONF_SENSOR_PORT_TRAFFIC, DEFAULT_SENSOR_PORT_TRAFFIC
+        )
+
+    # ---------------------------
+    #   option_sensor_client_traffic
+    # ---------------------------
+    @property
+    def option_sensor_client_traffic(self):
+        """Config entry option to not track ARP."""
+        return self.config_entry.options.get(
+            CONF_SENSOR_CLIENT_TRAFFIC, DEFAULT_SENSOR_CLIENT_TRAFFIC
+        )
+
+    # ---------------------------
+    #   option_sensor_simple_queues
+    # ---------------------------
+    @property
+    def option_sensor_simple_queues(self):
+        """Config entry option to not track ARP."""
+        return self.config_entry.options.get(
+            CONF_SENSOR_SIMPLE_QUEUES, DEFAULT_SENSOR_SIMPLE_QUEUES
+        )
 
     # ---------------------------
     #   option_scan_interval
@@ -411,7 +447,7 @@ class MikrotikControllerData:
         if self.api.connected():
             await self.async_process_host()
 
-        if self.api.connected():
+        if self.api.connected() and self.option_sensor_port_traffic:
             await self.hass.async_add_executor_job(self.get_interface_traffic)
 
         if self.api.connected():

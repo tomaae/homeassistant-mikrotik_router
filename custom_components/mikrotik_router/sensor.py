@@ -8,6 +8,12 @@ from homeassistant.const import (
     ATTR_DEVICE_CLASS,
     TEMP_CELSIUS,
 )
+
+from .const import (
+    CONF_SENSOR_PORT_TRAFFIC,
+    DEFAULT_SENSOR_PORT_TRAFFIC,
+)
+
 from homeassistant.core import callback
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -155,7 +161,9 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     @callback
     def update_controller():
         """Update the values of the controller."""
-        update_items(inst, mikrotik_controller, async_add_entities, sensors)
+        update_items(
+            inst, config_entry, mikrotik_controller, async_add_entities, sensors
+        )
 
     mikrotik_controller.listeners.append(
         async_dispatcher_connect(
@@ -170,7 +178,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 #   update_items
 # ---------------------------
 @callback
-def update_items(inst, mikrotik_controller, async_add_entities, sensors):
+def update_items(inst, config_entry, mikrotik_controller, async_add_entities, sensors):
     """Update sensor state from the controller."""
     new_sensors = []
 
@@ -189,6 +197,11 @@ def update_items(inst, mikrotik_controller, async_add_entities, sensors):
             new_sensors.append(sensors[item_id])
 
         if "traffic_" in sensor:
+            if not config_entry.options.get(
+                CONF_SENSOR_PORT_TRAFFIC, DEFAULT_SENSOR_PORT_TRAFFIC
+            ):
+                continue
+
             for uid in mikrotik_controller.data["interface"]:
                 if mikrotik_controller.data["interface"][uid]["type"] != "bridge":
                     item_id = f"{inst}-{sensor}-{mikrotik_controller.data['interface'][uid]['default-name']}"
