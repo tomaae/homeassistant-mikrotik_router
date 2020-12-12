@@ -459,7 +459,11 @@ class MikrotikControllerData:
         if self.api.connected():
             await self.hass.async_add_executor_job(self.get_system_resource)
 
-        if self.api.connected() and 0 < self.major_fw_version < 7:
+        if (
+            self.api.connected()
+            and self.option_sensor_client_traffic
+            and 0 < self.major_fw_version < 7
+        ):
             await self.hass.async_add_executor_job(self.process_accounting)
 
         if self.api.connected():
