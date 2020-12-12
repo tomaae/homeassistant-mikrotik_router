@@ -759,18 +759,6 @@ class MikrotikControllerData:
             ],
         )
 
-        if self.data["routerboard"]["firmware"] != "unknown":
-            try:
-                self.major_fw_version = int(
-                    self.data["routerboard"].get("firmware").split(".")[0]
-                )
-            except:
-                _LOGGER.error(
-                    "Mikrotik %s unable to determine major FW version (%s).",
-                    self.host,
-                    self.data["routerboard"].get("firmware"),
-                )
-
     # ---------------------------
     #   get_system_health
     # ---------------------------
@@ -868,6 +856,18 @@ class MikrotikControllerData:
             )
         else:
             self.data["fw-update"]["available"] = False
+
+        if self.data["fw-update"]["installed-version"] != "unknown":
+            try:
+                self.major_fw_version = int(
+                    self.data["fw-update"].get("installed-version").split(".")[0]
+                )
+            except:
+                _LOGGER.error(
+                    "Mikrotik %s unable to determine major FW version (%s).",
+                    self.host,
+                    self.data["fw-update"].get("installed-version"),
+                )
 
     # ---------------------------
     #   get_script
