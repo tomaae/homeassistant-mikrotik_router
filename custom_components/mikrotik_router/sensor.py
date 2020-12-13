@@ -49,7 +49,7 @@ SENSOR_TYPES = {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:clock-outline",
         ATTR_LABEL: "Uptime",
-        ATTR_UNIT: "s",
+        ATTR_UNIT: "h",
         ATTR_GROUP: "System",
         ATTR_PATH: "resource",
         ATTR_ATTR: "uptime",

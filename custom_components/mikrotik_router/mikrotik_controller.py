@@ -798,15 +798,18 @@ class MikrotikControllerData:
             ],
         )
 
-        # l = list(map(int, re.split('[wdhms]', self.data["resource"]["uptime_str"])[:-1]))
-        # if len(l) == 4:
-        #     self.data["resource"]["uptime"] =  l[0] * 604800 + l[1] * 3600 + l[2] * 60 + l[3]
-        # elif len(l) == 3:
-        #     self.data["resource"]["uptime"] =  l[0] * 3600 + l[1] * 60 + l[2]
-        # elif len(l) == 2:
-        #     self.data["resource"]["uptime"] =  l[0] * 60 + l[1]
-        # else:
-        #     self.data["resource"]["uptime"] = l[0]
+        tmp_uptime = 0
+        tmp = re.split(r"(\d+)[h]", self.data["resource"]["uptime_str"])
+        if len(tmp) > 1:
+            tmp_uptime += int(tmp[1])
+        tmp = re.split(r"(\d+)[d]", self.data["resource"]["uptime_str"])
+        if len(tmp) > 1:
+            tmp_uptime += int(tmp[1]) * 24
+        tmp = re.split(r"(\d+)[w]", self.data["resource"]["uptime_str"])
+        if len(tmp) > 1:
+            tmp_uptime += int(tmp[1]) * 24 * 7
+
+        self.data["resource"]["uptime"] = tmp_uptime
 
         if self.data["resource"]["total-memory"] > 0:
             self.data["resource"]["memory-usage"] = round(
