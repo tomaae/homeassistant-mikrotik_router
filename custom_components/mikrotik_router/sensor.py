@@ -144,6 +144,12 @@ SENSOR_TYPES = {
         ATTR_PATH: "accounting",
         ATTR_ATTR: "wan-rx",
     },
+    "environment": {
+        ATTR_DEVICE_CLASS: None,
+        ATTR_ICON: "mdi:clipboard-list",
+        ATTR_PATH: "environment",
+        ATTR_ATTR: "name",
+    },
 }
 
 DEVICE_ATTRIBUTES_ACCOUNTING = ["address", "mac-address", "host-name"]
@@ -241,7 +247,7 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
 
     for uid in mikrotik_controller.data["environment"]:
         item_id = (
-            f"{inst}-{sensor}-{mikrotik_controller.data['environment'][uid]['name']}"
+            f"{inst}-environment-{mikrotik_controller.data['environment'][uid]['name']}"
         )
         _LOGGER.debug("Updating sensor %s", item_id)
         if item_id in sensors:
@@ -252,7 +258,7 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
         sensors[item_id] = MikrotikControllerEnvironmentSensor(
             mikrotik_controller=mikrotik_controller,
             inst=inst,
-            sensor=sensor,
+            sensor="environment",
             uid=uid,
         )
         new_sensors.append(sensors[item_id])
