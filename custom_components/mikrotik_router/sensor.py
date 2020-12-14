@@ -194,6 +194,13 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
 
     for sensor in SENSOR_TYPES:
         if "system_" in sensor:
+            if (
+                mikrotik_controller.data[SENSOR_TYPES[sensor][ATTR_PATH]][
+                    SENSOR_TYPES[sensor][ATTR_ATTR]
+                ]
+                == "unknown"
+            ):
+                continue
             item_id = f"{inst}-{sensor}"
             _LOGGER.debug("Updating sensor %s", item_id)
             if item_id in sensors:
