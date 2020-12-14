@@ -536,6 +536,7 @@ class MikrotikControllerData:
                 {"name": "link-downs"},
                 {"name": "tx-queue-drop"},
                 {"name": "actual-mtu"},
+                {"name": "about", "source": ".about", "default": ""},
             ],
             ensure_vals=[
                 {"name": "client-ip-address"},

@@ -263,6 +263,9 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
         """Turn on the switch."""
         path = "/interface"
         param = "default-name"
+        if self._data["about"] == "managed by CAPsMAN":
+            _LOGGER.error("Unable to enable %s, managed by CAPsMAN", self._data[param])
+            return "managed by CAPsMAN"
         if "-" in self._data["port-mac-address"]:
             param = "name"
         value = self._data[param]
@@ -280,6 +283,9 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
         """Turn on the switch."""
         path = "/interface"
         param = "default-name"
+        if self._data["about"] == "managed by CAPsMAN":
+            _LOGGER.error("Unable to disable %s, managed by CAPsMAN", self._data[param])
+            return "managed by CAPsMAN"
         if "-" in self._data["port-mac-address"]:
             param = "name"
         value = self._data[param]
