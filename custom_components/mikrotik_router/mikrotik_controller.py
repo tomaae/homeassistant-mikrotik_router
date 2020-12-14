@@ -502,11 +502,7 @@ class MikrotikControllerData:
         if self.api.connected() and self.option_sensor_simple_queues:
             await self.hass.async_add_executor_job(self.get_queue)
 
-        if (
-            self.api.connected()
-            and self.option_sensor_environment
-            and 0 < self.major_fw_version < 7
-        ):
+        if self.api.connected() and self.option_sensor_environment:
             await self.hass.async_add_executor_job(self.get_environment)
 
         async_dispatcher_send(self.hass, self.signal_update)
