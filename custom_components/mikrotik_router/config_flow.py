@@ -37,6 +37,8 @@ from .const import (
     DEFAULT_SENSOR_SIMPLE_QUEUES,
     CONF_SENSOR_NAT,
     DEFAULT_SENSOR_NAT,
+    CONF_SENSOR_MANGLE,
+    DEFAULT_SENSOR_MANGLE,
     CONF_SENSOR_SCRIPTS,
     DEFAULT_SENSOR_SCRIPTS,
     CONF_SENSOR_ENVIRONMENT,
@@ -247,6 +249,12 @@ class MikrotikControllerOptionsFlowHandler(OptionsFlow):
                         CONF_SENSOR_NAT,
                         default=self.config_entry.options.get(
                             CONF_SENSOR_NAT, DEFAULT_SENSOR_NAT
+                        ),
+                    ): bool,
+                    vol.Optional(
+                        CONF_SENSOR_MANGLE,
+                        default=self.config_entry.options.get(
+                            CONF_SENSOR_MANGLE, DEFAULT_SENSOR_MANGLE
                         ),
                     ): bool,
                     vol.Optional(

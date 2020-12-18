@@ -40,6 +40,8 @@ from .const import (
     DEFAULT_SENSOR_SIMPLE_QUEUES,
     CONF_SENSOR_NAT,
     DEFAULT_SENSOR_NAT,
+    CONF_SENSOR_MANGLE,
+    DEFAULT_SENSOR_MANGLE,
     CONF_SENSOR_SCRIPTS,
     DEFAULT_SENSOR_SCRIPTS,
     CONF_SENSOR_ENVIRONMENT,
@@ -74,6 +76,7 @@ class MikrotikControllerData:
             "bridge_host": {},
             "arp": {},
             "nat": {},
+            "mangle": {},
             "fw-update": {},
             "script": {},
             "queue": {},
@@ -191,6 +194,14 @@ class MikrotikControllerData:
     def option_sensor_nat(self):
         """Config entry option to not track ARP."""
         return self.config_entry.options.get(CONF_SENSOR_NAT, DEFAULT_SENSOR_NAT)
+
+    # ---------------------------
+    #   option_sensor_nat
+    # ---------------------------
+    @property
+    def option_sensor_mangle(self):
+        """Config entry option to not track ARP."""
+        return self.config_entry.options.get(CONF_SENSOR_MANGLE, DEFAULT_SENSOR_MANGLE)
 
     # ---------------------------
     #   option_sensor_scripts
@@ -489,6 +500,9 @@ class MikrotikControllerData:
         if self.api.connected() and self.option_sensor_nat:
             await self.hass.async_add_executor_job(self.get_nat)
 
+        if self.api.connected() and self.option_sensor_mangle:
+            await self.hass.async_add_executor_job(self.get_mangle)
+
         if self.api.connected():
             await self.hass.async_add_executor_job(self.get_system_resource)
 
@@ -738,6 +752,51 @@ class MikrotikControllerData:
                 )
 
             del self.data["nat"][uid]
+
+    # ---------------------------
+    #   get_mangle
+    # ---------------------------
+    def get_mangle(self):
+        """Get Mangle data from Mikrotik"""
+        self.data["mangle"] = parse_api(
+            data=self.data["mangle"],
+            source=self.api.path("/ip/firewall/mangle"),
+            key=".id",
+            vals=[
+                {"name": ".id"},
+                {"name": "chain"},
+                {"name": "action"},
+                {"name": "comment"},
+                {"name": "address-list"},
+                {"name": "passthrough", "type": "bool", "default": False},
+                {"name": "new-packet-mark"},
+                {"name": "src-address-list"},
+                {"name": "protocol", "default": "any"},
+                {"name": "src-port", "default": "any"},
+                {"name": "dst-port", "default": "any"},
+                {
+                    "name": "enabled",
+                    "source": "disabled",
+                    "type": "bool",
+                    "reverse": True,
+                },
+            ],
+            val_proc=[
+                [
+                    {"name": "name"},
+                    {"action": "combine"},
+                    {"key": "protocol"},
+                    {"text": ":"},
+                    {"key": "dst-port"},
+                ]
+            ],
+            skip=[
+                {"name": "dynamic", "value": True},
+                {"name": "action", "value": "jump"},
+                {"name": "protocol", "value": ""},
+                {"name": "dst-port", "value": ""},
+            ],
+        )
 
     # ---------------------------
     #   get_system_routerboard

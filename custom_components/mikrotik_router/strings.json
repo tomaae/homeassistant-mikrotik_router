@@ -35,14 +35,15 @@
             },
             "sensor_select": {
                 "data": {
-                    "sensor_port_tracker": "Port tracker",
-                    "sensor_port_traffic": "Port traffic",
+                    "sensor_port_tracker": "Port tracker sensors",
+                    "sensor_port_traffic": "Port traffic sensors",
                     "track_network_hosts": "Track network devices",
-                    "sensor_client_traffic": "Client traffic",
-                    "sensor_simple_queues": "Simple queues",
-                    "sensor_nat": "NAT",
-                    "sensor_scripts": "Scripts",
-                    "sensor_environment": "Environment variables"
+                    "sensor_client_traffic": "Client traffic sensors",
+                    "sensor_simple_queues": "Simple queues switches",
+                    "sensor_nat": "NAT switches",
+                    "sensor_mangle": "Mangle switches",
+                    "sensor_scripts": "Scripts switches",
+                    "sensor_environment": "Environment variable sensors"
                 },
                 "title": "Sensor selection"
             }

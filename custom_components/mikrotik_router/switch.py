@@ -38,6 +38,18 @@ DEVICE_ATTRIBUTES_NAT = [
     "comment",
 ]
 
+DEVICE_ATTRIBUTES_MANGLE = [
+    "chain",
+    "action",
+    "address-list",
+    "passthrough",
+    "new-packet-mark",
+    "protocol",
+    "src-port",
+    "dst-port",
+    "comment",
+]
+
 DEVICE_ATTRIBUTES_SCRIPT = [
     "last-started",
     "run-count",
@@ -109,17 +121,18 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
     # Add switches
     for sid, sid_uid, sid_name, sid_ref, sid_attr, sid_func in zip(
         # Data point name
-        ["interface", "nat", "script", "queue"],
+        ["interface", "nat", "mangle", "script", "queue"],
         # Data point unique id
-        ["name", "name", "name", "name"],
+        ["name", "name", "name", "name", "name"],
         # Entry Name
-        ["name", "name", "name", "name"],
+        ["name", "name", "comment", "name", "name"],
         # Entry Unique id
-        ["port-mac-address", "name", "name", "name"],
+        ["port-mac-address", "name", "name", "name", "name"],
         # Attr
         [
             DEVICE_ATTRIBUTES_IFACE,
             DEVICE_ATTRIBUTES_NAT,
+            DEVICE_ATTRIBUTES_MANGLE,
             DEVICE_ATTRIBUTES_SCRIPT,
             DEVICE_ATTRIBUTES_QUEUE,
         ],
@@ -127,6 +140,7 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
         [
             MikrotikControllerPortSwitch,
             MikrotikControllerNATSwitch,
+            MikrotikControllerMangleSwitch,
             MikrotikControllerScriptSwitch,
             MikrotikControllerQueueSwitch,
         ],
@@ -372,6 +386,85 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
                 == f"{self._data['protocol']}:{self._data['dst-port']}"
             ):
                 value = self._ctrl.data["nat"][uid][".id"]
+
+        mod_param = "disabled"
+        mod_value = True
+        self._ctrl.set_value(path, param, value, mod_param, mod_value)
+        await self._ctrl.async_update()
+
+
+# ---------------------------
+#   MikrotikControllerMangleSwitch
+# ---------------------------
+class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
+    """Representation of a Mangle switch."""
+
+    def __init__(self, inst, uid, mikrotik_controller, sid_data):
+        """Set up Mangle switch."""
+        super().__init__(inst, uid, mikrotik_controller, sid_data)
+
+    @property
+    def name(self) -> str:
+        """Return the name of the Mangle switch."""
+        return f"{self._inst} Mangle {self._data['name']}"
+
+    @property
+    def icon(self):
+        """Return the icon."""
+        if not self._data["enabled"]:
+            icon = "mdi:bookmark-off-outline"
+        else:
+            icon = "mdi:bookmark-outline"
+
+        return icon
+
+    @property
+    def device_info(self):
+        """Return a Mangle switch description for device registry."""
+        info = {
+            "identifiers": {
+                (
+                    DOMAIN,
+                    "serial-number",
+                    self._ctrl.data["routerboard"]["serial-number"],
+                    "switch",
+                    "Mangle",
+                )
+            },
+            "manufacturer": self._ctrl.data["resource"]["platform"],
+            "model": self._ctrl.data["resource"]["board-name"],
+            "name": f"{self._inst} Mangle",
+        }
+        return info
+
+    async def async_turn_on(self):
+        """Turn on the switch."""
+        path = "/ip/firewall/mangle"
+        param = ".id"
+        value = None
+        for uid in self._ctrl.data["mangle"]:
+            if (
+                self._ctrl.data["mangle"][uid]["name"]
+                == f"{self._data['protocol']}:{self._data['dst-port']}"
+            ):
+                value = self._ctrl.data["mangle"][uid][".id"]
+
+        mod_param = "disabled"
+        mod_value = False
+        self._ctrl.set_value(path, param, value, mod_param, mod_value)
+        await self._ctrl.force_update()
+
+    async def async_turn_off(self):
+        """Turn on the switch."""
+        path = "/ip/firewall/mangle"
+        param = ".id"
+        value = None
+        for uid in self._ctrl.data["mangle"]:
+            if (
+                self._ctrl.data["mangle"][uid]["name"]
+                == f"{self._data['protocol']}:{self._data['dst-port']}"
+            ):
+                value = self._ctrl.data["mangle"][uid][".id"]
 
         mod_param = "disabled"
         mod_value = True
