@@ -190,16 +190,6 @@ SENSOR_TYPES = {
         ATTR_PATH: "accounting",
         ATTR_ATTR: "wan-rx",
     },
-    "environment": {
-        ATTR_DEVICE_CLASS: None,
-        ATTR_ICON: "mdi:clipboard-list",
-        ATTR_LABEL: "",
-        ATTR_UNIT: "",
-        # ATTR_UNIT_ATTR: "value",
-        ATTR_GROUP: "Environment",
-        ATTR_PATH: "environment",
-        ATTR_ATTR: "value",
-    },
 }
 
 DEVICE_ATTRIBUTES_ACCOUNTING = ["address", "mac-address", "host-name"]
@@ -238,6 +228,46 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
     """Update sensor state from the controller."""
     new_sensors = []
 
+    for sid, sid_uid, sid_name, sid_val, sid_ref, sid_attr, sid_func in zip(
+        # Data point name
+        ["environment"],
+        # Data point unique id
+        ["name"],
+        # Entry Name
+        ["name"],
+        # Entry Value
+        ["value"],
+        # Entry Unique id
+        ["name"],
+        # Attr
+        [
+            None,
+        ],
+        # Switch function
+        [
+            MikrotikControllerEnvironmentSensor,
+        ],
+    ):
+        for uid in mikrotik_controller.data[sid]:
+            item_id = f"{inst}-{sid}-{mikrotik_controller.data[sid][uid][sid_uid]}"
+            _LOGGER.debug("Updating sensor %s", item_id)
+            if item_id in sensors:
+                if sensors[item_id].enabled:
+                    sensors[item_id].async_schedule_update_ha_state()
+                continue
+
+            # Create new entity
+            sid_data = {
+                "sid": sid,
+                "sid_uid": sid_uid,
+                "sid_name": sid_name,
+                "sid_ref": sid_ref,
+                "sid_attr": sid_attr,
+                "sid_val": sid_val,
+            }
+            sensors[item_id] = sid_func(inst, uid, mikrotik_controller, sid_data)
+            new_sensors.append(sensors[item_id])
+
     for sensor in SENSOR_TYPES:
         if "system_" in sensor:
             if (
@@ -255,7 +285,7 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
                 continue
 
             sensors[item_id] = MikrotikControllerSensor(
-                mikrotik_controller=mikrotik_controller, inst=inst, sensor=sensor
+                mikrotik_controller=mikrotik_controller, inst=inst, sid_data=sensor
             )
             new_sensors.append(sensors[item_id])
 
@@ -302,24 +332,6 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
                     )
                     new_sensors.append(sensors[item_id])
 
-    for uid in mikrotik_controller.data["environment"]:
-        item_id = (
-            f"{inst}-environment-{mikrotik_controller.data['environment'][uid]['name']}"
-        )
-        _LOGGER.debug("Updating sensor %s", item_id)
-        if item_id in sensors:
-            if sensors[item_id].enabled:
-                sensors[item_id].async_schedule_update_ha_state()
-            continue
-
-        sensors[item_id] = MikrotikControllerEnvironmentSensor(
-            mikrotik_controller=mikrotik_controller,
-            inst=inst,
-            sensor="environment",
-            uid=uid,
-        )
-        new_sensors.append(sensors[item_id])
-
     if new_sensors:
         async_add_entities(new_sensors, True)
 
@@ -330,14 +342,19 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
 class MikrotikControllerSensor(Entity):
     """Define an Mikrotik Controller sensor."""
 
-    def __init__(self, mikrotik_controller, inst, sensor):
+    def __init__(self, mikrotik_controller, inst, sid_data):
         """Initialize."""
         self._inst = inst
-        self._sensor = sensor
+        self._sensor = sid_data
         self._ctrl = mikrotik_controller
-        self._data = mikrotik_controller.data[SENSOR_TYPES[sensor][ATTR_PATH]]
-        self._type = SENSOR_TYPES[sensor]
-        self._attr = SENSOR_TYPES[sensor][ATTR_ATTR]
+
+        if sid_data in SENSOR_TYPES:
+            self._data = mikrotik_controller.data[SENSOR_TYPES[sid_data][ATTR_PATH]]
+            self._type = SENSOR_TYPES[sid_data]
+            self._attr = SENSOR_TYPES[sid_data][ATTR_ATTR]
+        else:
+            self._type = {}
+            self._attr = None
 
         self._device_class = None
         self._state = None
@@ -367,13 +384,18 @@ class MikrotikControllerSensor(Entity):
     @property
     def icon(self) -> str:
         """Return the icon."""
-        self._icon = self._type[ATTR_ICON]
-        return self._icon
+        if ATTR_ICON in self._type:
+            return self._icon
+        else:
+            return ""
 
     @property
     def device_class(self) -> Optional[str]:
         """Return the device class."""
-        return self._type[ATTR_DEVICE_CLASS]
+        if ATTR_UNIT_ATTR in self._type:
+            return self._type[ATTR_DEVICE_CLASS]
+        else:
+            return None
 
     @property
     def unique_id(self) -> str:
@@ -408,7 +430,7 @@ class MikrotikControllerSensor(Entity):
                     DOMAIN,
                     "serial-number",
                     self._ctrl.data["routerboard"]["serial-number"],
-                    "switch",
+                    "sensor",
                     self._type[ATTR_GROUP],
                 )
             }
@@ -523,18 +545,40 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
 class MikrotikControllerEnvironmentSensor(MikrotikControllerSensor):
     """Define an Enviroment variable sensor."""
 
-    def __init__(self, mikrotik_controller, inst, sensor, uid):
+    def __init__(self, inst, uid, mikrotik_controller, sid_data):
         """Initialize."""
-        super().__init__(mikrotik_controller, inst, sensor)
+        super().__init__(mikrotik_controller, inst, "")
         self._uid = uid
-        self._data = mikrotik_controller.data["environment"][uid]
-
-    @property
-    def unique_id(self) -> str:
-        """Return a unique id for this entity."""
-        return f"{self._inst.lower()}-environment-{self._uid}"
+        self._sid_data = sid_data
+        self._data = mikrotik_controller.data[self._sid_data["sid"]][uid]
 
     @property
     def name(self) -> str:
         """Return the name."""
-        return f"{self._inst} {self._data['name']}"
+        return f"{self._inst} {self._data[self._sid_data['sid_ref']]}"
+
+    @property
+    def unique_id(self) -> str:
+        """Return a unique id for this entity."""
+        return f"{self._inst.lower()}-{self._sid_data['sid']}-{self._data[self._sid_data['sid_ref']]}"
+
+    @property
+    def state(self) -> Optional[str]:
+        """Return the state."""
+        return self._data[self._sid_data["sid_val"]]
+
+    @property
+    def icon(self) -> str:
+        """Return the icon."""
+        return "mdi:clipboard-list"
+
+    @property
+    def device_info(self) -> Dict[str, Any]:
+        """Return a description for device registry."""
+        info = {
+            "manufacturer": self._ctrl.data["resource"]["platform"],
+            "model": self._ctrl.data["resource"]["board-name"],
+            "name": f"{self._inst} {self._sid_data['sid']}",
+        }
+
+        return info
