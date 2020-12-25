@@ -1,7 +1,7 @@
 """Support for the Mikrotik Router switches."""
 
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.const import CONF_NAME, ATTR_ATTRIBUTION
@@ -254,6 +254,14 @@ class MikrotikControllerSwitch(SwitchEntity, RestoreEntity):
 
         return attributes
 
+    def turn_off(self, **kwargs: Any) -> None:
+        """Required abstract method."""
+        pass
+
+    def turn_on(self, **kwargs: Any) -> None:
+        """Required abstract method."""
+        pass
+
 
 # ---------------------------
 #   MikrotikControllerPortSwitch
@@ -299,7 +307,7 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
         }
         return info
 
-    async def async_turn_on(self) -> None:
+    async def async_turn_on(self) -> Optional[str]:
         """Turn on the switch."""
         path = "/interface"
         param = "default-name"
@@ -319,7 +327,7 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
 
         await self._ctrl.force_update()
 
-    async def async_turn_off(self) -> None:
+    async def async_turn_off(self) -> Optional[str]:
         """Turn off the switch."""
         path = "/interface"
         param = "default-name"
@@ -398,9 +406,10 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
         param = ".id"
         value = None
         for uid in self._ctrl.data["nat"]:
-            if (
-                self._ctrl.data["nat"][uid]["uniq-id"]
-                == f"{self._data['chain']},{self._data['action']},{self._data['protocol']},{self._data['in-interface']}:{self._data['dst-port']}-{self._data['out-interface']}:{self._data['to-addresses']}:{self._data['to-ports']}"
+            if self._ctrl.data["nat"][uid]["uniq-id"] == (
+                f"{self._data['chain']},{self._data['action']},{self._data['protocol']},"
+                f"{self._data['in-interface']}:{self._data['dst-port']}-"
+                f"{self._data['out-interface']}:{self._data['to-addresses']}:{self._data['to-ports']}"
             ):
                 value = self._ctrl.data["nat"][uid][".id"]
 
@@ -415,9 +424,10 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
         param = ".id"
         value = None
         for uid in self._ctrl.data["nat"]:
-            if (
-                self._ctrl.data["nat"][uid]["uniq-id"]
-                == f"{self._data['chain']},{self._data['action']},{self._data['protocol']},{self._data['in-interface']}:{self._data['dst-port']}-{self._data['out-interface']}:{self._data['to-addresses']}:{self._data['to-ports']}"
+            if self._ctrl.data["nat"][uid]["uniq-id"] == (
+                f"{self._data['chain']},{self._data['action']},{self._data['protocol']},"
+                f"{self._data['in-interface']}:{self._data['dst-port']}-"
+                f"{self._data['out-interface']}:{self._data['to-addresses']}:{self._data['to-ports']}"
             ):
                 value = self._ctrl.data["nat"][uid][".id"]
 
@@ -485,9 +495,10 @@ class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
         param = ".id"
         value = None
         for uid in self._ctrl.data["mangle"]:
-            if (
-                self._ctrl.data["mangle"][uid]["uniq-id"]
-                == f"{self._data['chain']},{self._data['action']},{self._data['protocol']},{self._data['src-address']}:{self._data['src-port']}-{self._data['dst-address']}:{self._data['dst-port']}"
+            if self._ctrl.data["mangle"][uid]["uniq-id"] == (
+                f"{self._data['chain']},{self._data['action']},{self._data['protocol']},"
+                f"{self._data['src-address']}:{self._data['src-port']}-"
+                f"{self._data['dst-address']}:{self._data['dst-port']}"
             ):
                 value = self._ctrl.data["mangle"][uid][".id"]
 
@@ -502,9 +513,10 @@ class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
         param = ".id"
         value = None
         for uid in self._ctrl.data["mangle"]:
-            if (
-                self._ctrl.data["mangle"][uid]["uniq-id"]
-                == f"{self._data['chain']},{self._data['action']},{self._data['protocol']},{self._data['src-address']}:{self._data['src-port']}-{self._data['dst-address']}:{self._data['dst-port']}"
+            if self._ctrl.data["mangle"][uid]["uniq-id"] == (
+                f"{self._data['chain']},{self._data['action']},{self._data['protocol']},"
+                f"{self._data['src-address']}:{self._data['src-port']}-"
+                f"{self._data['dst-address']}:{self._data['dst-port']}"
             ):
                 value = self._ctrl.data["mangle"][uid][".id"]
 

@@ -221,6 +221,10 @@ class MikrotikControllerDeviceTracker(ScannerEntity):
         attributes = self._attrs
         return attributes
 
+    @property
+    def is_connected(self) -> bool:
+        return False
+
 
 # ---------------------------
 #   MikrotikControllerHostDeviceTracker

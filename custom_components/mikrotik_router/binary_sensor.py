@@ -383,7 +383,10 @@ class MikrotikControllerPortBinarySensor(MikrotikControllerBinarySensor):
     @property
     def unique_id(self) -> str:
         """Return a unique id for this entity."""
-        return f"{self._inst.lower()}-{self._sid_data['sid']}-{self._data['port-mac-address']}_{self._data['default-name']}"
+        return (
+            f"{self._inst.lower()}-{self._sid_data['sid']}-"
+            f"{self._data['port-mac-address']}_{self._data['default-name']}"
+        )
 
     @property
     def is_on(self) -> bool:
