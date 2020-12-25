@@ -24,8 +24,6 @@ from .const import (
     DEFAULT_TRACK_HOST_TIMEOUT,
     CONF_SENSOR_PORT_TRACKER,
     DEFAULT_SENSOR_PORT_TRACKER,
-    CONF_SENSOR_PPP,
-    DEFAULT_SENSOR_PPP,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -54,15 +52,6 @@ DEVICE_ATTRIBUTES_HOST = [
     "interface",
     "source",
     "last-seen",
-]
-
-DEVICE_ATTRIBUTES_PPP_SECRET = [
-    "connected",
-    "service",
-    "profile",
-    "comment",
-    "caller-id",
-    "encoding",
 ]
 
 
@@ -126,18 +115,17 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, tr
     # Add switches
     for sid, sid_uid, sid_name, sid_ref, sid_func in zip(
         # Data point name
-        ["interface", "host", "ppp_secret"],
+        ["interface", "host"],
         # Data point unique id
-        ["default-name", "mac-address", "name"],
+        ["default-name", "mac-address"],
         # Entry Name
-        ["name", "host-name", "name"],
+        ["name", "host-name"],
         # Entry Unique id
-        ["port-mac-address", "mac-address", "name"],
+        ["port-mac-address", "mac-address"],
         # Tracker function
         [
             MikrotikControllerPortDeviceTracker,
             MikrotikControllerHostDeviceTracker,
-            MikrotikControllerPPPSecretDeviceTracker,
         ],
     ):
         if (
@@ -424,83 +412,4 @@ class MikrotikControllerHostDeviceTracker(MikrotikControllerDeviceTracker):
         if self._sid_data["sid"] == "interface":
             info["name"] = f"{self._inst} {self._data[self._sid_data['sid_name']]}"
 
-        return info
-
-
-# ---------------------------
-#   MikrotikControllerPPPSecretDeviceTracker
-# ---------------------------
-class MikrotikControllerPPPSecretDeviceTracker(MikrotikControllerDeviceTracker):
-    """Representation of a network device."""
-
-    def __init__(self, inst, uid, mikrotik_controller, config_entry, sid_data):
-        """Set up tracked port."""
-        super().__init__(inst, uid, mikrotik_controller, config_entry, sid_data)
-
-    @property
-    def option_sensor_ppp(self):
-        """Config entry option to not track ARP."""
-        return self._config_entry.options.get(CONF_SENSOR_PPP, DEFAULT_SENSOR_PPP)
-
-    @property
-    def name(self):
-        """Return the name of the port."""
-        return f"{self._inst} PPP {self._data['name']}"
-
-    @property
-    def is_connected(self):
-        """Return true if the host is connected to the network."""
-        if not self.option_sensor_ppp:
-            return False
-
-        return self._data["connected"]
-
-    @property
-    def available(self) -> bool:
-        """Return if controller is available."""
-        if not self.option_sensor_ppp:
-            return False
-
-        return self._ctrl.connected()
-
-    @property
-    def unique_id(self):
-        """Return a unique identifier for this port."""
-        return f"{self._inst.lower()}-{self._sid_data['sid']}_tracker-{self._data[self._sid_data['sid_ref']]}"
-
-    @property
-    def icon(self):
-        """Return the icon."""
-        if self._data["connected"]:
-            return "mdi:account-network-outline"
-        else:
-            return "mdi:account-off-outline"
-
-    @property
-    def device_state_attributes(self):
-        """Return the port state attributes."""
-        attributes = self._attrs
-        for variable in DEVICE_ATTRIBUTES_IFACE:
-            if variable in self._data:
-                attributes[format_attribute(variable)] = self._data[variable]
-
-        return attributes
-
-    @property
-    def device_info(self):
-        """Return a PPP Secret switch description for device registry."""
-        info = {
-            "identifiers": {
-                (
-                    DOMAIN,
-                    "serial-number",
-                    self._ctrl.data["routerboard"]["serial-number"],
-                    "switch",
-                    "PPP",
-                )
-            },
-            "manufacturer": self._ctrl.data["resource"]["platform"],
-            "model": self._ctrl.data["resource"]["board-name"],
-            "name": f"{self._inst} PPP",
-        }
         return info
