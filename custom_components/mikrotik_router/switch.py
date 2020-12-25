@@ -59,6 +59,17 @@ DEVICE_ATTRIBUTES_PPP_SECRET = [
     "encoding",
 ]
 
+DEVICE_ATTRIBUTES_KIDCONTROL = [
+    "rate-limit",
+    "mon",
+    "tue",
+    "wed",
+    "thu",
+    "fri",
+    "sat",
+    "sun",
+]
+
 DEVICE_ATTRIBUTES_SCRIPT = [
     "last-started",
     "run-count",
@@ -130,13 +141,13 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
     # Add switches
     for sid, sid_uid, sid_name, sid_ref, sid_attr, sid_func in zip(
         # Data point name
-        ["interface", "nat", "mangle", "ppp_secret", "script", "queue"],
+        ["interface", "nat", "mangle", "ppp_secret", "script", "queue", "kid-control"],
         # Data point unique id
-        ["name", "uniq-id", "name", "name", "name", "name"],
+        ["name", "uniq-id", "name", "name", "name", "name", "name"],
         # Entry Name
-        ["name", "name", "comment", "name", "name", "name"],
+        ["name", "name", "comment", "name", "name", "name", "name"],
         # Entry Unique id
-        ["port-mac-address", "uniq-id", "name", "name", "name", "name"],
+        ["port-mac-address", "uniq-id", "name", "name", "name", "name", "name"],
         # Attr
         [
             DEVICE_ATTRIBUTES_IFACE,
@@ -145,6 +156,7 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
             DEVICE_ATTRIBUTES_PPP_SECRET,
             DEVICE_ATTRIBUTES_SCRIPT,
             DEVICE_ATTRIBUTES_QUEUE,
+            DEVICE_ATTRIBUTES_KIDCONTROL,
         ],
         # Switch function
         [
@@ -154,6 +166,7 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
             MikrotikControllerPPPSecretSwitch,
             MikrotikControllerScriptSwitch,
             MikrotikControllerQueueSwitch,
+            MikrotikControllerKidcontrolSwitch,
         ],
     ):
         for uid in mikrotik_controller.data[sid]:
@@ -679,6 +692,66 @@ class MikrotikControllerQueueSwitch(MikrotikControllerSwitch):
             if self._ctrl.data["queue"][uid]["name"] == f"{self._data['name']}":
                 value = self._ctrl.data["queue"][uid][".id"]
 
+        mod_param = "disabled"
+        mod_value = True
+        self._ctrl.set_value(path, param, value, mod_param, mod_value)
+        await self._ctrl.async_update()
+
+
+# ---------------------------
+#   MikrotikControllerKidcontrolSwitch
+# ---------------------------
+class MikrotikControllerKidcontrolSwitch(MikrotikControllerSwitch):
+    """Representation of a queue switch."""
+
+    def __init__(self, inst, uid, mikrotik_controller, sid_data):
+        """Set up queue switch."""
+        super().__init__(inst, uid, mikrotik_controller, sid_data)
+
+    @property
+    def icon(self):
+        """Return the icon."""
+        if not self._data["enabled"]:
+            icon = "mdi:account-off-outline"
+        else:
+            icon = "mdi:account-outline"
+
+        return icon
+
+    @property
+    def device_info(self):
+        """Return a queue switch description for device registry."""
+        info = {
+            "identifiers": {
+                (
+                    DOMAIN,
+                    "serial-number",
+                    self._ctrl.data["routerboard"]["serial-number"],
+                    "switch",
+                    "Kidcontrol",
+                )
+            },
+            "manufacturer": self._ctrl.data["resource"]["platform"],
+            "model": self._ctrl.data["resource"]["board-name"],
+            "name": f"{self._inst} Kidcontrol",
+        }
+        return info
+
+    async def async_turn_on(self):
+        """Turn on the queue switch."""
+        path = "/ip/kid-control"
+        param = "name"
+        value = self._data["name"]
+        mod_param = "disabled"
+        mod_value = False
+        self._ctrl.set_value(path, param, value, mod_param, mod_value)
+        await self._ctrl.force_update()
+
+    async def async_turn_off(self):
+        """Turn on the queue switch."""
+        path = "/ip/kid-control"
+        param = "name"
+        value = self._data["name"]
         mod_param = "disabled"
         mod_value = True
         self._ctrl.set_value(path, param, value, mod_param, mod_value)

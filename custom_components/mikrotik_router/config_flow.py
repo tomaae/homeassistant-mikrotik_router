@@ -261,12 +261,12 @@ class MikrotikControllerOptionsFlowHandler(OptionsFlow):
                             CONF_SENSOR_MANGLE, DEFAULT_SENSOR_MANGLE
                         ),
                     ): bool,
-                    # vol.Optional(
-                    #     CONF_SENSOR_KIDCONTROL,
-                    #     default=self.config_entry.options.get(
-                    #         CONF_SENSOR_KIDCONTROL, DEFAULT_SENSOR_KIDCONTROL
-                    #     ),
-                    # ): bool,
+                    vol.Optional(
+                        CONF_SENSOR_KIDCONTROL,
+                        default=self.config_entry.options.get(
+                            CONF_SENSOR_KIDCONTROL, DEFAULT_SENSOR_KIDCONTROL
+                        ),
+                    ): bool,
                     vol.Optional(
                         CONF_SENSOR_PPP,
                         default=self.config_entry.options.get(

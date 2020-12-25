@@ -80,6 +80,7 @@ class MikrotikControllerData:
             "bridge_host": {},
             "arp": {},
             "nat": {},
+            "kid-control": {},
             "mangle": {},
             "ppp_secret": {},
             "ppp_active": {},
@@ -525,6 +526,9 @@ class MikrotikControllerData:
         if self.api.connected() and self.option_sensor_nat:
             await self.hass.async_add_executor_job(self.get_nat)
 
+        if self.api.connected() and self.option_sensor_kidcontrol:
+            await self.hass.async_add_executor_job(self.get_kidcontrol)
+
         if self.api.connected() and self.option_sensor_mangle:
             await self.hass.async_add_executor_job(self.get_mangle)
 
@@ -877,6 +881,35 @@ class MikrotikControllerData:
                 )
 
             del self.data["mangle"][uid]
+
+    # ---------------------------
+    #   get_kidcontrol
+    # ---------------------------
+    def get_kidcontrol(self):
+        """Get Kid-control data from Mikrotik"""
+        self.data["kid-control"] = parse_api(
+            data=self.data["kid-control"],
+            source=self.api.path("/ip/kid-control"),
+            key="name",
+            vals=[
+                {"name": "name"},
+                {"name": "rate-limit"},
+                {"name": "mon", "default": "None"},
+                {"name": "tue", "default": "None"},
+                {"name": "wed", "default": "None"},
+                {"name": "thu", "default": "None"},
+                {"name": "fri", "default": "None"},
+                {"name": "sat", "default": "None"},
+                {"name": "sun", "default": "None"},
+                {"name": "comment"},
+                {
+                    "name": "enabled",
+                    "source": "disabled",
+                    "type": "bool",
+                    "reverse": True,
+                },
+            ],
+        )
 
     # ---------------------------
     #   get_ppp
