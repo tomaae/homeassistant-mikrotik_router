@@ -772,7 +772,9 @@ class MikrotikControllerData:
                 {"name": "new-packet-mark"},
                 {"name": "src-address-list"},
                 {"name": "protocol", "default": "any"},
+                {"name": "src-address", "default": "any"},
                 {"name": "src-port", "default": "any"},
+                {"name": "dst-address", "default": "any"},
                 {"name": "dst-port", "default": "any"},
                 {
                     "name": "enabled",
@@ -785,7 +787,17 @@ class MikrotikControllerData:
                 [
                     {"name": "name"},
                     {"action": "combine"},
+                    {"key": "chain"},
+                    {"text": ","},
+                    {"key": "action"},
+                    {"text": ","},
                     {"key": "protocol"},
+                    {"text": ","},
+                    {"key": "src-address"},
+                    {"text": ":"},
+                    {"key": "src-port"},
+                    {"text": "-"},
+                    {"key": "dst-address"},
                     {"text": ":"},
                     {"key": "dst-port"},
                 ]
@@ -794,7 +806,7 @@ class MikrotikControllerData:
                 {"name": "dynamic", "value": True},
                 {"name": "action", "value": "jump"},
                 {"name": "protocol", "value": ""},
-                {"name": "dst-port", "value": ""},
+                # {"name": "dst-port", "value": ""},
             ],
         )
 

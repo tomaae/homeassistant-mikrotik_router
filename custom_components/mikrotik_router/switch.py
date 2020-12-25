@@ -445,7 +445,7 @@ class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
         for uid in self._ctrl.data["mangle"]:
             if (
                 self._ctrl.data["mangle"][uid]["name"]
-                == f"{self._data['protocol']}:{self._data['dst-port']}"
+                == f"{self._data['chain']},{self._data['action']},{self._data['protocol']},{self._data['src-address']}:{self._data['src-port']}:{self._data['dst-address']}:{self._data['dst-port']}"
             ):
                 value = self._ctrl.data["mangle"][uid][".id"]
 
@@ -462,7 +462,7 @@ class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
         for uid in self._ctrl.data["mangle"]:
             if (
                 self._ctrl.data["mangle"][uid]["name"]
-                == f"{self._data['protocol']}:{self._data['dst-port']}"
+                == f"{self._data['chain']},{self._data['action']},{self._data['protocol']},{self._data['src-address']}:{self._data['src-port']}:{self._data['dst-address']}:{self._data['dst-port']}"
             ):
                 value = self._ctrl.data["mangle"][uid][".id"]
 
