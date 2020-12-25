@@ -12,6 +12,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
+from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 
 from .const import (
     DOMAIN,
@@ -19,6 +20,8 @@ from .const import (
     ATTRIBUTION,
     CONF_SENSOR_PPP,
     DEFAULT_SENSOR_PPP,
+    CONF_SENSOR_PORT_TRACKER,
+    DEFAULT_SENSOR_PORT_TRACKER,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -36,6 +39,23 @@ SENSOR_TYPES = {
         ATTR_ATTR: "available",
     },
 }
+
+DEVICE_ATTRIBUTES_IFACE = [
+    "running",
+    "enabled",
+    "comment",
+    "client-ip-address",
+    "client-mac-address",
+    "port-mac-address",
+    "last-link-down-time",
+    "last-link-up-time",
+    "link-downs",
+    "actual-mtu",
+    "type",
+    "name",
+    "default-name",
+    "poe-out",
+]
 
 DEVICE_ATTRIBUTES_PPP_SECRET = [
     "connected",
@@ -106,19 +126,33 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
     # Add switches
     for sid, sid_uid, sid_name, sid_ref, sid_func in zip(
         # Data point name
-        ["ppp_secret"],
+        ["ppp_secret", "interface"],
         # Data point unique id
-        ["name"],
+        ["name", "default-name"],
         # Entry Name
-        ["name"],
+        ["name", "name"],
         # Entry Unique id
-        ["name"],
+        ["name", "port-mac-address"],
         # Tracker function
         [
             MikrotikControllerPPPSecretBinarySensor,
+            MikrotikControllerPortBinarySensor,
         ],
     ):
+        if (
+            sid_func == MikrotikControllerPortBinarySensor
+            and not config_entry.options.get(
+                CONF_SENSOR_PORT_TRACKER, DEFAULT_SENSOR_PORT_TRACKER
+            )
+        ):
+            continue
         for uid in mikrotik_controller.data[sid]:
+            if (
+                # Skip if interface is wlan
+                sid == "interface"
+                and mikrotik_controller.data[sid][uid]["type"] == "wlan"
+            ):
+                continue
             # Update entity
             item_id = f"{inst}-{sid}-{mikrotik_controller.data[sid][uid][sid_uid]}"
             _LOGGER.debug("Updating binary_sensor %s", item_id)
@@ -317,4 +351,90 @@ class MikrotikControllerPPPSecretBinarySensor(MikrotikControllerBinarySensor):
             "model": self._ctrl.data["resource"]["board-name"],
             "name": f"{self._inst} PPP",
         }
+        return info
+
+
+# ---------------------------
+#   MikrotikControllerPortBinarySensor
+# ---------------------------
+class MikrotikControllerPortBinarySensor(MikrotikControllerBinarySensor):
+    """Representation of a network port."""
+
+    def __init__(self, inst, uid, mikrotik_controller, config_entry, sid_data):
+        """Set up tracked port."""
+        super().__init__(mikrotik_controller, inst, uid)
+        self._sid_data = sid_data
+        self._data = mikrotik_controller.data[self._sid_data["sid"]][uid]
+        self._config_entry = config_entry
+
+    @property
+    def option_sensor_port_tracker(self):
+        """Config entry option to not track ARP."""
+        return self._config_entry.options.get(
+            CONF_SENSOR_PORT_TRACKER, DEFAULT_SENSOR_PORT_TRACKER
+        )
+
+    @property
+    def name(self):
+        """Return the name of the port."""
+        return f"{self._inst} {self._data[self._sid_data['sid_name']]}"
+
+    @property
+    def unique_id(self):
+        """Return a unique identifier for this port."""
+        return f"{self._inst.lower()}-{self._sid_data['sid']}-{self._data['port-mac-address']}_{self._data['default-name']}"
+
+    @property
+    def is_on(self):
+        """Return true if the port is connected to the network."""
+        return self._data["running"]
+
+    @property
+    def device_class(self) -> str:
+        """Return the device class."""
+        return DEVICE_CLASS_CONNECTIVITY
+
+    @property
+    def available(self) -> bool:
+        """Return if controller is available."""
+        if not self.option_sensor_port_tracker:
+            return False
+
+        return self._ctrl.connected()
+
+    @property
+    def icon(self):
+        """Return the icon."""
+        if self._data["running"]:
+            icon = "mdi:lan-connect"
+        else:
+            icon = "mdi:lan-pending"
+
+        if not self._data["enabled"]:
+            icon = "mdi:lan-disconnect"
+
+        return icon
+
+    @property
+    def device_state_attributes(self):
+        """Return the port state attributes."""
+        attributes = self._attrs
+        for variable in DEVICE_ATTRIBUTES_IFACE:
+            if variable in self._data:
+                attributes[format_attribute(variable)] = self._data[variable]
+
+        return attributes
+
+    @property
+    def device_info(self):
+        """Return a description for device registry."""
+        info = {
+            "connections": {
+                (CONNECTION_NETWORK_MAC, self._data[self._sid_data["sid_ref"]])
+            },
+            "manufacturer": self._ctrl.data["resource"]["platform"],
+            "model": self._ctrl.data["resource"]["board-name"],
+            "name": f"{self._inst} {self._data[self._sid_data['sid_name']]}",
+        }
+
         return info
