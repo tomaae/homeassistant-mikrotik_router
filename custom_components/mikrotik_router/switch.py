@@ -41,11 +41,11 @@ DEVICE_ATTRIBUTES_NAT = [
 DEVICE_ATTRIBUTES_MANGLE = [
     "chain",
     "action",
-    "address-list",
     "passthrough",
-    "new-packet-mark",
     "protocol",
+    "src-address",
     "src-port",
+    "dst-address",
     "dst-port",
     "comment",
 ]

@@ -792,8 +792,6 @@ class MikrotikControllerData:
                 {"name": "comment"},
                 {"name": "address-list"},
                 {"name": "passthrough", "type": "bool", "default": False},
-                {"name": "new-packet-mark"},
-                {"name": "src-address-list"},
                 {"name": "protocol", "default": "any"},
                 {"name": "src-address", "default": "any"},
                 {"name": "src-port", "default": "any"},
