@@ -113,6 +113,7 @@ class MikrotikControllerData:
         )
 
         self.nat_removed = {}
+        self.mangle_removed = {}
         self.host_hass_recovered = False
         self.host_tracking_initialized = False
 
@@ -809,6 +810,28 @@ class MikrotikControllerData:
                 # {"name": "dst-port", "value": ""},
             ],
         )
+
+        # Remove duplicate Mangle entries to prevent crash
+        mangle_uniq = {}
+        mangle_del = {}
+        for uid in self.data["mangle"]:
+            tmp_name = self.data["mangle"][uid]["name"]
+            if tmp_name not in mangle_uniq:
+                mangle_uniq[tmp_name] = uid
+            else:
+                mangle_del[uid] = 1
+                mangle_del[mangle_uniq[tmp_name]] = 1
+
+        for uid in mangle_del:
+            if self.data["mangle"][uid]["name"] not in self.mangle_removed:
+                self.mangle_removed[self.data["mangle"][uid]["name"]] = 1
+                _LOGGER.error(
+                    "Mikrotik %s duplicate Mangle rule %s, entity will be unavailable.",
+                    self.host,
+                    self.data["mangle"][uid]["name"],
+                )
+
+            del self.data["mangle"][uid]
 
     # ---------------------------
     #   get_system_routerboard
