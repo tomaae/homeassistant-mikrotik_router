@@ -826,7 +826,6 @@ class MikrotikControllerData:
             skip=[
                 {"name": "dynamic", "value": True},
                 {"name": "action", "value": "jump"},
-                {"name": "protocol", "value": ""},
             ],
         )
 
