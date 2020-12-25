@@ -532,12 +532,12 @@ class MikrotikControllerPPPSecretSwitch(MikrotikControllerSwitch):
                     "serial-number",
                     self._ctrl.data["routerboard"]["serial-number"],
                     "switch",
-                    "PPP Secret",
+                    "PPP",
                 )
             },
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
-            "name": f"{self._inst} PPP Secret",
+            "name": f"{self._inst} PPP",
         }
         return info
 

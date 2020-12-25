@@ -488,11 +488,19 @@ class MikrotikControllerPPPSecretDeviceTracker(MikrotikControllerDeviceTracker):
 
     @property
     def device_info(self):
-        """Return a description for device registry."""
+        """Return a PPP Secret switch description for device registry."""
         info = {
-            "connections": {
-                (CONNECTION_NETWORK_MAC, self._data[self._sid_data["sid_ref"]])
+            "identifiers": {
+                (
+                    DOMAIN,
+                    "serial-number",
+                    self._ctrl.data["routerboard"]["serial-number"],
+                    "switch",
+                    "PPP",
+                )
             },
-            "name": self._data[self._sid_data["sid_name"]],
+            "manufacturer": self._ctrl.data["resource"]["platform"],
+            "model": self._ctrl.data["resource"]["board-name"],
+            "name": f"{self._inst} PPP",
         }
         return info
