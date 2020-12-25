@@ -81,6 +81,8 @@ class MikrotikControllerData:
             "arp": {},
             "nat": {},
             "mangle": {},
+            "ppp_secret": {},
+            "ppp_active": {},
             "fw-update": {},
             "script": {},
             "queue": {},
@@ -526,6 +528,9 @@ class MikrotikControllerData:
         if self.api.connected() and self.option_sensor_mangle:
             await self.hass.async_add_executor_job(self.get_mangle)
 
+        if self.api.connected() and self.option_sensor_ppp:
+            await self.hass.async_add_executor_job(self.get_ppp)
+
         if self.api.connected():
             await self.hass.async_add_executor_job(self.get_system_resource)
 
@@ -850,6 +855,60 @@ class MikrotikControllerData:
                 )
 
             del self.data["mangle"][uid]
+
+    # ---------------------------
+    #   get_ppp
+    # ---------------------------
+    def get_ppp(self):
+        """Get PPP data from Mikrotik"""
+        self.data["ppp_secret"] = parse_api(
+            data=self.data["ppp_secret"],
+            source=self.api.path("/ppp/secret"),
+            key="name",
+            vals=[
+                {"name": "name"},
+                {"name": "service"},
+                {"name": "profile"},
+                {"name": "comment"},
+                {
+                    "name": "enabled",
+                    "source": "disabled",
+                    "type": "bool",
+                    "reverse": True,
+                },
+            ],
+            ensure_vals=[
+                {"name": "caller-id", "default": "not connected"},
+                {"name": "encoding", "default": "not connected"},
+                {"name": "connected", "default": False},
+            ],
+        )
+
+        self.data["ppp_active"] = parse_api(
+            data={},
+            source=self.api.path("/ppp/active"),
+            key="name",
+            vals=[
+                {"name": "name"},
+                {"name": "service"},
+                {"name": "caller-id"},
+                {"name": "encoding"},
+            ],
+        )
+
+        for uid in self.data["ppp_secret"]:
+            if self.data["ppp_secret"][uid]["name"] in self.data["ppp_active"]:
+                self.data["ppp_secret"][uid]["connected"] = True
+                self.data["ppp_secret"][uid]["caller-id"] = self.data["ppp_active"][
+                    uid
+                ]["caller-id"]
+                self.data["ppp_secret"][uid]["encoding"] = self.data["ppp_active"][uid][
+                    "encoding"
+                ]
+            else:
+                self.data["ppp_secret"][uid]["connected"] = False
+                self.data["ppp_secret"][uid]["caller-id"] = "not connected"
+                self.data["ppp_secret"][uid]["encoding"] = "not connected"
 
     # ---------------------------
     #   get_system_routerboard
