@@ -412,6 +412,11 @@ class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
         return f"{self._inst} Mangle {self._data['name']}"
 
     @property
+    def unique_id(self) -> str:
+        """Return a unique identifier for this mangle switch."""
+        return f"{self._inst.lower()}-enable_mangle-{self._data['name']}"
+
+    @property
     def icon(self):
         """Return the icon."""
         if not self._data["enabled"]:
@@ -448,7 +453,7 @@ class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
         for uid in self._ctrl.data["mangle"]:
             if (
                 self._ctrl.data["mangle"][uid]["name"]
-                == f"{self._data['chain']},{self._data['action']},{self._data['protocol']},{self._data['src-address']}:{self._data['src-port']}:{self._data['dst-address']}:{self._data['dst-port']}"
+                == f"{self._data['chain']},{self._data['action']},{self._data['protocol']},{self._data['src-address']}:{self._data['src-port']}-{self._data['dst-address']}:{self._data['dst-port']}"
             ):
                 value = self._ctrl.data["mangle"][uid][".id"]
 
@@ -465,7 +470,7 @@ class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
         for uid in self._ctrl.data["mangle"]:
             if (
                 self._ctrl.data["mangle"][uid]["name"]
-                == f"{self._data['chain']},{self._data['action']},{self._data['protocol']},{self._data['src-address']}:{self._data['src-port']}:{self._data['dst-address']}:{self._data['dst-port']}"
+                == f"{self._data['chain']},{self._data['action']},{self._data['protocol']},{self._data['src-address']}:{self._data['src-port']}-{self._data['dst-address']}:{self._data['dst-port']}"
             ):
                 value = self._ctrl.data["mangle"][uid][".id"]
 

@@ -807,7 +807,6 @@ class MikrotikControllerData:
                 {"name": "dynamic", "value": True},
                 {"name": "action", "value": "jump"},
                 {"name": "protocol", "value": ""},
-                # {"name": "dst-port", "value": ""},
             ],
         )
 
