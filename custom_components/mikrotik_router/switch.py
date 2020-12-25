@@ -50,6 +50,15 @@ DEVICE_ATTRIBUTES_MANGLE = [
     "comment",
 ]
 
+DEVICE_ATTRIBUTES_PPP_SECRET = [
+    "connected",
+    "service",
+    "profile",
+    "comment",
+    "caller-id",
+    "encoding",
+]
+
 DEVICE_ATTRIBUTES_SCRIPT = [
     "last-started",
     "run-count",
@@ -121,18 +130,19 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
     # Add switches
     for sid, sid_uid, sid_name, sid_ref, sid_attr, sid_func in zip(
         # Data point name
-        ["interface", "nat", "mangle", "script", "queue"],
+        ["interface", "nat", "mangle", "ppp_secret", "script", "queue"],
         # Data point unique id
-        ["name", "name", "name", "name", "name"],
+        ["name", "name", "name", "name", "name", "name"],
         # Entry Name
-        ["name", "name", "comment", "name", "name"],
+        ["name", "name", "comment", "name", "name", "name"],
         # Entry Unique id
-        ["port-mac-address", "name", "name", "name", "name"],
+        ["port-mac-address", "name", "name", "name", "name", "name"],
         # Attr
         [
             DEVICE_ATTRIBUTES_IFACE,
             DEVICE_ATTRIBUTES_NAT,
             DEVICE_ATTRIBUTES_MANGLE,
+            DEVICE_ATTRIBUTES_PPP_SECRET,
             DEVICE_ATTRIBUTES_SCRIPT,
             DEVICE_ATTRIBUTES_QUEUE,
         ],
@@ -141,6 +151,7 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
             MikrotikControllerPortSwitch,
             MikrotikControllerNATSwitch,
             MikrotikControllerMangleSwitch,
+            MikrotikControllerPPPSecretSwitch,
             MikrotikControllerScriptSwitch,
             MikrotikControllerQueueSwitch,
         ],
@@ -474,6 +485,77 @@ class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
             ):
                 value = self._ctrl.data["mangle"][uid][".id"]
 
+        mod_param = "disabled"
+        mod_value = True
+        self._ctrl.set_value(path, param, value, mod_param, mod_value)
+        await self._ctrl.async_update()
+
+
+# ---------------------------
+#   MikrotikControllerPPPSecretSwitch
+# ---------------------------
+class MikrotikControllerPPPSecretSwitch(MikrotikControllerSwitch):
+    """Representation of a PPP Secret switch."""
+
+    def __init__(self, inst, uid, mikrotik_controller, sid_data):
+        """Set up PPP Secret switch."""
+        super().__init__(inst, uid, mikrotik_controller, sid_data)
+
+    @property
+    def name(self) -> str:
+        """Return the name of the PPP Secret switch."""
+
+        return f"{self._inst} PPP Secret {self._data['name']}"
+
+    @property
+    def unique_id(self) -> str:
+        """Return a unique identifier for this ppp_secret switch."""
+        return f"{self._inst.lower()}-enable_ppp_secret-{self._data['name']}"
+
+    @property
+    def icon(self):
+        """Return the icon."""
+        if not self._data["enabled"]:
+            icon = "mdi:account-off-outline"
+        else:
+            icon = "mdi:account-outline"
+
+        return icon
+
+    @property
+    def device_info(self):
+        """Return a PPP Secret switch description for device registry."""
+        info = {
+            "identifiers": {
+                (
+                    DOMAIN,
+                    "serial-number",
+                    self._ctrl.data["routerboard"]["serial-number"],
+                    "switch",
+                    "PPP Secret",
+                )
+            },
+            "manufacturer": self._ctrl.data["resource"]["platform"],
+            "model": self._ctrl.data["resource"]["board-name"],
+            "name": f"{self._inst} PPP Secret",
+        }
+        return info
+
+    async def async_turn_on(self):
+        """Turn on the switch."""
+        path = "/ppp/secret"
+        param = "name"
+        value = self._data["name"]
+        mod_param = "disabled"
+        mod_value = False
+        self._ctrl.set_value(path, param, value, mod_param, mod_value)
+        await self._ctrl.force_update()
+
+    async def async_turn_off(self):
+        """Turn on the switch."""
+        path = "/ppp/secret"
+        param = "name"
+        value = self._data["name"]
         mod_param = "disabled"
         mod_value = True
         self._ctrl.set_value(path, param, value, mod_param, mod_value)
