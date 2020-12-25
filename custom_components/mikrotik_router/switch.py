@@ -406,6 +406,9 @@ class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
     @property
     def name(self) -> str:
         """Return the name of the Mangle switch."""
+        if self._data["comment"]:
+            return f"{self._inst} Mangle {self._data['comment']}"
+
         return f"{self._inst} Mangle {self._data['name']}"
 
     @property
