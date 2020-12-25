@@ -83,7 +83,7 @@ SENSOR_TYPES = {
     },
     "system_fan1-speed": {
         ATTR_DEVICE_CLASS: None,
-        ATTR_ICON: "mdi:transmission-tower",
+        ATTR_ICON: "mdi:fan",
         ATTR_LABEL: "Fan1 speed",
         ATTR_UNIT: "RPM",
         ATTR_GROUP: "System",
@@ -92,7 +92,7 @@ SENSOR_TYPES = {
     },
     "system_fan2-speed": {
         ATTR_DEVICE_CLASS: None,
-        ATTR_ICON: "mdi:transmission-tower",
+        ATTR_ICON: "mdi:fan",
         ATTR_LABEL: "Fan2 speed",
         ATTR_UNIT: "RPM",
         ATTR_GROUP: "System",
