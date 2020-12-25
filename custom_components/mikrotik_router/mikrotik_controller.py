@@ -938,7 +938,14 @@ class MikrotikControllerData:
         self.data["health"] = parse_api(
             data=self.data["health"],
             source=self.api.path("/system/health"),
-            vals=[{"name": "temperature", "default": "unknown"}],
+            vals=[
+                {"name": "temperature", "default": "unknown"},
+                {"name": "cpu-temperature", "default": "unknown"},
+                {"name": "power-consumption", "default": "unknown"},
+                {"name": "board-temperature1", "default": "unknown"},
+                {"name": "fan1-speed", "default": "unknown"},
+                {"name": "fan2-speed", "default": "unknown"},
+            ],
         )
 
     # ---------------------------
