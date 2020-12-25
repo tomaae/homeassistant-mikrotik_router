@@ -42,6 +42,8 @@
                     "sensor_simple_queues": "Simple queues switches",
                     "sensor_nat": "NAT switches",
                     "sensor_mangle": "Mangle switches",
+                    "sensor_kidcontrol": "Kid control",
+                    "sensor_ppp": "PPP users",
                     "sensor_scripts": "Scripts switches",
                     "sensor_environment": "Environment variable sensors"
                 },

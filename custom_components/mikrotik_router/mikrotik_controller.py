@@ -42,6 +42,10 @@ from .const import (
     DEFAULT_SENSOR_NAT,
     CONF_SENSOR_MANGLE,
     DEFAULT_SENSOR_MANGLE,
+    CONF_SENSOR_KIDCONTROL,
+    DEFAULT_SENSOR_KIDCONTROL,
+    CONF_SENSOR_PPP,
+    DEFAULT_SENSOR_PPP,
     CONF_SENSOR_SCRIPTS,
     DEFAULT_SENSOR_SCRIPTS,
     CONF_SENSOR_ENVIRONMENT,
@@ -197,12 +201,30 @@ class MikrotikControllerData:
         return self.config_entry.options.get(CONF_SENSOR_NAT, DEFAULT_SENSOR_NAT)
 
     # ---------------------------
-    #   option_sensor_nat
+    #   option_sensor_mangle
     # ---------------------------
     @property
     def option_sensor_mangle(self):
         """Config entry option to not track ARP."""
         return self.config_entry.options.get(CONF_SENSOR_MANGLE, DEFAULT_SENSOR_MANGLE)
+
+    # ---------------------------
+    #   option_sensor_kidcontrol
+    # ---------------------------
+    @property
+    def option_sensor_kidcontrol(self):
+        """Config entry option to not track ARP."""
+        return self.config_entry.options.get(
+            CONF_SENSOR_KIDCONTROL, DEFAULT_SENSOR_KIDCONTROL
+        )
+
+    # ---------------------------
+    #   option_sensor_ppp
+    # ---------------------------
+    @property
+    def option_sensor_ppp(self):
+        """Config entry option to not track ARP."""
+        return self.config_entry.options.get(CONF_SENSOR_PPP, DEFAULT_SENSOR_PPP)
 
     # ---------------------------
     #   option_sensor_scripts
