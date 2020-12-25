@@ -145,11 +145,11 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
         # Data point name
         ["interface", "nat", "mangle", "ppp_secret", "script", "queue", "kid-control"],
         # Data point unique id
-        ["name", "uniq-id", "name", "name", "name", "name", "name"],
+        ["name", "uniq-id", "uniq-id", "name", "name", "name", "name"],
         # Entry Name
-        ["name", "name", "comment", "name", "name", "name", "name"],
+        ["name", "name", "name", "name", "name", "name", "name"],
         # Entry Unique id
-        ["port-mac-address", "uniq-id", "name", "name", "name", "name", "name"],
+        ["port-mac-address", "uniq-id", "uniq-id", "name", "name", "name", "name"],
         # Attr
         [
             DEVICE_ATTRIBUTES_IFACE,
@@ -448,7 +448,7 @@ class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
     @property
     def unique_id(self) -> str:
         """Return a unique id for this entity."""
-        return f"{self._inst.lower()}-enable_mangle-{self._data['name']}"
+        return f"{self._inst.lower()}-enable_mangle-{self._data['uniq-id']}"
 
     @property
     def icon(self) -> str:
@@ -486,7 +486,7 @@ class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
         value = None
         for uid in self._ctrl.data["mangle"]:
             if (
-                self._ctrl.data["mangle"][uid]["name"]
+                self._ctrl.data["mangle"][uid]["uniq-id"]
                 == f"{self._data['chain']},{self._data['action']},{self._data['protocol']},{self._data['src-address']}:{self._data['src-port']}-{self._data['dst-address']}:{self._data['dst-port']}"
             ):
                 value = self._ctrl.data["mangle"][uid][".id"]
@@ -503,7 +503,7 @@ class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
         value = None
         for uid in self._ctrl.data["mangle"]:
             if (
-                self._ctrl.data["mangle"][uid]["name"]
+                self._ctrl.data["mangle"][uid]["uniq-id"]
                 == f"{self._data['chain']},{self._data['action']},{self._data['protocol']},{self._data['src-address']}:{self._data['src-port']}-{self._data['dst-address']}:{self._data['dst-port']}"
             ):
                 value = self._ctrl.data["mangle"][uid][".id"]

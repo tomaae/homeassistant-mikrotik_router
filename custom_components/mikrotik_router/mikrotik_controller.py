@@ -850,7 +850,7 @@ class MikrotikControllerData:
             ],
             val_proc=[
                 [
-                    {"name": "name"},
+                    {"name": "uniq-id"},
                     {"action": "combine"},
                     {"key": "chain"},
                     {"text": ","},
@@ -865,7 +865,16 @@ class MikrotikControllerData:
                     {"key": "dst-address"},
                     {"text": ":"},
                     {"key": "dst-port"},
-                ]
+                ],
+                [
+                    {"name": "name"},
+                    {"action": "combine"},
+                    {"key": "action"},
+                    {"text": ","},
+                    {"key": "protocol"},
+                    {"text": ":"},
+                    {"key": "dst-port"},
+                ],
             ],
             skip=[
                 {"name": "dynamic", "value": True},
@@ -877,7 +886,7 @@ class MikrotikControllerData:
         mangle_uniq = {}
         mangle_del = {}
         for uid in self.data["mangle"]:
-            tmp_name = self.data["mangle"][uid]["name"]
+            tmp_name = self.data["mangle"][uid]["uniq-id"]
             if tmp_name not in mangle_uniq:
                 mangle_uniq[tmp_name] = uid
             else:
@@ -885,8 +894,8 @@ class MikrotikControllerData:
                 mangle_del[mangle_uniq[tmp_name]] = 1
 
         for uid in mangle_del:
-            if self.data["mangle"][uid]["name"] not in self.mangle_removed:
-                self.mangle_removed[self.data["mangle"][uid]["name"]] = 1
+            if self.data["mangle"][uid]["uniq-id"] not in self.mangle_removed:
+                self.mangle_removed[self.data["mangle"][uid]["uniq-id"]] = 1
                 _LOGGER.error(
                     "Mikrotik %s duplicate Mangle rule %s, entity will be unavailable.",
                     self.host,
