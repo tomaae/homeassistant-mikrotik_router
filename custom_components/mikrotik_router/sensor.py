@@ -1,6 +1,7 @@
 """Support for the Mikrotik Router sensor service."""
 
 import logging
+from typing import Any, Dict, Optional
 
 from homeassistant.const import (
     CONF_NAME,
@@ -345,12 +346,12 @@ class MikrotikControllerSensor(Entity):
         self._attrs = {ATTR_ATTRIBUTION: ATTRIBUTION}
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Return the name."""
         return f"{self._inst} {self._type[ATTR_LABEL]}"
 
     @property
-    def state(self):
+    def state(self) -> Optional[str]:
         """Return the state."""
         val = "unknown"
         if self._attr in self._data:
@@ -359,24 +360,24 @@ class MikrotikControllerSensor(Entity):
         return val
 
     @property
-    def device_state_attributes(self):
+    def device_state_attributes(self) -> Dict[str, Any]:
         """Return the state attributes."""
         return self._attrs
 
     @property
-    def icon(self):
+    def icon(self) -> str:
         """Return the icon."""
         self._icon = self._type[ATTR_ICON]
         return self._icon
 
     @property
-    def device_class(self):
-        """Return the device_class."""
+    def device_class(self) -> Optional[str]:
+        """Return the device class."""
         return self._type[ATTR_DEVICE_CLASS]
 
     @property
-    def unique_id(self):
-        """Return a unique_id for this entity."""
+    def unique_id(self) -> str:
+        """Return a unique id for this entity."""
         return f"{self._inst.lower()}-{self._sensor.lower()}"
 
     @property
@@ -394,8 +395,8 @@ class MikrotikControllerSensor(Entity):
         return self._ctrl.connected()
 
     @property
-    def device_info(self):
-        """Return a port description for device registry."""
+    def device_info(self) -> Dict[str, Any]:
+        """Return a description for device registry."""
         info = {
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
@@ -418,7 +419,7 @@ class MikrotikControllerSensor(Entity):
         """Synchronize state with controller."""
 
     async def async_added_to_hass(self):
-        """Port entity created."""
+        """Run when entity about to be added to hass."""
         _LOGGER.debug("New sensor %s (%s)", self._inst, self._sensor)
 
 
@@ -426,7 +427,7 @@ class MikrotikControllerSensor(Entity):
 #   MikrotikControllerTrafficSensor
 # ---------------------------
 class MikrotikControllerTrafficSensor(MikrotikControllerSensor):
-    """Define an Mikrotik Controller sensor."""
+    """Define a traffic sensor."""
 
     def __init__(self, mikrotik_controller, inst, sensor, uid):
         """Initialize."""
@@ -435,18 +436,18 @@ class MikrotikControllerTrafficSensor(MikrotikControllerSensor):
         self._data = mikrotik_controller.data[SENSOR_TYPES[sensor][ATTR_PATH]][uid]
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Return the name."""
         return f"{self._inst} {self._data['name']} {self._type[ATTR_LABEL]}"
 
     @property
-    def unique_id(self):
-        """Return a unique_id for this entity."""
+    def unique_id(self) -> str:
+        """Return a unique id for this entity."""
         return f"{self._inst.lower()}-{self._sensor.lower()}-{self._data['default-name'].lower()}"
 
     @property
-    def device_info(self):
-        """Return a port description for device registry."""
+    def device_info(self) -> Dict[str, Any]:
+        """Return a description for device registry."""
         info = {
             "connections": {(CONNECTION_NETWORK_MAC, self._data["port-mac-address"])},
             "manufacturer": self._ctrl.data["resource"]["platform"],
@@ -455,15 +456,6 @@ class MikrotikControllerTrafficSensor(MikrotikControllerSensor):
         }
 
         return info
-
-    async def async_added_to_hass(self):
-        """Port entity created."""
-        _LOGGER.debug(
-            "New sensor %s (%s %s)",
-            self._inst,
-            self._data["default-name"],
-            self._sensor,
-        )
 
 
 # ---------------------------
@@ -479,13 +471,13 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
         self._data = mikrotik_controller.data[SENSOR_TYPES[sensor][ATTR_PATH]][uid]
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Return the name."""
         return f"{self._data['host-name']} {self._type[ATTR_LABEL]}"
 
     @property
-    def unique_id(self):
-        """Return a unique_id for this entity."""
+    def unique_id(self) -> str:
+        """Return a unique id for this entity."""
         return f"{self._inst.lower()}-{self._sensor.lower()}-{self._data['mac-address'].lower()}"
 
     @property
@@ -503,8 +495,8 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
             return self._ctrl.connected() and self._data["available"]
 
     @property
-    def device_info(self):
-        """Return a accounting description for device registry."""
+    def device_info(self) -> Dict[str, Any]:
+        """Return a description for device registry."""
         info = {
             "connections": {(CONNECTION_NETWORK_MAC, self._data["mac-address"])},
             "default_name": self._data["host-name"],
@@ -515,7 +507,7 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
         return info
 
     @property
-    def device_state_attributes(self):
+    def device_state_attributes(self) -> Dict[str, Any]:
         """Return the state attributes."""
         attributes = self._attrs
         for variable in DEVICE_ATTRIBUTES_ACCOUNTING:
@@ -524,22 +516,12 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
 
         return attributes
 
-    async def async_added_to_hass(self):
-        """Port entity created."""
-        _LOGGER.debug(
-            "New sensor %s (%s [%s] %s)",
-            self._inst,
-            self._data["host-name"],
-            self._data["mac-address"],
-            self._sensor,
-        )
-
 
 # ---------------------------
 #   MikrotikControllerEnvironmentSensor
 # ---------------------------
 class MikrotikControllerEnvironmentSensor(MikrotikControllerSensor):
-    """Define an Mikrotik Controller sensor."""
+    """Define an Enviroment variable sensor."""
 
     def __init__(self, mikrotik_controller, inst, sensor, uid):
         """Initialize."""
@@ -548,29 +530,11 @@ class MikrotikControllerEnvironmentSensor(MikrotikControllerSensor):
         self._data = mikrotik_controller.data["environment"][uid]
 
     @property
-    def unique_id(self):
-        """Return a unique_id for this entity."""
+    def unique_id(self) -> str:
+        """Return a unique id for this entity."""
         return f"{self._inst.lower()}-environment-{self._uid}"
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Return the name."""
         return f"{self._inst} {self._data['name']}"
-
-    @property
-    def state(self):
-        """Return the state."""
-        val = "unknown"
-        if self._attr in self._data:
-            val = self._data[self._attr]
-
-        return val
-
-    async def async_added_to_hass(self):
-        """Port entity created."""
-        _LOGGER.debug(
-            "New sensor %s (%s %s)",
-            self._inst,
-            self._data["name"],
-            self._sensor,
-        )

@@ -1,5 +1,7 @@
 """Support for the Mikrotik Router switches."""
+
 import logging
+from typing import Any, Dict
 
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.const import CONF_NAME, ATTR_ATTRIBUTION
@@ -199,7 +201,7 @@ class MikrotikControllerSwitch(SwitchEntity, RestoreEntity):
     """Representation of a switch."""
 
     def __init__(self, inst, uid, mikrotik_controller, sid_data):
-        """Set up switch."""
+        """Initialize."""
         self._sid_data = sid_data
         self._inst = inst
         self._ctrl = mikrotik_controller
@@ -210,7 +212,7 @@ class MikrotikControllerSwitch(SwitchEntity, RestoreEntity):
         }
 
     async def async_added_to_hass(self):
-        """Device tracker entity created."""
+        """Run when entity about to be added to hass."""
         _LOGGER.debug(
             "New switch %s (%s %s)",
             self._inst,
@@ -228,22 +230,22 @@ class MikrotikControllerSwitch(SwitchEntity, RestoreEntity):
 
     @property
     def name(self) -> str:
-        """Return the name of the port."""
+        """Return the name."""
         return f"{self._inst} {self._sid_data['sid']} {self._data[self._sid_data['sid_name']]}"
 
     @property
     def unique_id(self) -> str:
-        """Return a unique identifier for this port."""
+        """Return a unique id for this entity."""
         return f"{self._inst.lower()}-{self._sid_data['sid']}_switch-{self._data[self._sid_data['sid_ref']]}"
 
     @property
-    def is_on(self):
-        """Return true if the queue is on."""
+    def is_on(self) -> bool:
+        """Return true if device is on."""
         return self._data["enabled"]
 
     @property
-    def device_state_attributes(self):
-        """Return the port state attributes."""
+    def device_state_attributes(self) -> Dict[str, Any]:
+        """Return the state attributes."""
         attributes = self._attrs
 
         for variable in self._sid_data["sid_attr"]:
@@ -260,21 +262,21 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
     """Representation of a network port switch."""
 
     def __init__(self, inst, uid, mikrotik_controller, sid_data):
-        """Set up tracked port."""
+        """Initialize."""
         super().__init__(inst, uid, mikrotik_controller, sid_data)
 
     @property
     def name(self) -> str:
-        """Return the name of the port."""
+        """Return the name."""
         return f"{self._inst} port {self._data[self._sid_data['sid_name']]}"
 
     @property
     def unique_id(self) -> str:
-        """Return a unique identifier for this port."""
+        """Return a unique id for this entity."""
         return f"{self._inst.lower()}-enable_switch-{self._data['port-mac-address']}_{self._data['default-name']}"
 
     @property
-    def icon(self):
+    def icon(self) -> str:
         """Return the icon."""
         if self._data["running"]:
             icon = "mdi:lan-connect"
@@ -287,8 +289,8 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
         return icon
 
     @property
-    def device_info(self):
-        """Return a port description for device registry."""
+    def device_info(self) -> Dict[str, Any]:
+        """Return a description for device registry."""
         info = {
             "connections": {(CONNECTION_NETWORK_MAC, self._data["port-mac-address"])},
             "manufacturer": self._ctrl.data["resource"]["platform"],
@@ -297,7 +299,7 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
         }
         return info
 
-    async def async_turn_on(self):
+    async def async_turn_on(self) -> None:
         """Turn on the switch."""
         path = "/interface"
         param = "default-name"
@@ -317,8 +319,8 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
 
         await self._ctrl.force_update()
 
-    async def async_turn_off(self):
-        """Turn on the switch."""
+    async def async_turn_off(self) -> None:
+        """Turn off the switch."""
         path = "/interface"
         param = "default-name"
         if self._data["about"] == "managed by CAPsMAN":
@@ -345,12 +347,12 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
     """Representation of a NAT switch."""
 
     def __init__(self, inst, uid, mikrotik_controller, sid_data):
-        """Set up NAT switch."""
+        """Initialize."""
         super().__init__(inst, uid, mikrotik_controller, sid_data)
 
     @property
     def name(self) -> str:
-        """Return the name of the NAT switch."""
+        """Return the name."""
         if self._data["comment"]:
             return f"{self._inst} NAT {self._data['comment']}"
 
@@ -358,11 +360,11 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
 
     @property
     def unique_id(self) -> str:
-        """Return a unique identifier for this mangle switch."""
+        """Return a unique id for this entity."""
         return f"{self._inst.lower()}-enable_nat-{self._data['uniq-id']}"
 
     @property
-    def icon(self):
+    def icon(self) -> str:
         """Return the icon."""
         if not self._data["enabled"]:
             icon = "mdi:network-off-outline"
@@ -372,8 +374,8 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
         return icon
 
     @property
-    def device_info(self):
-        """Return a NAT switch description for device registry."""
+    def device_info(self) -> Dict[str, Any]:
+        """Return a description for device registry."""
         info = {
             "identifiers": {
                 (
@@ -390,7 +392,7 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
         }
         return info
 
-    async def async_turn_on(self):
+    async def async_turn_on(self) -> None:
         """Turn on the switch."""
         path = "/ip/firewall/nat"
         param = ".id"
@@ -407,8 +409,8 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
         self._ctrl.set_value(path, param, value, mod_param, mod_value)
         await self._ctrl.force_update()
 
-    async def async_turn_off(self):
-        """Turn on the switch."""
+    async def async_turn_off(self) -> None:
+        """Turn off the switch."""
         path = "/ip/firewall/nat"
         param = ".id"
         value = None
@@ -432,12 +434,12 @@ class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
     """Representation of a Mangle switch."""
 
     def __init__(self, inst, uid, mikrotik_controller, sid_data):
-        """Set up Mangle switch."""
+        """Initialize."""
         super().__init__(inst, uid, mikrotik_controller, sid_data)
 
     @property
     def name(self) -> str:
-        """Return the name of the Mangle switch."""
+        """Return the name."""
         if self._data["comment"]:
             return f"{self._inst} Mangle {self._data['comment']}"
 
@@ -445,11 +447,11 @@ class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
 
     @property
     def unique_id(self) -> str:
-        """Return a unique identifier for this mangle switch."""
+        """Return a unique id for this entity."""
         return f"{self._inst.lower()}-enable_mangle-{self._data['name']}"
 
     @property
-    def icon(self):
+    def icon(self) -> str:
         """Return the icon."""
         if not self._data["enabled"]:
             icon = "mdi:bookmark-off-outline"
@@ -459,8 +461,8 @@ class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
         return icon
 
     @property
-    def device_info(self):
-        """Return a Mangle switch description for device registry."""
+    def device_info(self) -> Dict[str, Any]:
+        """Return a description for device registry."""
         info = {
             "identifiers": {
                 (
@@ -477,7 +479,7 @@ class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
         }
         return info
 
-    async def async_turn_on(self):
+    async def async_turn_on(self) -> None:
         """Turn on the switch."""
         path = "/ip/firewall/mangle"
         param = ".id"
@@ -494,8 +496,8 @@ class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
         self._ctrl.set_value(path, param, value, mod_param, mod_value)
         await self._ctrl.force_update()
 
-    async def async_turn_off(self):
-        """Turn on the switch."""
+    async def async_turn_off(self) -> None:
+        """Turn off the switch."""
         path = "/ip/firewall/mangle"
         param = ".id"
         value = None
@@ -519,21 +521,21 @@ class MikrotikControllerPPPSecretSwitch(MikrotikControllerSwitch):
     """Representation of a PPP Secret switch."""
 
     def __init__(self, inst, uid, mikrotik_controller, sid_data):
-        """Set up PPP Secret switch."""
+        """Initialize."""
         super().__init__(inst, uid, mikrotik_controller, sid_data)
 
     @property
     def name(self) -> str:
-        """Return the name of the PPP Secret switch."""
+        """Return the name."""
         return f"{self._inst} PPP Secret {self._data['name']}"
 
     @property
     def unique_id(self) -> str:
-        """Return a unique identifier for this ppp_secret switch."""
+        """Return a unique id for this entity."""
         return f"{self._inst.lower()}-enable_ppp_secret-{self._data['name']}"
 
     @property
-    def icon(self):
+    def icon(self) -> str:
         """Return the icon."""
         if not self._data["enabled"]:
             icon = "mdi:account-off-outline"
@@ -543,8 +545,8 @@ class MikrotikControllerPPPSecretSwitch(MikrotikControllerSwitch):
         return icon
 
     @property
-    def device_info(self):
-        """Return a PPP Secret switch description for device registry."""
+    def device_info(self) -> Dict[str, Any]:
+        """Return a description for device registry."""
         info = {
             "identifiers": {
                 (
@@ -561,7 +563,7 @@ class MikrotikControllerPPPSecretSwitch(MikrotikControllerSwitch):
         }
         return info
 
-    async def async_turn_on(self):
+    async def async_turn_on(self) -> None:
         """Turn on the switch."""
         path = "/ppp/secret"
         param = "name"
@@ -571,8 +573,8 @@ class MikrotikControllerPPPSecretSwitch(MikrotikControllerSwitch):
         self._ctrl.set_value(path, param, value, mod_param, mod_value)
         await self._ctrl.force_update()
 
-    async def async_turn_off(self):
-        """Turn on the switch."""
+    async def async_turn_off(self) -> None:
+        """Turn off the switch."""
         path = "/ppp/secret"
         param = "name"
         value = self._data["name"]
@@ -589,17 +591,17 @@ class MikrotikControllerScriptSwitch(MikrotikControllerSwitch):
     """Representation of a script switch."""
 
     def __init__(self, inst, uid, mikrotik_controller, sid_data):
-        """Set up script switch."""
+        """Initialize."""
         super().__init__(inst, uid, mikrotik_controller, sid_data)
 
     @property
-    def icon(self):
+    def icon(self) -> str:
         """Return the icon."""
         return "mdi:script-text-outline"
 
     @property
-    def device_info(self):
-        """Return a script switch description for device registry."""
+    def device_info(self) -> Dict[str, Any]:
+        """Return a description for device registry."""
         info = {
             "identifiers": {
                 (
@@ -616,16 +618,16 @@ class MikrotikControllerScriptSwitch(MikrotikControllerSwitch):
         }
         return info
 
-    async def async_turn_on(self):
+    async def async_turn_on(self) -> None:
         """Turn on the switch."""
         self._ctrl.run_script(self._data["name"])
         await self._ctrl.force_update()
 
-    async def async_turn_off(self):
+    async def async_turn_off(self) -> None:
         """Turn off the switch."""
 
     @property
-    def is_on(self):
+    def is_on(self) -> bool:
         """Return true if device is on."""
         return False
 
@@ -637,11 +639,11 @@ class MikrotikControllerQueueSwitch(MikrotikControllerSwitch):
     """Representation of a queue switch."""
 
     def __init__(self, inst, uid, mikrotik_controller, sid_data):
-        """Set up queue switch."""
+        """Initialize."""
         super().__init__(inst, uid, mikrotik_controller, sid_data)
 
     @property
-    def icon(self):
+    def icon(self) -> str:
         """Return the icon."""
         if not self._data["enabled"]:
             icon = "mdi:leaf-off"
@@ -651,8 +653,8 @@ class MikrotikControllerQueueSwitch(MikrotikControllerSwitch):
         return icon
 
     @property
-    def device_info(self):
-        """Return a queue switch description for device registry."""
+    def device_info(self) -> Dict[str, Any]:
+        """Return a description for device registry."""
         info = {
             "identifiers": {
                 (
@@ -669,8 +671,8 @@ class MikrotikControllerQueueSwitch(MikrotikControllerSwitch):
         }
         return info
 
-    async def async_turn_on(self):
-        """Turn on the queue switch."""
+    async def async_turn_on(self) -> None:
+        """Turn on the switch."""
         path = "/queue/simple"
         param = ".id"
         value = None
@@ -683,8 +685,8 @@ class MikrotikControllerQueueSwitch(MikrotikControllerSwitch):
         self._ctrl.set_value(path, param, value, mod_param, mod_value)
         await self._ctrl.force_update()
 
-    async def async_turn_off(self):
-        """Turn on the queue switch."""
+    async def async_turn_off(self) -> None:
+        """Turn off the switch."""
         path = "/queue/simple"
         param = ".id"
         value = None
@@ -705,11 +707,11 @@ class MikrotikControllerKidcontrolSwitch(MikrotikControllerSwitch):
     """Representation of a queue switch."""
 
     def __init__(self, inst, uid, mikrotik_controller, sid_data):
-        """Set up queue switch."""
+        """Initialize."""
         super().__init__(inst, uid, mikrotik_controller, sid_data)
 
     @property
-    def icon(self):
+    def icon(self) -> str:
         """Return the icon."""
         if not self._data["enabled"]:
             icon = "mdi:account-off-outline"
@@ -719,8 +721,8 @@ class MikrotikControllerKidcontrolSwitch(MikrotikControllerSwitch):
         return icon
 
     @property
-    def device_info(self):
-        """Return a queue switch description for device registry."""
+    def device_info(self) -> Dict[str, Any]:
+        """Return a description for device registry."""
         info = {
             "identifiers": {
                 (
@@ -737,8 +739,8 @@ class MikrotikControllerKidcontrolSwitch(MikrotikControllerSwitch):
         }
         return info
 
-    async def async_turn_on(self):
-        """Turn on the queue switch."""
+    async def async_turn_on(self) -> None:
+        """Turn on the switch."""
         path = "/ip/kid-control"
         param = "name"
         value = self._data["name"]
@@ -747,8 +749,8 @@ class MikrotikControllerKidcontrolSwitch(MikrotikControllerSwitch):
         self._ctrl.set_value(path, param, value, mod_param, mod_value)
         await self._ctrl.force_update()
 
-    async def async_turn_off(self):
-        """Turn on the queue switch."""
+    async def async_turn_off(self) -> None:
+        """Turn off the switch."""
         path = "/ip/kid-control"
         param = "name"
         value = self._data["name"]
