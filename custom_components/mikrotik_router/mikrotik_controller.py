@@ -785,7 +785,7 @@ class MikrotikControllerData:
         nat_uniq = {}
         nat_del = {}
         for uid in self.data["nat"]:
-            tmp_name = self.data["nat"][uid]["name"]
+            tmp_name = self.data["nat"][uid]["uniq-id"]
             if tmp_name not in nat_uniq:
                 nat_uniq[tmp_name] = uid
             else:
@@ -793,8 +793,8 @@ class MikrotikControllerData:
                 nat_del[nat_uniq[tmp_name]] = 1
 
         for uid in nat_del:
-            if self.data["nat"][uid]["name"] not in self.nat_removed:
-                self.nat_removed[self.data["nat"][uid]["name"]] = 1
+            if self.data["nat"][uid]["uniq-id"] not in self.nat_removed:
+                self.nat_removed[self.data["nat"][uid]["uniq-id"]] = 1
                 _LOGGER.error(
                     "Mikrotik %s duplicate NAT rule %s, entity will be unavailable.",
                     self.host,
