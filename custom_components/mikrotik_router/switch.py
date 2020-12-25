@@ -132,11 +132,11 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
         # Data point name
         ["interface", "nat", "mangle", "ppp_secret", "script", "queue"],
         # Data point unique id
-        ["name", "name", "name", "name", "name", "name"],
+        ["name", "uniq-id", "name", "name", "name", "name"],
         # Entry Name
         ["name", "name", "comment", "name", "name", "name"],
         # Entry Unique id
-        ["port-mac-address", "name", "name", "name", "name", "name"],
+        ["port-mac-address", "uniq-id", "name", "name", "name", "name"],
         # Attr
         [
             DEVICE_ATTRIBUTES_IFACE,
@@ -338,7 +338,15 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
     @property
     def name(self) -> str:
         """Return the name of the NAT switch."""
+        if self._data["comment"]:
+            return f"{self._inst} NAT {self._data['comment']}"
+
         return f"{self._inst} NAT {self._data['name']}"
+
+    @property
+    def unique_id(self) -> str:
+        """Return a unique identifier for this mangle switch."""
+        return f"{self._inst.lower()}-enable_nat-{self._data['uniq-id']}"
 
     @property
     def icon(self):
@@ -376,8 +384,8 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
         value = None
         for uid in self._ctrl.data["nat"]:
             if (
-                self._ctrl.data["nat"][uid]["name"]
-                == f"{self._data['protocol']}:{self._data['dst-port']}"
+                self._ctrl.data["nat"][uid]["uniq-id"]
+                == f"{self._data['chain']},{self._data['action']},{self._data['protocol']},{self._data['in-interface']}:{self._data['dst-port']}-{self._data['out-interface']}:{self._data['to-addresses']}:{self._data['to-ports']}"
             ):
                 value = self._ctrl.data["nat"][uid][".id"]
 
@@ -393,8 +401,8 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
         value = None
         for uid in self._ctrl.data["nat"]:
             if (
-                self._ctrl.data["nat"][uid]["name"]
-                == f"{self._data['protocol']}:{self._data['dst-port']}"
+                self._ctrl.data["nat"][uid]["uniq-id"]
+                == f"{self._data['chain']},{self._data['action']},{self._data['protocol']},{self._data['in-interface']}:{self._data['dst-port']}-{self._data['out-interface']}:{self._data['to-addresses']}:{self._data['to-ports']}"
             ):
                 value = self._ctrl.data["nat"][uid][".id"]
 
@@ -504,7 +512,6 @@ class MikrotikControllerPPPSecretSwitch(MikrotikControllerSwitch):
     @property
     def name(self) -> str:
         """Return the name of the PPP Secret switch."""
-
         return f"{self._inst} PPP Secret {self._data['name']}"
 
     @property

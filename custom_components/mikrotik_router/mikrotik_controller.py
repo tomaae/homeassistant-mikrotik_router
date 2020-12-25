@@ -734,11 +734,14 @@ class MikrotikControllerData:
             key=".id",
             vals=[
                 {"name": ".id"},
+                {"name": "chain", "default": "unknown"},
+                {"name": "action", "default": "unknown"},
                 {"name": "protocol", "default": "any"},
                 {"name": "dst-port", "default": "any"},
                 {"name": "in-interface", "default": "any"},
+                {"name": "out-interface", "default": "any"},
                 {"name": "to-addresses"},
-                {"name": "to-ports"},
+                {"name": "to-ports", "default": "any"},
                 {"name": "comment"},
                 {
                     "name": "enabled",
@@ -749,12 +752,31 @@ class MikrotikControllerData:
             ],
             val_proc=[
                 [
+                    {"name": "uniq-id"},
+                    {"action": "combine"},
+                    {"key": "chain"},
+                    {"text": ","},
+                    {"key": "action"},
+                    {"text": ","},
+                    {"key": "protocol"},
+                    {"text": ","},
+                    {"key": "in-interface"},
+                    {"text": ":"},
+                    {"key": "dst-port"},
+                    {"text": "-"},
+                    {"key": "out-interface"},
+                    {"text": ":"},
+                    {"key": "to-addresses"},
+                    {"text": ":"},
+                    {"key": "to-ports"},
+                ],
+                [
                     {"name": "name"},
                     {"action": "combine"},
                     {"key": "protocol"},
                     {"text": ":"},
                     {"key": "dst-port"},
-                ]
+                ],
             ],
             only=[{"key": "action", "value": "dst-nat"}],
         )
