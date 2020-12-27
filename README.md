@@ -110,7 +110,7 @@ Minimum requirements:
 
 ## Setup integration
 1. Create user for homeassistant on your mikrotik router with following permissions:
-   * read, write, api, test
+   * read, write, api, test, policy
 2. If you want to be able to execute scripts on your mikrotik router from HA, script needs to have only following policies:
    * read, write, test
 or check "Don't Require Permissions" option
