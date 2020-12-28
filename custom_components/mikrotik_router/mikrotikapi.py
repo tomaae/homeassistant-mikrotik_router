@@ -272,7 +272,6 @@ class MikrotikAPI:
                 continue
 
             entry_found = tmp[".id"]
-            break
 
         if not entry_found:
             _LOGGER.error(
@@ -336,7 +335,6 @@ class MikrotikAPI:
                 continue
 
             entry_found = tmp[".id"]
-            break
 
         if not entry_found:
             _LOGGER.error(
