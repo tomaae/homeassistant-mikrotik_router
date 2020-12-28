@@ -358,7 +358,12 @@ class MikrotikControllerSensor(Entity):
 
         self._device_class = None
         self._state = None
-        self._icon = None
+
+        if ATTR_ICON in self._type:
+            self._icon = self._type[ATTR_ICON]
+        else:
+            self._icon = None
+
         self._unit_of_measurement = None
         self._attrs = {ATTR_ATTRIBUTION: ATTRIBUTION}
 
@@ -384,10 +389,10 @@ class MikrotikControllerSensor(Entity):
     @property
     def icon(self) -> str:
         """Return the icon."""
-        if ATTR_ICON in self._type:
+        if self._icon:
             return self._icon
-        else:
-            return ""
+
+        return ""
 
     @property
     def device_class(self) -> Optional[str]:
