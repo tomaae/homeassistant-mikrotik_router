@@ -404,9 +404,6 @@ class MikrotikControllerData:
         if self.api.connected():
             await self.hass.async_add_executor_job(self.get_system_resource)
 
-        if self.api.connected():
-            await self.hass.async_add_executor_job(self.get_system_health)
-
         if self.api.connected() and self.option_sensor_scripts:
             await self.hass.async_add_executor_job(self.get_script)
 
@@ -570,6 +567,9 @@ class MikrotikControllerData:
 
         if self.api.connected() and self.option_sensor_environment:
             await self.hass.async_add_executor_job(self.get_environment)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_system_health)
 
         async_dispatcher_send(self.hass, self.signal_update)
         self.lock.release()
