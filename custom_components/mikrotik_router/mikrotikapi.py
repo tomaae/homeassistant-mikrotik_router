@@ -313,6 +313,69 @@ class MikrotikAPI:
         return True
 
     # ---------------------------
+    #   execute
+    # ---------------------------
+    def execute(self, path, command, param, value) -> bool:
+        """Modify a parameter"""
+        entry_found = False
+
+        if not self.connection_check():
+            return False
+
+        response = self.path(path, return_list=False)
+        if response is None:
+            return False
+
+        for tmp in response:
+            if param not in tmp:
+                continue
+
+            if tmp[param] != value:
+                continue
+
+            entry_found = True
+            params = {".id": tmp[".id"]}
+            print(params)
+            self.lock.acquire()
+            try:
+                tuple(response(command, **params))
+            except librouteros.exceptions.ConnectionClosed:
+                self.disconnect()
+                self.lock.release()
+                return False
+            except (
+                librouteros.exceptions.TrapError,
+                librouteros.exceptions.MultiTrapError,
+                librouteros.exceptions.ProtocolError,
+                librouteros.exceptions.FatalError,
+                socket_timeout,
+                socket_error,
+                ssl.SSLError,
+                BrokenPipeError,
+                OSError,
+                ValueError,
+            ) as api_error:
+                self.disconnect("update", api_error)
+                self.lock.release()
+                return False
+            except:
+                self.disconnect("update")
+                self.lock.release()
+                return False
+
+        self.lock.release()
+        if not entry_found:
+            _LOGGER.error(
+                "Mikrotik %s Execute %s parameter %s with value %s not found",
+                self._host,
+                command,
+                param,
+                value,
+            )
+
+        return True
+
+    # ---------------------------
     #   run_script
     # ---------------------------
     def run_script(self, name) -> bool:

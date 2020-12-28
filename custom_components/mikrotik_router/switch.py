@@ -723,6 +723,11 @@ class MikrotikControllerKidcontrolSwitch(MikrotikControllerSwitch):
         super().__init__(inst, uid, mikrotik_controller, sid_data)
 
     @property
+    def is_on(self) -> bool:
+        """Return true if device is on."""
+        return self._data["paused"]
+
+    @property
     def icon(self) -> str:
         """Return the icon."""
         if not self._data["enabled"]:
@@ -756,9 +761,8 @@ class MikrotikControllerKidcontrolSwitch(MikrotikControllerSwitch):
         path = "/ip/kid-control"
         param = "name"
         value = self._data["name"]
-        mod_param = "disabled"
-        mod_value = False
-        self._ctrl.set_value(path, param, value, mod_param, mod_value)
+        command = "resume"
+        self._ctrl.execute(path, command, param, value)
         await self._ctrl.force_update()
 
     async def async_turn_off(self) -> None:
@@ -766,7 +770,6 @@ class MikrotikControllerKidcontrolSwitch(MikrotikControllerSwitch):
         path = "/ip/kid-control"
         param = "name"
         value = self._data["name"]
-        mod_param = "disabled"
-        mod_value = True
-        self._ctrl.set_value(path, param, value, mod_param, mod_value)
+        command = "pause"
+        self._ctrl.execute(path, command, param, value)
         await self._ctrl.async_update()

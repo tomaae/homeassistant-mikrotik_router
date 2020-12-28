@@ -305,6 +305,13 @@ class MikrotikControllerData:
         return self.api.update(path, param, value, mod_param, mod_value)
 
     # ---------------------------
+    #   execute
+    # ---------------------------
+    def execute(self, path, command, param, value):
+        """Change value using Mikrotik API"""
+        return self.api.execute(path, command, param, value)
+
+    # ---------------------------
     #   run_script
     # ---------------------------
     def run_script(self, name):
@@ -924,6 +931,7 @@ class MikrotikControllerData:
                 {"name": "sat", "default": "None"},
                 {"name": "sun", "default": "None"},
                 {"name": "comment"},
+                {"name": "paused", "type": "bool", "reverse": True},
                 {
                     "name": "enabled",
                     "source": "disabled",
