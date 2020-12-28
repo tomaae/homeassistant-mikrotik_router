@@ -355,11 +355,11 @@ class MikrotikAPI:
                 OSError,
                 ValueError,
             ) as api_error:
-                self.disconnect("update", api_error)
+                self.disconnect("execute", api_error)
                 self.lock.release()
                 return False
             except:
-                self.disconnect("update")
+                self.disconnect("execute")
                 self.lock.release()
                 return False
 
