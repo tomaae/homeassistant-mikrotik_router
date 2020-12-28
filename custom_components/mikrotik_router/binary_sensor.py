@@ -203,6 +203,9 @@ class MikrotikControllerBinarySensor(BinarySensorEntity):
             self._data = mikrotik_controller.data[SENSOR_TYPES[sensor][ATTR_PATH]]
             self._type = SENSOR_TYPES[sensor]
             self._attr = SENSOR_TYPES[sensor][ATTR_ATTR]
+        else:
+            self._type = {}
+            self._attr = None
 
         self._device_class = None
         self._state = None
@@ -244,7 +247,7 @@ class MikrotikControllerBinarySensor(BinarySensorEntity):
                     DOMAIN,
                     "serial-number",
                     self._ctrl.data["routerboard"]["serial-number"],
-                    "switch",
+                    "sensor",
                     self._type[ATTR_GROUP],
                 )
             }
