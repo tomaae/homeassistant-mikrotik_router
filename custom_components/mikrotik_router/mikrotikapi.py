@@ -255,7 +255,7 @@ class MikrotikAPI:
     # ---------------------------
     def update(self, path, param, value, mod_param, mod_value) -> bool:
         """Modify a parameter"""
-        entry_found = False
+        entry_found = None
 
         if not self.connection_check():
             return False
@@ -271,37 +271,9 @@ class MikrotikAPI:
             if tmp[param] != value:
                 continue
 
-            entry_found = True
-            params = {".id": tmp[".id"], mod_param: mod_value}
+            entry_found = tmp[".id"]
+            break
 
-            self.lock.acquire()
-            try:
-                response.update(**params)
-            except librouteros.exceptions.ConnectionClosed:
-                self.disconnect()
-                self.lock.release()
-                return False
-            except (
-                librouteros.exceptions.TrapError,
-                librouteros.exceptions.MultiTrapError,
-                librouteros.exceptions.ProtocolError,
-                librouteros.exceptions.FatalError,
-                socket_timeout,
-                socket_error,
-                ssl.SSLError,
-                BrokenPipeError,
-                OSError,
-                ValueError,
-            ) as api_error:
-                self.disconnect("update", api_error)
-                self.lock.release()
-                return False
-            except:
-                self.disconnect("update")
-                self.lock.release()
-                return False
-
-        self.lock.release()
         if not entry_found:
             _LOGGER.error(
                 "Mikrotik %s Update parameter %s with value %s not found",
@@ -309,15 +281,45 @@ class MikrotikAPI:
                 param,
                 value,
             )
+            return True
 
+        params = {".id": entry_found, mod_param: mod_value}
+        self.lock.acquire()
+        try:
+            response.update(**params)
+        except librouteros.exceptions.ConnectionClosed:
+            self.disconnect()
+            self.lock.release()
+            return False
+        except (
+            librouteros.exceptions.TrapError,
+            librouteros.exceptions.MultiTrapError,
+            librouteros.exceptions.ProtocolError,
+            librouteros.exceptions.FatalError,
+            socket_timeout,
+            socket_error,
+            ssl.SSLError,
+            BrokenPipeError,
+            OSError,
+            ValueError,
+        ) as api_error:
+            self.disconnect("update", api_error)
+            self.lock.release()
+            return False
+        except:
+            self.disconnect("update")
+            self.lock.release()
+            return False
+
+        self.lock.release()
         return True
 
     # ---------------------------
     #   execute
     # ---------------------------
     def execute(self, path, command, param, value) -> bool:
-        """Modify a parameter"""
-        entry_found = False
+        """Execute a command"""
+        entry_found = None
 
         if not self.connection_check():
             return False
@@ -333,37 +335,9 @@ class MikrotikAPI:
             if tmp[param] != value:
                 continue
 
-            entry_found = True
-            params = {".id": tmp[".id"]}
-            print(params)
-            self.lock.acquire()
-            try:
-                tuple(response(command, **params))
-            except librouteros.exceptions.ConnectionClosed:
-                self.disconnect()
-                self.lock.release()
-                return False
-            except (
-                librouteros.exceptions.TrapError,
-                librouteros.exceptions.MultiTrapError,
-                librouteros.exceptions.ProtocolError,
-                librouteros.exceptions.FatalError,
-                socket_timeout,
-                socket_error,
-                ssl.SSLError,
-                BrokenPipeError,
-                OSError,
-                ValueError,
-            ) as api_error:
-                self.disconnect("execute", api_error)
-                self.lock.release()
-                return False
-            except:
-                self.disconnect("execute")
-                self.lock.release()
-                return False
+            entry_found = tmp[".id"]
+            break
 
-        self.lock.release()
         if not entry_found:
             _LOGGER.error(
                 "Mikrotik %s Execute %s parameter %s with value %s not found",
@@ -372,7 +346,37 @@ class MikrotikAPI:
                 param,
                 value,
             )
+            return True
 
+        params = {".id": tmp[".id"]}
+        self.lock.acquire()
+        try:
+            tuple(response(command, **params))
+        except librouteros.exceptions.ConnectionClosed:
+            self.disconnect()
+            self.lock.release()
+            return False
+        except (
+            librouteros.exceptions.TrapError,
+            librouteros.exceptions.MultiTrapError,
+            librouteros.exceptions.ProtocolError,
+            librouteros.exceptions.FatalError,
+            socket_timeout,
+            socket_error,
+            ssl.SSLError,
+            BrokenPipeError,
+            OSError,
+            ValueError,
+        ) as api_error:
+            self.disconnect("execute", api_error)
+            self.lock.release()
+            return False
+        except:
+            self.disconnect("execute")
+            self.lock.release()
+            return False
+
+        self.lock.release()
         return True
 
     # ---------------------------
@@ -380,7 +384,7 @@ class MikrotikAPI:
     # ---------------------------
     def run_script(self, name) -> bool:
         """Run script"""
-        entry_found = False
+        entry_found = None
         if not self.connection_check():
             return False
 
@@ -396,38 +400,40 @@ class MikrotikAPI:
             if tmp["name"] != name:
                 continue
 
-            entry_found = True
-            try:
-                run = response("run", **{".id": tmp[".id"]})
-                tuple(run)
-            except librouteros.exceptions.ConnectionClosed:
-                self.disconnect()
-                self.lock.release()
-                return False
-            except (
-                librouteros.exceptions.TrapError,
-                librouteros.exceptions.MultiTrapError,
-                librouteros.exceptions.ProtocolError,
-                librouteros.exceptions.FatalError,
-                socket_timeout,
-                socket_error,
-                ssl.SSLError,
-                BrokenPipeError,
-                OSError,
-                ValueError,
-            ) as api_error:
-                self.disconnect("run_script", api_error)
-                self.lock.release()
-                return False
-            except:
-                self.disconnect("run_script")
-                self.lock.release()
-                return False
+            entry_found = tmp[".id"]
 
-        self.lock.release()
         if not entry_found:
             _LOGGER.error("Mikrotik %s Script %s not found", self._host, name)
+            return True
 
+        try:
+            run = response("run", **{".id": entry_found})
+            tuple(run)
+        except librouteros.exceptions.ConnectionClosed:
+            self.disconnect()
+            self.lock.release()
+            return False
+        except (
+            librouteros.exceptions.TrapError,
+            librouteros.exceptions.MultiTrapError,
+            librouteros.exceptions.ProtocolError,
+            librouteros.exceptions.FatalError,
+            socket_timeout,
+            socket_error,
+            ssl.SSLError,
+            BrokenPipeError,
+            OSError,
+            ValueError,
+        ) as api_error:
+            self.disconnect("run_script", api_error)
+            self.lock.release()
+            return False
+        except:
+            self.disconnect("run_script")
+            self.lock.release()
+            return False
+
+        self.lock.release()
         return True
 
     # ---------------------------
