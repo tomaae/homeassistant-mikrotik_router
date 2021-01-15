@@ -16,9 +16,9 @@ jobs:
       - name: Download Lokalise CLI
         run: |
           curl -sSL \
-            "https://s3-eu-west-1.amazonaws.com/lokalise-assets/cli/lokalise-0.721-linux-amd64.tgz" \
-            -o ./lokalise.tgz
-          tar -xvzf ./lokalise.tgz
+            "https://github.com/lokalise/lokalise-cli-2-go/releases/download/v2.6.2/lokalise2_linux_x86_64.tar.gz" \
+            -o ./lokalise.gz
+          tar -xvzf ./lokalise.gz
 
       - name: Downloading translations
         run: |
