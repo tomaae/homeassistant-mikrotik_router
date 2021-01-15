@@ -1,0 +1,120 @@
+{
+    "config": {
+        "title": {
+            "translation": "Mikrotik Router"
+        },
+        "step": {
+            "user": {
+                "title": {
+                    "translation": "Mikrotik Router"
+                },
+                "description": {
+                    "translation": "Setja upp Mikrotik Router samþættingu."
+                },
+                "data": {
+                    "name": {
+                        "translation": "Heiti samþættingar"
+                    },
+                    "host": {
+                        "translation": "Hýsill"
+                    },
+                    "port": {
+                        "translation": "Port"
+                    },
+                    "username": {
+                        "translation": "Notandanafn"
+                    },
+                    "password": {
+                        "translation": "Lykilorð"
+                    },
+                    "ssl": {
+                        "translation": "Nota SSL"
+                    }
+                }
+            }
+        },
+        "error": {
+            "name_exists": {
+                "translation": "Nafn er þegar til."
+            },
+            "cannot_connect": {
+                "translation": "Get ekki tengst Mikrotik."
+            },
+            "ssl_handshake_failure": {
+                "translation": "Villa við að koma á SSL samskiptum"
+            },
+            "connection_timeout": {
+                "translation": "Tengin við Mikrotik rann út á tíma."
+            },
+            "wrong_login": {
+                "translation": "Ógilt notendanafn eða lykilorð."
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "basic_options": {
+                "data": {
+                    "scan_interval": {
+                        "translation": "Tíðni skönnunar ( krefst endurræsingar á HA )"
+                    },
+                    "track_iface_clients": {
+                        "translation": "Sýna MAC og IP vistfang fyrir biðlara á netkortum"
+                    },
+                    "unit_of_measurement": {
+                        "translation": "Mælieining"
+                    },
+                    "track_network_hosts_timeout": {
+                        "translation": "Tímamörk við rakningu á netbúnaði ( sekúndur )"
+                    }
+                },
+                "title": {
+                    "translation": "Grunnvalkostir"
+                }
+            },
+            "sensor_select": {
+                "data": {
+                    "track_network_hosts": {
+                        "translation": "Rekja netbúnað"
+                    },
+                    "sensor_port_tracker": {
+                        "translation": "Port rakningarskynjarar"
+                    },
+                    "sensor_port_traffic": {
+                        "translation": "Port umferðarskynjarar"
+                    },
+                    "sensor_client_traffic": {
+                        "translation": "Biðlaraumferð skynjarar"
+                    },
+                    "sensor_simple_queues": {
+                        "translation": "Einfaldir biðraðir rofar"
+                    },
+                    "sensor_nat": {
+                        "translation": "NAT rofar"
+                    },
+                    "sensor_scripts": {
+                        "translation": "Skrifturofar"
+                    },
+                    "sensor_environment": {
+                        "translation": "Umhverfisbreytu skynjarar"
+                    },
+                    "sensor_pppusers": {
+                        "translation": "PPP notendur"
+                    },
+                    "sensor_kidcontrol": {
+                        "translation": "Krakkastjórnun"
+                    },
+                    "sensor_mangle": {
+                        "translation": ""
+                    },
+                    "sensor_ppp": {
+                        "translation": ""
+                    }
+                },
+                "title": {
+                    "translation": "Veldu skynjara"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,120 @@
+{
+    "config": {
+        "title": {
+            "translation": "Mikrotik Router"
+        },
+        "step": {
+            "user": {
+                "title": {
+                    "translation": "Mikrotik Router"
+                },
+                "description": {
+                    "translation": "Stel Mikrotik Router-integratie in."
+                },
+                "data": {
+                    "name": {
+                        "translation": "Naam van de integratie"
+                    },
+                    "host": {
+                        "translation": "Host"
+                    },
+                    "port": {
+                        "translation": "Poort"
+                    },
+                    "username": {
+                        "translation": "Gebruikersnaam"
+                    },
+                    "password": {
+                        "translation": "Wachtwoord"
+                    },
+                    "ssl": {
+                        "translation": "Gebruik SSL"
+                    }
+                }
+            }
+        },
+        "error": {
+            "name_exists": {
+                "translation": "Naam al in gebruik"
+            },
+            "cannot_connect": {
+                "translation": "Kan geen verbinding maken met Mikrotik."
+            },
+            "ssl_handshake_failure": {
+                "translation": "SSL overeenkomings-storing"
+            },
+            "connection_timeout": {
+                "translation": "Mikrotik verbinding time-out."
+            },
+            "wrong_login": {
+                "translation": "Ongeldige gebruikersnaam of wachtwoord."
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "basic_options": {
+                "data": {
+                    "scan_interval": {
+                        "translation": "Scaninterval (vereist opnieuw opstarten van HA)"
+                    },
+                    "track_iface_clients": {
+                        "translation": "Mac en IP van client weergeven op interfaces"
+                    },
+                    "unit_of_measurement": {
+                        "translation": "Meet eenheid"
+                    },
+                    "track_network_hosts_timeout": {
+                        "translation": "Volg de time-out van netwerkapparaten (seconden)"
+                    }
+                },
+                "title": {
+                    "translation": "Basisopties"
+                }
+            },
+            "sensor_select": {
+                "data": {
+                    "track_network_hosts": {
+                        "translation": "Volg netwerkapparaten"
+                    },
+                    "sensor_port_tracker": {
+                        "translation": "Poorttrackersensors"
+                    },
+                    "sensor_port_traffic": {
+                        "translation": "Poortverkeersensors"
+                    },
+                    "sensor_client_traffic": {
+                        "translation": "Clientverkeersensors"
+                    },
+                    "sensor_simple_queues": {
+                        "translation": "Eenvoudige wachtrijswitches"
+                    },
+                    "sensor_nat": {
+                        "translation": "NAT-switches"
+                    },
+                    "sensor_scripts": {
+                        "translation": "Script-switches"
+                    },
+                    "sensor_environment": {
+                        "translation": "Omgevingsvariabelesensors"
+                    },
+                    "sensor_pppusers": {
+                        "translation": ""
+                    },
+                    "sensor_kidcontrol": {
+                        "translation": ""
+                    },
+                    "sensor_mangle": {
+                        "translation": ""
+                    },
+                    "sensor_ppp": {
+                        "translation": ""
+                    }
+                },
+                "title": {
+                    "translation": "Selecteer sensors"
+                }
+            }
+        }
+    }
+}

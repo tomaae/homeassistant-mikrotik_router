@@ -1,0 +1,120 @@
+{
+    "config": {
+        "title": {
+            "translation": "Mikrotik Router"
+        },
+        "step": {
+            "user": {
+                "title": {
+                    "translation": "Mikrotik Router"
+                },
+                "description": {
+                    "translation": "Nastavte integraci Mikrotik Router."
+                },
+                "data": {
+                    "name": {
+                        "translation": "Název integrace"
+                    },
+                    "host": {
+                        "translation": "Zařízení"
+                    },
+                    "port": {
+                        "translation": "Port"
+                    },
+                    "username": {
+                        "translation": "Uživatel"
+                    },
+                    "password": {
+                        "translation": "Heslo"
+                    },
+                    "ssl": {
+                        "translation": "Použití SSL"
+                    }
+                }
+            }
+        },
+        "error": {
+            "name_exists": {
+                "translation": "Název již existuje."
+            },
+            "cannot_connect": {
+                "translation": "Nelze se připojit k Mikrotiku."
+            },
+            "ssl_handshake_failure": {
+                "translation": "Selhání handshake SSL"
+            },
+            "connection_timeout": {
+                "translation": "Časový limit připojení vypršel."
+            },
+            "wrong_login": {
+                "translation": "Neplatné uživatelské jméno nebo heslo."
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "basic_options": {
+                "data": {
+                    "scan_interval": {
+                        "translation": "Interval skenování (vyžaduje restartování HA)"
+                    },
+                    "track_iface_clients": {
+                        "translation": "Zobrazit klientské MAC a IP na rozhraních"
+                    },
+                    "unit_of_measurement": {
+                        "translation": "Jednotka měření"
+                    },
+                    "track_network_hosts_timeout": {
+                        "translation": "Časový limit sledování síťových zařízení (v sekundách)"
+                    }
+                },
+                "title": {
+                    "translation": "Základní možnosti"
+                }
+            },
+            "sensor_select": {
+                "data": {
+                    "track_network_hosts": {
+                        "translation": "Sledování síťových zařízení"
+                    },
+                    "sensor_port_tracker": {
+                        "translation": "Senzory pro sledování portů"
+                    },
+                    "sensor_port_traffic": {
+                        "translation": "Senzory provozu portu"
+                    },
+                    "sensor_client_traffic": {
+                        "translation": "Senzory provozu klienta"
+                    },
+                    "sensor_simple_queues": {
+                        "translation": "Přepínače jednoduchých front"
+                    },
+                    "sensor_nat": {
+                        "translation": "Přepínače NAT"
+                    },
+                    "sensor_scripts": {
+                        "translation": "Přepínače skriptů"
+                    },
+                    "sensor_environment": {
+                        "translation": "Senzory prostředí"
+                    },
+                    "sensor_pppusers": {
+                        "translation": ""
+                    },
+                    "sensor_kidcontrol": {
+                        "translation": ""
+                    },
+                    "sensor_mangle": {
+                        "translation": ""
+                    },
+                    "sensor_ppp": {
+                        "translation": ""
+                    }
+                },
+                "title": {
+                    "translation": "Vyberte senzory"
+                }
+            }
+        }
+    }
+}

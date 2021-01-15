@@ -1,0 +1,120 @@
+{
+    "config": {
+        "title": {
+            "translation": "Mikrotik Router"
+        },
+        "step": {
+            "user": {
+                "title": {
+                    "translation": "Mikrotik Router"
+                },
+                "description": {
+                    "translation": "Mikrotik राउटर इन्टीग्रेशन सेट अप करें।"
+                },
+                "data": {
+                    "name": {
+                        "translation": "इन्टीग्रेशन का नाम"
+                    },
+                    "host": {
+                        "translation": "होस्ट"
+                    },
+                    "port": {
+                        "translation": "पोर्ट"
+                    },
+                    "username": {
+                        "translation": "उपयोगकर्ता नाम"
+                    },
+                    "password": {
+                        "translation": "पासवर्ड"
+                    },
+                    "ssl": {
+                        "translation": "SSL का उपयोग करें"
+                    }
+                }
+            }
+        },
+        "error": {
+            "name_exists": {
+                "translation": "नाम पहले से मौजूद है।"
+            },
+            "cannot_connect": {
+                "translation": "Mikrotik से कनेक्ट नही कर सकते।"
+            },
+            "ssl_handshake_failure": {
+                "translation": "SSL हैन्डशेक विफ़ल हो गया"
+            },
+            "connection_timeout": {
+                "translation": "Mikrotik कनेक्शन टाइम आउट हो गया।"
+            },
+            "wrong_login": {
+                "translation": "अमान्य उपयोगकर्ता नाम या पासवर्ड।"
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "basic_options": {
+                "data": {
+                    "scan_interval": {
+                        "translation": "स्कैन अन्तराल (HA रिस्टार्ट आवश्यक है)"
+                    },
+                    "track_iface_clients": {
+                        "translation": "ग्राहक का MAC और IP इन्टरफ़ेस पर दिखाएं"
+                    },
+                    "unit_of_measurement": {
+                        "translation": "माप का युनीट"
+                    },
+                    "track_network_hosts_timeout": {
+                        "translation": "नेटवर्क डिवाइस ट्रैक टाइम आउट (सेकन्ड)"
+                    }
+                },
+                "title": {
+                    "translation": "बेसिक विकल्प"
+                }
+            },
+            "sensor_select": {
+                "data": {
+                    "track_network_hosts": {
+                        "translation": "नेटवर्क डिवाइस को ट्रैक करें"
+                    },
+                    "sensor_port_tracker": {
+                        "translation": "पोर्ट ट्रैकर सेंसर"
+                    },
+                    "sensor_port_traffic": {
+                        "translation": "पोर्ट ट्रैफ़िक सेंसर"
+                    },
+                    "sensor_client_traffic": {
+                        "translation": "क्लाइंट ट्रैफ़िक सेंसर"
+                    },
+                    "sensor_simple_queues": {
+                        "translation": "सामान्य कतार स्विच"
+                    },
+                    "sensor_nat": {
+                        "translation": "NAT स्विच"
+                    },
+                    "sensor_scripts": {
+                        "translation": "स्क्रिप्ट स्विच"
+                    },
+                    "sensor_environment": {
+                        "translation": "पारिस्थितिक वेरिएबल सेंसर"
+                    },
+                    "sensor_pppusers": {
+                        "translation": ""
+                    },
+                    "sensor_kidcontrol": {
+                        "translation": ""
+                    },
+                    "sensor_mangle": {
+                        "translation": ""
+                    },
+                    "sensor_ppp": {
+                        "translation": ""
+                    }
+                },
+                "title": {
+                    "translation": "सेंसर चुनें"
+                }
+            }
+        }
+    }
+}

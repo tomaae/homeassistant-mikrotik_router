@@ -1,0 +1,120 @@
+{
+    "config": {
+        "title": {
+            "translation": ""
+        },
+        "step": {
+            "user": {
+                "title": {
+                    "translation": ""
+                },
+                "description": {
+                    "translation": "Mikrotik maršrutētāja integrācijas konfigurēšana."
+                },
+                "data": {
+                    "name": {
+                        "translation": "Integrācijas nosaukums"
+                    },
+                    "host": {
+                        "translation": "Maršrutētāja adrese"
+                    },
+                    "port": {
+                        "translation": "Ports"
+                    },
+                    "username": {
+                        "translation": "Lietotājvārds"
+                    },
+                    "password": {
+                        "translation": "Parole"
+                    },
+                    "ssl": {
+                        "translation": "Izmantot SSL"
+                    }
+                }
+            }
+        },
+        "error": {
+            "name_exists": {
+                "translation": "Nosaukums jau eksistē."
+            },
+            "cannot_connect": {
+                "translation": "Neizdodas savienoties ar Mikrotik."
+            },
+            "ssl_handshake_failure": {
+                "translation": "SSL savienojuma kļūda"
+            },
+            "connection_timeout": {
+                "translation": "Mikrotik savienojuma noilgums."
+            },
+            "wrong_login": {
+                "translation": "Nederīgs lietotājvārds vai parole."
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "basic_options": {
+                "data": {
+                    "scan_interval": {
+                        "translation": "Skenēšanas periods (nepieciešama HA restartēšana)"
+                    },
+                    "track_iface_clients": {
+                        "translation": "Rādīt klienta MAC un IP interfeisā"
+                    },
+                    "unit_of_measurement": {
+                        "translation": "Mērvienības"
+                    },
+                    "track_network_hosts_timeout": {
+                        "translation": "Tīkla ierīces uzraudzības noilgums (sekundēs)"
+                    }
+                },
+                "title": {
+                    "translation": "Pamata parametri"
+                }
+            },
+            "sensor_select": {
+                "data": {
+                    "track_network_hosts": {
+                        "translation": "Tīkla ierīču izsekošana"
+                    },
+                    "sensor_port_tracker": {
+                        "translation": "Porta izsekošanas sensori"
+                    },
+                    "sensor_port_traffic": {
+                        "translation": "Porta datu plūsmas sensori"
+                    },
+                    "sensor_client_traffic": {
+                        "translation": "Klientu datu plūsmas sensori"
+                    },
+                    "sensor_simple_queues": {
+                        "translation": "Vienkāršo rindu slēdži"
+                    },
+                    "sensor_nat": {
+                        "translation": "NAT kārtulu slēdži"
+                    },
+                    "sensor_scripts": {
+                        "translation": "Skriptu slēdži"
+                    },
+                    "sensor_environment": {
+                        "translation": "Mainīgie vides sensori"
+                    },
+                    "sensor_pppusers": {
+                        "translation": "PPP lietotāji"
+                    },
+                    "sensor_kidcontrol": {
+                        "translation": "Bērnu kontrole"
+                    },
+                    "sensor_mangle": {
+                        "translation": ""
+                    },
+                    "sensor_ppp": {
+                        "translation": ""
+                    }
+                },
+                "title": {
+                    "translation": "Sensora izvēle"
+                }
+            }
+        }
+    }
+}
