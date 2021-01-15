@@ -37,14 +37,18 @@ Monitor and control your Mikrotik device from Home Assistant.
    * Enable/disable interfaces
    * Monitor RX/TX traffic per interface
    * Monitor device presence per interface
-   * IP, MAC, Link information per interface for connected devices
+   * IP, MAC, Link information per an interface for connected devices
  * Enable/disable NAT rule switches
  * Enable/disable Simple Queue switches
+ * Enable/disable Mangle switches
+ * Monitor and control PPP users
+ * Kid Control
  * Mikrotik Accounting traffic sensors per hosts for RX/TX WAN/LAN
  * Device tracker for hosts in network
  * System sensors (CPU, Memory, HDD, Temperature)
  * Check firmware update
- * Execute scripts using switches or services
+ * Execute scripts
+ * View environment variables
  * Configurable update interval
  * Configurable traffic unit (bps, Kbps, Mbps, B/s, KB/s, MB/s)
  * Supports monitoring of multiple mikrotik devices simultaneously
@@ -60,25 +64,36 @@ Monitor and control status on each Mikrotik interface, both lan and wlan. Both p
 ## NAT
 Monitor and control individual NAT rules.
 
-More information about NAT rules can be found on [Mikrotik support page](https://wiki.mikrotik.com/wiki/Manual:IP/Firewall/NAT).
-
-NOTE: dst-port and protocol combination must be unique for each rule. All conflicting NAT rules will not be available in HA.
+More information about NAT rules can be found on [Mikrotik support page](https://help.mikrotik.com/docs/display/ROS/NAT).
 
 ![NAT switch](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/nat.png)
+
+## Mangle
+Monitor and control individual Mangle rules.
+
+More information about Mangle rules can be found on [Mikrotik support page](https://help.mikrotik.com/docs/display/ROS/Mangle).
+
+![Mangle switch](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/mangle_switch.png)
+
 
 ## Simple Queue
 Control simple queues.
 
-More information about simple queues can be found on [Mikrotik support page](https://wiki.mikrotik.com/wiki/Manual:Queue#Simple_Queues).
+More information about simple queues can be found on [Mikrotik support page](https://help.mikrotik.com/docs/display/ROS/Queues#heading-SimpleQueue).
 
 NOTE: FastTracked packets are not processed by Simple Queues.
 
 ![Queue switch](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/queue_switch.png)
 
+
+### PPP
+Control and monitor PPP users.
+
+![PPP switch](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/ppp_switch.png)
+![PPP tracker](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/ppp_tracker.png)
+
 ## Host Tracking
 Track availability of all network devices. All devices visible to Mikrotik device can be tracked, including: LAN connected devices and both Wireless and CAPsMAN from Mikrotik wireless package.
-
-NOTE: Host Tracking is disabled by default and has to be enabled in integration options.
 
 ![Host tracker](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/host_tracker.png)
 
@@ -88,7 +103,15 @@ You can execute scripts by automatically created switches or using services.
 
 ![Script Switch](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/script_switch.png)
 
+## Kid Control
+Monitor and control.
+
+![Kid Control](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/kidcontrol_switch.png)
+
+
 ## Accounting
+*RouterOS 7+ no longer support accounting*
+
 Monitor per-IP throughput tracking based on Mikrotik Accounting.
 
 Feature is present in Winbox IP-Accounting. Make sure that threshold is set to reasonable value to store all connections between user defined scan interval. Max value is 8192 so for piece of mind I recommend setting that value.
@@ -129,8 +152,10 @@ NOTE: Do not mistake "Mikrotik Router" integration with HA build-in integration 
 * "Scan interval" - Scan/refresh time in seconds. HA needs to be reloaded for scan interval change to be applied
 * "Unit of measurement" - Traffic sensor measurement (bps, Kbps, Mbps, B/s, KB/s, MB/s)
 * "Show client MAC and IP on interfaces" - Display connected IP and MAC address for devices connected to ports on router
-* "Track network devices" - Enable device tracker
 * "Track network devices timeout" - Tracked devices will be marked as away after timeout (does not apply to Mikrotik wireless and caps-man)
+
+![Integration sensors](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/integration_options_sensors.png)
+Select sensors
 
 # Development
 
