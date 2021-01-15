@@ -1,0 +1,120 @@
+{
+    "config": {
+        "title": {
+            "translation": "Mikrotik Router"
+        },
+        "step": {
+            "user": {
+                "title": {
+                    "translation": "Mikrotik Router"
+                },
+                "description": {
+                    "translation": "Imposta integrazione Router Mikrotik"
+                },
+                "data": {
+                    "name": {
+                        "translation": "Nome integrazione"
+                    },
+                    "host": {
+                        "translation": "Host"
+                    },
+                    "port": {
+                        "translation": "Porta"
+                    },
+                    "username": {
+                        "translation": "Nome utente"
+                    },
+                    "password": {
+                        "translation": "Password"
+                    },
+                    "ssl": {
+                        "translation": "Usa SSL"
+                    }
+                }
+            }
+        },
+        "error": {
+            "name_exists": {
+                "translation": "Nome già esistente."
+            },
+            "cannot_connect": {
+                "translation": "Impossibile connettersi a Mikrotik."
+            },
+            "ssl_handshake_failure": {
+                "translation": "Errore SSL handshake"
+            },
+            "connection_timeout": {
+                "translation": "Timeout connessione Mikrotik."
+            },
+            "wrong_login": {
+                "translation": "Nome utente o password non validi."
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "basic_options": {
+                "data": {
+                    "scan_interval": {
+                        "translation": "Intervallo scansione (richiede riavvio HA)"
+                    },
+                    "track_iface_clients": {
+                        "translation": "Mostra client MAC e IP sulle interfacce"
+                    },
+                    "unit_of_measurement": {
+                        "translation": "Unità di misura"
+                    },
+                    "track_network_hosts_timeout": {
+                        "translation": "Traccia timeout dei dispositivi di rete (secondi)"
+                    }
+                },
+                "title": {
+                    "translation": "Opzioni di base"
+                }
+            },
+            "sensor_select": {
+                "data": {
+                    "track_network_hosts": {
+                        "translation": "Traccia dispositivi di rete"
+                    },
+                    "sensor_port_tracker": {
+                        "translation": "Sensori di tracciamento della porta"
+                    },
+                    "sensor_port_traffic": {
+                        "translation": "Sensori di traffico della porta"
+                    },
+                    "sensor_client_traffic": {
+                        "translation": "Sensori di traffico del client"
+                    },
+                    "sensor_simple_queues": {
+                        "translation": "Commutatori di code semplici"
+                    },
+                    "sensor_nat": {
+                        "translation": "Commutatori NAT"
+                    },
+                    "sensor_scripts": {
+                        "translation": "Commutatori di script"
+                    },
+                    "sensor_environment": {
+                        "translation": "Sensori di variabili ambientali"
+                    },
+                    "sensor_pppusers": {
+                        "translation": ""
+                    },
+                    "sensor_kidcontrol": {
+                        "translation": ""
+                    },
+                    "sensor_mangle": {
+                        "translation": ""
+                    },
+                    "sensor_ppp": {
+                        "translation": ""
+                    }
+                },
+                "title": {
+                    "translation": "Seleziona i sensori"
+                }
+            }
+        }
+    }
+}

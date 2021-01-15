@@ -1,0 +1,120 @@
+{
+    "config": {
+        "title": {
+            "translation": "Mikrotik Router"
+        },
+        "step": {
+            "user": {
+                "title": {
+                    "translation": "Mikrotik Router"
+                },
+                "description": {
+                    "translation": "Set up Mikrotik Router integration."
+                },
+                "data": {
+                    "name": {
+                        "translation": "Name of the integration"
+                    },
+                    "host": {
+                        "translation": "Host"
+                    },
+                    "port": {
+                        "translation": "Port"
+                    },
+                    "username": {
+                        "translation": "Username"
+                    },
+                    "password": {
+                        "translation": "Password"
+                    },
+                    "ssl": {
+                        "translation": "Use SSL"
+                    }
+                }
+            }
+        },
+        "error": {
+            "name_exists": {
+                "translation": "Name already exists."
+            },
+            "cannot_connect": {
+                "translation": "Cannot connect to Mikrotik."
+            },
+            "ssl_handshake_failure": {
+                "translation": "SSL handshake failure"
+            },
+            "connection_timeout": {
+                "translation": "Mikrotik connection timeout."
+            },
+            "wrong_login": {
+                "translation": "Invalid user name or password."
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "basic_options": {
+                "data": {
+                    "scan_interval": {
+                        "translation": "Scan interval (requires HA restart)"
+                    },
+                    "track_iface_clients": {
+                        "translation": "Show client MAC and IP on interfaces"
+                    },
+                    "unit_of_measurement": {
+                        "translation": "Unit of measurement"
+                    },
+                    "track_network_hosts_timeout": {
+                        "translation": "Track network devices timeout (seconds)"
+                    }
+                },
+                "title": {
+                    "translation": "Basic options"
+                }
+            },
+            "sensor_select": {
+                "data": {
+                    "track_network_hosts": {
+                        "translation": "Track network devices"
+                    },
+                    "sensor_port_tracker": {
+                        "translation": "Port tracker sensors"
+                    },
+                    "sensor_port_traffic": {
+                        "translation": "Port traffic sensors"
+                    },
+                    "sensor_client_traffic": {
+                        "translation": "Client traffic sensors"
+                    },
+                    "sensor_simple_queues": {
+                        "translation": "Simple queues switches"
+                    },
+                    "sensor_nat": {
+                        "translation": "NAT switches"
+                    },
+                    "sensor_scripts": {
+                        "translation": "Scripts switches"
+                    },
+                    "sensor_environment": {
+                        "translation": "Environment variable sensors"
+                    },
+                    "sensor_pppusers": {
+                        "translation": "PPP users"
+                    },
+                    "sensor_kidcontrol": {
+                        "translation": "Kid control"
+                    },
+                    "sensor_mangle": {
+                        "translation": "Mangle switches"
+                    },
+                    "sensor_ppp": {
+                        "translation": "PPP users"
+                    }
+                },
+                "title": {
+                    "translation": "Select sensors"
+                }
+            }
+        }
+    }
+}
