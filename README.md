@@ -129,7 +129,7 @@ You can find it under "Integrations", named "Mikrotik Router"
 
 Minimum requirements:
 * RouterOS v6.43
-* Home Assistant 0.110.0
+* Home Assistant 0.114.0
 
 ## Setup integration
 1. Create user for homeassistant on your mikrotik router with following permissions:
@@ -155,6 +155,7 @@ NOTE: Do not mistake "Mikrotik Router" integration with HA build-in integration 
 * "Track network devices timeout" - Tracked devices will be marked as away after timeout (does not apply to Mikrotik wireless and caps-man)
 
 ![Integration sensors](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/integration_options_sensors.png)
+
 Select sensors
 
 # Development
