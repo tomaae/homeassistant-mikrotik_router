@@ -13,29 +13,6 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
 
-      - name: Download Lokalise CLI
-        run: |
-          curl -sSL \
-            "https://github.com/lokalise/lokalise-cli-2-go/releases/download/v2.6.2/lokalise2_linux_x86_64.tar.gz" \
-            -o ./lokalise.gz
-          tar -xvzf ./lokalise.gz
-
-      - name: Downloading translations
-        run: |
-          ./lokalise \
-              --token "${{ secrets.LOKALISE_TOKEN }}" \
-              export "581188395e9778a6060128.17699416" \
-              --type json \
-              --unzip_to  /tmp/lokalise \
-              --filter last_reviewed_only \
-              --export_empty skip \
-              --export_sort a_z
-
-      - name: Move new translations
-        run: |
-          mkdir -p /home/runner/work/homeassistant-mikrotik_router/homeassistant-mikrotik_router/custom_components/mikrotik_router/translations/
-          cp /tmp/lokalise/locale/* /home/runner/work/homeassistant-mikrotik_router/homeassistant-mikrotik_router/custom_components/mikrotik_router/translations/
-
       - name: Zip mikrotik_router dir
         run: |
           cd /home/runner/work/homeassistant-mikrotik_router/homeassistant-mikrotik_router/custom_components/mikrotik_router
