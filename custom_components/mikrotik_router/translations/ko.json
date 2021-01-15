@@ -1,119 +1,55 @@
 {
     "config": {
-        "title": {
-            "translation": "Mikrotik Router"
-        },
+        "title": "Mikrotik Router",
         "step": {
             "user": {
-                "title": {
-                    "translation": "Mikrotik Router"
-                },
-                "description": {
-                    "translation": "Mikrotik 라우터 통합을 설정합니다."
-                },
+                "title": "Mikrotik Router",
+                "description": "Mikrotik 라우터 통합을 설정합니다.",
                 "data": {
-                    "name": {
-                        "translation": "통합 이름"
-                    },
-                    "host": {
-                        "translation": "호스트"
-                    },
-                    "port": {
-                        "translation": "포트"
-                    },
-                    "username": {
-                        "translation": "사용자 이름"
-                    },
-                    "password": {
-                        "translation": "비밀번호"
-                    },
-                    "ssl": {
-                        "translation": "SSL 사용"
-                    }
+                    "name": "통합 이름",
+                    "host": "호스트",
+                    "port": "포트",
+                    "username": "사용자 이름",
+                    "password": "비밀번호",
+                    "ssl": "SSL 사용"
                 }
             }
         },
         "error": {
-            "name_exists": {
-                "translation": "존재하는 이름입니다."
-            },
-            "cannot_connect": {
-                "translation": "Mikrotik에 연결할 수 없습니다."
-            },
-            "ssl_handshake_failure": {
-                "translation": "SSL 핸드셰이크 실패"
-            },
-            "connection_timeout": {
-                "translation": "Mikrotik 연결 시간이 초과되었습니다."
-            },
-            "wrong_login": {
-                "translation": "사용자 이름 또는 비밀번호가 유효하지 않습니다."
-            }
+            "name_exists": "존재하는 이름입니다.",
+            "cannot_connect": "Mikrotik에 연결할 수 없습니다.",
+            "ssl_handshake_failure": "SSL 핸드셰이크 실패",
+            "connection_timeout": "Mikrotik 연결 시간이 초과되었습니다.",
+            "wrong_login": "사용자 이름 또는 비밀번호가 유효하지 않습니다."
         }
     },
     "options": {
         "step": {
             "basic_options": {
                 "data": {
-                    "scan_interval": {
-                        "translation": "스캔 간격(HA 재시작 필요)"
-                    },
-                    "track_iface_clients": {
-                        "translation": "인터페이스에 클라이언트 MAC 및 IP 표시"
-                    },
-                    "unit_of_measurement": {
-                        "translation": "측정 단위"
-                    },
-                    "track_network_hosts_timeout": {
-                        "translation": "네트워크 기기 시간 초과 추적(초)"
-                    }
+                    "scan_interval": "스캔 간격(HA 재시작 필요)",
+                    "track_iface_clients": "인터페이스에 클라이언트 MAC 및 IP 표시",
+                    "unit_of_measurement": "측정 단위",
+                    "track_network_hosts_timeout": "네트워크 기기 시간 초과 추적(초)"
                 },
-                "title": {
-                    "translation": "기본 설정"
-                }
+                "title": "기본 설정"
             },
             "sensor_select": {
                 "data": {
-                    "track_network_hosts": {
-                        "translation": "네트워크 기기 추적"
-                    },
-                    "sensor_port_tracker": {
-                        "translation": "트래커 센서 복사"
-                    },
-                    "sensor_port_traffic": {
-                        "translation": "트래픽 센서 복사"
-                    },
-                    "sensor_client_traffic": {
-                        "translation": "클라이언트 트래픽 센서"
-                    },
-                    "sensor_simple_queues": {
-                        "translation": "단순 대기열 스위치"
-                    },
-                    "sensor_nat": {
-                        "translation": "내트 스위치"
-                    },
-                    "sensor_scripts": {
-                        "translation": "스크립트 스위치"
-                    },
-                    "sensor_environment": {
-                        "translation": "환경 변수 센서"
-                    },
-                    "sensor_pppusers": {
-                        "translation": ""
-                    },
-                    "sensor_kidcontrol": {
-                        "translation": ""
-                    },
-                    "sensor_mangle": {
-                        "translation": ""
-                    },
-                    "sensor_ppp": {
-                        "translation": ""
-                    }
+                    "track_network_hosts": "네트워크 기기 추적",
+                    "sensor_port_tracker": "트래커 센서 복사",
+                    "sensor_port_traffic": "트래픽 센서 복사",
+                    "sensor_client_traffic": "클라이언트 트래픽 센서",
+                    "sensor_simple_queues": "단순 대기열 스위치",
+                    "sensor_nat": "내트 스위치",
+                    "sensor_scripts": "스크립트 스위치",
+                    "sensor_environment": "환경 변수 센서",
+                    "sensor_pppusers": "PPP users",
+                    "sensor_kidcontrol": "Kid control",
+                    "sensor_mangle": "Mangle switches",
+                    "sensor_ppp": "PPP users"
                 },
-                "title": {
-                    "translation": "센서 선택"
-                }
+                "title": "센서 선택"
             }
         }
     }

@@ -1,119 +1,55 @@
 {
     "config": {
-        "title": {
-            "translation": "Mikrotik Router"
-        },
+        "title": "Mikrotik Router",
         "step": {
             "user": {
-                "title": {
-                    "translation": "Mikrotik Router"
-                },
-                "description": {
-                    "translation": "Skonfiguruj integrację z routerem Mikrotik."
-                },
+                "title": "Mikrotik Router",
+                "description": "Skonfiguruj integrację z routerem Mikrotik.",
                 "data": {
-                    "name": {
-                        "translation": "Nazwa integracji"
-                    },
-                    "host": {
-                        "translation": "Host"
-                    },
-                    "port": {
-                        "translation": "Port"
-                    },
-                    "username": {
-                        "translation": "Nazwa użytkownika"
-                    },
-                    "password": {
-                        "translation": "Hasło"
-                    },
-                    "ssl": {
-                        "translation": "Użyj SSL"
-                    }
+                    "name": "Nazwa integracji",
+                    "host": "Host",
+                    "port": "Port",
+                    "username": "Nazwa użytkownika",
+                    "password": "Hasło",
+                    "ssl": "Użyj SSL"
                 }
             }
         },
         "error": {
-            "name_exists": {
-                "translation": "Nazwa już istnieje"
-            },
-            "cannot_connect": {
-                "translation": "Nie można połączyć się z Mikrotik."
-            },
-            "ssl_handshake_failure": {
-                "translation": "Błąd uzgadniania SSL"
-            },
-            "connection_timeout": {
-                "translation": "Limit czasu dla połączenia Mikrotik został przekroczony."
-            },
-            "wrong_login": {
-                "translation": "Nieprawidłowa nazwa użytkownika lub hasło."
-            }
+            "name_exists": "Nazwa już istnieje",
+            "cannot_connect": "Nie można połączyć się z Mikrotik.",
+            "ssl_handshake_failure": "Błąd uzgadniania SSL",
+            "connection_timeout": "Limit czasu dla połączenia Mikrotik został przekroczony.",
+            "wrong_login": "Nieprawidłowa nazwa użytkownika lub hasło."
         }
     },
     "options": {
         "step": {
             "basic_options": {
                 "data": {
-                    "scan_interval": {
-                        "translation": "Częstotliwość skanowania (wymaga ponownego uruchomienia HA)"
-                    },
-                    "track_iface_clients": {
-                        "translation": "Pokaż w interfejsach adres MAC i IP klienta"
-                    },
-                    "unit_of_measurement": {
-                        "translation": "Jednostka miary"
-                    },
-                    "track_network_hosts_timeout": {
-                        "translation": "Śledź limity czasu dla urządzeń sieciowych (sekundy)"
-                    }
+                    "scan_interval": "Częstotliwość skanowania (wymaga ponownego uruchomienia HA)",
+                    "track_iface_clients": "Pokaż w interfejsach adres MAC i IP klienta",
+                    "unit_of_measurement": "Jednostka miary",
+                    "track_network_hosts_timeout": "Śledź limity czasu dla urządzeń sieciowych (sekundy)"
                 },
-                "title": {
-                    "translation": "Podstawowe opcje"
-                }
+                "title": "Podstawowe opcje"
             },
             "sensor_select": {
                 "data": {
-                    "track_network_hosts": {
-                        "translation": "Śledź urządzenia sieciowe"
-                    },
-                    "sensor_port_tracker": {
-                        "translation": "Czujniki monitora portu"
-                    },
-                    "sensor_port_traffic": {
-                        "translation": "Czujniki ruchu portowego"
-                    },
-                    "sensor_client_traffic": {
-                        "translation": "Czujniki ruchu klienta"
-                    },
-                    "sensor_simple_queues": {
-                        "translation": "Przełączniki prostych kolejek"
-                    },
-                    "sensor_nat": {
-                        "translation": "Przełączniki NAT"
-                    },
-                    "sensor_scripts": {
-                        "translation": "Przełączniki skryptów"
-                    },
-                    "sensor_environment": {
-                        "translation": "Czujniki zmiennych środowiskowych"
-                    },
-                    "sensor_pppusers": {
-                        "translation": "Użytkownicy PPP"
-                    },
-                    "sensor_kidcontrol": {
-                        "translation": "Kontrola rodzicielska"
-                    },
-                    "sensor_mangle": {
-                        "translation": ""
-                    },
-                    "sensor_ppp": {
-                        "translation": ""
-                    }
+                    "track_network_hosts": "Śledź urządzenia sieciowe",
+                    "sensor_port_tracker": "Czujniki monitora portu",
+                    "sensor_port_traffic": "Czujniki ruchu portowego",
+                    "sensor_client_traffic": "Czujniki ruchu klienta",
+                    "sensor_simple_queues": "Przełączniki prostych kolejek",
+                    "sensor_nat": "Przełączniki NAT",
+                    "sensor_scripts": "Przełączniki skryptów",
+                    "sensor_environment": "Czujniki zmiennych środowiskowych",
+                    "sensor_pppusers": "Użytkownicy PPP",
+                    "sensor_kidcontrol": "Kontrola rodzicielska",
+                    "sensor_mangle": "Mangle switches",
+                    "sensor_ppp": "PPP users"
                 },
-                "title": {
-                    "translation": "Wybierz czujniki"
-                }
+                "title": "Wybierz czujniki"
             }
         }
     }

@@ -1,119 +1,55 @@
 {
     "config": {
-        "title": {
-            "translation": "Mikrotik Router"
-        },
+        "title": "Mikrotik Router",
         "step": {
             "user": {
-                "title": {
-                    "translation": "Mikrotik Router"
-                },
-                "description": {
-                    "translation": "Mikrotik-Router-Integration einstellen"
-                },
+                "title": "Mikrotik Router",
+                "description": "Mikrotik-Router-Integration einstellen",
                 "data": {
-                    "name": {
-                        "translation": "Name der Integration"
-                    },
-                    "host": {
-                        "translation": "Host"
-                    },
-                    "port": {
-                        "translation": "Port"
-                    },
-                    "username": {
-                        "translation": "Benutzername"
-                    },
-                    "password": {
-                        "translation": "Passwort"
-                    },
-                    "ssl": {
-                        "translation": "SSL benutzen"
-                    }
+                    "name": "Name der Integration",
+                    "host": "Host",
+                    "port": "Port",
+                    "username": "Benutzername",
+                    "password": "Passwort",
+                    "ssl": "SSL benutzen"
                 }
             }
         },
         "error": {
-            "name_exists": {
-                "translation": "Name existiert bereits"
-            },
-            "cannot_connect": {
-                "translation": "Verbindung zu Mikrotik nicht möglich."
-            },
-            "ssl_handshake_failure": {
-                "translation": "SSL Vereinbarung-Fehler"
-            },
-            "connection_timeout": {
-                "translation": "Mikrotik-Verbindungstimeout."
-            },
-            "wrong_login": {
-                "translation": "Ungültiger Benutzername oder Passwort."
-            }
+            "name_exists": "Name existiert bereits",
+            "cannot_connect": "Verbindung zu Mikrotik nicht möglich.",
+            "ssl_handshake_failure": "SSL Vereinbarung-Fehler",
+            "connection_timeout": "Mikrotik-Verbindungstimeout.",
+            "wrong_login": "Ungültiger Benutzername oder Passwort."
         }
     },
     "options": {
         "step": {
             "basic_options": {
                 "data": {
-                    "scan_interval": {
-                        "translation": "Scan-Intervall (erfordert HA-Neustart)"
-                    },
-                    "track_iface_clients": {
-                        "translation": "Client MAC und IP auf dem Interface anzeigen"
-                    },
-                    "unit_of_measurement": {
-                        "translation": "Maßeinheit"
-                    },
-                    "track_network_hosts_timeout": {
-                        "translation": "Zeitlimit für Netzwerkgeräte verfolgen (Sekunden)"
-                    }
+                    "scan_interval": "Scan-Intervall (erfordert HA-Neustart)",
+                    "track_iface_clients": "Client MAC und IP auf dem Interface anzeigen",
+                    "unit_of_measurement": "Maßeinheit",
+                    "track_network_hosts_timeout": "Zeitlimit für Netzwerkgeräte verfolgen (Sekunden)"
                 },
-                "title": {
-                    "translation": "Grundlegende Optionen"
-                }
+                "title": "Grundlegende Optionen"
             },
             "sensor_select": {
                 "data": {
-                    "track_network_hosts": {
-                        "translation": "Verfolgen Sie Netzwerkgeräte"
-                    },
-                    "sensor_port_tracker": {
-                        "translation": "Hafentracker-Sensoren"
-                    },
-                    "sensor_port_traffic": {
-                        "translation": "Hafen-Verkehrssensoren"
-                    },
-                    "sensor_client_traffic": {
-                        "translation": "Kunden-Verkehrssensoren"
-                    },
-                    "sensor_simple_queues": {
-                        "translation": "Einfache Endschalter"
-                    },
-                    "sensor_nat": {
-                        "translation": "NAT-Schalter"
-                    },
-                    "sensor_scripts": {
-                        "translation": "Skript-Schalter"
-                    },
-                    "sensor_environment": {
-                        "translation": "Umweltvariable Sensoren"
-                    },
-                    "sensor_pppusers": {
-                        "translation": ""
-                    },
-                    "sensor_kidcontrol": {
-                        "translation": ""
-                    },
-                    "sensor_mangle": {
-                        "translation": ""
-                    },
-                    "sensor_ppp": {
-                        "translation": ""
-                    }
+                    "track_network_hosts": "Verfolgen Sie Netzwerkgeräte",
+                    "sensor_port_tracker": "Hafentracker-Sensoren",
+                    "sensor_port_traffic": "Hafen-Verkehrssensoren",
+                    "sensor_client_traffic": "Kunden-Verkehrssensoren",
+                    "sensor_simple_queues": "Einfache Endschalter",
+                    "sensor_nat": "NAT-Schalter",
+                    "sensor_scripts": "Skript-Schalter",
+                    "sensor_environment": "Umweltvariable Sensoren",
+                    "sensor_pppusers": "PPP users",
+                    "sensor_kidcontrol": "Kid control",
+                    "sensor_mangle": "Mangle switches",
+                    "sensor_ppp": "PPP users"
                 },
-                "title": {
-                    "translation": "Sensoren auswählen"
-                }
+                "title": "Sensoren auswählen"
             }
         }
     }

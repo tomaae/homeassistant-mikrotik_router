@@ -1,119 +1,55 @@
 {
     "config": {
-        "title": {
-            "translation": "Mikrotik Router"
-        },
+        "title": "Mikrotik Router",
         "step": {
             "user": {
-                "title": {
-                    "translation": "Mikrotik Router"
-                },
-                "description": {
-                    "translation": "إعداد دمج موجِّه (Mikrotik)."
-                },
+                "title": "Mikrotik Router",
+                "description": "إعداد دمج موجِّه (Mikrotik).",
                 "data": {
-                    "name": {
-                        "translation": "اسم الدّمج"
-                    },
-                    "host": {
-                        "translation": "المُضيف"
-                    },
-                    "port": {
-                        "translation": "منفذ"
-                    },
-                    "username": {
-                        "translation": "اسم المستخدم"
-                    },
-                    "password": {
-                        "translation": "كلمة المرور"
-                    },
-                    "ssl": {
-                        "translation": "استعمل طبقة الوصلات الآمنة (SSL)"
-                    }
+                    "name": "اسم الدّمج",
+                    "host": "المُضيف",
+                    "port": "منفذ",
+                    "username": "اسم المستخدم",
+                    "password": "كلمة المرور",
+                    "ssl": "استعمل طبقة الوصلات الآمنة (SSL)"
                 }
             }
         },
         "error": {
-            "name_exists": {
-                "translation": "الاسم موجود بالفعل."
-            },
-            "cannot_connect": {
-                "translation": "لا يمكن الاتصال بـ (Mikrotik)."
-            },
-            "ssl_handshake_failure": {
-                "translation": "فشل تأكيد الاتصال (SSL)"
-            },
-            "connection_timeout": {
-                "translation": "مهلة اتصال (Mikrotik)."
-            },
-            "wrong_login": {
-                "translation": "خطأ في اسم المستخدم أو كلمة مرور."
-            }
+            "name_exists": "الاسم موجود بالفعل.",
+            "cannot_connect": "لا يمكن الاتصال بـ (Mikrotik).",
+            "ssl_handshake_failure": "فشل تأكيد الاتصال (SSL)",
+            "connection_timeout": "مهلة اتصال (Mikrotik).",
+            "wrong_login": "خطأ في اسم المستخدم أو كلمة مرور."
         }
     },
     "options": {
         "step": {
             "basic_options": {
                 "data": {
-                    "scan_interval": {
-                        "translation": "الفاصل الزمني للمسح الضوئي (يتطلب إعادة تشغيل HA)"
-                    },
-                    "track_iface_clients": {
-                        "translation": "إظهار  عنوان التحكّم في الوسائط (MAC)  و بروتوكول الإنترنت (IP) للعميل على الواجهات"
-                    },
-                    "unit_of_measurement": {
-                        "translation": "وحدة قياس"
-                    },
-                    "track_network_hosts_timeout": {
-                        "translation": "مهلة تتبّع أجهزة الشبكة (بالثواني)"
-                    }
+                    "scan_interval": "الفاصل الزمني للمسح الضوئي (يتطلب إعادة تشغيل HA)",
+                    "track_iface_clients": "إظهار  عنوان التحكّم في الوسائط (MAC)  و بروتوكول الإنترنت (IP) للعميل على الواجهات",
+                    "unit_of_measurement": "وحدة قياس",
+                    "track_network_hosts_timeout": "مهلة تتبّع أجهزة الشبكة (بالثواني)"
                 },
-                "title": {
-                    "translation": "الخيارات الأساسية"
-                }
+                "title": "الخيارات الأساسية"
             },
             "sensor_select": {
                 "data": {
-                    "track_network_hosts": {
-                        "translation": "تتبّع أجهزة الشبكة"
-                    },
-                    "sensor_port_tracker": {
-                        "translation": "مُستشعرات تعقُب منفذ الشبكة"
-                    },
-                    "sensor_port_traffic": {
-                        "translation": "مُستشعرات حركة المرور عبر منفذ الشبكة"
-                    },
-                    "sensor_client_traffic": {
-                        "translation": "مُستشعرات حركة المرور على شبكات العميل"
-                    },
-                    "sensor_simple_queues": {
-                        "translation": "مُبدِّل الاِصْطِفاف البسيط"
-                    },
-                    "sensor_nat": {
-                        "translation": "مُبدِّلات ترجمة عنوان الشبكة"
-                    },
-                    "sensor_scripts": {
-                        "translation": "مُبدِّلات النصوص"
-                    },
-                    "sensor_environment": {
-                        "translation": "مُستشعرات متغير البيئة"
-                    },
-                    "sensor_pppusers": {
-                        "translation": ""
-                    },
-                    "sensor_kidcontrol": {
-                        "translation": ""
-                    },
-                    "sensor_mangle": {
-                        "translation": ""
-                    },
-                    "sensor_ppp": {
-                        "translation": ""
-                    }
+                    "track_network_hosts": "تتبّع أجهزة الشبكة",
+                    "sensor_port_tracker": "مُستشعرات تعقُب منفذ الشبكة",
+                    "sensor_port_traffic": "مُستشعرات حركة المرور عبر منفذ الشبكة",
+                    "sensor_client_traffic": "مُستشعرات حركة المرور على شبكات العميل",
+                    "sensor_simple_queues": "مُبدِّل الاِصْطِفاف البسيط",
+                    "sensor_nat": "مُبدِّلات ترجمة عنوان الشبكة",
+                    "sensor_scripts": "مُبدِّلات النصوص",
+                    "sensor_environment": "مُستشعرات متغير البيئة",
+                    "sensor_pppusers": "PPP users",
+                    "sensor_kidcontrol": "Kid control",
+                    "sensor_mangle": "Mangle switches",
+                    "sensor_ppp": "PPP users"
                 },
-                "title": {
-                    "translation": "حدد المُستشعرات"
-                }
+                "title": "حدد المُستشعرات"
             }
         }
     }

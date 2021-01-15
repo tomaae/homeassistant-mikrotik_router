@@ -1,119 +1,55 @@
 {
     "config": {
-        "title": {
-            "translation": "Mikrotik Router"
-        },
+        "title": "Mikrotik Router",
         "step": {
             "user": {
-                "title": {
-                    "translation": "Mikrotik Router"
-                },
-                "description": {
-                    "translation": "Állítsd be a Mikrotik Router integrációt."
-                },
+                "title": "Mikrotik Router",
+                "description": "Állítsd be a Mikrotik Router integrációt.",
                 "data": {
-                    "name": {
-                        "translation": "Integráció neve"
-                    },
-                    "host": {
-                        "translation": "Hoszt"
-                    },
-                    "port": {
-                        "translation": "Port"
-                    },
-                    "username": {
-                        "translation": "Felhasználónév"
-                    },
-                    "password": {
-                        "translation": "Jelszó"
-                    },
-                    "ssl": {
-                        "translation": "SSL használata"
-                    }
+                    "name": "Integráció neve",
+                    "host": "Hoszt",
+                    "port": "Port",
+                    "username": "Felhasználónév",
+                    "password": "Jelszó",
+                    "ssl": "SSL használata"
                 }
             }
         },
         "error": {
-            "name_exists": {
-                "translation": "A név már létezik."
-            },
-            "cannot_connect": {
-                "translation": "Nem lehet csatlakozni a Mikrotikhez."
-            },
-            "ssl_handshake_failure": {
-                "translation": "SSL-kézfogás sikertelen"
-            },
-            "connection_timeout": {
-                "translation": "Mikrotik kapcsolat időtúllépés."
-            },
-            "wrong_login": {
-                "translation": "Érvénytelen felhasználónév vagy jelszó."
-            }
+            "name_exists": "A név már létezik.",
+            "cannot_connect": "Nem lehet csatlakozni a Mikrotikhez.",
+            "ssl_handshake_failure": "SSL-kézfogás sikertelen",
+            "connection_timeout": "Mikrotik kapcsolat időtúllépés.",
+            "wrong_login": "Érvénytelen felhasználónév vagy jelszó."
         }
     },
     "options": {
         "step": {
             "basic_options": {
                 "data": {
-                    "scan_interval": {
-                        "translation": "Felderítési időköz (HA újraindítása szükséges)"
-                    },
-                    "track_iface_clients": {
-                        "translation": "Ügyfél MAC- és IP-címének mutatása az interfészeken"
-                    },
-                    "unit_of_measurement": {
-                        "translation": "Mértékegység"
-                    },
-                    "track_network_hosts_timeout": {
-                        "translation": "Hálózati eszközök követésének időtúllépése (másodperc)"
-                    }
+                    "scan_interval": "Felderítési időköz (HA újraindítása szükséges)",
+                    "track_iface_clients": "Ügyfél MAC- és IP-címének mutatása az interfészeken",
+                    "unit_of_measurement": "Mértékegység",
+                    "track_network_hosts_timeout": "Hálózati eszközök követésének időtúllépése (másodperc)"
                 },
-                "title": {
-                    "translation": "Alapbeállítások"
-                }
+                "title": "Alapbeállítások"
             },
             "sensor_select": {
                 "data": {
-                    "track_network_hosts": {
-                        "translation": "Hálózati eszközök követése"
-                    },
-                    "sensor_port_tracker": {
-                        "translation": "Portfigyelő érzékelők"
-                    },
-                    "sensor_port_traffic": {
-                        "translation": "Portforgalom érzékelők"
-                    },
-                    "sensor_client_traffic": {
-                        "translation": "Kliensforgalom érzékelők"
-                    },
-                    "sensor_simple_queues": {
-                        "translation": "Simple queue kapcsolók"
-                    },
-                    "sensor_nat": {
-                        "translation": "NAT kapcsolók"
-                    },
-                    "sensor_scripts": {
-                        "translation": "Szkript kapcsolók"
-                    },
-                    "sensor_environment": {
-                        "translation": "Környezeti változó érzékelők"
-                    },
-                    "sensor_pppusers": {
-                        "translation": "PPP felhasználók"
-                    },
-                    "sensor_kidcontrol": {
-                        "translation": "Szülői felügyelet"
-                    },
-                    "sensor_mangle": {
-                        "translation": ""
-                    },
-                    "sensor_ppp": {
-                        "translation": ""
-                    }
+                    "track_network_hosts": "Hálózati eszközök követése",
+                    "sensor_port_tracker": "Portfigyelő érzékelők",
+                    "sensor_port_traffic": "Portforgalom érzékelők",
+                    "sensor_client_traffic": "Kliensforgalom érzékelők",
+                    "sensor_simple_queues": "Simple queue kapcsolók",
+                    "sensor_nat": "NAT kapcsolók",
+                    "sensor_scripts": "Szkript kapcsolók",
+                    "sensor_environment": "Környezeti változó érzékelők",
+                    "sensor_pppusers": "PPP felhasználók",
+                    "sensor_kidcontrol": "Szülői felügyelet",
+                    "sensor_mangle": "Mangle switches",
+                    "sensor_ppp": "PPP users"
                 },
-                "title": {
-                    "translation": "Válassz érzékelőket"
-                }
+                "title": "Válassz érzékelőket"
             }
         }
     }

@@ -1,119 +1,55 @@
 {
     "config": {
-        "title": {
-            "translation": ""
-        },
+        "title": "Mikrotik Router",
         "step": {
             "user": {
-                "title": {
-                    "translation": ""
-                },
-                "description": {
-                    "translation": "Mikrotik maršrutētāja integrācijas konfigurēšana."
-                },
+                "title": "Mikrotik Router",
+                "description": "Mikrotik maršrutētāja integrācijas konfigurēšana.",
                 "data": {
-                    "name": {
-                        "translation": "Integrācijas nosaukums"
-                    },
-                    "host": {
-                        "translation": "Maršrutētāja adrese"
-                    },
-                    "port": {
-                        "translation": "Ports"
-                    },
-                    "username": {
-                        "translation": "Lietotājvārds"
-                    },
-                    "password": {
-                        "translation": "Parole"
-                    },
-                    "ssl": {
-                        "translation": "Izmantot SSL"
-                    }
+                    "name": "Integrācijas nosaukums",
+                    "host": "Maršrutētāja adrese",
+                    "port": "Ports",
+                    "username": "Lietotājvārds",
+                    "password": "Parole",
+                    "ssl": "Izmantot SSL"
                 }
             }
         },
         "error": {
-            "name_exists": {
-                "translation": "Nosaukums jau eksistē."
-            },
-            "cannot_connect": {
-                "translation": "Neizdodas savienoties ar Mikrotik."
-            },
-            "ssl_handshake_failure": {
-                "translation": "SSL savienojuma kļūda"
-            },
-            "connection_timeout": {
-                "translation": "Mikrotik savienojuma noilgums."
-            },
-            "wrong_login": {
-                "translation": "Nederīgs lietotājvārds vai parole."
-            }
+            "name_exists": "Nosaukums jau eksistē.",
+            "cannot_connect": "Neizdodas savienoties ar Mikrotik.",
+            "ssl_handshake_failure": "SSL savienojuma kļūda",
+            "connection_timeout": "Mikrotik savienojuma noilgums.",
+            "wrong_login": "Nederīgs lietotājvārds vai parole."
         }
     },
     "options": {
         "step": {
             "basic_options": {
                 "data": {
-                    "scan_interval": {
-                        "translation": "Skenēšanas periods (nepieciešama HA restartēšana)"
-                    },
-                    "track_iface_clients": {
-                        "translation": "Rādīt klienta MAC un IP interfeisā"
-                    },
-                    "unit_of_measurement": {
-                        "translation": "Mērvienības"
-                    },
-                    "track_network_hosts_timeout": {
-                        "translation": "Tīkla ierīces uzraudzības noilgums (sekundēs)"
-                    }
+                    "scan_interval": "Skenēšanas periods (nepieciešama HA restartēšana)",
+                    "track_iface_clients": "Rādīt klienta MAC un IP interfeisā",
+                    "unit_of_measurement": "Mērvienības",
+                    "track_network_hosts_timeout": "Tīkla ierīces uzraudzības noilgums (sekundēs)"
                 },
-                "title": {
-                    "translation": "Pamata parametri"
-                }
+                "title": "Pamata parametri"
             },
             "sensor_select": {
                 "data": {
-                    "track_network_hosts": {
-                        "translation": "Tīkla ierīču izsekošana"
-                    },
-                    "sensor_port_tracker": {
-                        "translation": "Porta izsekošanas sensori"
-                    },
-                    "sensor_port_traffic": {
-                        "translation": "Porta datu plūsmas sensori"
-                    },
-                    "sensor_client_traffic": {
-                        "translation": "Klientu datu plūsmas sensori"
-                    },
-                    "sensor_simple_queues": {
-                        "translation": "Vienkāršo rindu slēdži"
-                    },
-                    "sensor_nat": {
-                        "translation": "NAT kārtulu slēdži"
-                    },
-                    "sensor_scripts": {
-                        "translation": "Skriptu slēdži"
-                    },
-                    "sensor_environment": {
-                        "translation": "Mainīgie vides sensori"
-                    },
-                    "sensor_pppusers": {
-                        "translation": "PPP lietotāji"
-                    },
-                    "sensor_kidcontrol": {
-                        "translation": "Bērnu kontrole"
-                    },
-                    "sensor_mangle": {
-                        "translation": ""
-                    },
-                    "sensor_ppp": {
-                        "translation": ""
-                    }
+                    "track_network_hosts": "Tīkla ierīču izsekošana",
+                    "sensor_port_tracker": "Porta izsekošanas sensori",
+                    "sensor_port_traffic": "Porta datu plūsmas sensori",
+                    "sensor_client_traffic": "Klientu datu plūsmas sensori",
+                    "sensor_simple_queues": "Vienkāršo rindu slēdži",
+                    "sensor_nat": "NAT kārtulu slēdži",
+                    "sensor_scripts": "Skriptu slēdži",
+                    "sensor_environment": "Mainīgie vides sensori",
+                    "sensor_pppusers": "PPP lietotāji",
+                    "sensor_kidcontrol": "Bērnu kontrole",
+                    "sensor_mangle": "Mangle switches",
+                    "sensor_ppp": "PPP users"
                 },
-                "title": {
-                    "translation": "Sensora izvēle"
-                }
+                "title": "Sensora izvēle"
             }
         }
     }
