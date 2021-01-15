@@ -1,119 +1,55 @@
 {
     "config": {
-        "title": {
-            "translation": "Mikrotik Router"
-        },
+        "title": "Mikrotik Router",
         "step": {
             "user": {
-                "title": {
-                    "translation": "Mikrotik Router"
-                },
-                "description": {
-                    "translation": "Mikrotikルータ統合をセットアップします。"
-                },
+                "title": "Mikrotik Router",
+                "description": "Mikrotikルータ統合をセットアップします。",
                 "data": {
-                    "name": {
-                        "translation": "統合名"
-                    },
-                    "host": {
-                        "translation": "ホスト"
-                    },
-                    "port": {
-                        "translation": "ポート"
-                    },
-                    "username": {
-                        "translation": "ユーザ名"
-                    },
-                    "password": {
-                        "translation": "パスワード"
-                    },
-                    "ssl": {
-                        "translation": "SSLを使用します"
-                    }
+                    "name": "統合名",
+                    "host": "ホスト",
+                    "port": "ポート",
+                    "username": "ユーザ名",
+                    "password": "パスワード",
+                    "ssl": "SSLを使用します"
                 }
             }
         },
         "error": {
-            "name_exists": {
-                "translation": "名前は既に存在します。"
-            },
-            "cannot_connect": {
-                "translation": "Mikrotikに接続できません。"
-            },
-            "ssl_handshake_failure": {
-                "translation": "SSLハンドシェイクに失敗しました"
-            },
-            "connection_timeout": {
-                "translation": "Mikrotik接続がタイムアウトしました。"
-            },
-            "wrong_login": {
-                "translation": "ユーザ名またはパスワードが無効です。"
-            }
+            "name_exists": "名前は既に存在します。",
+            "cannot_connect": "Mikrotikに接続できません。",
+            "ssl_handshake_failure": "SSLハンドシェイクに失敗しました",
+            "connection_timeout": "Mikrotik接続がタイムアウトしました。",
+            "wrong_login": "ユーザ名またはパスワードが無効です。"
         }
     },
     "options": {
         "step": {
             "basic_options": {
                 "data": {
-                    "scan_interval": {
-                        "translation": "スキャン間隔（HAの再起動が必要）"
-                    },
-                    "track_iface_clients": {
-                        "translation": "クライアントのMACとインターフェイスのIPを表示します"
-                    },
-                    "unit_of_measurement": {
-                        "translation": "測定単位"
-                    },
-                    "track_network_hosts_timeout": {
-                        "translation": "ネットワーク デバイスのタイムアウト（秒）をトラッキングします"
-                    }
+                    "scan_interval": "スキャン間隔（HAの再起動が必要）",
+                    "track_iface_clients": "クライアントのMACとインターフェイスのIPを表示します",
+                    "unit_of_measurement": "測定単位",
+                    "track_network_hosts_timeout": "ネットワーク デバイスのタイムアウト（秒）をトラッキングします"
                 },
-                "title": {
-                    "translation": "基本オプション"
-                }
+                "title": "基本オプション"
             },
             "sensor_select": {
                 "data": {
-                    "track_network_hosts": {
-                        "translation": "ネットワーク デバイスをトラッキングします"
-                    },
-                    "sensor_port_tracker": {
-                        "translation": "ポートトラッカーセンサー"
-                    },
-                    "sensor_port_traffic": {
-                        "translation": "ポートトラフィックセンサー"
-                    },
-                    "sensor_client_traffic": {
-                        "translation": "クライアントトラフィックセンサー"
-                    },
-                    "sensor_simple_queues": {
-                        "translation": "単純キュースイッチ"
-                    },
-                    "sensor_nat": {
-                        "translation": "NAT スイッチ"
-                    },
-                    "sensor_scripts": {
-                        "translation": "スクリプトスイッチ"
-                    },
-                    "sensor_environment": {
-                        "translation": "環境変数センサー"
-                    },
-                    "sensor_pppusers": {
-                        "translation": ""
-                    },
-                    "sensor_kidcontrol": {
-                        "translation": ""
-                    },
-                    "sensor_mangle": {
-                        "translation": ""
-                    },
-                    "sensor_ppp": {
-                        "translation": ""
-                    }
+                    "track_network_hosts": "ネットワーク デバイスをトラッキングします",
+                    "sensor_port_tracker": "ポートトラッカーセンサー",
+                    "sensor_port_traffic": "ポートトラフィックセンサー",
+                    "sensor_client_traffic": "クライアントトラフィックセンサー",
+                    "sensor_simple_queues": "単純キュースイッチ",
+                    "sensor_nat": "NAT スイッチ",
+                    "sensor_scripts": "スクリプトスイッチ",
+                    "sensor_environment": "環境変数センサー",
+                    "sensor_pppusers": "PPP users",
+                    "sensor_kidcontrol": "Kid control",
+                    "sensor_mangle": "Mangle switches",
+                    "sensor_ppp": "PPP users"
                 },
-                "title": {
-                    "translation": "センサーを選択"
-                }
+                "title": "センサーを選択"
             }
         }
     }

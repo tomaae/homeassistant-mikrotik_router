@@ -1,119 +1,55 @@
 {
     "config": {
-        "title": {
-            "translation": "Роутер Mikrotik"
-        },
+        "title": "Роутер Mikrotik",
         "step": {
             "user": {
-                "title": {
-                    "translation": "Роутер Mikrotik"
-                },
-                "description": {
-                    "translation": "Настройка интеграции маршрутизатора Mikrotik."
-                },
+                "title": "Роутер Mikrotik",
+                "description": "Настройка интеграции маршрутизатора Mikrotik.",
                 "data": {
-                    "name": {
-                        "translation": "Название интеграции"
-                    },
-                    "host": {
-                        "translation": "Адрес маршрутизатора"
-                    },
-                    "port": {
-                        "translation": "Порт"
-                    },
-                    "username": {
-                        "translation": "Имя пользователя"
-                    },
-                    "password": {
-                        "translation": "Пароль"
-                    },
-                    "ssl": {
-                        "translation": "Использовать SSL"
-                    }
+                    "name": "Название интеграции",
+                    "host": "Адрес маршрутизатора",
+                    "port": "Порт",
+                    "username": "Имя пользователя",
+                    "password": "Пароль",
+                    "ssl": "Использовать SSL"
                 }
             }
         },
         "error": {
-            "name_exists": {
-                "translation": "Имя уже используется."
-            },
-            "cannot_connect": {
-                "translation": "Не удается подключиться к Mikrotik."
-            },
-            "ssl_handshake_failure": {
-                "translation": "Ошибка SSL-соединения"
-            },
-            "connection_timeout": {
-                "translation": "Таймаут подключения к Mikrotik."
-            },
-            "wrong_login": {
-                "translation": "Неверное имя пользователя или пароль."
-            }
+            "name_exists": "Имя уже используется.",
+            "cannot_connect": "Не удается подключиться к Mikrotik.",
+            "ssl_handshake_failure": "Ошибка SSL-соединения",
+            "connection_timeout": "Таймаут подключения к Mikrotik.",
+            "wrong_login": "Неверное имя пользователя или пароль."
         }
     },
     "options": {
         "step": {
             "basic_options": {
                 "data": {
-                    "scan_interval": {
-                        "translation": "Период сканирования (требуется перезагрузка HA)"
-                    },
-                    "track_iface_clients": {
-                        "translation": "Показывать в интерфейсе MAC и IP клиентов"
-                    },
-                    "unit_of_measurement": {
-                        "translation": "Единицы измерения"
-                    },
-                    "track_network_hosts_timeout": {
-                        "translation": "Таймаут отслеживания сетевых устройств (секунд)"
-                    }
+                    "scan_interval": "Период сканирования (требуется перезагрузка HA)",
+                    "track_iface_clients": "Показывать в интерфейсе MAC и IP клиентов",
+                    "unit_of_measurement": "Единицы измерения",
+                    "track_network_hosts_timeout": "Таймаут отслеживания сетевых устройств (секунд)"
                 },
-                "title": {
-                    "translation": "Базовые параметры"
-                }
+                "title": "Базовые параметры"
             },
             "sensor_select": {
                 "data": {
-                    "track_network_hosts": {
-                        "translation": "Отслеживание сетевых устройств"
-                    },
-                    "sensor_port_tracker": {
-                        "translation": "Датчики отслеживания порта"
-                    },
-                    "sensor_port_traffic": {
-                        "translation": "Датчики трафика порта"
-                    },
-                    "sensor_client_traffic": {
-                        "translation": "Датчики клиентского трафика"
-                    },
-                    "sensor_simple_queues": {
-                        "translation": "Переключатели простых очередей"
-                    },
-                    "sensor_nat": {
-                        "translation": "Переключатели NAT правил"
-                    },
-                    "sensor_scripts": {
-                        "translation": "Переключатели сценариев"
-                    },
-                    "sensor_environment": {
-                        "translation": "Датчики переменных окружения"
-                    },
-                    "sensor_pppusers": {
-                        "translation": "PPP пользователи"
-                    },
-                    "sensor_kidcontrol": {
-                        "translation": "Детский контроль"
-                    },
-                    "sensor_mangle": {
-                        "translation": ""
-                    },
-                    "sensor_ppp": {
-                        "translation": ""
-                    }
+                    "track_network_hosts": "Отслеживание сетевых устройств",
+                    "sensor_port_tracker": "Датчики отслеживания порта",
+                    "sensor_port_traffic": "Датчики трафика порта",
+                    "sensor_client_traffic": "Датчики клиентского трафика",
+                    "sensor_simple_queues": "Переключатели простых очередей",
+                    "sensor_nat": "Переключатели NAT правил",
+                    "sensor_scripts": "Переключатели сценариев",
+                    "sensor_environment": "Датчики переменных окружения",
+                    "sensor_pppusers": "PPP пользователи",
+                    "sensor_kidcontrol": "Детский контроль",
+                    "sensor_mangle": "Mangle switches",
+                    "sensor_ppp": "PPP users"
                 },
-                "title": {
-                    "translation": "Выбор датчиков"
-                }
+                "title": "Выбор датчиков"
             }
         }
     }

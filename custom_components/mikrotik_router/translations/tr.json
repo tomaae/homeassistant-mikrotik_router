@@ -1,119 +1,55 @@
 {
     "config": {
-        "title": {
-            "translation": "Mikrotik Router"
-        },
+        "title": "Mikrotik Router",
         "step": {
             "user": {
-                "title": {
-                    "translation": "Mikrotik Router"
-                },
-                "description": {
-                    "translation": "Mikrotik yönlendirici entegrasyonunu kur"
-                },
+                "title": "Mikrotik Router",
+                "description": "Mikrotik yönlendirici entegrasyonunu kur",
                 "data": {
-                    "name": {
-                        "translation": "Entegrasyon adı"
-                    },
-                    "host": {
-                        "translation": "Sunucu"
-                    },
-                    "port": {
-                        "translation": "Port"
-                    },
-                    "username": {
-                        "translation": "Kullanıcı adı"
-                    },
-                    "password": {
-                        "translation": "Şifre"
-                    },
-                    "ssl": {
-                        "translation": "SSL kullan"
-                    }
+                    "name": "Entegrasyon adı",
+                    "host": "Sunucu",
+                    "port": "Port",
+                    "username": "Kullanıcı adı",
+                    "password": "Şifre",
+                    "ssl": "SSL kullan"
                 }
             }
         },
         "error": {
-            "name_exists": {
-                "translation": "Bu ad zaten var."
-            },
-            "cannot_connect": {
-                "translation": "Mikrotik'e bağlanılamıyor."
-            },
-            "ssl_handshake_failure": {
-                "translation": "SSL uyuşma hatası"
-            },
-            "connection_timeout": {
-                "translation": "Mikrotik bağlantısı zaman aşımı."
-            },
-            "wrong_login": {
-                "translation": "Geçersiz kullanıcı adı veya şifresi."
-            }
+            "name_exists": "Bu ad zaten var.",
+            "cannot_connect": "Mikrotik'e bağlanılamıyor.",
+            "ssl_handshake_failure": "SSL uyuşma hatası",
+            "connection_timeout": "Mikrotik bağlantısı zaman aşımı.",
+            "wrong_login": "Geçersiz kullanıcı adı veya şifresi."
         }
     },
     "options": {
         "step": {
             "basic_options": {
                 "data": {
-                    "scan_interval": {
-                        "translation": "Aralığı tara (HA yeniden başlatma gerektirir)"
-                    },
-                    "track_iface_clients": {
-                        "translation": "Müşteri MAC'ini ve IP'sini arayüzlerde göster"
-                    },
-                    "unit_of_measurement": {
-                        "translation": "Ölçü birimi"
-                    },
-                    "track_network_hosts_timeout": {
-                        "translation": "Ağ cihazı izleme zaman aşımı (saniyeler)"
-                    }
+                    "scan_interval": "Aralığı tara (HA yeniden başlatma gerektirir)",
+                    "track_iface_clients": "Müşteri MAC'ini ve IP'sini arayüzlerde göster",
+                    "unit_of_measurement": "Ölçü birimi",
+                    "track_network_hosts_timeout": "Ağ cihazı izleme zaman aşımı (saniyeler)"
                 },
-                "title": {
-                    "translation": "Temel seçenekler"
-                }
+                "title": "Temel seçenekler"
             },
             "sensor_select": {
                 "data": {
-                    "track_network_hosts": {
-                        "translation": "Ağ cihazlarını izle"
-                    },
-                    "sensor_port_tracker": {
-                        "translation": "Port izleme sensörleri"
-                    },
-                    "sensor_port_traffic": {
-                        "translation": "Port trafiği sensörleri"
-                    },
-                    "sensor_client_traffic": {
-                        "translation": "İstemci trafik sensörleri"
-                    },
-                    "sensor_simple_queues": {
-                        "translation": "Basit kuyruk switchleri"
-                    },
-                    "sensor_nat": {
-                        "translation": "NAT switchler"
-                    },
-                    "sensor_scripts": {
-                        "translation": "Betik switchleri"
-                    },
-                    "sensor_environment": {
-                        "translation": "Çevre değişkeni sensörleri"
-                    },
-                    "sensor_pppusers": {
-                        "translation": ""
-                    },
-                    "sensor_kidcontrol": {
-                        "translation": ""
-                    },
-                    "sensor_mangle": {
-                        "translation": ""
-                    },
-                    "sensor_ppp": {
-                        "translation": ""
-                    }
+                    "track_network_hosts": "Ağ cihazlarını izle",
+                    "sensor_port_tracker": "Port izleme sensörleri",
+                    "sensor_port_traffic": "Port trafiği sensörleri",
+                    "sensor_client_traffic": "İstemci trafik sensörleri",
+                    "sensor_simple_queues": "Basit kuyruk switchleri",
+                    "sensor_nat": "NAT switchler",
+                    "sensor_scripts": "Betik switchleri",
+                    "sensor_environment": "Çevre değişkeni sensörleri",
+                    "sensor_pppusers": "PPP users",
+                    "sensor_kidcontrol": "Kid control",
+                    "sensor_mangle": "Mangle switches",
+                    "sensor_ppp": "PPP users"
                 },
-                "title": {
-                    "translation": "Sensörleri seçin"
-                }
+                "title": "Sensörleri seçin"
             }
         }
     }

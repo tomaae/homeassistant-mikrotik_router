@@ -1,119 +1,55 @@
 {
     "config": {
-        "title": {
-            "translation": "Mikrotik Router"
-        },
+        "title": "Mikrotik Router",
         "step": {
             "user": {
-                "title": {
-                    "translation": "Mikrotik Router"
-                },
-                "description": {
-                    "translation": "Nastaviť integráciu Mikrotik Router."
-                },
+                "title": "Mikrotik Router",
+                "description": "Nastaviť integráciu Mikrotik Router.",
                 "data": {
-                    "name": {
-                        "translation": "Názov integrácie"
-                    },
-                    "host": {
-                        "translation": "Zariadenie"
-                    },
-                    "port": {
-                        "translation": "Port"
-                    },
-                    "username": {
-                        "translation": "Užívateľ"
-                    },
-                    "password": {
-                        "translation": "Heslo"
-                    },
-                    "ssl": {
-                        "translation": "Použiť SSL"
-                    }
+                    "name": "Názov integrácie",
+                    "host": "Zariadenie",
+                    "port": "Port",
+                    "username": "Užívateľ",
+                    "password": "Heslo",
+                    "ssl": "Použiť SSL"
                 }
             }
         },
         "error": {
-            "name_exists": {
-                "translation": "Názov už existuje."
-            },
-            "cannot_connect": {
-                "translation": "Nedá sa pripojiť k Mikrotiku."
-            },
-            "ssl_handshake_failure": {
-                "translation": "Zlyhanie nadviazania spojenia SSL."
-            },
-            "connection_timeout": {
-                "translation": "Časový limit pripojenia vypršal."
-            },
-            "wrong_login": {
-                "translation": "Nesprávne užívateľské meno alebo heslo."
-            }
+            "name_exists": "Názov už existuje.",
+            "cannot_connect": "Nedá sa pripojiť k Mikrotiku.",
+            "ssl_handshake_failure": "Zlyhanie nadviazania spojenia SSL.",
+            "connection_timeout": "Časový limit pripojenia vypršal.",
+            "wrong_login": "Nesprávne užívateľské meno alebo heslo."
         }
     },
     "options": {
         "step": {
             "basic_options": {
                 "data": {
-                    "scan_interval": {
-                        "translation": "Interval skenovania (vyžaduje sa reštart HA)"
-                    },
-                    "track_iface_clients": {
-                        "translation": "Zobraziť klientske MAC a IP na rozhraniach"
-                    },
-                    "unit_of_measurement": {
-                        "translation": "Merná jednotka"
-                    },
-                    "track_network_hosts_timeout": {
-                        "translation": "Časový limit sledovania sieťových zariadení (sekundy)"
-                    }
+                    "scan_interval": "Interval skenovania (vyžaduje sa reštart HA)",
+                    "track_iface_clients": "Zobraziť klientske MAC a IP na rozhraniach",
+                    "unit_of_measurement": "Merná jednotka",
+                    "track_network_hosts_timeout": "Časový limit sledovania sieťových zariadení (sekundy)"
                 },
-                "title": {
-                    "translation": "Základné možnosti"
-                }
+                "title": "Základné možnosti"
             },
             "sensor_select": {
                 "data": {
-                    "track_network_hosts": {
-                        "translation": "Sledovanie sieťových zariadení"
-                    },
-                    "sensor_port_tracker": {
-                        "translation": "Senzory sledovania portov"
-                    },
-                    "sensor_port_traffic": {
-                        "translation": "Senzory prenosu v porte"
-                    },
-                    "sensor_client_traffic": {
-                        "translation": "Senzory prenosu klientov"
-                    },
-                    "sensor_simple_queues": {
-                        "translation": "Jednoduché prepínače radov"
-                    },
-                    "sensor_nat": {
-                        "translation": "Prepínače NAT"
-                    },
-                    "sensor_scripts": {
-                        "translation": "Prepínače skriptov"
-                    },
-                    "sensor_environment": {
-                        "translation": "Snímače prostredia"
-                    },
-                    "sensor_pppusers": {
-                        "translation": ""
-                    },
-                    "sensor_kidcontrol": {
-                        "translation": ""
-                    },
-                    "sensor_mangle": {
-                        "translation": ""
-                    },
-                    "sensor_ppp": {
-                        "translation": ""
-                    }
+                    "track_network_hosts": "Sledovanie sieťových zariadení",
+                    "sensor_port_tracker": "Senzory sledovania portov",
+                    "sensor_port_traffic": "Senzory prenosu v porte",
+                    "sensor_client_traffic": "Senzory prenosu klientov",
+                    "sensor_simple_queues": "Jednoduché prepínače radov",
+                    "sensor_nat": "Prepínače NAT",
+                    "sensor_scripts": "Prepínače skriptov",
+                    "sensor_environment": "Snímače prostredia",
+                    "sensor_pppusers": "PPP users",
+                    "sensor_kidcontrol": "Kid control",
+                    "sensor_mangle": "Mangle switches",
+                    "sensor_ppp": "PPP users"
                 },
-                "title": {
-                    "translation": "Vybrať senzory"
-                }
+                "title": "Vybrať senzory"
             }
         }
     }

@@ -1,119 +1,55 @@
 {
     "config": {
-        "title": {
-            "translation": "Mikrotik Router"
-        },
+        "title": "Mikrotik Router",
         "step": {
             "user": {
-                "title": {
-                    "translation": "Mikrotik Router"
-                },
-                "description": {
-                    "translation": "Configurar a integração do Mikrotik Router."
-                },
+                "title": "Mikrotik Router",
+                "description": "Configurar a integração do Mikrotik Router.",
                 "data": {
-                    "name": {
-                        "translation": "Nome da integração"
-                    },
-                    "host": {
-                        "translation": "Anfitrião"
-                    },
-                    "port": {
-                        "translation": "Porta"
-                    },
-                    "username": {
-                        "translation": "Nome de utilizador"
-                    },
-                    "password": {
-                        "translation": "Palavra-passe"
-                    },
-                    "ssl": {
-                        "translation": "Usar SSL"
-                    }
+                    "name": "Nome da integração",
+                    "host": "Anfitrião",
+                    "port": "Porta",
+                    "username": "Nome de utilizador",
+                    "password": "Palavra-passe",
+                    "ssl": "Usar SSL"
                 }
             }
         },
         "error": {
-            "name_exists": {
-                "translation": "O nome já existe."
-            },
-            "cannot_connect": {
-                "translation": "Não é possível ligar à Mikrotik."
-            },
-            "ssl_handshake_failure": {
-                "translation": "Falha no reconhecimento SSL"
-            },
-            "connection_timeout": {
-                "translation": "Tempo limite da ligação à Mikrotik."
-            },
-            "wrong_login": {
-                "translation": "Nome de utilizador ou palavra-passe inválidos."
-            }
+            "name_exists": "O nome já existe.",
+            "cannot_connect": "Não é possível ligar à Mikrotik.",
+            "ssl_handshake_failure": "Falha no reconhecimento SSL",
+            "connection_timeout": "Tempo limite da ligação à Mikrotik.",
+            "wrong_login": "Nome de utilizador ou palavra-passe inválidos."
         }
     },
     "options": {
         "step": {
             "basic_options": {
                 "data": {
-                    "scan_interval": {
-                        "translation": "Intervalo de verificação (requer reinicialização de HA)"
-                    },
-                    "track_iface_clients": {
-                        "translation": "Mostrar MAC e IP do cliente nas interfaces"
-                    },
-                    "unit_of_measurement": {
-                        "translation": "Unidade de medida"
-                    },
-                    "track_network_hosts_timeout": {
-                        "translation": "Rastrear o tempo limite dos dispositivos de rede (segundos)"
-                    }
+                    "scan_interval": "Intervalo de verificação (requer reinicialização de HA)",
+                    "track_iface_clients": "Mostrar MAC e IP do cliente nas interfaces",
+                    "unit_of_measurement": "Unidade de medida",
+                    "track_network_hosts_timeout": "Rastrear o tempo limite dos dispositivos de rede (segundos)"
                 },
-                "title": {
-                    "translation": "Opções básicas"
-                }
+                "title": "Opções básicas"
             },
             "sensor_select": {
                 "data": {
-                    "track_network_hosts": {
-                        "translation": "Rastrear dispositivos de rede"
-                    },
-                    "sensor_port_tracker": {
-                        "translation": "Sensores de rastreamento das portas"
-                    },
-                    "sensor_port_traffic": {
-                        "translation": "Sensores de tráfego das portas"
-                    },
-                    "sensor_client_traffic": {
-                        "translation": "Sensores de tráfego do cliente"
-                    },
-                    "sensor_simple_queues": {
-                        "translation": "Comutadores simples de filas de espera"
-                    },
-                    "sensor_nat": {
-                        "translation": "Comutadores NAT"
-                    },
-                    "sensor_scripts": {
-                        "translation": "Comutadores de scripts"
-                    },
-                    "sensor_environment": {
-                        "translation": "Sensores de variáveis de ambiente"
-                    },
-                    "sensor_pppusers": {
-                        "translation": ""
-                    },
-                    "sensor_kidcontrol": {
-                        "translation": ""
-                    },
-                    "sensor_mangle": {
-                        "translation": ""
-                    },
-                    "sensor_ppp": {
-                        "translation": ""
-                    }
+                    "track_network_hosts": "Rastrear dispositivos de rede",
+                    "sensor_port_tracker": "Sensores de rastreamento das portas",
+                    "sensor_port_traffic": "Sensores de tráfego das portas",
+                    "sensor_client_traffic": "Sensores de tráfego do cliente",
+                    "sensor_simple_queues": "Comutadores simples de filas de espera",
+                    "sensor_nat": "Comutadores NAT",
+                    "sensor_scripts": "Comutadores de scripts",
+                    "sensor_environment": "Sensores de variáveis de ambiente",
+                    "sensor_pppusers": "PPP users",
+                    "sensor_kidcontrol": "Kid control",
+                    "sensor_mangle": "Mangle switches",
+                    "sensor_ppp": "PPP users"
                 },
-                "title": {
-                    "translation": "Selecionar os sensores"
-                }
+                "title": "Selecionar os sensores"
             }
         }
     }
