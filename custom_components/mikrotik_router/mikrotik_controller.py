@@ -472,6 +472,9 @@ class MikrotikControllerData:
                 if uid in self.data["arp"] and self.data["arp"][uid]["bridge"] != "":
                     tmp_interface = self.data["arp"][uid]["bridge"]
 
+                _LOGGER.debug(
+                    "Ping host: %s (%s)", uid, self.data["host"][uid]["address"]
+                )
                 self.data["host"][uid][
                     "available"
                 ] = await self.hass.async_add_executor_job(
