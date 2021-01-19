@@ -149,15 +149,17 @@ NOTE: Do not mistake "Mikrotik Router" integration with HA build-in integration 
 * "Port" - Leave at 0 for defaults
 
 ## Configuration
+First options page:
 ![Integration options](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/integration_options.png)
 * "Scan interval" - Scan/refresh time in seconds. HA needs to be reloaded for scan interval change to be applied
 * "Unit of measurement" - Traffic sensor measurement (bps, Kbps, Mbps, B/s, KB/s, MB/s)
 * "Show client MAC and IP on interfaces" - Display connected IP and MAC address for devices connected to ports on router
 * "Track network devices timeout" - Tracked devices will be marked as away after timeout (does not apply to Mikrotik wireless and caps-man)
 
+Second options page:
 ![Integration sensors](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/integration_options_sensors.png)
 
-Select sensors
+Select sensors you want to use in Home Assistant.
 
 # Development
 
