@@ -528,7 +528,7 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
             "connections": {(CONNECTION_NETWORK_MAC, self._data["mac-address"])},
             "default_name": self._data["host-name"],
         }
-        if self._data["manufacturer"] != "":
+        if "manufacturer" in self._data and self._data["manufacturer"] != "":
             info["manufacturer"] = self._data["manufacturer"]
 
         return info
