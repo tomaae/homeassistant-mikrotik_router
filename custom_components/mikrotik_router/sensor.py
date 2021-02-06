@@ -581,9 +581,18 @@ class MikrotikControllerEnvironmentSensor(MikrotikControllerSensor):
     def device_info(self) -> Dict[str, Any]:
         """Return a description for device registry."""
         info = {
+            "identifiers": {
+                (
+                    DOMAIN,
+                    "serial-number",
+                    self._ctrl.data["routerboard"]["serial-number"],
+                    "sensor",
+                    "Environment",
+                )
+            },
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
-            "name": f"{self._inst} {self._sid_data['sid']}",
+            "name": f"{self._inst} Environment",
         }
 
         return info
