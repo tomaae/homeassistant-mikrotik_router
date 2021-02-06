@@ -1160,7 +1160,7 @@ class MikrotikControllerData:
     def get_environment(self):
         """Get list of all environment variables from Mikrotik"""
         self.data["environment"] = parse_api(
-            data={},
+            data=self.data["environment"],
             source=self.api.path("/system/script/environment"),
             key="name",
             vals=[
