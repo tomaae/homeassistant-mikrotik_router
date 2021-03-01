@@ -341,7 +341,7 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
         mod_value = True
         self._ctrl.set_value(path, param, value, mod_param, mod_value)
 
-        if self._data["poe-out"] == "auto-on":
+        if "poe-out" in self._data and self._data["poe-out"] == "auto-on":
             path = "/interface/ethernet"
             self._ctrl.set_value(path, param, value, "poe-out", "off")
 
