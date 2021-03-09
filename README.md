@@ -132,6 +132,12 @@ Minimum requirements:
 * RouterOS v6.43
 * Home Assistant 0.114.0
 
+## Using Mikrotik development branch
+If you are using development branch for mikrotik, some features may stop working due to major changes in RouterOS.
+Use integration master branch instead of latest release to keep up with RouterOS beta adjustments.
+* beta 7.3 was fully tested.
+* beta 7.4 have been reported to miss system health information.
+
 ## Setup integration
 1. Create user for homeassistant on your mikrotik router with following permissions:
    * read, write, api, test, policy
