@@ -346,7 +346,7 @@ class MikrotikAPI:
             )
             return True
 
-        params = {".id": tmp[".id"]}
+        params = {".id": entry_found}
         self.lock.acquire()
         try:
             tuple(response(command, **params))
