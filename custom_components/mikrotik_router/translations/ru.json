@@ -46,8 +46,9 @@
                     "sensor_environment": "Датчики переменных окружения",
                     "sensor_pppusers": "PPP пользователи",
                     "sensor_kidcontrol": "Детский контроль",
-                    "sensor_mangle": "Mangle switches",
-                    "sensor_ppp": "PPP users"
+                    "sensor_mangle": "Переключатели правил Mangle",
+                    "sensor_ppp": "PPP-пользователи",
+                    "sensor_filter": "Filter switches"
                 },
                 "title": "Выбор датчиков"
             }

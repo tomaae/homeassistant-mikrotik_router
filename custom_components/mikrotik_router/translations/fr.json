@@ -7,7 +7,7 @@
                 "description": "Configurer l'intégration de routeur Mikrotik.",
                 "data": {
                     "name": "Nom de l'intégration",
-                    "host": "Mot de passe",
+                    "host": "Hôte",
                     "port": "Port",
                     "username": "Identifiant",
                     "password": "Mot de passe",
@@ -18,7 +18,7 @@
         "error": {
             "name_exists": "Le nom existe déjà.",
             "cannot_connect": "Impossible de se connecter à Mikrotik.",
-            "ssl_handshake_failure": "Échec de poignée de main SSL",
+            "ssl_handshake_failure": "Échec de la négociation SSL",
             "connection_timeout": "Expiration de connexion Mikrotik.",
             "wrong_login": "Identifiant ou mot de passe invalide."
         }
@@ -38,16 +38,17 @@
                 "data": {
                     "track_network_hosts": "Suivre les appareils du réseau",
                     "sensor_port_tracker": "Capteurs de suivi de ports",
-                    "sensor_port_traffic": "Capteurs de trafic portuaire",
+                    "sensor_port_traffic": "Capteurs de trafic par ports",
                     "sensor_client_traffic": "Capteurs de trafic de clients",
                     "sensor_simple_queues": "Commutateurs de files d'attente simples",
                     "sensor_nat": "Commutateurs NAT",
                     "sensor_scripts": "Commutation de scripts",
                     "sensor_environment": "Capteurs de variables d'environnement",
-                    "sensor_pppusers": "PPP users",
-                    "sensor_kidcontrol": "Kid control",
-                    "sensor_mangle": "Mangle switches",
-                    "sensor_ppp": "PPP users"
+                    "sensor_pppusers": "Utilisateurs PPP",
+                    "sensor_kidcontrol": "Contrôle parental",
+                    "sensor_mangle": "Commutateurs Mangle",
+                    "sensor_ppp": "Utilisateurs PPP",
+                    "sensor_filter": "Filter switches"
                 },
                 "title": "Sélectionner les capteurs"
             }
