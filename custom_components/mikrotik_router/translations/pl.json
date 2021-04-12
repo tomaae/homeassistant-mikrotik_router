@@ -47,7 +47,8 @@
                     "sensor_pppusers": "Użytkownicy PPP",
                     "sensor_kidcontrol": "Kontrola rodzicielska",
                     "sensor_mangle": "Mangle switches",
-                    "sensor_ppp": "PPP users"
+                    "sensor_ppp": "PPP users",
+                    "sensor_filter": "Filter switches"
                 },
                 "title": "Wybierz czujniki"
             }
