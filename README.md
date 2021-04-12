@@ -36,12 +36,15 @@
 Monitor and control your Mikrotik device from Home Assistant.
  * Interfaces:
    * Enable/disable interfaces
+   * SFP status and information
+   * POE status, control and information
    * Monitor RX/TX traffic per interface
    * Monitor device presence per interface
    * IP, MAC, Link information per an interface for connected devices
  * Enable/disable NAT rule switches
  * Enable/disable Simple Queue switches
  * Enable/disable Mangle switches
+ * Enable/disable Filter switches
  * Monitor and control PPP users
  * Kid Control
  * Mikrotik Accounting traffic sensors per hosts for RX/TX WAN/LAN
