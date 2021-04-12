@@ -1723,11 +1723,20 @@ class MikrotikControllerData:
                                 self.data["host"][uid]["host-name"] = dns_vals[
                                     "comment"
                                 ].split("#", 1)[0]
+                            elif (
+                                uid in self.data["dhcp"]
+                                and self.data["dhcp"][uid]["comment"] != ""
+                            ):
+                                # Override name if DHCP comment exists
+                                self.data["host"][uid]["host-name"] = self.data["dhcp"][
+                                    uid
+                                ]["comment"].split("#", 1)[0]
                             else:
                                 self.data["host"][uid]["host-name"] = dns_vals[
                                     "name"
                                 ].split(".")[0]
                             break
+
                 # Resolve hostname from DHCP comment
                 if (
                     self.data["host"][uid]["host-name"] == "unknown"
