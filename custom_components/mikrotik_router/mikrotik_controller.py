@@ -1340,7 +1340,7 @@ class MikrotikControllerData:
             key="mac-address",
             vals=[
                 {"name": "mac-address"},
-                {"name": "active-mac-address"},
+                {"name": "active-mac-address", "default": "unknown"},
                 {"name": "address", "default": "unknown"},
                 {"name": "active-address", "default": "unknown"},
                 {"name": "host-name", "default": "unknown"},
