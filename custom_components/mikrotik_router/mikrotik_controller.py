@@ -134,6 +134,7 @@ class MikrotikControllerData:
 
         self.nat_removed = {}
         self.mangle_removed = {}
+        self.filter_removed = {}
         self.host_hass_recovered = False
         self.host_tracking_initialized = False
 
@@ -224,6 +225,14 @@ class MikrotikControllerData:
     def option_sensor_mangle(self):
         """Config entry option to not track ARP."""
         return self.config_entry.options.get(CONF_SENSOR_MANGLE, DEFAULT_SENSOR_MANGLE)
+
+    # ---------------------------
+    #   option_sensor_filter
+    # ---------------------------
+    @property
+    def option_sensor_filter(self):
+        """Config entry option to not track ARP."""
+        return self.config_entry.options.get(CONF_SENSOR_FILTER, DEFAULT_SENSOR_FILTER)
 
     # ---------------------------
     #   option_sensor_kidcontrol
@@ -564,6 +573,9 @@ class MikrotikControllerData:
 
         if self.api.connected() and self.option_sensor_mangle:
             await self.hass.async_add_executor_job(self.get_mangle)
+
+        if self.api.connected() and self.option_sensor_filter:
+            await self.hass.async_add_executor_job(self.get_filter)
 
         if self.api.connected() and self.support_ppp and self.option_sensor_ppp:
             await self.hass.async_add_executor_job(self.get_ppp)
@@ -954,6 +966,101 @@ class MikrotikControllerData:
                 )
 
             del self.data["mangle"][uid]
+
+    # ---------------------------
+    #   get_filter
+    # ---------------------------
+    def get_filter(self):
+        """Get Filter data from Mikrotik"""
+        self.data["filter"] = parse_api(
+            data=self.data["filter"],
+            source=self.api.path("/ip/firewall/filter"),
+            key=".id",
+            vals=[
+                {"name": ".id"},
+                {"name": "chain"},
+                {"name": "action"},
+                {"name": "comment"},
+                {"name": "address-list"},
+                {"name": "protocol", "default": "any"},
+                {"name": "in-interface", "default": "any"},
+                {"name": "out-interface", "default": "any"},
+                {"name": "src-address", "default": "any"},
+                {"name": "src-port", "default": "any"},
+                {"name": "dst-address", "default": "any"},
+                {"name": "dst-port", "default": "any"},
+                {"name": "layer7-protocol", "default": "any"},
+                {"name": "connection-state", "default": "any"},
+                {"name": "tcp-flags", "default": "any"},
+                {
+                    "name": "enabled",
+                    "source": "disabled",
+                    "type": "bool",
+                    "reverse": True,
+                    "default": True,
+                },
+            ],
+            val_proc=[
+                [
+                    {"name": "uniq-id"},
+                    {"action": "combine"},
+                    {"key": "chain"},
+                    {"text": ","},
+                    {"key": "action"},
+                    {"text": ","},
+                    {"key": "protocol"},
+                    {"text": ","},
+                    {"key": "layer7-protocol"},
+                    {"text": ","},
+                    {"key": "in-interface"},
+                    {"text": ":"},
+                    {"key": "src-address"},
+                    {"text": ":"},
+                    {"key": "src-port"},
+                    {"text": "-"},
+                    {"key": "out-interface"},
+                    {"text": ":"},
+                    {"key": "dst-address"},
+                    {"text": ":"},
+                    {"key": "dst-port"},
+                ],
+                [
+                    {"name": "name"},
+                    {"action": "combine"},
+                    {"key": "action"},
+                    {"text": ","},
+                    {"key": "protocol"},
+                    {"text": ":"},
+                    {"key": "dst-port"},
+                ],
+            ],
+            skip=[
+                {"name": "dynamic", "value": True},
+                {"name": "action", "value": "jump"},
+            ],
+        )
+
+        # Remove duplicate filter entries to prevent crash
+        filter_uniq = {}
+        filter_del = {}
+        for uid in self.data["filter"]:
+            tmp_name = self.data["filter"][uid]["uniq-id"]
+            if tmp_name not in filter_uniq:
+                filter_uniq[tmp_name] = uid
+            else:
+                filter_del[uid] = 1
+                filter_del[filter_uniq[tmp_name]] = 1
+
+        for uid in filter_del:
+            if self.data["filter"][uid]["uniq-id"] not in self.filter_removed:
+                self.filter_removed[self.data["filter"][uid]["uniq-id"]] = 1
+                _LOGGER.error(
+                    "Mikrotik %s duplicate Filter rule %s, entity will be unavailable.",
+                    self.host,
+                    self.data["filter"][uid]["name"],
+                )
+
+            del self.data["filter"][uid]
 
     # ---------------------------
     #   get_kidcontrol
