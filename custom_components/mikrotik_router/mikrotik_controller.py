@@ -654,8 +654,11 @@ class MikrotikControllerData:
                     "port-mac-address"
                 ] = f"{vals['port-mac-address']}-{vals['name']}"
 
-            if "sfp-shutdown-temperature" in vals and vals["sfp-shutdown-temperature"] != "":
-                #_LOGGER.warning("!!!!!!!SFP Port %s", uid)
+            if (
+                "sfp-shutdown-temperature" in vals
+                and vals["sfp-shutdown-temperature"] != ""
+            ):
+                # _LOGGER.warning("!!!!!!!SFP Port %s", uid)
                 self.data["interface"] = parse_api(
                     data=self.data["interface"],
                     source=self.api.path("/interface/ethernet"),

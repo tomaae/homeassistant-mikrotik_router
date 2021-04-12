@@ -269,7 +269,7 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
             new_sensors.append(sensors[item_id])
 
     for sensor in SENSOR_TYPES:
-        #if SENSOR_TYPES[sensor][ATTR_ATTR] in mikrotik_controller.data[SENSOR_TYPES[sensor][ATTR_PATH]]:
+        # if SENSOR_TYPES[sensor][ATTR_ATTR] in mikrotik_controller.data[SENSOR_TYPES[sensor][ATTR_PATH]]:
         #    _LOGGER.debug("Defined sensor %s, value %s", sensor, mikrotik_controller.data[SENSOR_TYPES[sensor][ATTR_PATH]][
         #            SENSOR_TYPES[sensor][ATTR_ATTR]
         #        ])
