@@ -683,26 +683,31 @@ class MikrotikControllerData:
                 "sfp-shutdown-temperature" in vals
                 and vals["sfp-shutdown-temperature"] != ""
             ):
-                # _LOGGER.warning("!!!!!!!SFP Port %s", uid)
                 self.data["interface"] = parse_api(
                     data=self.data["interface"],
-                    source=self.api.path("/interface/ethernet"),
-                    key="default-name",
-                    key_secondary="name",
+                    source=self.api.get_sfp(uid),
+                    key_search="name",
                     vals=[
-                        {"name": "default-name"},
-                        {"name": "name", "default_val": "default-name"},
-                        {"name": "poe-out", "default": "N/A"},
-                        {"name": "sfp-shutdown-temperature", "default": ""},
-                    ],
-                    skip=[
-                        {"name": "type", "value": "bridge"},
-                        {"name": "type", "value": "ppp-in"},
-                        {"name": "type", "value": "pptp-in"},
-                        {"name": "type", "value": "sstp-in"},
-                        {"name": "type", "value": "l2tp-in"},
-                        {"name": "type", "value": "pppoe-in"},
-                        {"name": "type", "value": "ovpn-in"},
+                        {"name": "status", "default": "unknown"},
+                        {"name": "auto-negotiation", "default": "unknown"},
+                        {"name": "advertising", "default": "unknown"},
+                        {"name": "link-partner-advertising", "default": "unknown"},
+                        {"name": "sfp-temperature", "default": "unknown"},
+                        {"name": "sfp-supply-voltage", "default": "unknown"},
+                        {"name": "sfp-module-present", "default": "unknown"},
+                        {"name": "sfp-tx-bias-current", "default": "unknown"},
+                        {"name": "sfp-tx-power", "default": "unknown"},
+                        {"name": "sfp-rx-power", "default": "unknown"},
+                        {"name": "sfp-rx-loss", "default": "unknown"},
+                        {"name": "sfp-tx-fault", "default": "unknown"},
+                        {"name": "sfp-type", "default": "unknown"},
+                        {"name": "sfp-connector-type", "default": "unknown"},
+                        {"name": "sfp-vendor-name", "default": "unknown"},
+                        {"name": "sfp-vendor-part-number", "default": "unknown"},
+                        {"name": "sfp-vendor-revision", "default": "unknown"},
+                        {"name": "sfp-vendor-serial", "default": "unknown"},
+                        {"name": "sfp-manufacturing-date", "default": "unknown"},
+                        {"name": "eeprom-checksum", "default": "unknown"},
                     ],
                 )
 

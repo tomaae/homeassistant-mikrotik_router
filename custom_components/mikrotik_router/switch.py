@@ -31,6 +31,29 @@ DEVICE_ATTRIBUTES_IFACE = [
     "poe-out",
 ]
 
+DEVICE_ATTRIBUTES_IFACE_SFP = [
+    "status",
+    "auto-negotiation",
+    "advertising",
+    "link-partner-advertising",
+    "sfp-temperature",
+    "sfp-supply-voltage",
+    "sfp-module-present",
+    "sfp-tx-bias-current",
+    "sfp-tx-power",
+    "sfp-rx-power",
+    "sfp-rx-loss",
+    "sfp-tx-fault",
+    "sfp-type",
+    "sfp-connector-type",
+    "sfp-vendor-name",
+    "sfp-vendor-part-number",
+    "sfp-vendor-revision",
+    "sfp-vendor-serial",
+    "sfp-manufacturing-date",
+    "eeprom-checksum",
+]
+
 DEVICE_ATTRIBUTES_NAT = [
     "protocol",
     "dst-port",
@@ -319,6 +342,22 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
     def unique_id(self) -> str:
         """Return a unique id for this entity."""
         return f"{self._inst.lower()}-enable_switch-{self._data['port-mac-address']}_{self._data['default-name']}"
+
+    @property
+    def device_state_attributes(self) -> Dict[str, Any]:
+        """Return the state attributes."""
+        attributes = self._attrs
+
+        for variable in self._sid_data["sid_attr"]:
+            if variable in self._data:
+                attributes[format_attribute(variable)] = self._data[variable]
+
+        if "sfp-shutdown-temperature" in self._data:
+            for variable in DEVICE_ATTRIBUTES_IFACE_SFP:
+                if variable in self._data:
+                    attributes[format_attribute(variable)] = self._data[variable]
+
+        return attributes
 
     @property
     def icon(self) -> str:
