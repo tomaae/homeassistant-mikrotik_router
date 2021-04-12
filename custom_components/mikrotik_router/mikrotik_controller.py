@@ -3,6 +3,8 @@
 import re
 import asyncio
 import logging
+import ipaddress
+
 from datetime import timedelta
 from ipaddress import ip_address, IPv4Network
 from mac_vendor_lookup import AsyncMacLookup
@@ -56,6 +58,14 @@ from .helper import parse_api
 from .mikrotikapi import MikrotikAPI
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def is_valid_ip(address):
+    try:
+        ipaddress.ip_address(address)
+        return True
+    except ValueError:
+        return False
 
 
 # ---------------------------
@@ -1330,7 +1340,9 @@ class MikrotikControllerData:
             key="mac-address",
             vals=[
                 {"name": "mac-address"},
+                {"name": "active-mac-address"},
                 {"name": "address", "default": "unknown"},
+                {"name": "active-address", "default": "unknown"},
                 {"name": "host-name", "default": "unknown"},
                 {"name": "status", "default": "unknown"},
                 {"name": "last-seen", "default": "unknown"},
@@ -1342,6 +1354,29 @@ class MikrotikControllerData:
 
         dhcpserver_query = False
         for uid in self.data["dhcp"]:
+            # is_valid_ip
+            if self.data["dhcp"][uid]["address"] != "unknown":
+                if not is_valid_ip(self.data["dhcp"][uid]["address"]):
+                    self.data["dhcp"][uid]["address"] = "unknown"
+
+                if (
+                    self.data["dhcp"][uid]["active-address"]
+                    != self.data["dhcp"][uid]["address"]
+                    and self.data["dhcp"][uid]["active-address"] != "unknown"
+                ):
+                    self.data["dhcp"][uid]["address"] = self.data["dhcp"][uid][
+                        "active-address"
+                    ]
+
+                if (
+                    self.data["dhcp"][uid]["mac-address"]
+                    != self.data["dhcp"][uid]["active-mac-address"]
+                    and self.data["dhcp"][uid]["active-mac-address"] != "unknown"
+                ):
+                    self.data["dhcp"][uid]["mac-address"] = self.data["dhcp"][uid][
+                        "active-mac-address"
+                    ]
+
             if (
                 not dhcpserver_query
                 and self.data["dhcp"][uid]["server"] not in self.data["dhcp-server"]
