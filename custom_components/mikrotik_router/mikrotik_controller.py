@@ -633,6 +633,7 @@ class MikrotikControllerData:
                 {"name": "default-name"},
                 {"name": "name", "default_val": "default-name"},
                 {"name": "poe-out", "default": "N/A"},
+                {"name": "sfp-shutdown-temperature", "default": ""},
             ],
             skip=[
                 {"name": "type", "value": "bridge"},
@@ -652,6 +653,30 @@ class MikrotikControllerData:
                 self.data["interface"][uid][
                     "port-mac-address"
                 ] = f"{vals['port-mac-address']}-{vals['name']}"
+
+            if "sfp-shutdown-temperature" in vals and vals["sfp-shutdown-temperature"] != "":
+                #_LOGGER.warning("!!!!!!!SFP Port %s", uid)
+                self.data["interface"] = parse_api(
+                    data=self.data["interface"],
+                    source=self.api.path("/interface/ethernet"),
+                    key="default-name",
+                    key_secondary="name",
+                    vals=[
+                        {"name": "default-name"},
+                        {"name": "name", "default_val": "default-name"},
+                        {"name": "poe-out", "default": "N/A"},
+                        {"name": "sfp-shutdown-temperature", "default": ""},
+                    ],
+                    skip=[
+                        {"name": "type", "value": "bridge"},
+                        {"name": "type", "value": "ppp-in"},
+                        {"name": "type", "value": "pptp-in"},
+                        {"name": "type", "value": "sstp-in"},
+                        {"name": "type", "value": "l2tp-in"},
+                        {"name": "type", "value": "pppoe-in"},
+                        {"name": "type", "value": "ovpn-in"},
+                    ],
+                )
 
     # ---------------------------
     #   get_interface_traffic
