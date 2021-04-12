@@ -1436,7 +1436,7 @@ class MikrotikControllerData:
             data=self.data["dns"],
             source=self.api.path("/ip/dns/static"),
             key="name",
-            vals=[{"name": "name"}, {"name": "address"}],
+            vals=[{"name": "name"}, {"name": "address"}, {"name": "comment"}],
         )
 
     # ---------------------------
@@ -1719,9 +1719,14 @@ class MikrotikControllerData:
                 if vals["address"] != "unknown":
                     for dns_uid, dns_vals in self.data["dns"].items():
                         if dns_vals["address"] == vals["address"]:
-                            self.data["host"][uid]["host-name"] = dns_vals[
-                                "name"
-                            ].split(".")[0]
+                            if dns_vals["comment"] != "":
+                                self.data["host"][uid]["host-name"] = dns_vals[
+                                    "comment"
+                                ].split("#", 1)[0]
+                            else:
+                                self.data["host"][uid]["host-name"] = dns_vals[
+                                    "name"
+                                ].split(".")[0]
                             break
                 # Resolve hostname from DHCP comment
                 if (
@@ -1731,7 +1736,7 @@ class MikrotikControllerData:
                 ):
                     self.data["host"][uid]["host-name"] = self.data["dhcp"][uid][
                         "comment"
-                    ]
+                    ].split("#", 1)[0]
                 # Resolve hostname from DHCP hostname
                 elif (
                     self.data["host"][uid]["host-name"] == "unknown"
