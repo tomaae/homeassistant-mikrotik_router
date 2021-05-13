@@ -7,6 +7,8 @@ from homeassistant.const import (
     CONF_NAME,
     ATTR_ATTRIBUTION,
     ATTR_DEVICE_CLASS,
+    DEVICE_CLASS_TEMPERATURE,
+    DEVICE_CLASS_POWER,
     TEMP_CELSIUS,
 )
 
@@ -51,7 +53,7 @@ ATTR_ATTR = "data_attr"
 
 SENSOR_TYPES = {
     "system_temperature": {
-        ATTR_DEVICE_CLASS: None,
+        ATTR_DEVICE_CLASS: DEVICE_CLASS_TEMPERATURE,
         ATTR_ICON: "mdi:thermometer",
         ATTR_LABEL: "Temperature",
         ATTR_UNIT: TEMP_CELSIUS,
@@ -60,7 +62,7 @@ SENSOR_TYPES = {
         ATTR_ATTR: "temperature",
     },
     "system_cpu-temperature": {
-        ATTR_DEVICE_CLASS: None,
+        ATTR_DEVICE_CLASS: DEVICE_CLASS_TEMPERATURE,
         ATTR_ICON: "mdi:thermometer",
         ATTR_LABEL: "CPU temperature",
         ATTR_UNIT: TEMP_CELSIUS,
@@ -69,7 +71,7 @@ SENSOR_TYPES = {
         ATTR_ATTR: "cpu-temperature",
     },
     "system_board-temperature1": {
-        ATTR_DEVICE_CLASS: None,
+        ATTR_DEVICE_CLASS: DEVICE_CLASS_TEMPERATURE,
         ATTR_ICON: "mdi:thermometer",
         ATTR_LABEL: "Board temperature",
         ATTR_UNIT: TEMP_CELSIUS,
@@ -78,7 +80,7 @@ SENSOR_TYPES = {
         ATTR_ATTR: "board-temperature1",
     },
     "system_power-consumption": {
-        ATTR_DEVICE_CLASS: None,
+        ATTR_DEVICE_CLASS: DEVICE_CLASS_POWER,
         ATTR_ICON: "mdi:transmission-tower",
         ATTR_LABEL: "Power consumption",
         ATTR_UNIT: "W",
@@ -396,15 +398,15 @@ class MikrotikControllerSensor(SensorEntity):
         if self._icon:
             return self._icon
 
-        return ""
+        return None
 
     @property
     def device_class(self) -> Optional[str]:
         """Return the device class."""
-        if ATTR_UNIT_ATTR in self._type:
+        if ATTR_DEVICE_CLASS in self._type:
             return self._type[ATTR_DEVICE_CLASS]
-        else:
-            return None
+
+        return None
 
     @property
     def unique_id(self) -> str:
