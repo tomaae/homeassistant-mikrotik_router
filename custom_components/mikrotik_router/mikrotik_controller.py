@@ -1251,16 +1251,20 @@ class MikrotikControllerData:
 
         now = datetime.now().replace(microsecond=0)
         uptime_tm = datetime.timestamp(now - timedelta(seconds=tmp_uptime))
-        update_uptime = False;
-        if self.data["resource"]["uptime"] is None or self.data["resource"]["uptime"] == 0:
-            update_uptime = True;
+        update_uptime = False
+        if not self.data["resource"]["uptime"]:
+            update_uptime = True
         else:
-            uptime_old = datetime.timestamp(datetime.fromisoformat(self.data["resource"]["uptime"]))
-            if uptime_tm > uptime_old:
-                update_uptime = True;
+            uptime_old = datetime.timestamp(
+                datetime.fromisoformat(self.data["resource"]["uptime"])
+            )
+            if uptime_tm > uptime_old + 10:
+                update_uptime = True
 
         if update_uptime:
-            self.data["resource"]["uptime"] = str(as_local(utc_from_timestamp(uptime_tm)).isoformat())
+            self.data["resource"]["uptime"] = str(
+                as_local(utc_from_timestamp(uptime_tm)).isoformat()
+            )
 
         if self.data["resource"]["total-memory"] > 0:
             self.data["resource"]["memory-usage"] = round(
