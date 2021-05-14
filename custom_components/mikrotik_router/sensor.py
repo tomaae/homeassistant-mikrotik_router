@@ -8,6 +8,7 @@ from homeassistant.const import (
     ATTR_ATTRIBUTION,
     ATTR_DEVICE_CLASS,
     DEVICE_CLASS_TEMPERATURE,
+    DEVICE_CLASS_TIMESTAMP,
     DEVICE_CLASS_POWER,
     TEMP_CELSIUS,
 )
@@ -107,10 +108,10 @@ SENSOR_TYPES = {
         ATTR_ATTR: "fan2-speed",
     },
     "system_uptime": {
-        ATTR_DEVICE_CLASS: None,
-        ATTR_ICON: "mdi:clock-outline",
+        ATTR_DEVICE_CLASS: DEVICE_CLASS_TIMESTAMP,
+        ATTR_ICON: None,
         ATTR_LABEL: "Uptime",
-        ATTR_UNIT: "h",
+        ATTR_UNIT: None,
         ATTR_GROUP: "System",
         ATTR_PATH: "resource",
         ATTR_ATTR: "uptime",
