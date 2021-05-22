@@ -1805,13 +1805,16 @@ class MikrotikControllerData:
                     self.data["host"][uid]["host-name"] = uid
 
             # Resolve manufacturer
-            if vals["manufacturer"] == "detect" and vals["address"] != "unknown":
+            if vals["manufacturer"] == "detect" and vals["mac-address"] != "unknown":
                 try:
                     self.data["host"][uid][
                         "manufacturer"
                     ] = await self.async_mac_lookup.lookup(vals["mac-address"])
                 except:
                     self.data["host"][uid]["manufacturer"] = ""
+
+            if vals["manufacturer"] == "detect":
+                self.data["host"][uid]["manufacturer"] = ""
 
     # ---------------------------
     #   process_accounting
