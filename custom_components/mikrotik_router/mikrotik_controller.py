@@ -956,10 +956,8 @@ class MikrotikControllerData:
                     {"key": "dst-port"},
                     {"text": ","},
                     {"key": "src-address-list"},
-                    {"text": ":"},
+                    {"text": "-"},
                     {"key": "dst-address-list"},
-
-
                 ],
                 [
                     {"name": "name"},
