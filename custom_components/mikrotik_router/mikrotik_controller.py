@@ -1764,13 +1764,14 @@ class MikrotikControllerData:
                 if vals["address"] != "unknown":
                     for dns_uid, dns_vals in self.data["dns"].items():
                         if dns_vals["address"] == vals["address"]:
-                            if dns_vals["comment"] != "":
+                            if dns_vals["comment"].split("#", 1)[0] != "":
                                 self.data["host"][uid]["host-name"] = dns_vals[
                                     "comment"
                                 ].split("#", 1)[0]
                             elif (
                                 uid in self.data["dhcp"]
-                                and self.data["dhcp"][uid]["comment"] != ""
+                                and self.data["dhcp"][uid]["comment"].split("#", 1)[0]
+                                != ""
                             ):
                                 # Override name if DHCP comment exists
                                 self.data["host"][uid]["host-name"] = self.data["dhcp"][
@@ -1786,7 +1787,7 @@ class MikrotikControllerData:
                 if (
                     self.data["host"][uid]["host-name"] == "unknown"
                     and uid in self.data["dhcp"]
-                    and self.data["dhcp"][uid]["comment"] != ""
+                    and self.data["dhcp"][uid]["comment"].split("#", 1)[0] != ""
                 ):
                     self.data["host"][uid]["host-name"] = self.data["dhcp"][uid][
                         "comment"
