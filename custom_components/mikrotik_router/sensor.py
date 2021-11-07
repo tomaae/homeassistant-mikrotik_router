@@ -478,6 +478,11 @@ class MikrotikControllerTrafficSensor(MikrotikControllerSensor):
     def unique_id(self) -> str:
         """Return a unique id for this entity."""
         return f"{self._inst.lower()}-{self._sensor.lower()}-{self._data['default-name'].lower()}"
+        
+    @property
+    def state_class(self) -> str:
+        """Return the state_class"""
+        return f"measurement"
 
     @property
     def device_info(self) -> Dict[str, Any]:
