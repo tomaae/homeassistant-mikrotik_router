@@ -150,7 +150,9 @@ or check "Don't Require Permissions" option
 3. Setup this integration for your Mikrotik device in Home Assistant via `Configuration -> Integrations -> Add -> Mikrotik Router`.
 You can add this integration several times for different devices.
 
-NOTE: Do not mistake "Mikrotik Router" integration with HA build-in integration named "Mikrotik".
+NOTES: 
+- Do not mistake "Mikrotik Router" integration with HA build-in integration named "Mikrotik".
+- If you dont see "Mikrotik Router" integration, clear your browser cache.
 
 ![Add Integration](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/setup_integration.png)
 * "Name of the integration" - Friendly name for this router
