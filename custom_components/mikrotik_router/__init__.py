@@ -86,7 +86,7 @@ async def async_setup_entry(hass, config_entry):
             controller.data["routerboard"]["serial-number"],
             "sensor",
             f"{config_entry.data[CONF_NAME]} {controller.data['routerboard']['model']}",
-        }
+        },
     )
 
     return True
