@@ -7,11 +7,10 @@ from homeassistant.const import (
     CONF_NAME,
     ATTR_ATTRIBUTION,
     ATTR_DEVICE_CLASS,
-    DEVICE_CLASS_TEMPERATURE,
-    DEVICE_CLASS_TIMESTAMP,
-    DEVICE_CLASS_POWER,
     TEMP_CELSIUS,
 )
+
+from homeassistant.components.sensor import SensorDeviceClass
 
 from .const import (
     CONF_SENSOR_PORT_TRAFFIC,
@@ -54,7 +53,7 @@ ATTR_ATTR = "data_attr"
 
 SENSOR_TYPES = {
     "system_temperature": {
-        ATTR_DEVICE_CLASS: DEVICE_CLASS_TEMPERATURE,
+        ATTR_DEVICE_CLASS: SensorDeviceClass.TEMPERATURE,
         ATTR_ICON: "mdi:thermometer",
         ATTR_LABEL: "Temperature",
         ATTR_UNIT: TEMP_CELSIUS,
@@ -63,7 +62,7 @@ SENSOR_TYPES = {
         ATTR_ATTR: "temperature",
     },
     "system_cpu-temperature": {
-        ATTR_DEVICE_CLASS: DEVICE_CLASS_TEMPERATURE,
+        ATTR_DEVICE_CLASS: SensorDeviceClass.TEMPERATURE,
         ATTR_ICON: "mdi:thermometer",
         ATTR_LABEL: "CPU temperature",
         ATTR_UNIT: TEMP_CELSIUS,
@@ -72,7 +71,7 @@ SENSOR_TYPES = {
         ATTR_ATTR: "cpu-temperature",
     },
     "system_board-temperature1": {
-        ATTR_DEVICE_CLASS: DEVICE_CLASS_TEMPERATURE,
+        ATTR_DEVICE_CLASS: SensorDeviceClass.TEMPERATURE,
         ATTR_ICON: "mdi:thermometer",
         ATTR_LABEL: "Board temperature",
         ATTR_UNIT: TEMP_CELSIUS,
@@ -81,7 +80,7 @@ SENSOR_TYPES = {
         ATTR_ATTR: "board-temperature1",
     },
     "system_power-consumption": {
-        ATTR_DEVICE_CLASS: DEVICE_CLASS_POWER,
+        ATTR_DEVICE_CLASS: SensorDeviceClass.POWER,
         ATTR_ICON: "mdi:transmission-tower",
         ATTR_LABEL: "Power consumption",
         ATTR_UNIT: "W",
@@ -108,7 +107,7 @@ SENSOR_TYPES = {
         ATTR_ATTR: "fan2-speed",
     },
     "system_uptime": {
-        ATTR_DEVICE_CLASS: DEVICE_CLASS_TIMESTAMP,
+        ATTR_DEVICE_CLASS: SensorDeviceClass.TIMESTAMP,
         ATTR_ICON: None,
         ATTR_LABEL: "Uptime",
         ATTR_UNIT: None,

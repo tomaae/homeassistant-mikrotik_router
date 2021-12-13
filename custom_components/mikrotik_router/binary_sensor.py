@@ -3,9 +3,10 @@
 import logging
 from typing import Any, Dict, Optional
 
+
 from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
-    DEVICE_CLASS_CONNECTIVITY,
+    BinarySensorDeviceClass,
 )
 from homeassistant.const import (
     CONF_NAME,
@@ -332,7 +333,7 @@ class MikrotikControllerPPPSecretBinarySensor(MikrotikControllerBinarySensor):
     @property
     def device_class(self) -> Optional[str]:
         """Return the device class."""
-        return DEVICE_CLASS_CONNECTIVITY
+        return BinarySensorDeviceClass.CONNECTIVITY
 
     @property
     def available(self) -> bool:
@@ -426,7 +427,7 @@ class MikrotikControllerPortBinarySensor(MikrotikControllerBinarySensor):
     @property
     def device_class(self) -> Optional[str]:
         """Return the device class."""
-        return DEVICE_CLASS_CONNECTIVITY
+        return BinarySensorDeviceClass.CONNECTIVITY
 
     @property
     def available(self) -> bool:
