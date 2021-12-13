@@ -10,6 +10,7 @@ from homeassistant.components.binary_sensor import (
 )
 from homeassistant.const import (
     CONF_NAME,
+    CONF_HOST,
     ATTR_ATTRIBUTION,
 )
 from homeassistant.core import callback
@@ -264,10 +265,16 @@ class MikrotikControllerBinarySensor(BinarySensorEntity):
     @property
     def device_info(self) -> Dict[str, Any]:
         """Return a description for device registry."""
+        if self._type[ATTR_GROUP] == "System":
+            self._type[ATTR_GROUP] = self._ctrl.data["resource"]["board-name"]
+
         info = {
+            "connections": {(DOMAIN, self._ctrl.data["routerboard"]["serial-number"])},
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
             "name": f"{self._inst} {self._type[ATTR_GROUP]}",
+            "sw_version": self._ctrl.data["resource"]["version"],
+            "configuration_url": f"http://{self._ctrl.config_entry.data[CONF_HOST]}",
         }
         if ATTR_GROUP in self._type:
             info["identifiers"] = {
@@ -276,7 +283,7 @@ class MikrotikControllerBinarySensor(BinarySensorEntity):
                     "serial-number",
                     self._ctrl.data["routerboard"]["serial-number"],
                     "sensor",
-                    self._type[ATTR_GROUP],
+                    f"{self._inst} {self._type[ATTR_GROUP]}",
                 )
             }
 
