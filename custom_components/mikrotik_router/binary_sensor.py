@@ -11,6 +11,7 @@ from homeassistant.components.binary_sensor import (
 from homeassistant.const import (
     CONF_NAME,
     CONF_HOST,
+    ATTR_DEVICE_CLASS,
     ATTR_ATTRIBUTION,
 )
 from homeassistant.core import callback
@@ -37,6 +38,7 @@ ATTR_CTGR = "entity_category"
 
 SENSOR_TYPES = {
     "system_fwupdate": {
+        ATTR_DEVICE_CLASS: BinarySensorDeviceClass.UPDATE,
         ATTR_LABEL: "Firmware update",
         ATTR_GROUP: "System",
         ATTR_PATH: "fw-update",
