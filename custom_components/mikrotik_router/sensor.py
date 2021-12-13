@@ -11,6 +11,7 @@ from homeassistant.const import (
     TEMP_CELSIUS,
 )
 
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.components.sensor import SensorDeviceClass
 
 from .const import (
@@ -51,6 +52,7 @@ ATTR_UNIT_ATTR = "unit_attr"
 ATTR_GROUP = "group"
 ATTR_PATH = "data_path"
 ATTR_ATTR = "data_attr"
+ATTR_CTGR = "entity_category"
 
 SENSOR_TYPES = {
     "system_temperature": {
@@ -115,6 +117,7 @@ SENSOR_TYPES = {
         ATTR_GROUP: "System",
         ATTR_PATH: "resource",
         ATTR_ATTR: "uptime",
+        ATTR_CTGR: EntityCategory.DIAGNOSTIC,
     },
     "system_cpu-load": {
         ATTR_DEVICE_CLASS: None,
@@ -366,6 +369,11 @@ class MikrotikControllerSensor(SensorEntity):
         self._device_class = None
         self._state = None
 
+        if ATTR_CTGR in self._type:
+            self._entity_category = self._type[ATTR_CTGR]
+        else:
+            self._entity_category = None
+
         if ATTR_ICON in self._type:
             self._icon = self._type[ATTR_ICON]
         else:
@@ -398,6 +406,14 @@ class MikrotikControllerSensor(SensorEntity):
         """Return the icon."""
         if self._icon:
             return self._icon
+
+        return None
+
+    @property
+    def entity_category(self) -> str:
+        """Return entity category"""
+        if self._entity_category:
+            return self._entity_category
 
         return None
 

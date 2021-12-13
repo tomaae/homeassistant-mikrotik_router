@@ -3,7 +3,7 @@
 import logging
 from typing import Any, Dict, Optional
 
-
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     BinarySensorDeviceClass,
@@ -33,6 +33,7 @@ ATTR_LABEL = "label"
 ATTR_GROUP = "group"
 ATTR_PATH = "data_path"
 ATTR_ATTR = "data_attr"
+ATTR_CTGR = "entity_category"
 
 SENSOR_TYPES = {
     "system_fwupdate": {
@@ -40,6 +41,7 @@ SENSOR_TYPES = {
         ATTR_GROUP: "System",
         ATTR_PATH: "fw-update",
         ATTR_ATTR: "available",
+        ATTR_CTGR: EntityCategory.DIAGNOSTIC,
     },
 }
 
@@ -236,6 +238,11 @@ class MikrotikControllerBinarySensor(BinarySensorEntity):
             self._type = {}
             self._attr = None
 
+        if ATTR_CTGR in self._type:
+            self._entity_category = self._type[ATTR_CTGR]
+        else:
+            self._entity_category = None
+
         self._device_class = None
         self._state = None
         self._icon = None
@@ -261,6 +268,14 @@ class MikrotikControllerBinarySensor(BinarySensorEntity):
     def available(self) -> bool:
         """Return if controller is available."""
         return self._ctrl.connected()
+
+    @property
+    def entity_category(self) -> str:
+        """Return entity category"""
+        if self._entity_category:
+            return self._entity_category
+
+        return None
 
     @property
     def device_info(self) -> Dict[str, Any]:
