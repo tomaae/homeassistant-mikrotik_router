@@ -389,7 +389,7 @@ class MikrotikControllerSensor(SensorEntity):
         return val
 
     @property
-    def device_state_attributes(self) -> Dict[str, Any]:
+    def extra_state_attributes(self) -> Dict[str, Any]:
         """Return the state attributes."""
         return self._attrs
 
@@ -478,7 +478,7 @@ class MikrotikControllerTrafficSensor(MikrotikControllerSensor):
     def unique_id(self) -> str:
         """Return a unique id for this entity."""
         return f"{self._inst.lower()}-{self._sensor.lower()}-{self._data['default-name'].lower()}"
-        
+
     @property
     def state_class(self) -> str:
         """Return the state_class"""
@@ -546,7 +546,7 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
         return info
 
     @property
-    def device_state_attributes(self) -> Dict[str, Any]:
+    def extra_state_attributes(self) -> Dict[str, Any]:
         """Return the state attributes."""
         attributes = self._attrs
         for variable in DEVICE_ATTRIBUTES_ACCOUNTING:

@@ -246,7 +246,7 @@ class MikrotikControllerBinarySensor(BinarySensorEntity):
         return f"{self._inst} {self._type[ATTR_LABEL]}"
 
     @property
-    def device_state_attributes(self) -> Dict[str, Any]:
+    def extra_state_attributes(self) -> Dict[str, Any]:
         """Return the state attributes."""
         return self._attrs
 
@@ -356,7 +356,7 @@ class MikrotikControllerPPPSecretBinarySensor(MikrotikControllerBinarySensor):
             return "mdi:account-off-outline"
 
     @property
-    def device_state_attributes(self) -> Dict[str, Any]:
+    def extra_state_attributes(self) -> Dict[str, Any]:
         """Return the state attributes."""
         attributes = self._attrs
         for variable in DEVICE_ATTRIBUTES_PPP_SECRET:
@@ -450,7 +450,7 @@ class MikrotikControllerPortBinarySensor(MikrotikControllerBinarySensor):
         return icon
 
     @property
-    def device_state_attributes(self) -> Dict[str, Any]:
+    def extra_state_attributes(self) -> Dict[str, Any]:
         """Return the state attributes."""
         attributes = self._attrs
         for variable in DEVICE_ATTRIBUTES_IFACE:
