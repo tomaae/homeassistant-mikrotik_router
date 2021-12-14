@@ -262,6 +262,14 @@ class MikrotikControllerBinarySensor(BinarySensorEntity):
         return self._attrs
 
     @property
+    def device_class(self) -> Optional[str]:
+        """Return the device class."""
+        if ATTR_DEVICE_CLASS in self._type:
+            return self._type[ATTR_DEVICE_CLASS]
+
+        return None
+
+    @property
     def unique_id(self) -> str:
         """Return a unique id for this entity."""
         return f"{self._inst.lower()}-{self._sensor.lower()}"
