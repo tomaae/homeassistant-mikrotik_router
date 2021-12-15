@@ -216,7 +216,7 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
             continue
 
         sensors[item_id] = MikrotikControllerBinarySensor(
-            mikrotik_controller=mikrotik_controller, inst=inst, sensor=sensor
+            mikrotik_controller=mikrotik_controller, inst=inst, sid_data=sensor
         )
         new_sensors.append(sensors[item_id])
 
