@@ -698,37 +698,50 @@ class MikrotikControllerData:
                     "port-mac-address"
                 ] = f"{vals['port-mac-address']}-{vals['name']}"
 
-            if (
-                "sfp-shutdown-temperature" in vals
-                and vals["sfp-shutdown-temperature"] != ""
-            ):
-                self.data["interface"] = parse_api(
-                    data=self.data["interface"],
-                    source=self.api.get_sfp(vals[".id"]),
-                    key_search="name",
-                    vals=[
-                        {"name": "status", "default": "unknown"},
-                        {"name": "auto-negotiation", "default": "unknown"},
-                        {"name": "advertising", "default": "unknown"},
-                        {"name": "link-partner-advertising", "default": "unknown"},
-                        {"name": "sfp-temperature", "default": "unknown"},
-                        {"name": "sfp-supply-voltage", "default": "unknown"},
-                        {"name": "sfp-module-present", "default": "unknown"},
-                        {"name": "sfp-tx-bias-current", "default": "unknown"},
-                        {"name": "sfp-tx-power", "default": "unknown"},
-                        {"name": "sfp-rx-power", "default": "unknown"},
-                        {"name": "sfp-rx-loss", "default": "unknown"},
-                        {"name": "sfp-tx-fault", "default": "unknown"},
-                        {"name": "sfp-type", "default": "unknown"},
-                        {"name": "sfp-connector-type", "default": "unknown"},
-                        {"name": "sfp-vendor-name", "default": "unknown"},
-                        {"name": "sfp-vendor-part-number", "default": "unknown"},
-                        {"name": "sfp-vendor-revision", "default": "unknown"},
-                        {"name": "sfp-vendor-serial", "default": "unknown"},
-                        {"name": "sfp-manufacturing-date", "default": "unknown"},
-                        {"name": "eeprom-checksum", "default": "unknown"},
-                    ],
-                )
+            if self.data["interface"][uid]["type"] == "ether":
+                if (
+                    "sfp-shutdown-temperature" in vals
+                    and vals["sfp-shutdown-temperature"] != ""
+                ):
+                    self.data["interface"] = parse_api(
+                        data=self.data["interface"],
+                        source=self.api.get_sfp(vals[".id"]),
+                        key_search="name",
+                        vals=[
+                            {"name": "status", "default": "unknown"},
+                            {"name": "auto-negotiation", "default": "unknown"},
+                            {"name": "advertising", "default": "unknown"},
+                            {"name": "link-partner-advertising", "default": "unknown"},
+                            {"name": "sfp-temperature", "default": "unknown"},
+                            {"name": "sfp-supply-voltage", "default": "unknown"},
+                            {"name": "sfp-module-present", "default": "unknown"},
+                            {"name": "sfp-tx-bias-current", "default": "unknown"},
+                            {"name": "sfp-tx-power", "default": "unknown"},
+                            {"name": "sfp-rx-power", "default": "unknown"},
+                            {"name": "sfp-rx-loss", "default": "unknown"},
+                            {"name": "sfp-tx-fault", "default": "unknown"},
+                            {"name": "sfp-type", "default": "unknown"},
+                            {"name": "sfp-connector-type", "default": "unknown"},
+                            {"name": "sfp-vendor-name", "default": "unknown"},
+                            {"name": "sfp-vendor-part-number", "default": "unknown"},
+                            {"name": "sfp-vendor-revision", "default": "unknown"},
+                            {"name": "sfp-vendor-serial", "default": "unknown"},
+                            {"name": "sfp-manufacturing-date", "default": "unknown"},
+                            {"name": "eeprom-checksum", "default": "unknown"},
+                        ],
+                    )
+                else:
+                    self.data["interface"] = parse_api(
+                        data=self.data["interface"],
+                        source=self.api.get_sfp(vals[".id"]),
+                        key_search="name",
+                        vals=[
+                            {"name": "status", "default": "unknown"},
+                            {"name": "rate", "default": "unknown"},
+                            {"name": "full-duplex", "default": "unknown"},
+                            {"name": "auto-negotiation", "default": "unknown"},
+                        ],
+                    )
 
     # ---------------------------
     #   get_interface_traffic

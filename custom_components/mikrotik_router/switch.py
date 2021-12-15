@@ -27,6 +27,25 @@ DEVICE_ATTRIBUTES_IFACE = [
     "actual-mtu",
     "type",
     "name",
+]
+
+DEVICE_ATTRIBUTES_IFACE_ETHER = [
+    "running",
+    "enabled",
+    "comment",
+    "client-ip-address",
+    "client-mac-address",
+    "port-mac-address",
+    "last-link-down-time",
+    "last-link-up-time",
+    "link-downs",
+    "actual-mtu",
+    "type",
+    "name",
+    "status",
+    "auto-negotiation",
+    "rate",
+    "full-duplex",
     "default-name",
     "poe-out",
 ]
@@ -379,12 +398,18 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
         """Return the state attributes."""
         attributes = self._attrs
 
-        for variable in self._sid_data["sid_attr"]:
-            if variable in self._data:
-                attributes[format_attribute(variable)] = self._data[variable]
+        if self._data["type"] == "ether":
+            for variable in DEVICE_ATTRIBUTES_IFACE_ETHER:
+                if variable in self._data:
+                    attributes[format_attribute(variable)] = self._data[variable]
 
-        if "sfp-shutdown-temperature" in self._data:
-            for variable in DEVICE_ATTRIBUTES_IFACE_SFP:
+            if "sfp-shutdown-temperature" in self._data:
+                for variable in DEVICE_ATTRIBUTES_IFACE_SFP:
+                    if variable in self._data:
+                        attributes[format_attribute(variable)] = self._data[variable]
+
+        else:
+            for variable in self._sid_data["sid_attr"]:
                 if variable in self._data:
                     attributes[format_attribute(variable)] = self._data[variable]
 
