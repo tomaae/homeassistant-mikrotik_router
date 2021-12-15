@@ -63,6 +63,7 @@ SENSOR_TYPES = {
         ATTR_GROUP: "System",
         ATTR_PATH: "health",
         ATTR_ATTR: "temperature",
+        ATTR_CTGR: None,
     },
     "system_cpu-temperature": {
         ATTR_DEVICE_CLASS: SensorDeviceClass.TEMPERATURE,
@@ -72,6 +73,7 @@ SENSOR_TYPES = {
         ATTR_GROUP: "System",
         ATTR_PATH: "health",
         ATTR_ATTR: "cpu-temperature",
+        ATTR_CTGR: None,
     },
     "system_board-temperature1": {
         ATTR_DEVICE_CLASS: SensorDeviceClass.TEMPERATURE,
@@ -81,6 +83,7 @@ SENSOR_TYPES = {
         ATTR_GROUP: "System",
         ATTR_PATH: "health",
         ATTR_ATTR: "board-temperature1",
+        ATTR_CTGR: None,
     },
     "system_power-consumption": {
         ATTR_DEVICE_CLASS: SensorDeviceClass.POWER,
@@ -90,6 +93,7 @@ SENSOR_TYPES = {
         ATTR_GROUP: "System",
         ATTR_PATH: "health",
         ATTR_ATTR: "power-consumption",
+        ATTR_CTGR: None,
     },
     "system_fan1-speed": {
         ATTR_DEVICE_CLASS: None,
@@ -99,6 +103,7 @@ SENSOR_TYPES = {
         ATTR_GROUP: "System",
         ATTR_PATH: "health",
         ATTR_ATTR: "fan1-speed",
+        ATTR_CTGR: None,
     },
     "system_fan2-speed": {
         ATTR_DEVICE_CLASS: None,
@@ -108,6 +113,7 @@ SENSOR_TYPES = {
         ATTR_GROUP: "System",
         ATTR_PATH: "health",
         ATTR_ATTR: "fan2-speed",
+        ATTR_CTGR: None,
     },
     "system_uptime": {
         ATTR_DEVICE_CLASS: SensorDeviceClass.TIMESTAMP,
@@ -127,6 +133,7 @@ SENSOR_TYPES = {
         ATTR_GROUP: "System",
         ATTR_PATH: "resource",
         ATTR_ATTR: "cpu-load",
+        ATTR_CTGR: None,
     },
     "system_memory-usage": {
         ATTR_DEVICE_CLASS: None,
@@ -136,6 +143,7 @@ SENSOR_TYPES = {
         ATTR_GROUP: "System",
         ATTR_PATH: "resource",
         ATTR_ATTR: "memory-usage",
+        ATTR_CTGR: None,
     },
     "system_hdd-usage": {
         ATTR_DEVICE_CLASS: None,
@@ -145,6 +153,7 @@ SENSOR_TYPES = {
         ATTR_GROUP: "System",
         ATTR_PATH: "resource",
         ATTR_ATTR: "hdd-usage",
+        ATTR_CTGR: None,
     },
     "traffic_tx": {
         ATTR_DEVICE_CLASS: None,
@@ -154,6 +163,7 @@ SENSOR_TYPES = {
         ATTR_UNIT_ATTR: "tx-bits-per-second-attr",
         ATTR_PATH: "interface",
         ATTR_ATTR: "tx-bits-per-second",
+        ATTR_CTGR: None,
     },
     "traffic_rx": {
         ATTR_DEVICE_CLASS: None,
@@ -163,6 +173,7 @@ SENSOR_TYPES = {
         ATTR_UNIT_ATTR: "rx-bits-per-second-attr",
         ATTR_PATH: "interface",
         ATTR_ATTR: "rx-bits-per-second",
+        ATTR_CTGR: None,
     },
     "accounting_lan_tx": {
         ATTR_DEVICE_CLASS: None,
@@ -172,6 +183,7 @@ SENSOR_TYPES = {
         ATTR_UNIT_ATTR: "tx-rx-attr",
         ATTR_PATH: "accounting",
         ATTR_ATTR: "lan-tx",
+        ATTR_CTGR: None,
     },
     "accounting_lan_rx": {
         ATTR_DEVICE_CLASS: None,
@@ -181,6 +193,7 @@ SENSOR_TYPES = {
         ATTR_UNIT_ATTR: "tx-rx-attr",
         ATTR_PATH: "accounting",
         ATTR_ATTR: "lan-rx",
+        ATTR_CTGR: None,
     },
     "accounting_wan_tx": {
         ATTR_DEVICE_CLASS: None,
@@ -190,6 +203,7 @@ SENSOR_TYPES = {
         ATTR_UNIT_ATTR: "tx-rx-attr",
         ATTR_PATH: "accounting",
         ATTR_ATTR: "wan-tx",
+        ATTR_CTGR: None,
     },
     "accounting_wan_rx": {
         ATTR_DEVICE_CLASS: None,
@@ -199,6 +213,7 @@ SENSOR_TYPES = {
         ATTR_UNIT_ATTR: "tx-rx-attr",
         ATTR_PATH: "accounting",
         ATTR_ATTR: "wan-rx",
+        ATTR_CTGR: None,
     },
 }
 
@@ -361,25 +376,23 @@ class MikrotikControllerSensor(SensorEntity):
         if sid_data in SENSOR_TYPES:
             self._data = mikrotik_controller.data[SENSOR_TYPES[sid_data][ATTR_PATH]]
             self._type = SENSOR_TYPES[sid_data]
-            self._attr = SENSOR_TYPES[sid_data][ATTR_ATTR]
+            self._icon = self._type[ATTR_ICON]
+            if ATTR_UNIT in self._type:
+                self._unit = self._type[ATTR_UNIT]
+            if ATTR_UNIT_ATTR in self._type:
+                self._unit = self._data[SENSOR_TYPES[self._sensor][ATTR_UNIT_ATTR]]
+            self._attr = self._type[ATTR_ATTR]
+            self._dcls = self._type[ATTR_DEVICE_CLASS]
+            self._ctgr = self._type[ATTR_CTGR]
         else:
             self._type = {}
-            self._attr = None
-
-        self._device_class = None
-        self._state = None
-
-        if ATTR_CTGR in self._type:
-            self._entity_category = self._type[ATTR_CTGR]
-        else:
-            self._entity_category = None
-
-        if ATTR_ICON in self._type:
-            self._icon = self._type[ATTR_ICON]
-        else:
             self._icon = None
+            self._unit = None
+            self._attr = None
+            self._dcls = None
+            self._ctgr = None
 
-        self._unit_of_measurement = None
+        self._state = None
         self._attrs = {ATTR_ATTRIBUTION: ATTRIBUTION}
 
     @property
@@ -404,26 +417,17 @@ class MikrotikControllerSensor(SensorEntity):
     @property
     def icon(self) -> str:
         """Return the icon."""
-        if self._icon:
-            return self._icon
-
-        return None
+        return self._icon
 
     @property
     def entity_category(self) -> str:
         """Return entity category"""
-        if self._entity_category:
-            return self._entity_category
-
-        return None
+        return self._ctgr
 
     @property
     def device_class(self) -> Optional[str]:
         """Return the device class."""
-        if ATTR_DEVICE_CLASS in self._type:
-            return self._type[ATTR_DEVICE_CLASS]
-
-        return None
+        return self._dcls
 
     @property
     def unique_id(self) -> str:
@@ -433,11 +437,7 @@ class MikrotikControllerSensor(SensorEntity):
     @property
     def unit_of_measurement(self):
         """Return the unit the value is expressed in."""
-        if ATTR_UNIT_ATTR in self._type:
-            return self._data[SENSOR_TYPES[self._sensor][ATTR_UNIT_ATTR]]
-
-        if ATTR_UNIT in self._type:
-            return self._type[ATTR_UNIT]
+        return self._unit
 
     @property
     def available(self) -> bool:

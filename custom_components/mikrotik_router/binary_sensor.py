@@ -227,28 +227,24 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
 class MikrotikControllerBinarySensor(BinarySensorEntity):
     """Define an Mikrotik Controller Binary Sensor."""
 
-    def __init__(self, mikrotik_controller, inst, sensor):
+    def __init__(self, mikrotik_controller, inst, sid_data):
         """Initialize."""
         self._inst = inst
-        self._sensor = sensor
+        self._sensor = sid_data
         self._ctrl = mikrotik_controller
-        if sensor in SENSOR_TYPES:
-            self._data = mikrotik_controller.data[SENSOR_TYPES[sensor][ATTR_PATH]]
-            self._type = SENSOR_TYPES[sensor]
-            self._attr = SENSOR_TYPES[sensor][ATTR_ATTR]
+        if sid_data in SENSOR_TYPES:
+            self._data = mikrotik_controller.data[SENSOR_TYPES[sid_data][ATTR_PATH]]
+            self._type = SENSOR_TYPES[sid_data]
+            self._attr = SENSOR_TYPES[sid_data][ATTR_ATTR]
+            self._dcls = SENSOR_TYPES[sid_data][ATTR_DEVICE_CLASS]
+            self._ctgr = SENSOR_TYPES[sid_data][ATTR_CTGR]
         else:
             self._type = {}
             self._attr = None
+            self._dcls = None
+            self._ctgr = None
 
-        if ATTR_CTGR in self._type:
-            self._entity_category = self._type[ATTR_CTGR]
-        else:
-            self._entity_category = None
-
-        self._device_class = None
         self._state = None
-        self._icon = None
-        self._unit_of_measurement = None
         self._attrs = {ATTR_ATTRIBUTION: ATTRIBUTION}
 
     @property
@@ -264,10 +260,7 @@ class MikrotikControllerBinarySensor(BinarySensorEntity):
     @property
     def device_class(self) -> Optional[str]:
         """Return the device class."""
-        if ATTR_DEVICE_CLASS in self._type:
-            return self._type[ATTR_DEVICE_CLASS]
-
-        return None
+        return self._dcls
 
     @property
     def unique_id(self) -> str:
@@ -282,10 +275,7 @@ class MikrotikControllerBinarySensor(BinarySensorEntity):
     @property
     def entity_category(self) -> str:
         """Return entity category"""
-        if self._entity_category:
-            return self._entity_category
-
-        return None
+        return self._ctgr
 
     @property
     def device_info(self) -> Dict[str, Any]:
