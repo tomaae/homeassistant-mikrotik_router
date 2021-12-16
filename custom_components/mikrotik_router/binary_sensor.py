@@ -177,7 +177,7 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
     new_sensors = []
 
     # Add switches
-    for sid, sid_uid, sid_name, sid_ref, sid_func in zip(
+    for sid, sid_uid, sid_name, sid_ref, sid_attr, sid_func in zip(
         # Data point name
         ["ppp_secret", "interface"],
         # Data point unique id
@@ -186,6 +186,8 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
         ["name", "name"],
         # Entry Unique id
         ["name", "port-mac-address"],
+        # Attr
+        [None, DEVICE_ATTRIBUTES_IFACE],
         # Tracker function
         [
             MikrotikControllerPPPSecretBinarySensor,
@@ -220,6 +222,7 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
                 "sid_uid": sid_uid,
                 "sid_name": sid_name,
                 "sid_ref": sid_ref,
+                "sid_attr": sid_attr,
             }
             sensors[item_id] = sid_func(
                 inst, uid, mikrotik_controller, config_entry, sid_data

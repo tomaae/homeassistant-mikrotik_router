@@ -377,17 +377,12 @@ class MikrotikControllerSensor(SensorEntity):
             self._data = mikrotik_controller.data[SENSOR_TYPES[sid_data][ATTR_PATH]]
             self._type = SENSOR_TYPES[sid_data]
             self._icon = self._type[ATTR_ICON]
-            if ATTR_UNIT in self._type:
-                self._unit = self._type[ATTR_UNIT]
-            if ATTR_UNIT_ATTR in self._type:
-                self._unit = self._data[SENSOR_TYPES[self._sensor][ATTR_UNIT_ATTR]]
             self._attr = self._type[ATTR_ATTR]
             self._dcls = self._type[ATTR_DEVICE_CLASS]
             self._ctgr = self._type[ATTR_CTGR]
         else:
             self._type = {}
             self._icon = None
-            self._unit = None
             self._attr = None
             self._dcls = None
             self._ctgr = None
@@ -437,7 +432,11 @@ class MikrotikControllerSensor(SensorEntity):
     @property
     def unit_of_measurement(self):
         """Return the unit the value is expressed in."""
-        return self._unit
+        if ATTR_UNIT_ATTR in self._type:
+            return self._data[SENSOR_TYPES[self._sensor][ATTR_UNIT_ATTR]]
+
+        if ATTR_UNIT in self._type:
+            return self._type[ATTR_UNIT]
 
     @property
     def available(self) -> bool:
