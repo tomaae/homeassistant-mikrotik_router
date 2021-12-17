@@ -24,6 +24,8 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_PASSWORD,
     CONF_SSL,
+    CONF_ZONE,
+    STATE_HOME,
 )
 
 from .const import (
@@ -310,6 +312,17 @@ class MikrotikControllerData:
         return self.config_entry.options.get(
             CONF_UNIT_OF_MEASUREMENT, DEFAULT_UNIT_OF_MEASUREMENT
         )
+
+    # ---------------------------
+    #   option_zone
+    # ---------------------------
+    @property
+    def option_zone(self):
+        """Config entry option to not track ARP."""
+        return self.config_entry.options.get(
+            CONF_ZONE, STATE_HOME
+        )
+    
 
     # ---------------------------
     #   signal_update
