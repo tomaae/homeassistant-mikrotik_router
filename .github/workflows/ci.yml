@@ -54,6 +54,19 @@ jobs:
   #         pip install pytest
   #         pytest
 
+  security:
+    name: Security check - Bandit
+    needs: [black, tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code from GitHub
+        uses: "actions/checkout@v2"
+      - name: Security check - Bandit
+        uses: ioggstream/bandit-report-artifacts@v0.0.2
+        with:
+          project_path: /custom_components/mikrotik_router
+          ignore_failure: false
+
   validate:
     name: Check hassfest
     needs: [black, tests]
