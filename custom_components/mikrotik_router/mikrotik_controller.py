@@ -2109,13 +2109,13 @@ class MikrotikControllerData:
 
             current_tx = vals['bytes-up']
             previous_tx = self.data["client_traffic"][uid]['previous-bytes-up']
-            delta_tx = max(0, current_tx - previous_tx)
+            delta_tx = max(0, current_tx - previous_tx) * 8
             self.data["client_traffic"][uid]['wan-tx'] = round(delta_tx / time_diff * uom_div, 2)
             self.data["client_traffic"][uid]['previous-bytes-up'] = current_tx
 
             current_rx = vals['bytes-down']
             previous_rx = self.data["client_traffic"][uid]['previous-bytes-down']
-            delta_rx = max(0, current_rx - previous_rx)
+            delta_rx = max(0, current_rx - previous_rx) * 8
             self.data["client_traffic"][uid]['wan-rx'] = round(delta_rx / time_diff * uom_div, 2)
             self.data["client_traffic"][uid]['previous-bytes-down'] = current_rx
 
