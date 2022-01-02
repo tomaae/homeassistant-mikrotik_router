@@ -56,7 +56,7 @@ jobs:
 
   security:
     name: Security check - Bandit
-    needs: [black, tests]
+    needs: [tests]
     runs-on: ubuntu-latest
     steps:
       - name: Check out code from GitHub
@@ -69,7 +69,7 @@ jobs:
 
   validate:
     name: Check hassfest
-    needs: [black, tests]
+    needs: [tests]
     runs-on: "ubuntu-latest"
     steps:
       - name: Check out code from GitHub
