@@ -64,7 +64,7 @@ jobs:
       - name: Security check - Bandit
         uses: ioggstream/bandit-report-artifacts@v0.0.2
         with:
-          project_path: /custom_components/mikrotik_router
+          project_path: custom_components/mikrotik_router
           ignore_failure: false
 
   validate:
