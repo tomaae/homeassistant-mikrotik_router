@@ -17,7 +17,7 @@ from homeassistant.const import (
     CONF_PASSWORD,
     CONF_SSL,
     CONF_ZONE,
-    STATE_HOME
+    STATE_HOME,
 )
 from homeassistant.core import callback
 
@@ -211,11 +211,8 @@ class MikrotikControllerOptionsFlowHandler(OptionsFlow):
                     ): int,
                     vol.Optional(
                         CONF_ZONE,
-                        default=self.config_entry.options.get(
-                            CONF_ZONE, STATE_HOME
-                        ),
+                        default=self.config_entry.options.get(CONF_ZONE, STATE_HOME),
                     ): str,
-
                 }
             ),
         )

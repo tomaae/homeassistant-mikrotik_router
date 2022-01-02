@@ -318,11 +318,8 @@ class MikrotikControllerData:
     # ---------------------------
     @property
     def option_zone(self):
-        """Config entry option to not track ARP."""
-        return self.config_entry.options.get(
-            CONF_ZONE, STATE_HOME
-        )
-    
+        """Config entry option zones."""
+        return self.config_entry.options.get(CONF_ZONE, STATE_HOME)
 
     # ---------------------------
     #   signal_update
