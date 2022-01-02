@@ -305,7 +305,7 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
             new_sensors.append(sensors[item_id])
 
     for sensor in SENSOR_TYPES:
-        if "system_" in sensor:
+        if sensor.startswith("system_"):
             if (
                 SENSOR_TYPES[sensor][ATTR_ATTR]
                 not in mikrotik_controller.data[SENSOR_TYPES[sensor][ATTR_PATH]]
@@ -327,27 +327,7 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
             )
             new_sensors.append(sensors[item_id])
 
-        if "client_traffic_" in sensor:
-            for uid in mikrotik_controller.data["client_traffic"]:
-                item_id = f"{inst}-{sensor}-{mikrotik_controller.data['client_traffic'][uid]['mac-address']}"
-                if item_id in sensors:
-                    if sensors[item_id].enabled:
-                        sensors[item_id].async_schedule_update_ha_state()
-                    continue
-
-                if (
-                    SENSOR_TYPES[sensor][ATTR_ATTR]
-                    in mikrotik_controller.data["client_traffic"][uid].keys()
-                ):
-                    sensors[item_id] = MikrotikClientTrafficSensor(
-                        mikrotik_controller=mikrotik_controller,
-                        inst=inst,
-                        sensor=sensor,
-                        uid=uid,
-                    )
-                    new_sensors.append(sensors[item_id])
-
-        if "traffic_" in sensor:
+        if sensor.startswith("traffic_"):
             if not config_entry.options.get(
                 CONF_SENSOR_PORT_TRAFFIC, DEFAULT_SENSOR_PORT_TRAFFIC
             ):
@@ -363,6 +343,26 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
                         continue
 
                     sensors[item_id] = MikrotikControllerTrafficSensor(
+                        mikrotik_controller=mikrotik_controller,
+                        inst=inst,
+                        sensor=sensor,
+                        uid=uid,
+                    )
+                    new_sensors.append(sensors[item_id])
+
+        if sensor.startswith("client_traffic_"):
+            for uid in mikrotik_controller.data["client_traffic"]:
+                item_id = f"{inst}-{sensor}-{mikrotik_controller.data['client_traffic'][uid]['mac-address']}"
+                if item_id in sensors:
+                    if sensors[item_id].enabled:
+                        sensors[item_id].async_schedule_update_ha_state()
+                    continue
+
+                if (
+                    SENSOR_TYPES[sensor][ATTR_ATTR]
+                    in mikrotik_controller.data["client_traffic"][uid].keys()
+                ):
+                    sensors[item_id] = MikrotikClientTrafficSensor(
                         mikrotik_controller=mikrotik_controller,
                         inst=inst,
                         sensor=sensor,

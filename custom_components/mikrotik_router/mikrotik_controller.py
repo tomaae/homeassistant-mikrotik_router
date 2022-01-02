@@ -614,10 +614,8 @@ class MikrotikControllerData:
 
         if self.api.connected() and self.option_sensor_client_traffic:
             if 0 < self.major_fw_version < 7:
-                _LOGGER.info("Using accounting feature for client traffic processing")
                 await self.hass.async_add_executor_job(self.process_accounting)
             elif 0 < self.major_fw_version >= 7:
-                _LOGGER.info("Using accounting kid control devices for client traffic processing")
                 await self.hass.async_add_executor_job(self.process_kid_control_devices)
 
         if self.api.connected() and self.option_sensor_simple_queues:
@@ -2172,4 +2170,3 @@ class MikrotikControllerData:
                 break
 
         return uid
-
