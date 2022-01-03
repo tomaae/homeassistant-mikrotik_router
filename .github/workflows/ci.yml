@@ -66,6 +66,11 @@ jobs:
         with:
           project_path: custom_components/mikrotik_router
           ignore_failure: false
+      - name: Security check report artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: Security report
+          path: output/security_report.txt
 
   validate:
     name: Check hassfest
