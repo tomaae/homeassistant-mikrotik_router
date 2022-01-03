@@ -133,6 +133,8 @@ class MikrotikControllerData:
             "environment": {}
         }
 
+        self.notified_flags = []
+
         self.listeners = []
         self.lock = asyncio.Lock()
         self.lock_ping = asyncio.Lock()
@@ -2074,7 +2076,7 @@ class MikrotikControllerData:
                     "local_accounting": False,
                 }
 
-        _LOGGER.debug(f"Working with {len(self.data['client_traffic'])} kid control devices")
+        _LOGGER.debug(f"Working with {len(self.data['client_traffic'])} client-traffic hosts")
 
         time_diff = self.api.take_client_traffic_snapshot(False)
         if not time_diff:
@@ -2098,7 +2100,12 @@ class MikrotikControllerData:
         )
 
         if not kid_control_devices_data:
-            _LOGGER.debug("No kid control devices found, make sure kid-control feature is configured")
+            if "kid-control-devices" not in self.notified_flags:
+                _LOGGER.error("No kid-control-devices found on Mikrotik, make sure kid-control feature is configured")
+                self.notified_flags.append("kid-control-devices")
+            return
+        elif "kid-control-devices" in self.notified_flags:
+            self.notified_flags.remove("kid-control-devices")
 
         for uid, vals in kid_control_devices_data.items():
             if uid not in self.data["client_traffic"]:
