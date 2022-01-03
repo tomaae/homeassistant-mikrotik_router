@@ -2076,11 +2076,7 @@ class MikrotikControllerData:
                     "local_accounting": False,
                 }
 
-        _LOGGER.debug(f"Working with {len(self.data['client_traffic'])} client-traffic hosts")
-
-        time_diff = self.api.take_client_traffic_snapshot(False)
-        if not time_diff:
-            return
+        _LOGGER.debug(f"Working with {len(self.data['client_traffic'])} kid control devices")
 
         kid_control_devices_data = parse_api(
             data={},
@@ -2099,9 +2095,11 @@ class MikrotikControllerData:
             ]
         )
 
+        time_diff = self.api.take_client_traffic_snapshot(False)
+
         if not kid_control_devices_data:
             if "kid-control-devices" not in self.notified_flags:
-                _LOGGER.error("No kid-control-devices found on Mikrotik, make sure kid-control feature is configured")
+                _LOGGER.error("No kid control devices found, make sure kid-control feature is configured")
                 self.notified_flags.append("kid-control-devices")
             return
         elif "kid-control-devices" in self.notified_flags:
@@ -2116,14 +2114,16 @@ class MikrotikControllerData:
 
             current_tx = vals['bytes-up']
             previous_tx = self.data["client_traffic"][uid]['previous-bytes-up']
-            delta_tx = max(0, current_tx - previous_tx) * 8
-            self.data["client_traffic"][uid]['wan-tx'] = round(delta_tx / time_diff * uom_div, 2)
+            if time_diff:
+                delta_tx = max(0, current_tx - previous_tx) * 8
+                self.data["client_traffic"][uid]['wan-tx'] = round(delta_tx / time_diff * uom_div, 2)
             self.data["client_traffic"][uid]['previous-bytes-up'] = current_tx
 
             current_rx = vals['bytes-down']
             previous_rx = self.data["client_traffic"][uid]['previous-bytes-down']
-            delta_rx = max(0, current_rx - previous_rx) * 8
-            self.data["client_traffic"][uid]['wan-rx'] = round(delta_rx / time_diff * uom_div, 2)
+            if time_diff:
+                delta_rx = max(0, current_rx - previous_rx) * 8
+                self.data["client_traffic"][uid]['wan-rx'] = round(delta_rx / time_diff * uom_div, 2)
             self.data["client_traffic"][uid]['previous-bytes-down'] = current_rx
 
     # ---------------------------
