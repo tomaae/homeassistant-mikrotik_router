@@ -9,6 +9,7 @@ from homeassistant.const import (
     ATTR_ATTRIBUTION,
     ATTR_DEVICE_CLASS,
     TEMP_CELSIUS,
+    ELECTRIC_POTENTIAL_VOLT,
 )
 
 from homeassistant.helpers.entity import EntityCategory
@@ -64,6 +65,16 @@ SENSOR_TYPES = {
         ATTR_PATH: "health",
         ATTR_ATTR: "temperature",
         ATTR_CTGR: None,
+    },
+    "system_voltage": {
+        ATTR_DEVICE_CLASS: SensorDeviceClass.VOLTAGE,
+        ATTR_ICON: "mdi:lightning-bolt",
+        ATTR_LABEL: "Voltage",
+        ATTR_UNIT: ELECTRIC_POTENTIAL_VOLT,
+        ATTR_GROUP: "System",
+        ATTR_PATH: "health",
+        ATTR_ATTR: "voltage",
+        ATTR_CTGR: EntityCategory.DIAGNOSTIC,
     },
     "system_cpu-temperature": {
         ATTR_DEVICE_CLASS: SensorDeviceClass.TEMPERATURE,
@@ -296,7 +307,9 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
     for sensor in SENSOR_TYPES:
         if "system_" in sensor:
             if (
-                mikrotik_controller.data[SENSOR_TYPES[sensor][ATTR_PATH]][
+                SENSOR_TYPES[sensor][ATTR_ATTR]
+                not in mikrotik_controller.data[SENSOR_TYPES[sensor][ATTR_PATH]]
+                or mikrotik_controller.data[SENSOR_TYPES[sensor][ATTR_PATH]][
                     SENSOR_TYPES[sensor][ATTR_ATTR]
                 ]
                 == "unknown"

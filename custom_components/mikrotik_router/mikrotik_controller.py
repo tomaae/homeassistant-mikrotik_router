@@ -107,6 +107,7 @@ class MikrotikControllerData:
             "routerboard": {},
             "resource": {},
             "health": {},
+            "health7": {},
             "interface": {},
             "bridge": {},
             "bridge_host": {},
@@ -1218,18 +1219,32 @@ class MikrotikControllerData:
     # ---------------------------
     def get_system_health(self):
         """Get routerboard data from Mikrotik"""
-        self.data["health"] = parse_api(
-            data=self.data["health"],
-            source=self.api.path("/system/health"),
-            vals=[
-                {"name": "temperature", "default": "unknown"},
-                {"name": "cpu-temperature", "default": "unknown"},
-                {"name": "power-consumption", "default": "unknown"},
-                {"name": "board-temperature1", "default": "unknown"},
-                {"name": "fan1-speed", "default": "unknown"},
-                {"name": "fan2-speed", "default": "unknown"},
-            ],
-        )
+        if self.major_fw_version >= 7:
+            self.data["health7"] = parse_api(
+                data=self.data["health7"],
+                source=self.api.path("/system/health"),
+                key="name",
+                vals=[
+                    {"name": "value", "default": "unknown"},
+                ],
+            )
+            for uid, vals in self.data["health7"].items():
+                self.data["health"][uid] = vals["value"]
+
+        else:
+            self.data["health"] = parse_api(
+                data=self.data["health"],
+                source=self.api.path("/system/health"),
+                vals=[
+                    {"name": "temperature", "default": "unknown"},
+                    {"name": "voltage", "default": "unknown"},
+                    {"name": "cpu-temperature", "default": "unknown"},
+                    {"name": "power-consumption", "default": "unknown"},
+                    {"name": "board-temperature1", "default": "unknown"},
+                    {"name": "fan1-speed", "default": "unknown"},
+                    {"name": "fan2-speed", "default": "unknown"},
+                ],
+            )
 
     # ---------------------------
     #   get_system_resource
