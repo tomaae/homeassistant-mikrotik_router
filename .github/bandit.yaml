@@ -1,0 +1,2 @@
+skips:
+- B105 # :hardcoded_password_string

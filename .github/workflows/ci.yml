@@ -65,6 +65,7 @@ jobs:
         uses: ioggstream/bandit-report-artifacts@v0.0.2
         with:
           project_path: custom_components/mikrotik_router
+          config_file: .github/bandit.yaml
           ignore_failure: false
       - name: Security check report artifacts
         uses: actions/upload-artifact@v1
