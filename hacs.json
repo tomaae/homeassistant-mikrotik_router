@@ -2,7 +2,7 @@
     "name": "Mikrotik Router",
     "homeassistant": "2021.12.1",
     "iot_class": "local_poll",
-    "domains": ["device_tracker", "switch", "sensor", "binary_sensor"],
+    "domains": ["device_tracker", "switch", "button", "sensor", "binary_sensor"],
     "render_readme": false,
     "zip_release": true,
     "filename": "mikrotik_router.zip"

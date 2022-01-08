@@ -131,11 +131,6 @@ DEVICE_ATTRIBUTES_KIDCONTROL = [
     "sun",
 ]
 
-DEVICE_ATTRIBUTES_SCRIPT = [
-    "last-started",
-    "run-count",
-]
-
 DEVICE_ATTRIBUTES_QUEUE = [
     "target",
     "download-rate",
@@ -212,7 +207,6 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
             "mangle",
             "filter",
             "ppp_secret",
-            "script",
             "queue",
             "kid-control",
             "kid-control",
@@ -227,11 +221,9 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
             "name",
             "name",
             "name",
-            "name",
         ],
         # Entry Name
         [
-            "name",
             "name",
             "name",
             "name",
@@ -251,7 +243,6 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
             "name",
             "name",
             "name",
-            "name",
         ],
         # Attr
         [
@@ -260,7 +251,6 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
             DEVICE_ATTRIBUTES_MANGLE,
             DEVICE_ATTRIBUTES_FILTER,
             DEVICE_ATTRIBUTES_PPP_SECRET,
-            DEVICE_ATTRIBUTES_SCRIPT,
             DEVICE_ATTRIBUTES_QUEUE,
             DEVICE_ATTRIBUTES_KIDCONTROL,
             DEVICE_ATTRIBUTES_KIDCONTROL,
@@ -272,7 +262,6 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
             MikrotikControllerMangleSwitch,
             MikrotikControllerFilterSwitch,
             MikrotikControllerPPPSecretSwitch,
-            MikrotikControllerScriptSwitch,
             MikrotikControllerQueueSwitch,
             MikrotikControllerKidcontrolSwitch,
             MikrotikControllerKidcontrolPauseSwitch,
@@ -815,54 +804,6 @@ class MikrotikControllerPPPSecretSwitch(MikrotikControllerSwitch):
         mod_value = True
         self._ctrl.set_value(path, param, value, mod_param, mod_value)
         await self._ctrl.async_update()
-
-
-# ---------------------------
-#   MikrotikControllerScriptSwitch
-# ---------------------------
-class MikrotikControllerScriptSwitch(MikrotikControllerSwitch):
-    """Representation of a script switch."""
-
-    def __init__(self, inst, uid, mikrotik_controller, sid_data):
-        """Initialize."""
-        super().__init__(inst, uid, mikrotik_controller, sid_data)
-
-    @property
-    def icon(self) -> str:
-        """Return the icon."""
-        return "mdi:script-text-outline"
-
-    @property
-    def device_info(self) -> Dict[str, Any]:
-        """Return a description for device registry."""
-        info = {
-            "identifiers": {
-                (
-                    DOMAIN,
-                    "serial-number",
-                    self._ctrl.data["routerboard"]["serial-number"],
-                    "switch",
-                    "Scripts",
-                )
-            },
-            "manufacturer": self._ctrl.data["resource"]["platform"],
-            "model": self._ctrl.data["resource"]["board-name"],
-            "name": f"{self._inst} Scripts",
-        }
-        return info
-
-    async def async_turn_on(self) -> None:
-        """Turn on the switch."""
-        self._ctrl.run_script(self._data["name"])
-        await self._ctrl.force_update()
-
-    async def async_turn_off(self) -> None:
-        """Turn off the switch."""
-
-    @property
-    def is_on(self) -> bool:
-        """Return true if device is on."""
-        return False
 
 
 # ---------------------------
