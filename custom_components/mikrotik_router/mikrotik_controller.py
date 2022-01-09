@@ -952,6 +952,8 @@ class MikrotikControllerData:
                 {"name": "src-port", "default": "any"},
                 {"name": "dst-address", "default": "any"},
                 {"name": "dst-port", "default": "any"},
+                {"name": "src-address-list", "default": "any"},
+                {"name": "dst-address-list", "default": "any"},
                 {
                     "name": "enabled",
                     "source": "disabled",
@@ -976,6 +978,10 @@ class MikrotikControllerData:
                     {"key": "dst-address"},
                     {"text": ":"},
                     {"key": "dst-port"},
+                    {"text": ","},
+                    {"key": "src-address-list"},
+                    {"text": "-"},
+                    {"key": "dst-address-list"},
                 ],
                 [
                     {"name": "name"},
