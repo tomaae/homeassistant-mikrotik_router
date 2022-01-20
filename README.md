@@ -114,7 +114,7 @@ Monitor and control.
 
 ## Client Traffic
 
-#### RouterOS FW version < 7
+#### RouterOS v6
 ###### Accounting
 
 Monitor per-IP throughput tracking based on Mikrotik Accounting.
@@ -126,10 +126,10 @@ More information about Accounting can be found on [Mikrotik support page](https:
 NOTE: Accounting does not count in FastTracked packets.
 
 
-#### RouterOS FW version > 7
+#### RouterOS v7
 ###### Kid Control Devices
 
-In RouterOS FW version 7+ Accounting feature is deprecated so alternative approach for is to use 
+In RouterOS v7 Accounting feature is deprecated so alternative approach for is to use 
 Kid Control Devices feature (IP - Kid Control - Devices).
 
 This feature requires at least one 'kid' to be defined, 
@@ -147,14 +147,12 @@ This integration is distributed using [HACS](https://hacs.xyz/).
 You can find it under "Integrations", named "Mikrotik Router"
 
 Minimum requirements:
-* RouterOS v6.43
+* RouterOS v6.43/v7.1
 * Home Assistant 0.114.0
 
 ## Using Mikrotik development branch
 If you are using development branch for mikrotik, some features may stop working due to major changes in RouterOS.
 Use integration master branch instead of latest release to keep up with RouterOS beta adjustments.
-* beta 7.3 was fully tested.
-* beta 7.4 have been reported to miss system health information.
 
 ## Setup integration
 1. Create user for homeassistant on your mikrotik router with following permissions:
