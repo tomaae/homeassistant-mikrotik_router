@@ -186,49 +186,49 @@ SENSOR_TYPES = {
         ATTR_ATTR: "rx-bits-per-second",
         ATTR_CTGR: None,
     },
-    "accounting_lan_tx": {
+    "client_traffic_lan_tx": {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:upload-network",
         ATTR_LABEL: "LAN TX",
         ATTR_UNIT: "ps",
         ATTR_UNIT_ATTR: "tx-rx-attr",
-        ATTR_PATH: "accounting",
+        ATTR_PATH: "client_traffic",
         ATTR_ATTR: "lan-tx",
         ATTR_CTGR: None,
     },
-    "accounting_lan_rx": {
+    "client_traffic_lan_rx": {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:download-network",
         ATTR_LABEL: "LAN RX",
         ATTR_UNIT: "ps",
         ATTR_UNIT_ATTR: "tx-rx-attr",
-        ATTR_PATH: "accounting",
+        ATTR_PATH: "client_traffic",
         ATTR_ATTR: "lan-rx",
         ATTR_CTGR: None,
     },
-    "accounting_wan_tx": {
+    "client_traffic_wan_tx": {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:upload-network",
         ATTR_LABEL: "WAN TX",
         ATTR_UNIT: "ps",
         ATTR_UNIT_ATTR: "tx-rx-attr",
-        ATTR_PATH: "accounting",
+        ATTR_PATH: "client_traffic",
         ATTR_ATTR: "wan-tx",
         ATTR_CTGR: None,
     },
-    "accounting_wan_rx": {
+    "client_traffic_wan_rx": {
         ATTR_DEVICE_CLASS: None,
         ATTR_ICON: "mdi:download-network",
         ATTR_LABEL: "WAN RX",
         ATTR_UNIT: "ps",
         ATTR_UNIT_ATTR: "tx-rx-attr",
-        ATTR_PATH: "accounting",
+        ATTR_PATH: "client_traffic",
         ATTR_ATTR: "wan-rx",
         ATTR_CTGR: None,
     },
 }
 
-DEVICE_ATTRIBUTES_ACCOUNTING = ["address", "mac-address", "host-name"]
+DEVICE_ATTRIBUTES_CLIENT_TRAFFIC = ["address", "mac-address", "host-name"]
 
 
 # ---------------------------
@@ -305,7 +305,7 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
             new_sensors.append(sensors[item_id])
 
     for sensor in SENSOR_TYPES:
-        if "system_" in sensor:
+        if sensor.startswith("system_"):
             if (
                 SENSOR_TYPES[sensor][ATTR_ATTR]
                 not in mikrotik_controller.data[SENSOR_TYPES[sensor][ATTR_PATH]]
@@ -327,7 +327,7 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
             )
             new_sensors.append(sensors[item_id])
 
-        if "traffic_" in sensor:
+        if sensor.startswith("traffic_"):
             if not config_entry.options.get(
                 CONF_SENSOR_PORT_TRAFFIC, DEFAULT_SENSOR_PORT_TRAFFIC
             ):
@@ -350,9 +350,9 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
                     )
                     new_sensors.append(sensors[item_id])
 
-        if "accounting_" in sensor:
-            for uid in mikrotik_controller.data["accounting"]:
-                item_id = f"{inst}-{sensor}-{mikrotik_controller.data['accounting'][uid]['mac-address']}"
+        if sensor.startswith("client_traffic_"):
+            for uid in mikrotik_controller.data["client_traffic"]:
+                item_id = f"{inst}-{sensor}-{mikrotik_controller.data['client_traffic'][uid]['mac-address']}"
                 if item_id in sensors:
                     if sensors[item_id].enabled:
                         sensors[item_id].async_schedule_update_ha_state()
@@ -360,9 +360,9 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
 
                 if (
                     SENSOR_TYPES[sensor][ATTR_ATTR]
-                    in mikrotik_controller.data["accounting"][uid].keys()
+                    in mikrotik_controller.data["client_traffic"][uid].keys()
                 ):
-                    sensors[item_id] = MikrotikAccountingSensor(
+                    sensors[item_id] = MikrotikClientTrafficSensor(
                         mikrotik_controller=mikrotik_controller,
                         inst=inst,
                         sensor=sensor,
@@ -532,10 +532,10 @@ class MikrotikControllerTrafficSensor(MikrotikControllerSensor):
 
 
 # ---------------------------
-#   MikrotikAccountingSensor
+#   MikrotikClientTrafficSensor
 # ---------------------------
-class MikrotikAccountingSensor(MikrotikControllerSensor):
-    """Define an Mikrotik Accounting sensor."""
+class MikrotikClientTrafficSensor(MikrotikControllerSensor):
+    """Define an Mikrotik MikrotikClientTrafficSensor sensor."""
 
     def __init__(self, mikrotik_controller, inst, sensor, uid):
         """Initialize."""
@@ -583,7 +583,7 @@ class MikrotikAccountingSensor(MikrotikControllerSensor):
     def extra_state_attributes(self) -> Dict[str, Any]:
         """Return the state attributes."""
         attributes = self._attrs
-        for variable in DEVICE_ATTRIBUTES_ACCOUNTING:
+        for variable in DEVICE_ATTRIBUTES_CLIENT_TRAFFIC:
             if variable in self._data:
                 attributes[format_attribute(variable)] = self._data[variable]
 
