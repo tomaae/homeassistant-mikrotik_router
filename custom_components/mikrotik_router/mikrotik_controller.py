@@ -2104,7 +2104,7 @@ class MikrotikControllerData:
         if not kid_control_devices_data:
             if "kid-control-devices" not in self.notified_flags:
                 _LOGGER.error(
-                    "No kid control devices found, make sure kid-control feature is configured"
+                    "No kid control devices found on your Mikrotik device, make sure kid-control feature is configured"
                 )
                 self.notified_flags.append("kid-control-devices")
             return
