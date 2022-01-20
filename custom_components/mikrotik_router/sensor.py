@@ -370,7 +370,6 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
                     )
                     new_sensors.append(sensors[item_id])
 
-
     if new_sensors:
         async_add_entities(new_sensors, True)
 
