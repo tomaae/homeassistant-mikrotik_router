@@ -130,7 +130,7 @@ class MikrotikControllerData:
             "host": {},
             "host_hass": {},
             "client_traffic": {},
-            "environment": {}
+            "environment": {},
         }
 
         self.notified_flags = []
@@ -1886,7 +1886,9 @@ class MikrotikControllerData:
                     "local_accounting": False,
                 }
 
-        _LOGGER.debug(f"Working with {len(self.data['client_traffic'])} accounting devices")
+        _LOGGER.debug(
+            f"Working with {len(self.data['client_traffic'])} accounting devices"
+        )
 
         # Build temp accounting values dict with ip address as key
         tmp_accounting_values = {}
@@ -2076,7 +2078,9 @@ class MikrotikControllerData:
                     "local_accounting": False,
                 }
 
-        _LOGGER.debug(f"Working with {len(self.data['client_traffic'])} kid control devices")
+        _LOGGER.debug(
+            f"Working with {len(self.data['client_traffic'])} kid control devices"
+        )
 
         kid_control_devices_data = parse_api(
             data={},
@@ -2091,15 +2095,17 @@ class MikrotikControllerData:
                     "source": "disabled",
                     "type": "bool",
                     "reverse": True,
-                }
-            ]
+                },
+            ],
         )
 
         time_diff = self.api.take_client_traffic_snapshot(False)
 
         if not kid_control_devices_data:
             if "kid-control-devices" not in self.notified_flags:
-                _LOGGER.error("No kid control devices found, make sure kid-control feature is configured")
+                _LOGGER.error(
+                    "No kid control devices found, make sure kid-control feature is configured"
+                )
                 self.notified_flags.append("kid-control-devices")
             return
         elif "kid-control-devices" in self.notified_flags:
@@ -2110,21 +2116,25 @@ class MikrotikControllerData:
                 _LOGGER.debug(f"Skipping unknown device {uid}")
                 continue
 
-            self.data["client_traffic"][uid]["available"] = vals['enabled']
+            self.data["client_traffic"][uid]["available"] = vals["enabled"]
 
-            current_tx = vals['bytes-up']
-            previous_tx = self.data["client_traffic"][uid]['previous-bytes-up']
+            current_tx = vals["bytes-up"]
+            previous_tx = self.data["client_traffic"][uid]["previous-bytes-up"]
             if time_diff:
                 delta_tx = max(0, current_tx - previous_tx) * 8
-                self.data["client_traffic"][uid]['wan-tx'] = round(delta_tx / time_diff * uom_div, 2)
-            self.data["client_traffic"][uid]['previous-bytes-up'] = current_tx
+                self.data["client_traffic"][uid]["wan-tx"] = round(
+                    delta_tx / time_diff * uom_div, 2
+                )
+            self.data["client_traffic"][uid]["previous-bytes-up"] = current_tx
 
-            current_rx = vals['bytes-down']
-            previous_rx = self.data["client_traffic"][uid]['previous-bytes-down']
+            current_rx = vals["bytes-down"]
+            previous_rx = self.data["client_traffic"][uid]["previous-bytes-down"]
             if time_diff:
                 delta_rx = max(0, current_rx - previous_rx) * 8
-                self.data["client_traffic"][uid]['wan-rx'] = round(delta_rx / time_diff * uom_div, 2)
-            self.data["client_traffic"][uid]['previous-bytes-down'] = current_rx
+                self.data["client_traffic"][uid]["wan-rx"] = round(
+                    delta_rx / time_diff * uom_div, 2
+                )
+            self.data["client_traffic"][uid]["previous-bytes-down"] = current_rx
 
     # ---------------------------
     #   _get_unit_of_measurement
