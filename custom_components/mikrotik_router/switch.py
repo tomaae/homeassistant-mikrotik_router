@@ -510,7 +510,7 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
                 (
                     DOMAIN,
                     "serial-number",
-                    self._ctrl.data["routerboard"]["serial-number"],
+                    f"{self._ctrl.data['routerboard']['serial-number']}",
                     "switch",
                     "NAT",
                 )
@@ -599,7 +599,7 @@ class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
                 (
                     DOMAIN,
                     "serial-number",
-                    self._ctrl.data["routerboard"]["serial-number"],
+                    f"{self._ctrl.data['routerboard']['serial-number']}",
                     "switch",
                     "Mangle",
                 )
@@ -688,7 +688,7 @@ class MikrotikControllerFilterSwitch(MikrotikControllerSwitch):
                 (
                     DOMAIN,
                     "serial-number",
-                    self._ctrl.data["routerboard"]["serial-number"],
+                    f"{self._ctrl.data['routerboard']['serial-number']}",
                     "switch",
                     "Filter",
                 )
@@ -774,7 +774,7 @@ class MikrotikControllerPPPSecretSwitch(MikrotikControllerSwitch):
                 (
                     DOMAIN,
                     "serial-number",
-                    self._ctrl.data["routerboard"]["serial-number"],
+                    f"{self._ctrl.data['routerboard']['serial-number']}",
                     "switch",
                     "PPP",
                 )
@@ -834,7 +834,7 @@ class MikrotikControllerQueueSwitch(MikrotikControllerSwitch):
                 (
                     DOMAIN,
                     "serial-number",
-                    self._ctrl.data["routerboard"]["serial-number"],
+                    f"{self._ctrl.data['routerboard']['serial-number']}",
                     "switch",
                     "Queue",
                 )
@@ -902,7 +902,7 @@ class MikrotikControllerKidcontrolSwitch(MikrotikControllerSwitch):
                 (
                     DOMAIN,
                     "serial-number",
-                    self._ctrl.data["routerboard"]["serial-number"],
+                    f"{self._ctrl.data['routerboard']['serial-number']}",
                     "switch",
                     "Kidcontrol",
                 )
@@ -977,7 +977,7 @@ class MikrotikControllerKidcontrolPauseSwitch(MikrotikControllerSwitch):
                 (
                     DOMAIN,
                     "serial-number",
-                    self._ctrl.data["routerboard"]["serial-number"],
+                    f"{self._ctrl.data['routerboard']['serial-number']}",
                     "switch",
                     "Kidcontrol",
                 )

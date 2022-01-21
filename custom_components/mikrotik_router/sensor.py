@@ -463,7 +463,9 @@ class MikrotikControllerSensor(SensorEntity):
             self._type[ATTR_GROUP] = self._ctrl.data["resource"]["board-name"]
 
         info = {
-            "connections": {(DOMAIN, self._ctrl.data["routerboard"]["serial-number"])},
+            "connections": {
+                (DOMAIN, f"{self._ctrl.data['routerboard']['serial-number']}")
+            },
             "manufacturer": self._ctrl.data["resource"]["platform"],
             "model": self._ctrl.data["resource"]["board-name"],
             "name": f"{self._inst} {self._type[ATTR_GROUP]}",
@@ -475,7 +477,7 @@ class MikrotikControllerSensor(SensorEntity):
                 (
                     DOMAIN,
                     "serial-number",
-                    self._ctrl.data["routerboard"]["serial-number"],
+                    f"{self._ctrl.data['routerboard']['serial-number']}",
                     "sensor",
                     f"{self._inst} {self._type[ATTR_GROUP]}",
                 )
@@ -631,7 +633,7 @@ class MikrotikControllerEnvironmentSensor(MikrotikControllerSensor):
                 (
                     DOMAIN,
                     "serial-number",
-                    self._ctrl.data["routerboard"]["serial-number"],
+                    f"{self._ctrl.data['routerboard']['serial-number']}",
                     "sensor",
                     "Environment",
                 )

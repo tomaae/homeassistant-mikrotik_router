@@ -199,7 +199,7 @@ class MikrotikControllerScriptButton(MikrotikControllerButton):
                 (
                     DOMAIN,
                     "serial-number",
-                    self._ctrl.data["routerboard"]["serial-number"],
+                    f"{self._ctrl.data['routerboard']['serial-number']}",
                     "button",
                     "Scripts",
                 )
