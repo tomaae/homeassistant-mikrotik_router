@@ -47,7 +47,7 @@ Monitor and control your Mikrotik device from Home Assistant.
  * Enable/disable Filter switches
  * Monitor and control PPP users
  * Kid Control
- * Mikrotik Accounting traffic sensors per hosts for RX/TX WAN/LAN
+ * Client Traffic RX/TX WAN/LAN monitoring though Accounting or Kid Control Devices (depending on RouterOS FW version)
  * Device tracker for hosts in network
  * System sensors (CPU, Memory, HDD, Temperature)
  * Check firmware update
@@ -112,9 +112,10 @@ Monitor and control.
 
 ![Kid Control](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/kidcontrol_switch.png)
 
+## Client Traffic
 
-## Accounting
-*RouterOS 7+ no longer support accounting*
+#### RouterOS v6
+###### Accounting
 
 Monitor per-IP throughput tracking based on Mikrotik Accounting.
 
@@ -124,6 +125,20 @@ More information about Accounting can be found on [Mikrotik support page](https:
 
 NOTE: Accounting does not count in FastTracked packets.
 
+
+#### RouterOS v7
+###### Kid Control Devices
+
+In RouterOS v7 Accounting feature is deprecated so alternative approach for is to use 
+Kid Control Devices feature (IP - Kid Control - Devices).
+
+This feature requires at least one 'kid' to be defined, 
+after that Mikrotik will dynamically start tracking bandwidth usage of all known devices.
+
+Simple dummy Kid entry can be defined with
+
+```/ip kid-control add name=Monitor mon=0s-1d tue=0s-1d wed=0s-1d thu=0s-1d fri=0s-1d sat=0s-1d sun=0s-1d```
+
 ![Accounting sensor](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/accounting_sensor.png)
 
 # Install integration
@@ -132,14 +147,12 @@ This integration is distributed using [HACS](https://hacs.xyz/).
 You can find it under "Integrations", named "Mikrotik Router"
 
 Minimum requirements:
-* RouterOS v6.43
+* RouterOS v6.43/v7.1
 * Home Assistant 0.114.0
 
 ## Using Mikrotik development branch
 If you are using development branch for mikrotik, some features may stop working due to major changes in RouterOS.
 Use integration master branch instead of latest release to keep up with RouterOS beta adjustments.
-* beta 7.3 was fully tested.
-* beta 7.4 have been reported to miss system health information.
 
 ## Setup integration
 1. Create user for homeassistant on your mikrotik router with following permissions:

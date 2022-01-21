@@ -129,9 +129,11 @@ class MikrotikControllerData:
             "wireless_hosts": {},
             "host": {},
             "host_hass": {},
-            "accounting": {},
+            "client_traffic": {},
             "environment": {},
         }
+
+        self.notified_flags = []
 
         self.listeners = []
         self.lock = asyncio.Lock()
@@ -612,12 +614,11 @@ class MikrotikControllerData:
         if self.api.connected():
             await self.hass.async_add_executor_job(self.get_system_resource)
 
-        if (
-            self.api.connected()
-            and self.option_sensor_client_traffic
-            and 0 < self.major_fw_version < 7
-        ):
-            await self.hass.async_add_executor_job(self.process_accounting)
+        if self.api.connected() and self.option_sensor_client_traffic:
+            if 0 < self.major_fw_version < 7:
+                await self.hass.async_add_executor_job(self.process_accounting)
+            elif 0 < self.major_fw_version >= 7:
+                await self.hass.async_add_executor_job(self.process_kid_control_devices)
 
         if self.api.connected() and self.option_sensor_simple_queues:
             await self.hass.async_add_executor_job(self.get_queue)
@@ -952,6 +953,8 @@ class MikrotikControllerData:
                 {"name": "src-port", "default": "any"},
                 {"name": "dst-address", "default": "any"},
                 {"name": "dst-port", "default": "any"},
+                {"name": "src-address-list", "default": "any"},
+                {"name": "dst-address-list", "default": "any"},
                 {
                     "name": "enabled",
                     "source": "disabled",
@@ -976,6 +979,10 @@ class MikrotikControllerData:
                     {"key": "dst-address"},
                     {"text": ":"},
                     {"key": "dst-port"},
+                    {"text": ","},
+                    {"key": "src-address-list"},
+                    {"text": "-"},
+                    {"key": "dst-address-list"},
                 ],
                 [
                     {"name": "name"},
@@ -1869,8 +1876,8 @@ class MikrotikControllerData:
 
         # Build missing hosts from main hosts dict
         for uid, vals in self.data["host"].items():
-            if uid not in self.data["accounting"]:
-                self.data["accounting"][uid] = {
+            if uid not in self.data["client_traffic"]:
+                self.data["client_traffic"][uid] = {
                     "address": vals["address"],
                     "mac-address": vals["mac-address"],
                     "host-name": vals["host-name"],
@@ -1879,11 +1886,13 @@ class MikrotikControllerData:
                     "local_accounting": False,
                 }
 
-        _LOGGER.debug(f"Working with {len(self.data['accounting'])} accounting devices")
+        _LOGGER.debug(
+            f"Working with {len(self.data['client_traffic'])} accounting devices"
+        )
 
         # Build temp accounting values dict with ip address as key
         tmp_accounting_values = {}
-        for uid, vals in self.data["accounting"].items():
+        for uid, vals in self.data["client_traffic"].items():
             tmp_accounting_values[vals["address"]] = {
                 "wan-tx": 0,
                 "wan-rx": 0,
@@ -1891,7 +1900,7 @@ class MikrotikControllerData:
                 "lan-rx": 0,
             }
 
-        time_diff = self.api.take_accounting_snapshot()
+        time_diff = self.api.take_client_traffic_snapshot(True)
         if time_diff:
             accounting_data = parse_api(
                 data={},
@@ -1959,20 +1968,20 @@ class MikrotikControllerData:
                 )
                 continue
 
-            self.data["accounting"][uid]["tx-rx-attr"] = uom_type
-            self.data["accounting"][uid]["available"] = accounting_enabled
-            self.data["accounting"][uid]["local_accounting"] = local_traffic_enabled
+            self.data["client_traffic"][uid]["tx-rx-attr"] = uom_type
+            self.data["client_traffic"][uid]["available"] = accounting_enabled
+            self.data["client_traffic"][uid]["local_accounting"] = local_traffic_enabled
 
             if not accounting_enabled:
                 # Skip calculation for WAN and LAN if accounting is disabled
                 continue
 
-            self.data["accounting"][uid]["wan-tx"] = (
+            self.data["client_traffic"][uid]["wan-tx"] = (
                 round(vals["wan-tx"] / time_diff * uom_div, 2)
                 if vals["wan-tx"]
                 else 0.0
             )
-            self.data["accounting"][uid]["wan-rx"] = (
+            self.data["client_traffic"][uid]["wan-rx"] = (
                 round(vals["wan-rx"] / time_diff * uom_div, 2)
                 if vals["wan-rx"]
                 else 0.0
@@ -1982,12 +1991,12 @@ class MikrotikControllerData:
                 # Skip calculation for LAN if LAN accounting is disabled
                 continue
 
-            self.data["accounting"][uid]["lan-tx"] = (
+            self.data["client_traffic"][uid]["lan-tx"] = (
                 round(vals["lan-tx"] / time_diff * uom_div, 2)
                 if vals["lan-tx"]
                 else 0.0
             )
-            self.data["accounting"][uid]["lan-rx"] = (
+            self.data["client_traffic"][uid]["lan-rx"] = (
                 round(vals["lan-rx"] / time_diff * uom_div, 2)
                 if vals["lan-rx"]
                 else 0.0
@@ -2027,7 +2036,7 @@ class MikrotikControllerData:
     #   _get_accounting_uid_by_ip
     # ---------------------------
     def _get_accounting_uid_by_ip(self, requested_ip):
-        for mac, vals in self.data["accounting"].items():
+        for mac, vals in self.data["client_traffic"].items():
             if vals.get("address") is requested_ip:
                 return mac
         return None
@@ -2044,3 +2053,85 @@ class MikrotikControllerData:
                 break
 
         return uid
+
+    # ---------------------------
+    #   process_kid_control
+    # ---------------------------
+    def process_kid_control_devices(self):
+        """Get Kid Control Device data from Mikrotik"""
+
+        uom_type, uom_div = self._get_unit_of_measurement()
+
+        # Build missing hosts from main hosts dict
+        for uid, vals in self.data["host"].items():
+            if uid not in self.data["client_traffic"]:
+                self.data["client_traffic"][uid] = {
+                    "address": vals["address"],
+                    "mac-address": vals["mac-address"],
+                    "host-name": vals["host-name"],
+                    "previous-bytes-up": 0.0,
+                    "previous-bytes-down": 0.0,
+                    "wan-tx": 0.0,
+                    "wan-rx": 0.0,
+                    "tx-rx-attr": uom_type,
+                    "available": False,
+                    "local_accounting": False,
+                }
+
+        _LOGGER.debug(
+            f"Working with {len(self.data['client_traffic'])} kid control devices"
+        )
+
+        kid_control_devices_data = parse_api(
+            data={},
+            source=self.api.path("/ip/kid-control/device"),
+            key="mac-address",
+            vals=[
+                {"name": "mac-address"},
+                {"name": "bytes-down"},
+                {"name": "bytes-up"},
+                {
+                    "name": "enabled",
+                    "source": "disabled",
+                    "type": "bool",
+                    "reverse": True,
+                },
+            ],
+        )
+
+        time_diff = self.api.take_client_traffic_snapshot(False)
+
+        if not kid_control_devices_data:
+            if "kid-control-devices" not in self.notified_flags:
+                _LOGGER.error(
+                    "No kid control devices found on your Mikrotik device, make sure kid-control feature is configured"
+                )
+                self.notified_flags.append("kid-control-devices")
+            return
+        elif "kid-control-devices" in self.notified_flags:
+            self.notified_flags.remove("kid-control-devices")
+
+        for uid, vals in kid_control_devices_data.items():
+            if uid not in self.data["client_traffic"]:
+                _LOGGER.debug(f"Skipping unknown device {uid}")
+                continue
+
+            self.data["client_traffic"][uid]["available"] = vals["enabled"]
+
+            current_tx = vals["bytes-up"]
+            previous_tx = self.data["client_traffic"][uid]["previous-bytes-up"]
+            if time_diff:
+                delta_tx = max(0, current_tx - previous_tx) * 8
+                self.data["client_traffic"][uid]["wan-tx"] = round(
+                    delta_tx / time_diff * uom_div, 2
+                )
+            self.data["client_traffic"][uid]["previous-bytes-up"] = current_tx
+
+            current_rx = vals["bytes-down"]
+            previous_rx = self.data["client_traffic"][uid]["previous-bytes-down"]
+            if time_diff:
+                delta_rx = max(0, current_rx - previous_rx) * 8
+                self.data["client_traffic"][uid]["wan-rx"] = round(
+                    delta_rx / time_diff * uom_div, 2
+                )
+            self.data["client_traffic"][uid]["previous-bytes-down"] = current_rx
