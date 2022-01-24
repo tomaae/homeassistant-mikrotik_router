@@ -42,6 +42,8 @@ async def async_setup_entry(hass, config_entry):
     """Set up Mikrotik Router as config entry."""
     controller = MikrotikControllerData(hass, config_entry)
     await controller.async_hwinfo_update()
+    if not controller.connected():
+        raise ConfigEntryNotReady(f"Cannot connect to host")
 
     await controller.async_update()
 
