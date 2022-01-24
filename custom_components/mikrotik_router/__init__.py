@@ -102,15 +102,15 @@ async def async_setup_entry(hass, config_entry):
 # ---------------------------
 #   async_unload_entry
 # ---------------------------
-async def async_unload_entry(hass, config_entry):
+async def async_unload_entry(hass, config_entry) -> bool:
     """Unload a config entry."""
-    controller = hass.data[DOMAIN][DATA_CLIENT][config_entry.entry_id]
-    await controller.async_reset()
-    hass.services.async_remove(DOMAIN, RUN_SCRIPT_COMMAND)
-    hass.data[DOMAIN][DATA_CLIENT].pop(config_entry.entry_id)
-
     unload_ok = await hass.config_entries.async_unload_platforms(
         config_entry, PLATFORMS
     )
+    if unload_ok:
+        controller = hass.data[DOMAIN][DATA_CLIENT][config_entry.entry_id]
+        await controller.async_reset()
+        hass.services.async_remove(DOMAIN, RUN_SCRIPT_COMMAND)
+        hass.data[DOMAIN][DATA_CLIENT].pop(config_entry.entry_id)
 
     return unload_ok
