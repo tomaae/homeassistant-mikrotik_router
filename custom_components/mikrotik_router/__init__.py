@@ -12,6 +12,7 @@ from homeassistant.const import (
 )
 
 from .const import (
+    PLATFORMS,
     DOMAIN,
     DATA_CLIENT,
     RUN_SCRIPT_COMMAND,
@@ -104,12 +105,12 @@ async def async_setup_entry(hass, config_entry):
 async def async_unload_entry(hass, config_entry):
     """Unload a config entry."""
     controller = hass.data[DOMAIN][DATA_CLIENT][config_entry.entry_id]
-    await hass.config_entries.async_forward_entry_unload(config_entry, "sensor")
-    await hass.config_entries.async_forward_entry_unload(config_entry, "binary_sensor")
-    await hass.config_entries.async_forward_entry_unload(config_entry, "device_tracker")
-    await hass.config_entries.async_forward_entry_unload(config_entry, "switch")
-    await hass.config_entries.async_forward_entry_unload(config_entry, "button")
-    hass.services.async_remove(DOMAIN, RUN_SCRIPT_COMMAND)
     await controller.async_reset()
+    hass.services.async_remove(DOMAIN, RUN_SCRIPT_COMMAND)
     hass.data[DOMAIN][DATA_CLIENT].pop(config_entry.entry_id)
-    return True
+
+    unload_ok = await hass.config_entries.async_unload_platforms(
+        config_entry, PLATFORMS
+    )
+
+    return unload_ok
