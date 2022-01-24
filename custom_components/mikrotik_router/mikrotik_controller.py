@@ -167,22 +167,24 @@ class MikrotikControllerData:
 
         self.major_fw_version = 0
 
-        self._force_update_callback = None
-        self._force_fwupdate_check_callback = None
-        self._async_ping_tracked_hosts_callback = None
-
         self.async_mac_lookup = AsyncMacLookup()
         # self.async_mac_lookup.update_vendors()
 
     async def async_init(self):
-        self._force_update_callback = async_track_time_interval(
-            self.hass, self.force_update, self.option_scan_interval
+        self.listeners.append(
+            async_track_time_interval(
+                self.hass, self.force_update, self.option_scan_interval
+            )
         )
-        self._force_fwupdate_check_callback = async_track_time_interval(
-            self.hass, self.force_fwupdate_check, timedelta(hours=1)
+        self.listeners.append(
+            async_track_time_interval(
+                self.hass, self.force_fwupdate_check, timedelta(hours=1)
+            )
         )
-        self._async_ping_tracked_hosts_callback = async_track_time_interval(
-            self.hass, self.async_ping_tracked_hosts, timedelta(seconds=15)
+        self.listeners.append(
+            async_track_time_interval(
+                self.hass, self.async_ping_tracked_hosts, timedelta(seconds=15)
+            )
         )
 
     # ---------------------------
