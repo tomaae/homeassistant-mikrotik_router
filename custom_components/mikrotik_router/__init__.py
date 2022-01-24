@@ -37,9 +37,17 @@ async def async_setup(hass, _config):
 
 
 # ---------------------------
+#   update_listener
+# ---------------------------
+async def update_listener(hass, config_entry) -> None:
+    """Handle options update."""
+    await hass.config_entries.async_reload(config_entry.entry_id)
+
+
+# ---------------------------
 #   async_setup_entry
 # ---------------------------
-async def async_setup_entry(hass, config_entry):
+async def async_setup_entry(hass, config_entry) -> bool:
     """Set up Mikrotik Router as config entry."""
     controller = MikrotikControllerData(hass, config_entry)
     await controller.async_hwinfo_update()
@@ -54,25 +62,8 @@ async def async_setup_entry(hass, config_entry):
     await controller.async_init()
     hass.data[DOMAIN][DATA_CLIENT][config_entry.entry_id] = controller
 
-    hass.async_create_task(
-        hass.config_entries.async_forward_entry_setup(config_entry, "sensor")
-    )
-
-    hass.async_create_task(
-        hass.config_entries.async_forward_entry_setup(config_entry, "binary_sensor")
-    )
-
-    hass.async_create_task(
-        hass.config_entries.async_forward_entry_setup(config_entry, "device_tracker")
-    )
-
-    hass.async_create_task(
-        hass.config_entries.async_forward_entry_setup(config_entry, "switch")
-    )
-
-    hass.async_create_task(
-        hass.config_entries.async_forward_entry_setup(config_entry, "button")
-    )
+    hass.config_entries.async_setup_platforms(config_entry, PLATFORMS)
+    config_entry.async_on_unload(config_entry.add_update_listener(update_listener))
 
     hass.services.async_register(
         DOMAIN, RUN_SCRIPT_COMMAND, controller.run_script, schema=SCRIPT_SCHEMA
