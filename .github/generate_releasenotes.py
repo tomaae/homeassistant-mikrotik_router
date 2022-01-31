@@ -107,9 +107,7 @@ def get_integration_commits(github, skip=True):
                 ath = commit.author
             else:
                 ath = "Unknown"
-            changes += CHANGE.format(
-                line=msg, link=commit.html_url, author=ath
-            )
+            changes += CHANGE.format(line=msg, link=commit.html_url, author=ath)
 
     return changes
 
