@@ -1228,19 +1228,7 @@ class MikrotikControllerData:
     # ---------------------------
     def get_system_health(self):
         """Get routerboard data from Mikrotik"""
-        if self.major_fw_version >= 7:
-            self.data["health7"] = parse_api(
-                data=self.data["health7"],
-                source=self.api.path("/system/health"),
-                key="name",
-                vals=[
-                    {"name": "value", "default": "unknown"},
-                ],
-            )
-            for uid, vals in self.data["health7"].items():
-                self.data["health"][uid] = vals["value"]
-
-        else:
+        if 0 < self.major_fw_version < 7:
             self.data["health"] = parse_api(
                 data=self.data["health"],
                 source=self.api.path("/system/health"),
@@ -1254,6 +1242,17 @@ class MikrotikControllerData:
                     {"name": "fan2-speed", "default": "unknown"},
                 ],
             )
+        elif 0 < self.major_fw_version >= 7:
+            self.data["health7"] = parse_api(
+                data=self.data["health7"],
+                source=self.api.path("/system/health"),
+                key="name",
+                vals=[
+                    {"name": "value", "default": "unknown"},
+                ],
+            )
+            for uid, vals in self.data["health7"].items():
+                self.data["health"][uid] = vals["value"]
 
     # ---------------------------
     #   get_system_resource
