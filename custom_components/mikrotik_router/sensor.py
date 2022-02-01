@@ -285,16 +285,6 @@ class MikrotikControllerSensor(SensorEntity):
             via_device=(DOMAIN, f"{self._ctrl.data['routerboard']['serial-number']}"),
         )
 
-        if (
-            dev_connection != DOMAIN
-            and dev_connection_value
-            != f"{self._ctrl.data['routerboard']['serial-number']}"
-        ):
-            info["via_device"] = (
-                DOMAIN,
-                f"{self._ctrl.data['routerboard']['serial-number']}",
-            )
-
         if "mac-address" in self.entity_description.data_reference:
             dev_name = self._data[self.entity_description.data_name]
             dev_manufacturer = ""
