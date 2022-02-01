@@ -3,6 +3,7 @@
 import logging
 
 from typing import Any, Dict, Optional
+from collections.abc import Mapping
 
 from homeassistant.const import (
     CONF_NAME,
@@ -26,7 +27,6 @@ from .const import DOMAIN, DATA_CLIENT, ATTRIBUTION
 from .sensor_types import (
     MikrotikSensorEntityDescription,
     SENSOR_TYPES,
-    DEVICE_ATTRIBUTES_CLIENT_TRAFFIC,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -131,48 +131,48 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
             )
             new_sensors.append(sensors[item_id])
 
-        # if sensor.startswith("traffic_"):
-        #     if not config_entry.options.get(
-        #         CONF_SENSOR_PORT_TRAFFIC, DEFAULT_SENSOR_PORT_TRAFFIC
-        #     ):
-        #         continue
-        #
-        #     for uid in mikrotik_controller.data["interface"]:
-        #         if mikrotik_controller.data["interface"][uid]["type"] != "bridge":
-        #             item_id = f"{inst}-{sensor}-{mikrotik_controller.data['interface'][uid]['default-name']}"
-        #             _LOGGER.debug("Updating sensor %s", item_id)
-        #             if item_id in sensors:
-        #                 if sensors[item_id].enabled:
-        #                     sensors[item_id].async_schedule_update_ha_state()
-        #                 continue
-        #
-        #             sensors[item_id] = MikrotikControllerTrafficSensor(
-        #                 mikrotik_controller=mikrotik_controller,
-        #                 inst=inst,
-        #                 sensor=SENSOR_TYPES[sensor],
-        #                 uid=uid,
-        #             )
-        #             new_sensors.append(sensors[item_id])
-        #
-        # if sensor.startswith("client_traffic_"):
-        #     for uid in mikrotik_controller.data["client_traffic"]:
-        #         item_id = f"{inst}-{sensor}-{mikrotik_controller.data['client_traffic'][uid]['mac-address']}"
-        #         if item_id in sensors:
-        #             if sensors[item_id].enabled:
-        #                 sensors[item_id].async_schedule_update_ha_state()
-        #             continue
-        #
-        #         if (
-        #             SENSOR_TYPES[sensor].data_attribute
-        #             in mikrotik_controller.data["client_traffic"][uid].keys()
-        #         ):
-        #             sensors[item_id] = MikrotikClientTrafficSensor(
-        #                 mikrotik_controller=mikrotik_controller,
-        #                 inst=inst,
-        #                 sensor=SENSOR_TYPES[sensor],
-        #                 uid=uid,
-        #             )
-        #             new_sensors.append(sensors[item_id])
+        if sensor.startswith("traffic_"):
+            if not config_entry.options.get(
+                CONF_SENSOR_PORT_TRAFFIC, DEFAULT_SENSOR_PORT_TRAFFIC
+            ):
+                continue
+
+            for uid in mikrotik_controller.data["interface"]:
+                if mikrotik_controller.data["interface"][uid]["type"] != "bridge":
+                    item_id = f"{inst}-{sensor}-{mikrotik_controller.data['interface'][uid]['default-name']}"
+                    _LOGGER.debug("Updating sensor %s", item_id)
+                    if item_id in sensors:
+                        if sensors[item_id].enabled:
+                            sensors[item_id].async_schedule_update_ha_state()
+                        continue
+
+                    sensors[item_id] = MikrotikControllerSensor(
+                        inst=inst,
+                        mikrotik_controller=mikrotik_controller,
+                        uid=uid,
+                        entity_description=SENSOR_TYPES[sensor],
+                    )
+                    new_sensors.append(sensors[item_id])
+
+        if sensor.startswith("client_traffic_"):
+            for uid in mikrotik_controller.data["client_traffic"]:
+                item_id = f"{inst}-{sensor}-{mikrotik_controller.data['client_traffic'][uid]['mac-address']}"
+                if item_id in sensors:
+                    if sensors[item_id].enabled:
+                        sensors[item_id].async_schedule_update_ha_state()
+                    continue
+
+                if (
+                    SENSOR_TYPES[sensor].data_attribute
+                    in mikrotik_controller.data["client_traffic"][uid].keys()
+                ):
+                    sensors[item_id] = MikrotikClientTrafficSensor(
+                        inst=inst,
+                        mikrotik_controller=mikrotik_controller,
+                        uid=uid,
+                        entity_description=SENSOR_TYPES[sensor],
+                    )
+                    new_sensors.append(sensors[item_id])
 
     if new_sensors:
         async_add_entities(new_sensors, True)
@@ -192,8 +192,8 @@ class MikrotikControllerSensor(SensorEntity):
         entity_description: MikrotikSensorEntityDescription,
     ):
         """Initialize."""
-        self._inst = inst
         self.entity_description = entity_description
+        self._inst = inst
         self._ctrl = mikrotik_controller
         self._attr_extra_state_attributes = {ATTR_ATTRIBUTION: ATTRIBUTION}
         self._uid = uid
@@ -208,7 +208,10 @@ class MikrotikControllerSensor(SensorEntity):
     def name(self) -> str:
         """Return the name."""
         if self._uid:
-            return f"{self._inst} {self._data[self.entity_description.data_reference]}"
+            if self.entity_description.name:
+                return f"{self._inst} {self._data[self.entity_description.data_name]} {self.entity_description.name}"
+
+            return f"{self._inst} {self._data[self.entity_description.data_name]}"
         else:
             return f"{self._inst} {self.entity_description.name}"
 
@@ -229,6 +232,20 @@ class MikrotikControllerSensor(SensorEntity):
             return "unknown"
 
     @property
+    def native_unit_of_measurement(self):
+        """Return the unit the value is expressed in."""
+        if self.entity_description.native_unit_of_measurement:
+            if self.entity_description.native_unit_of_measurement.startswith("data__"):
+                uom = self.entity_description.native_unit_of_measurement[6:]
+                if uom in self._data:
+                    uom = self._data[uom]
+                    return uom
+
+            return self.entity_description.native_unit_of_measurement
+
+        return None
+
+    @property
     def available(self) -> bool:
         """Return if controller is available."""
         return self._ctrl.connected()
@@ -236,14 +253,31 @@ class MikrotikControllerSensor(SensorEntity):
     @property
     def device_info(self) -> DeviceInfo:
         """Return a description for device registry."""
-        di_domain = self.entity_description.data_reference
+        dev_connection = DOMAIN
+        dev_connection_value = self.entity_description.data_reference
+        dev_name = self.entity_description.ha_group
         if self.entity_description.ha_group == "System":
-            self.entity_description.ha_group = self._ctrl.data["resource"]["board-name"]
-            di_domain = self._ctrl.data["routerboard"]["serial-number"]
+            dev_name = self._ctrl.data["resource"]["board-name"]
+            dev_connection_value = self._ctrl.data["routerboard"]["serial-number"]
+
+        if self.entity_description.ha_group.startswith("data__"):
+            dev_name = self.entity_description.ha_group[6:]
+            if dev_name in self._data:
+                dev_name = self._data[dev_name]
+                dev_connection_value = dev_name
+
+        if self.entity_description.ha_connection:
+            dev_connection = self.entity_description.ha_connection
+
+        if self.entity_description.ha_connection_value:
+            dev_connection_value = self.entity_description.ha_connection_value
+            if dev_connection_value.startswith("data__"):
+                dev_connection_value = dev_connection_value[6:]
+                dev_connection_value = self._data[dev_connection_value]
 
         info = DeviceInfo(
-            connections={(DOMAIN, f"{di_domain}")},
-            name=f"{self._inst} {self.entity_description.ha_group}",
+            connections={(dev_connection, f"{dev_connection_value}")},
+            default_name=f"{self._inst} {dev_name}",
             model=f"{self._ctrl.data['resource']['board-name']}",
             manufacturer=f"{self._ctrl.data['resource']['platform']}",
             sw_version=f"{self._ctrl.data['resource']['version']}",
@@ -251,52 +285,34 @@ class MikrotikControllerSensor(SensorEntity):
             via_device=(DOMAIN, f"{self._ctrl.data['routerboard']['serial-number']}"),
         )
 
+        if "mac-address" in self.entity_description.data_reference:
+            info = DeviceInfo(
+                connections={(dev_connection, f"{dev_connection_value}")},
+                default_name=f"{self._data[self.entity_description.data_name]}",
+                via_device=(
+                    DOMAIN,
+                    f"{self._ctrl.data['routerboard']['serial-number']}",
+                ),
+            )
+
+            if "manufacturer" in self._data and self._data["manufacturer"] != "":
+                info["manufacturer"] = self._data["manufacturer"]
+
         return info
+
+    @property
+    def extra_state_attributes(self) -> Mapping[str, Any]:
+        """Return the state attributes."""
+        attributes = super().extra_state_attributes
+        for variable in self.entity_description.data_attributes_list:
+            if variable in self._data:
+                attributes[format_attribute(variable)] = self._data[variable]
+
+        return attributes
 
     async def async_added_to_hass(self):
         """Run when entity about to be added to hass."""
-        _LOGGER.debug("New sensor %s (%s)", self._inst, self.entity_description.name)
-
-
-# ---------------------------
-#   MikrotikControllerTrafficSensor
-# ---------------------------
-class MikrotikControllerTrafficSensor(MikrotikControllerSensor):
-    """Define a traffic sensor."""
-
-    def __init__(self, mikrotik_controller, inst, sensor, uid):
-        """Initialize."""
-        super().__init__(mikrotik_controller, inst, sensor)
-        if uid:
-            self._uid = uid
-            self._data = mikrotik_controller.data[sensor.data_path][uid]
-
-    @property
-    def name(self) -> str:
-        """Return the name."""
-        return f"{self._inst} {self._data['name']} {self.entity_description.name}"
-
-    @property
-    def unique_id(self) -> str:
-        """Return a unique id for this entity."""
-        return f"{self._inst.lower()}-{self.entity_description.lower()}-{self._data['default-name'].lower()}"
-
-    @property
-    def state_class(self) -> str:
-        """Return the state_class"""
-        return f"measurement"
-
-    @property
-    def device_info(self) -> Dict[str, Any]:
-        """Return a description for device registry."""
-        info = {
-            "connections": {(CONNECTION_NETWORK_MAC, self._data["port-mac-address"])},
-            "manufacturer": self._ctrl.data["resource"]["platform"],
-            "model": self._ctrl.data["resource"]["board-name"],
-            "name": f"{self._inst} {self._data['default-name']}",
-        }
-
-        return info
+        _LOGGER.debug("New sensor %s (%s)", self._inst, self.unique_id)
 
 
 # ---------------------------
@@ -305,28 +321,17 @@ class MikrotikControllerTrafficSensor(MikrotikControllerSensor):
 class MikrotikClientTrafficSensor(MikrotikControllerSensor):
     """Define an Mikrotik MikrotikClientTrafficSensor sensor."""
 
-    def __init__(self, mikrotik_controller, inst, sensor, uid):
-        """Initialize."""
-        super().__init__(mikrotik_controller, inst, sensor)
-        self._uid = uid
-        self._data = mikrotik_controller.data[sensor.data_path][uid]
-
     @property
     def name(self) -> str:
         """Return the name."""
-        return f"{self._data['host-name']} {self.entity_description.name}"
-
-    @property
-    def unique_id(self) -> str:
-        """Return a unique id for this entity."""
-        return f"{self._inst.lower()}-{self.entity_description.lower()}-{self._data['mac-address'].lower()}"
+        return f"{self._data[self.entity_description.data_name]} {self.entity_description.name}"
 
     @property
     def available(self) -> bool:
         """Return if controller and accounting feature in Mikrotik is available.
         Additional check for lan-tx/rx sensors
         """
-        if self._attr in ["lan-tx", "lan-rx"]:
+        if self.entity_description.data_attribute in ["lan-tx", "lan-rx"]:
             return (
                 self._ctrl.connected()
                 and self._data["available"]
@@ -334,25 +339,3 @@ class MikrotikClientTrafficSensor(MikrotikControllerSensor):
             )
         else:
             return self._ctrl.connected() and self._data["available"]
-
-    @property
-    def device_info(self) -> Dict[str, Any]:
-        """Return a description for device registry."""
-        info = {
-            "connections": {(CONNECTION_NETWORK_MAC, self._data["mac-address"])},
-            "default_name": self._data["host-name"],
-        }
-        if "manufacturer" in self._data and self._data["manufacturer"] != "":
-            info["manufacturer"] = self._data["manufacturer"]
-
-        return info
-
-    @property
-    def extra_state_attributes(self) -> Dict[str, Any]:
-        """Return the state attributes."""
-        attributes = self._attrs
-        for variable in DEVICE_ATTRIBUTES_CLIENT_TRAFFIC:
-            if variable in self._data:
-                attributes[format_attribute(variable)] = self._data[variable]
-
-        return attributes
