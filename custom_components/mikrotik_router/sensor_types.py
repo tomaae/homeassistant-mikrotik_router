@@ -1,5 +1,7 @@
 """Definitions for Mikrotik Router sensor entities."""
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import List
+from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.entity import EntityCategory, DeviceInfo
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -12,27 +14,25 @@ from homeassistant.const import (
     POWER_WATT,
     PERCENTAGE,
 )
+from .const import DOMAIN
+
+
+DEVICE_ATTRIBUTES_CLIENT_TRAFFIC = ["address", "mac-address", "host-name"]
 
 
 @dataclass
-class MikrotikSensorEntityDescriptionAdd:
-    """Required values when describing secondary sensor attributes."""
-
-    ha_group: str
-    data_path: str
-    data_attribute: str
-    data_name: str
-    data_uid: str
-    data_reference: str
-    data_attributes_list: []
-
-
-@dataclass
-class MikrotikSensorEntityDescription(
-    SensorEntityDescription,
-    MikrotikSensorEntityDescriptionAdd,
-):
+class MikrotikSensorEntityDescription(SensorEntityDescription):
     """Class describing mikrotik entities."""
+
+    ha_group: str = ""
+    ha_connection: str = ""
+    ha_connection_value: str = ""
+    data_path: str = ""
+    data_attribute: str = ""
+    data_name: str = ""
+    data_uid: str = ""
+    data_reference: str = ""
+    data_attributes_list: List = field(default_factory=lambda: [])
 
 
 SENSOR_TYPES = {
@@ -50,7 +50,6 @@ SENSOR_TYPES = {
         data_name="",
         data_uid="",
         data_reference="",
-        data_attributes_list=None,
     ),
     "system_voltage": MikrotikSensorEntityDescription(
         key="system_voltage",
@@ -66,7 +65,6 @@ SENSOR_TYPES = {
         data_name="",
         data_uid="",
         data_reference="",
-        data_attributes_list=None,
     ),
     "system_cpu-temperature": MikrotikSensorEntityDescription(
         key="system_cpu-temperature",
@@ -82,7 +80,6 @@ SENSOR_TYPES = {
         data_name="",
         data_uid="",
         data_reference="",
-        data_attributes_list=None,
     ),
     "system_board-temperature1": MikrotikSensorEntityDescription(
         key="system_board-temperature1",
@@ -98,7 +95,6 @@ SENSOR_TYPES = {
         data_name="",
         data_uid="",
         data_reference="",
-        data_attributes_list=None,
     ),
     "system_power-consumption": MikrotikSensorEntityDescription(
         key="system_power-consumption",
@@ -114,7 +110,6 @@ SENSOR_TYPES = {
         data_name="",
         data_uid="",
         data_reference="",
-        data_attributes_list=None,
     ),
     "system_fan1-speed": MikrotikSensorEntityDescription(
         key="system_fan1-speed",
@@ -130,7 +125,6 @@ SENSOR_TYPES = {
         data_name="",
         data_uid="",
         data_reference="",
-        data_attributes_list=None,
     ),
     "system_fan2-speed": MikrotikSensorEntityDescription(
         key="system_fan2-speed",
@@ -146,7 +140,6 @@ SENSOR_TYPES = {
         data_name="",
         data_uid="",
         data_reference="",
-        data_attributes_list=None,
     ),
     "system_uptime": MikrotikSensorEntityDescription(
         key="system_uptime",
@@ -162,7 +155,6 @@ SENSOR_TYPES = {
         data_name="",
         data_uid="",
         data_reference="",
-        data_attributes_list=None,
     ),
     "system_cpu-load": MikrotikSensorEntityDescription(
         key="system_cpu-load",
@@ -178,7 +170,6 @@ SENSOR_TYPES = {
         data_name="",
         data_uid="",
         data_reference="",
-        data_attributes_list=None,
     ),
     "system_memory-usage": MikrotikSensorEntityDescription(
         key="system_memory-usage",
@@ -194,7 +185,6 @@ SENSOR_TYPES = {
         data_name="",
         data_uid="",
         data_reference="",
-        data_attributes_list=None,
     ),
     "system_hdd-usage": MikrotikSensorEntityDescription(
         key="system_hdd-usage",
@@ -210,103 +200,112 @@ SENSOR_TYPES = {
         data_name="",
         data_uid="",
         data_reference="",
-        data_attributes_list=None,
     ),
     "traffic_tx": MikrotikSensorEntityDescription(
         key="traffic_tx",
         name="TX",
         icon="mdi:upload-network-outline",
-        native_unit_of_measurement="ps",
+        native_unit_of_measurement="data__tx-bits-per-second-attr",
         device_class=None,
-        state_class=None,
+        state_class=SensorStateClass.MEASUREMENT,
         entity_category=None,
-        ha_group="",
+        ha_group="data__default-name",
+        ha_connection=CONNECTION_NETWORK_MAC,
+        ha_connection_value="data__port-mac-address",
         data_path="interface",
         data_attribute="tx-bits-per-second",
-        data_name="",
+        data_name="name",
         data_uid="",
-        data_reference="",
-        data_attributes_list=None,
+        data_reference="default-name",
     ),
     "traffic_rx": MikrotikSensorEntityDescription(
         key="traffic_rx",
         name="RX",
         icon="mdi:download-network-outline",
-        native_unit_of_measurement="ps",
+        native_unit_of_measurement="data__rx-bits-per-second-attr",
         device_class=None,
-        state_class=None,
+        state_class=SensorStateClass.MEASUREMENT,
         entity_category=None,
-        ha_group="",
+        ha_group="data__default-name",
+        ha_connection=CONNECTION_NETWORK_MAC,
+        ha_connection_value="data__port-mac-address",
         data_path="interface",
         data_attribute="rx-bits-per-second",
-        data_name="",
+        data_name="name",
         data_uid="",
-        data_reference="",
-        data_attributes_list=None,
+        data_reference="default-name",
     ),
     "client_traffic_lan_tx": MikrotikSensorEntityDescription(
         key="client_traffic_lan_tx",
         name="LAN TX",
         icon="mdi:upload-network",
-        native_unit_of_measurement="tx-rx-attr",
+        native_unit_of_measurement="data__tx-rx-attr",
         device_class=None,
-        state_class=None,
+        state_class=SensorStateClass.MEASUREMENT,
         entity_category=None,
         ha_group="",
+        ha_connection=CONNECTION_NETWORK_MAC,
+        ha_connection_value="data__mac-address",
         data_path="client_traffic",
         data_attribute="lan-tx",
-        data_name="",
+        data_name="host-name",
         data_uid="",
-        data_reference="",
-        data_attributes_list=None,
+        data_reference="mac-address",
+        data_attributes_list=DEVICE_ATTRIBUTES_CLIENT_TRAFFIC,
     ),
     "client_traffic_lan_rx": MikrotikSensorEntityDescription(
         key="client_traffic_lan_rx",
         name="LAN RX",
         icon="mdi:download-network",
-        native_unit_of_measurement="tx-rx-attr",
+        native_unit_of_measurement="data__tx-rx-attr",
         device_class=None,
-        state_class=None,
+        state_class=SensorStateClass.MEASUREMENT,
         entity_category=None,
         ha_group="",
+        ha_connection=CONNECTION_NETWORK_MAC,
+        ha_connection_value="data__mac-address",
         data_path="client_traffic",
         data_attribute="lan-rx",
-        data_name="",
+        data_name="host-name",
         data_uid="",
-        data_reference="",
-        data_attributes_list=None,
+        data_reference="mac-address",
+        data_attributes_list=DEVICE_ATTRIBUTES_CLIENT_TRAFFIC,
     ),
     "client_traffic_wan_tx": MikrotikSensorEntityDescription(
         key="client_traffic_wan_tx",
         name="WAN TX",
         icon="mdi:upload-network",
-        native_unit_of_measurement="tx-rx-attr",
+        native_unit_of_measurement="data__tx-rx-attr",
         device_class=None,
-        state_class=None,
+        state_class=SensorStateClass.MEASUREMENT,
         entity_category=None,
         ha_group="",
+        ha_connection=CONNECTION_NETWORK_MAC,
+        ha_connection_value="data__mac-address",
         data_path="client_traffic",
         data_attribute="wan-tx",
-        data_name="",
+        data_name="host-name",
         data_uid="",
-        data_reference="",
-        data_attributes_list=None,
+        data_reference="mac-address",
+        data_attributes_list=DEVICE_ATTRIBUTES_CLIENT_TRAFFIC,
     ),
     "client_traffic_wan_rx": MikrotikSensorEntityDescription(
         key="client_traffic_wan_rx",
         name="WAN RX",
         icon="mdi:download-network",
-        native_unit_of_measurement="tx-rx-attr",
+        native_unit_of_measurement="data__tx-rx-attr",
         device_class=None,
-        state_class=None,
+        state_class=SensorStateClass.MEASUREMENT,
         entity_category=None,
         ha_group="",
+        ha_connection=CONNECTION_NETWORK_MAC,
+        ha_connection_value="data__mac-address",
         data_path="client_traffic",
         data_attribute="wan-rx",
-        data_name="",
+        data_name="host-name",
         data_uid="",
-        data_reference="",
-        data_attributes_list=None,
+        data_reference="mac-address",
+        data_attributes_list=DEVICE_ATTRIBUTES_CLIENT_TRAFFIC,
     ),
     "environment": MikrotikSensorEntityDescription(
         key="environment",
@@ -317,13 +316,12 @@ SENSOR_TYPES = {
         state_class=None,
         entity_category=None,
         ha_group="Environment",
+        ha_connection=DOMAIN,
+        ha_connection_value="Environment",
         data_path="environment",
         data_attribute="value",
         data_name="name",
         data_uid="name",
         data_reference="name",
-        data_attributes_list=None,
     ),
 }
-
-DEVICE_ATTRIBUTES_CLIENT_TRAFFIC = ["address", "mac-address", "host-name"]
