@@ -276,6 +276,7 @@ class MikrotikControllerSensor(SensorEntity):
 
         info = DeviceInfo(
             connections={(dev_connection, f"{dev_connection_value}")},
+            identifiers={(dev_connection, f"{dev_connection_value}")},
             default_name=f"{self._inst} {dev_name}",
             model=f"{self._ctrl.data['resource']['board-name']}",
             manufacturer=f"{self._ctrl.data['resource']['platform']}",
@@ -284,18 +285,34 @@ class MikrotikControllerSensor(SensorEntity):
             via_device=(DOMAIN, f"{self._ctrl.data['routerboard']['serial-number']}"),
         )
 
+        if (
+            dev_connection != DOMAIN
+            and dev_connection_value
+            != f"{self._ctrl.data['routerboard']['serial-number']}"
+        ):
+            info["via_device"] = (
+                DOMAIN,
+                f"{self._ctrl.data['routerboard']['serial-number']}",
+            )
+
         if "mac-address" in self.entity_description.data_reference:
+            dev_name = self._data[self.entity_description.data_name]
+            dev_manufacturer = ""
+            if dev_connection_value in self._ctrl.data["host"]:
+                dev_name = self._ctrl.data["host"][dev_connection_value]["host-name"]
+                dev_manufacturer = self._ctrl.data["host"][dev_connection_value][
+                    "manufacturer"
+                ]
+
             info = DeviceInfo(
                 connections={(dev_connection, f"{dev_connection_value}")},
-                default_name=f"{self._data[self.entity_description.data_name]}",
+                default_name=f"{dev_name}",
+                manufacturer=f"{dev_manufacturer}",
                 via_device=(
                     DOMAIN,
                     f"{self._ctrl.data['routerboard']['serial-number']}",
                 ),
             )
-
-            if "manufacturer" in self._data and self._data["manufacturer"] != "":
-                info["manufacturer"] = self._data["manufacturer"]
 
         return info
 
