@@ -2,7 +2,7 @@
 
 import logging
 
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 from collections.abc import Mapping
 
 from homeassistant.const import (
@@ -20,7 +20,6 @@ from .const import (
 )
 
 from homeassistant.core import callback
-from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 from .const import DOMAIN, DATA_CLIENT, ATTRIBUTION
