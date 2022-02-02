@@ -82,14 +82,47 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
 
     for sensor, sid_func in zip(
         # Sensor type name
-        ["environment"],
+        [
+            "environment",
+            "traffic_rx",
+            "traffic_tx",
+            "client_traffic_lan_rx",
+            "client_traffic_lan_tx",
+            "client_traffic_wan_rx",
+            "client_traffic_wan_tx",
+        ],
         # Entity function
         [
             MikrotikControllerSensor,
+            MikrotikControllerSensor,
+            MikrotikControllerSensor,
+            MikrotikClientTrafficSensor,
+            MikrotikClientTrafficSensor,
+            MikrotikClientTrafficSensor,
+            MikrotikClientTrafficSensor,
         ],
     ):
+        if sensor.startswith("traffic_") and not config_entry.options.get(
+            CONF_SENSOR_PORT_TRAFFIC, DEFAULT_SENSOR_PORT_TRAFFIC
+        ):
+            continue
+
+        uid_sensor = SENSOR_TYPES[sensor]
         for uid in mikrotik_controller.data[SENSOR_TYPES[sensor].data_path]:
-            item_id = f"{inst}-{sensor}-{mikrotik_controller.data[sensor][uid][SENSOR_TYPES[sensor].data_reference]}"
+            uid_data = mikrotik_controller.data[SENSOR_TYPES[sensor].data_path]
+            if (
+                uid_sensor.data_path == "interface"
+                and uid_data[uid]["type"] == "bridge"
+            ):
+                continue
+
+            if (
+                uid_sensor.data_path == "client_traffic"
+                and uid_sensor.data_attribute not in uid_data[uid].keys()
+            ):
+                continue
+
+            item_id = f"{inst}-{sensor}-{uid_data[uid][uid_sensor.data_reference]}"
             _LOGGER.debug("Updating sensor %s", item_id)
             if item_id in sensors:
                 if sensors[item_id].enabled:
@@ -100,17 +133,18 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
                 inst=inst,
                 uid=uid,
                 mikrotik_controller=mikrotik_controller,
-                entity_description=SENSOR_TYPES[sensor],
+                entity_description=uid_sensor,
             )
             new_sensors.append(sensors[item_id])
 
     for sensor in SENSOR_TYPES:
         if sensor.startswith("system_"):
+            uid_sensor = SENSOR_TYPES[sensor]
             if (
-                SENSOR_TYPES[sensor].data_attribute
-                not in mikrotik_controller.data[SENSOR_TYPES[sensor].data_path]
-                or mikrotik_controller.data[SENSOR_TYPES[sensor].data_path][
-                    SENSOR_TYPES[sensor].data_attribute
+                uid_sensor.data_attribute
+                not in mikrotik_controller.data[uid_sensor.data_path]
+                or mikrotik_controller.data[uid_sensor.data_path][
+                    uid_sensor.data_attribute
                 ]
                 == "unknown"
             ):
@@ -126,52 +160,9 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
                 inst=inst,
                 uid="",
                 mikrotik_controller=mikrotik_controller,
-                entity_description=SENSOR_TYPES[sensor],
+                entity_description=uid_sensor,
             )
             new_sensors.append(sensors[item_id])
-
-        if sensor.startswith("traffic_"):
-            if not config_entry.options.get(
-                CONF_SENSOR_PORT_TRAFFIC, DEFAULT_SENSOR_PORT_TRAFFIC
-            ):
-                continue
-
-            for uid in mikrotik_controller.data["interface"]:
-                if mikrotik_controller.data["interface"][uid]["type"] != "bridge":
-                    item_id = f"{inst}-{sensor}-{mikrotik_controller.data['interface'][uid]['default-name']}"
-                    _LOGGER.debug("Updating sensor %s", item_id)
-                    if item_id in sensors:
-                        if sensors[item_id].enabled:
-                            sensors[item_id].async_schedule_update_ha_state()
-                        continue
-
-                    sensors[item_id] = MikrotikControllerSensor(
-                        inst=inst,
-                        mikrotik_controller=mikrotik_controller,
-                        uid=uid,
-                        entity_description=SENSOR_TYPES[sensor],
-                    )
-                    new_sensors.append(sensors[item_id])
-
-        if sensor.startswith("client_traffic_"):
-            for uid in mikrotik_controller.data["client_traffic"]:
-                item_id = f"{inst}-{sensor}-{mikrotik_controller.data['client_traffic'][uid]['mac-address']}"
-                if item_id in sensors:
-                    if sensors[item_id].enabled:
-                        sensors[item_id].async_schedule_update_ha_state()
-                    continue
-
-                if (
-                    SENSOR_TYPES[sensor].data_attribute
-                    in mikrotik_controller.data["client_traffic"][uid].keys()
-                ):
-                    sensors[item_id] = MikrotikClientTrafficSensor(
-                        inst=inst,
-                        mikrotik_controller=mikrotik_controller,
-                        uid=uid,
-                        entity_description=SENSOR_TYPES[sensor],
-                    )
-                    new_sensors.append(sensors[item_id])
 
     if new_sensors:
         async_add_entities(new_sensors, True)
