@@ -15,7 +15,7 @@ from homeassistant.core import callback
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.util.dt import get_age, utcnow
-from .helper import format_attribute
+from .helper import format_attribute, format_value
 from .const import (
     DOMAIN,
     DATA_CLIENT,
@@ -36,18 +36,6 @@ DEVICE_ATTRIBUTES_HOST = [
     "source",
     "last-seen",
 ]
-
-
-# ---------------------------
-#   format_value
-# ---------------------------
-def format_value(res):
-    res = res.replace("dhcp", "DHCP")
-    res = res.replace("dns", "DNS")
-    res = res.replace("capsman", "CAPsMAN")
-    res = res.replace("wireless", "Wireless")
-    res = res.replace("restored", "Restored")
-    return res
 
 
 # ---------------------------

@@ -2,6 +2,7 @@
 
 import logging
 from typing import Any, Dict, Optional
+
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
@@ -113,18 +114,6 @@ DEVICE_ATTRIBUTES_PPP_SECRET = [
     "caller-id",
     "encoding",
 ]
-
-
-# ---------------------------
-#   format_value
-# ---------------------------
-def format_value(res):
-    res = res.replace("dhcp", "DHCP")
-    res = res.replace("dns", "DNS")
-    res = res.replace("capsman", "CAPsMAN")
-    res = res.replace("wireless", "Wireless")
-    res = res.replace("restored", "Restored")
-    return res
 
 
 # ---------------------------
