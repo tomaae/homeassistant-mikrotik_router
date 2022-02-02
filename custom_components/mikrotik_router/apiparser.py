@@ -1,4 +1,4 @@
-"""Helper functions for Mikrotik Router."""
+"""API parser functions for Mikrotik Router."""
 
 import logging
 
