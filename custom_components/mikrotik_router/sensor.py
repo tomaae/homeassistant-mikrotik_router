@@ -1,50 +1,31 @@
 """Implementation of Mikrotik Router sensor entities."""
 
 import logging
-
 from typing import Any, Optional
 from collections.abc import Mapping
-
 from homeassistant.const import (
     CONF_NAME,
     CONF_HOST,
     ATTR_ATTRIBUTION,
 )
-
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.components.sensor import SensorEntity
-
+from homeassistant.core import callback
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
+from .helper import format_attribute
 from .const import (
     CONF_SENSOR_PORT_TRAFFIC,
     DEFAULT_SENSOR_PORT_TRAFFIC,
+    DOMAIN,
+    DATA_CLIENT,
+    ATTRIBUTION,
 )
-
-from homeassistant.core import callback
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
-
-from .const import DOMAIN, DATA_CLIENT, ATTRIBUTION
 from .sensor_types import (
     MikrotikSensorEntityDescription,
     SENSOR_TYPES,
 )
 
 _LOGGER = logging.getLogger(__name__)
-
-
-# ---------------------------
-#   format_attribute
-# ---------------------------
-def format_attribute(attr):
-    res = attr.replace("-", " ")
-    res = res.capitalize()
-    res = res.replace(" ip ", " IP ")
-    res = res.replace(" mac ", " MAC ")
-    res = res.replace(" mtu", " MTU")
-    res = res.replace("Sfp", "SFP")
-    res = res.replace("Poe", "POE")
-    res = res.replace(" tx", " TX")
-    res = res.replace(" rx", " RX")
-    return res
 
 
 # ---------------------------

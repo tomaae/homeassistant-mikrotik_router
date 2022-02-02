@@ -2,7 +2,6 @@
 
 import logging
 from typing import Any, Dict, Optional
-
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
@@ -17,7 +16,7 @@ from homeassistant.const import (
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
-
+from .helper import format_attribute
 from .const import (
     DOMAIN,
     DATA_CLIENT,
@@ -114,22 +113,6 @@ DEVICE_ATTRIBUTES_PPP_SECRET = [
     "caller-id",
     "encoding",
 ]
-
-
-# ---------------------------
-#   format_attribute
-# ---------------------------
-def format_attribute(attr):
-    res = attr.replace("-", " ")
-    res = res.capitalize()
-    res = res.replace(" ip ", " IP ")
-    res = res.replace(" mac ", " MAC ")
-    res = res.replace(" mtu", " MTU")
-    res = res.replace("Sfp", "SFP")
-    res = res.replace("Poe", "POE")
-    res = res.replace(" tx", " TX")
-    res = res.replace(" rx", " RX")
-    return res
 
 
 # ---------------------------

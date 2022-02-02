@@ -2,13 +2,12 @@
 
 import logging
 from typing import Any, Dict
-
 from homeassistant.components.button import ButtonEntity
 from homeassistant.const import CONF_NAME, ATTR_ATTRIBUTION
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.restore_state import RestoreEntity
-
+from .helper import format_attribute
 from .const import DOMAIN, DATA_CLIENT, ATTRIBUTION
 
 _LOGGER = logging.getLogger(__name__)
@@ -17,22 +16,6 @@ DEVICE_ATTRIBUTES_SCRIPT = [
     "last-started",
     "run-count",
 ]
-
-
-# ---------------------------
-#   format_attribute
-# ---------------------------
-def format_attribute(attr):
-    res = attr.replace("-", " ")
-    res = res.capitalize()
-    res = res.replace(" ip ", " IP ")
-    res = res.replace(" mac ", " MAC ")
-    res = res.replace(" mtu", " MTU")
-    res = res.replace("Sfp", "SFP")
-    res = res.replace("Poe", "POE")
-    res = res.replace(" tx", " TX")
-    res = res.replace(" rx", " RX")
-    return res
 
 
 # ---------------------------

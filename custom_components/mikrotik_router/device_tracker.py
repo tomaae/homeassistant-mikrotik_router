@@ -15,7 +15,7 @@ from homeassistant.core import callback
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.util.dt import get_age, utcnow
-
+from .helper import format_attribute
 from .const import (
     DOMAIN,
     DATA_CLIENT,
@@ -36,22 +36,6 @@ DEVICE_ATTRIBUTES_HOST = [
     "source",
     "last-seen",
 ]
-
-
-# ---------------------------
-#   format_attribute
-# ---------------------------
-def format_attribute(attr):
-    res = attr.replace("-", " ")
-    res = res.capitalize()
-    res = res.replace(" ip ", " IP ")
-    res = res.replace(" mac ", " MAC ")
-    res = res.replace(" mtu", " MTU")
-    res = res.replace("Sfp", "SFP")
-    res = res.replace("Poe", "POE")
-    res = res.replace(" tx", " TX")
-    res = res.replace(" rx", " RX")
-    return res
 
 
 # ---------------------------

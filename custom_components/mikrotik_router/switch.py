@@ -9,7 +9,7 @@ from homeassistant.core import callback
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.restore_state import RestoreEntity
-
+from .helper import format_attribute
 from .const import DOMAIN, DATA_CLIENT, ATTRIBUTION
 
 _LOGGER = logging.getLogger(__name__)
@@ -149,22 +149,6 @@ DEVICE_ATTRIBUTES_QUEUE = [
     "parent",
     "comment",
 ]
-
-
-# ---------------------------
-#   format_attribute
-# ---------------------------
-def format_attribute(attr):
-    res = attr.replace("-", " ")
-    res = res.capitalize()
-    res = res.replace(" ip ", " IP ")
-    res = res.replace(" mac ", " MAC ")
-    res = res.replace(" mtu", " MTU")
-    res = res.replace("Sfp", "SFP")
-    res = res.replace("Poe", "POE")
-    res = res.replace(" tx", " TX")
-    res = res.replace(" rx", " RX")
-    return res
 
 
 # ---------------------------
