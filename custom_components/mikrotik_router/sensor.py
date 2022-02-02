@@ -81,15 +81,15 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
     new_sensors = []
 
     for sensor, sid_func in zip(
-        # Data point name
+        # Sensor type name
         ["environment"],
-        # Switch function
+        # Entity function
         [
             MikrotikControllerSensor,
         ],
     ):
         for uid in mikrotik_controller.data[SENSOR_TYPES[sensor].data_path]:
-            item_id = f"{inst}-{sensor}-{mikrotik_controller.data[sensor][uid][SENSOR_TYPES[sensor].data_uid]}"
+            item_id = f"{inst}-{sensor}-{mikrotik_controller.data[sensor][uid][SENSOR_TYPES[sensor].data_reference]}"
             _LOGGER.debug("Updating sensor %s", item_id)
             if item_id in sensors:
                 if sensors[item_id].enabled:
