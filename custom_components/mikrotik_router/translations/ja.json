@@ -30,7 +30,8 @@
                     "scan_interval": "スキャン間隔（HAの再起動が必要）",
                     "track_iface_clients": "クライアントのMACとインターフェイスのIPを表示します",
                     "unit_of_measurement": "測定単位",
-                    "track_network_hosts_timeout": "ネットワーク デバイスのタイムアウト（秒）をトラッキングします"
+                    "track_network_hosts_timeout": "ネットワーク デバイスのタイムアウト（秒）をトラッキングします",
+                    "zone": "Zone for device tracker"
                 },
                 "title": "基本オプション"
             },

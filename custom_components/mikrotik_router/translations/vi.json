@@ -30,7 +30,8 @@
                     "scan_interval": "Khoảng thời gian quét (yêu cầu khởi động lại HA)",
                     "track_iface_clients": "Hiển thị MAC và IP của máy khách trên giao diện",
                     "unit_of_measurement": "Đơn vị đo",
-                    "track_network_hosts_timeout": "Theo dõi thời gian chờ thiết bị mạng (giây)"
+                    "track_network_hosts_timeout": "Theo dõi thời gian chờ thiết bị mạng (giây)",
+                    "zone": "Zone for device tracker"
                 },
                 "title": "Tùy chọn cơ bản"
             },

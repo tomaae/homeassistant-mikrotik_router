@@ -30,7 +30,8 @@
                     "scan_interval": "Intervalle d'analyse (nécessite le redémarrage HA)",
                     "track_iface_clients": "Afficher l'IP et le MAC du client sur les interfaces",
                     "unit_of_measurement": "Unité de mesure",
-                    "track_network_hosts_timeout": "Suivre l'expiration des appareils du réseau (secondes)"
+                    "track_network_hosts_timeout": "Suivre l'expiration des appareils du réseau (secondes)",
+                    "zone": "Zone for device tracker"
                 },
                 "title": "Options de base"
             },

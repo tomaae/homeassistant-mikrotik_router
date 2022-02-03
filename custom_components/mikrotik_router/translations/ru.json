@@ -30,7 +30,8 @@
                     "scan_interval": "Период сканирования (требуется перезагрузка HA)",
                     "track_iface_clients": "Показывать в интерфейсе MAC и IP клиентов",
                     "unit_of_measurement": "Единицы измерения",
-                    "track_network_hosts_timeout": "Таймаут отслеживания сетевых устройств (секунд)"
+                    "track_network_hosts_timeout": "Таймаут отслеживания сетевых устройств (секунд)",
+                    "zone": "Zone for device tracker"
                 },
                 "title": "Базовые параметры"
             },

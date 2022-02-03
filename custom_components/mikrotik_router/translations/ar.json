@@ -30,7 +30,8 @@
                     "scan_interval": "الفاصل الزمني للمسح الضوئي (يتطلب إعادة تشغيل HA)",
                     "track_iface_clients": "إظهار  عنوان التحكّم في الوسائط (MAC)  و بروتوكول الإنترنت (IP) للعميل على الواجهات",
                     "unit_of_measurement": "وحدة قياس",
-                    "track_network_hosts_timeout": "مهلة تتبّع أجهزة الشبكة (بالثواني)"
+                    "track_network_hosts_timeout": "مهلة تتبّع أجهزة الشبكة (بالثواني)",
+                    "zone": "Zone for device tracker"
                 },
                 "title": "الخيارات الأساسية"
             },

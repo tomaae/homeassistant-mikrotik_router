@@ -30,7 +30,8 @@
                     "scan_interval": "स्कैन अन्तराल (HA रिस्टार्ट आवश्यक है)",
                     "track_iface_clients": "ग्राहक का MAC और IP इन्टरफ़ेस पर दिखाएं",
                     "unit_of_measurement": "माप का युनीट",
-                    "track_network_hosts_timeout": "नेटवर्क डिवाइस ट्रैक टाइम आउट (सेकन्ड)"
+                    "track_network_hosts_timeout": "नेटवर्क डिवाइस ट्रैक टाइम आउट (सेकन्ड)",
+                    "zone": "Zone for device tracker"
                 },
                 "title": "बेसिक विकल्प"
             },

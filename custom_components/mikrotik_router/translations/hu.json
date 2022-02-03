@@ -30,7 +30,8 @@
                     "scan_interval": "Felderítési időköz (HA újraindítása szükséges)",
                     "track_iface_clients": "Ügyfél MAC- és IP-címének mutatása az interfészeken",
                     "unit_of_measurement": "Mértékegység",
-                    "track_network_hosts_timeout": "Hálózati eszközök követésének időtúllépése (másodperc)"
+                    "track_network_hosts_timeout": "Hálózati eszközök követésének időtúllépése (másodperc)",
+                    "zone": "Zone for device tracker"
                 },
                 "title": "Alapbeállítások"
             },

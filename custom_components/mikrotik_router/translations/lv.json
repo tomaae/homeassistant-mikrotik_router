@@ -30,7 +30,8 @@
                     "scan_interval": "Skenēšanas periods (nepieciešama HA restartēšana)",
                     "track_iface_clients": "Rādīt klienta MAC un IP interfeisā",
                     "unit_of_measurement": "Mērvienības",
-                    "track_network_hosts_timeout": "Tīkla ierīces uzraudzības noilgums (sekundēs)"
+                    "track_network_hosts_timeout": "Tīkla ierīces uzraudzības noilgums (sekundēs)",
+                    "zone": "Zone for device tracker"
                 },
                 "title": "Pamata parametri"
             },

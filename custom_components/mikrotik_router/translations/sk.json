@@ -30,7 +30,8 @@
                     "scan_interval": "Interval skenovania (vyžaduje sa reštart HA)",
                     "track_iface_clients": "Zobraziť klientske MAC a IP na rozhraniach",
                     "unit_of_measurement": "Merná jednotka",
-                    "track_network_hosts_timeout": "Časový limit sledovania sieťových zariadení (sekundy)"
+                    "track_network_hosts_timeout": "Časový limit sledovania sieťových zariadení (sekundy)",
+                    "zone": "Zone for device tracker"
                 },
                 "title": "Základné možnosti"
             },
