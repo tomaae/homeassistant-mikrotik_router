@@ -157,17 +157,22 @@ class MikrotikSwitchEntityDescription(SwitchEntityDescription):
     data_attributes_list: List = field(default_factory=lambda: [])
 
 
-SENSOR_TYPES = {
-    "system_temperature": MikrotikSwitchEntityDescription(
-        key="system_temperature",
-        name="Temperature",
-        icon="mdi:thermometer",
+SWITCH_TYPES = {
+    "interface": MikrotikSwitchEntityDescription(
+        key="interface",
+        name="port",
+        icon_enabled="mdi:lan-connect",
+        icon_disabled="mdi:lan-pending",
         entity_category=None,
-        ha_group="System",
-        data_path="health",
+        ha_group="data__default-name",
+        ha_connection=CONNECTION_NETWORK_MAC,
+        ha_connection_value="data__port-mac-address",
+        data_path="interface",
         data_attribute="temperature",
-        data_name="",
-        data_uid="",
-        data_reference="",
+        data_switch_path="/interface",
+        data_name="name",
+        data_uid="name",
+        data_reference="default-name",
+        data_attributes_list=DEVICE_ATTRIBUTES_IFACE,
     ),
 }

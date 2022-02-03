@@ -2,76 +2,24 @@
 
 import logging
 from typing import Any, Dict, Optional
-
+from collections.abc import Mapping
 from homeassistant.components.switch import SwitchEntity
-from homeassistant.const import CONF_NAME, ATTR_ATTRIBUTION
+from homeassistant.const import CONF_NAME, CONF_HOST, ATTR_ATTRIBUTION
 from homeassistant.core import callback
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.restore_state import RestoreEntity
 from .helper import format_attribute
 from .const import DOMAIN, DATA_CLIENT, ATTRIBUTION
+from .switch_types import (
+    MikrotikSwitchEntityDescription,
+    SWITCH_TYPES,
+    DEVICE_ATTRIBUTES_IFACE_ETHER,
+    DEVICE_ATTRIBUTES_IFACE_SFP,
+)
 
 _LOGGER = logging.getLogger(__name__)
-
-DEVICE_ATTRIBUTES_IFACE = [
-    "running",
-    "enabled",
-    "comment",
-    "client-ip-address",
-    "client-mac-address",
-    "port-mac-address",
-    "last-link-down-time",
-    "last-link-up-time",
-    "link-downs",
-    "actual-mtu",
-    "type",
-    "name",
-]
-
-DEVICE_ATTRIBUTES_IFACE_ETHER = [
-    "running",
-    "enabled",
-    "comment",
-    "client-ip-address",
-    "client-mac-address",
-    "port-mac-address",
-    "last-link-down-time",
-    "last-link-up-time",
-    "link-downs",
-    "actual-mtu",
-    "type",
-    "name",
-    "status",
-    "auto-negotiation",
-    "rate",
-    "full-duplex",
-    "default-name",
-    "poe-out",
-]
-
-DEVICE_ATTRIBUTES_IFACE_SFP = [
-    "status",
-    "auto-negotiation",
-    "advertising",
-    "link-partner-advertising",
-    "sfp-temperature",
-    "sfp-supply-voltage",
-    "sfp-module-present",
-    "sfp-tx-bias-current",
-    "sfp-tx-power",
-    "sfp-rx-power",
-    "sfp-rx-loss",
-    "sfp-tx-fault",
-    "sfp-type",
-    "sfp-connector-type",
-    "sfp-vendor-name",
-    "sfp-vendor-part-number",
-    "sfp-vendor-revision",
-    "sfp-vendor-serial",
-    "sfp-manufacturing-date",
-    "eeprom-checksum",
-]
 
 DEVICE_ATTRIBUTES_NAT = [
     "protocol",
@@ -183,96 +131,124 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
     new_switches = []
 
     # Add switches
-    for sid, sid_uid, sid_name, sid_ref, sid_attr, sid_func in zip(
-        # Data point name
+    for switch, sid_func in zip(
+        # Switch type name
         [
             "interface",
-            "nat",
-            "mangle",
-            "filter",
-            "ppp_secret",
-            "queue",
-            "kid-control",
-            "kid-control",
         ],
-        # Data point unique id
-        [
-            "name",
-            "uniq-id",
-            "uniq-id",
-            "uniq-id",
-            "name",
-            "name",
-            "name",
-            "name",
-        ],
-        # Entry Name
-        [
-            "name",
-            "name",
-            "name",
-            "name",
-            "name",
-            "name",
-            "name",
-            "name",
-        ],
-        # Entry Unique id
-        [
-            "port-mac-address",
-            "uniq-id",
-            "uniq-id",
-            "uniq-id",
-            "name",
-            "name",
-            "name",
-            "name",
-        ],
-        # Attr
-        [
-            DEVICE_ATTRIBUTES_IFACE,
-            DEVICE_ATTRIBUTES_NAT,
-            DEVICE_ATTRIBUTES_MANGLE,
-            DEVICE_ATTRIBUTES_FILTER,
-            DEVICE_ATTRIBUTES_PPP_SECRET,
-            DEVICE_ATTRIBUTES_QUEUE,
-            DEVICE_ATTRIBUTES_KIDCONTROL,
-            DEVICE_ATTRIBUTES_KIDCONTROL,
-        ],
-        # Switch function
+        # Entity function
         [
             MikrotikControllerPortSwitch,
-            MikrotikControllerNATSwitch,
-            MikrotikControllerMangleSwitch,
-            MikrotikControllerFilterSwitch,
-            MikrotikControllerPPPSecretSwitch,
-            MikrotikControllerQueueSwitch,
-            MikrotikControllerKidcontrolSwitch,
-            MikrotikControllerKidcontrolPauseSwitch,
         ],
     ):
-        for uid in mikrotik_controller.data[sid]:
-            item_id = f"{inst}-{sid}-{mikrotik_controller.data[sid][uid][sid_uid]}"
-            if sid_func.__name__ == "MikrotikControllerKidcontrolPauseSwitch":
-                item_id = f"{inst}-kid-control-pause-{mikrotik_controller.data[sid][uid][sid_uid]}"
-
-            _LOGGER.debug("Updating switch %s", item_id)
+        uid_switch = SWITCH_TYPES[switch]
+        for uid in mikrotik_controller.data[SWITCH_TYPES[switch].data_path]:
+            uid_data = mikrotik_controller.data[SWITCH_TYPES[switch].data_path]
+            item_id = f"{inst}-{switch}-{uid_data[uid][uid_switch.data_reference]}"
+            _LOGGER.debug("Updating sensor %s", item_id)
             if item_id in switches:
                 if switches[item_id].enabled:
                     switches[item_id].async_schedule_update_ha_state()
                 continue
 
-            # Create new entity
-            sid_data = {
-                "sid": sid,
-                "sid_uid": sid_uid,
-                "sid_name": sid_name,
-                "sid_ref": sid_ref,
-                "sid_attr": sid_attr,
-            }
-            switches[item_id] = sid_func(inst, uid, mikrotik_controller, sid_data)
+            switches[item_id] = sid_func(
+                inst=inst,
+                uid=uid,
+                mikrotik_controller=mikrotik_controller,
+                entity_description=uid_switch,
+            )
             new_switches.append(switches[item_id])
 
+    # for sid, sid_uid, sid_name, sid_ref, sid_attr, sid_func in zip(
+    #     # Data point name
+    #     [
+    #         "interface",
+    #         "nat",
+    #         "mangle",
+    #         "filter",
+    #         "ppp_secret",
+    #         "queue",
+    #         "kid-control",
+    #         "kid-control",
+    #     ],
+    #     # Data point unique id
+    #     [
+    #         "name",
+    #         "uniq-id",
+    #         "uniq-id",
+    #         "uniq-id",
+    #         "name",
+    #         "name",
+    #         "name",
+    #         "name",
+    #     ],
+    #     # Entry Name
+    #     [
+    #         "name",
+    #         "name",
+    #         "name",
+    #         "name",
+    #         "name",
+    #         "name",
+    #         "name",
+    #         "name",
+    #     ],
+    #     # Entry Unique id
+    #     [
+    #         "port-mac-address",
+    #         "uniq-id",
+    #         "uniq-id",
+    #         "uniq-id",
+    #         "name",
+    #         "name",
+    #         "name",
+    #         "name",
+    #     ],
+    #     # Attr
+    #     [
+    #         DEVICE_ATTRIBUTES_IFACE,
+    #         DEVICE_ATTRIBUTES_NAT,
+    #         DEVICE_ATTRIBUTES_MANGLE,
+    #         DEVICE_ATTRIBUTES_FILTER,
+    #         DEVICE_ATTRIBUTES_PPP_SECRET,
+    #         DEVICE_ATTRIBUTES_QUEUE,
+    #         DEVICE_ATTRIBUTES_KIDCONTROL,
+    #         DEVICE_ATTRIBUTES_KIDCONTROL,
+    #     ],
+    #     # Switch function
+    #     [
+    #         MikrotikControllerPortSwitch,
+    #         MikrotikControllerNATSwitch,
+    #         MikrotikControllerMangleSwitch,
+    #         MikrotikControllerFilterSwitch,
+    #         MikrotikControllerPPPSecretSwitch,
+    #         MikrotikControllerQueueSwitch,
+    #         MikrotikControllerKidcontrolSwitch,
+    #         MikrotikControllerKidcontrolPauseSwitch,
+    #     ],
+    # ):
+    #     for uid in mikrotik_controller.data[sid]:
+    #         item_id = f"{inst}-{sid}-{mikrotik_controller.data[sid][uid][sid_uid]}"
+    #         if sid_func.__name__ == "MikrotikControllerKidcontrolPauseSwitch":
+    #             item_id = f"{inst}-kid-control-pause-{mikrotik_controller.data[sid][uid][sid_uid]}"
+    #
+    #         _LOGGER.debug("Updating switch %s", item_id)
+    #         if item_id in switches:
+    #             if switches[item_id].enabled:
+    #                 switches[item_id].async_schedule_update_ha_state()
+    #             continue
+    #
+    #         # Create new entity
+    #         sid_data = {
+    #             "sid": sid,
+    #             "sid_uid": sid_uid,
+    #             "sid_name": sid_name,
+    #             "sid_ref": sid_ref,
+    #             "sid_attr": sid_attr,
+    #         }
+    #         switches[item_id] = sid_func(inst, uid, mikrotik_controller, sid_data)
+    #         new_switches.append(switches[item_id])
+    #
     if new_switches:
         async_add_entities(new_switches)
 
@@ -283,28 +259,18 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
 class MikrotikControllerSwitch(SwitchEntity, RestoreEntity):
     """Representation of a switch."""
 
-    def __init__(self, inst, uid, mikrotik_controller, sid_data):
-        """Initialize."""
-        self._sid_data = sid_data
+    def __init__(
+        self,
+        inst,
+        uid,
+        mikrotik_controller,
+        entity_description: MikrotikSwitchEntityDescription,
+    ):
+        self.entity_description = entity_description
         self._inst = inst
         self._ctrl = mikrotik_controller
-        self._data = mikrotik_controller.data[self._sid_data["sid"]][uid]
-
-        self._attrs = {
-            ATTR_ATTRIBUTION: ATTRIBUTION,
-        }
-
-    async def async_added_to_hass(self):
-        """Run when entity about to be added to hass."""
-        _LOGGER.debug(
-            "New switch %s (%s %s)",
-            self._inst,
-            self._sid_data["sid"],
-            self._data[self._sid_data["sid_uid"]],
-        )
-
-    async def async_update(self):
-        """Synchronize state with controller."""
+        self._attr_extra_state_attributes = {ATTR_ATTRIBUTION: ATTRIBUTION}
+        self._data = mikrotik_controller.data[self.entity_description.data_path][uid]
 
     @property
     def available(self) -> bool:
@@ -314,36 +280,99 @@ class MikrotikControllerSwitch(SwitchEntity, RestoreEntity):
     @property
     def name(self) -> str:
         """Return the name."""
-        return f"{self._inst} {self._sid_data['sid']} {self._data[self._sid_data['sid_name']]}"
+        return f"{self._inst} {self.entity_description.name} {self._data[self.entity_description.data_name]}"
 
     @property
     def unique_id(self) -> str:
         """Return a unique id for this entity."""
-        return f"{self._inst.lower()}-{self._sid_data['sid']}_switch-{self._data[self._sid_data['sid_ref']]}"
+        return f"{self._inst.lower()}-{self.entity_description.key}-{self._data[self.entity_description.data_reference].lower()}"
 
     @property
     def is_on(self) -> bool:
         """Return true if device is on."""
-        return self._data["enabled"]
+        return self._data[self.entity_description.data_is_on]
 
     @property
-    def extra_state_attributes(self) -> Dict[str, Any]:
-        """Return the state attributes."""
-        attributes = self._attrs
+    def icon(self) -> str:
+        """Return the icon."""
+        if self._data[self.entity_description.data_is_on]:
+            return self.entity_description.icon_enabled
+        else:
+            return self.entity_description.icon_disabled
 
-        for variable in self._sid_data["sid_attr"]:
+    @property
+    def extra_state_attributes(self) -> Mapping[str, Any]:
+        """Return the state attributes."""
+        attributes = super().extra_state_attributes
+        for variable in self.entity_description.data_attributes_list:
             if variable in self._data:
                 attributes[format_attribute(variable)] = self._data[variable]
 
         return attributes
 
+    def turn_on(self, **kwargs: Any) -> None:
+        """Required abstract method."""
+        pass
+
     def turn_off(self, **kwargs: Any) -> None:
         """Required abstract method."""
         pass
 
-    def turn_on(self, **kwargs: Any) -> None:
-        """Required abstract method."""
-        pass
+    async def async_turn_on(self) -> None:
+        """Turn on the switch."""
+        path = self.entity_description.data_switch_path
+        param = self.entity_description.data_reference
+        value = self._data[self.entity_description.data_reference]
+        mod_param = self.entity_description.data_switch_parameter
+        self._ctrl.set_value(path, param, value, mod_param, False)
+        await self._ctrl.force_update()
+
+    async def async_turn_off(self) -> None:
+        """Turn off the switch."""
+        path = self.entity_description.data_switch_path
+        param = self.entity_description.data_reference
+        value = self._data[self.entity_description.data_reference]
+        mod_param = self.entity_description.data_switch_parameter
+        self._ctrl.set_value(path, param, value, mod_param, True)
+        await self._ctrl.async_update()
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Return a description for device registry."""
+        dev_connection = DOMAIN
+        dev_connection_value = self.entity_description.data_reference
+        dev_group = self.entity_description.ha_group
+        if self.entity_description.ha_group.startswith("data__"):
+            dev_group = self.entity_description.ha_group[6:]
+            if dev_group in self._data:
+                dev_group = self._data[dev_group]
+                dev_connection_value = dev_group
+
+        if self.entity_description.ha_connection:
+            dev_connection = self.entity_description.ha_connection
+
+        if self.entity_description.ha_connection_value:
+            dev_connection_value = self.entity_description.ha_connection_value
+            if dev_connection_value.startswith("data__"):
+                dev_connection_value = dev_connection_value[6:]
+                dev_connection_value = self._data[dev_connection_value]
+
+        info = DeviceInfo(
+            connections={(dev_connection, f"{dev_connection_value}")},
+            identifiers={(dev_connection, f"{dev_connection_value}")},
+            default_name=f"{self._inst} {dev_group}",
+            model=f"{self._ctrl.data['resource']['board-name']}",
+            manufacturer=f"{self._ctrl.data['resource']['platform']}",
+            sw_version=f"{self._ctrl.data['resource']['version']}",
+            configuration_url=f"http://{self._ctrl.config_entry.data[CONF_HOST]}",
+            via_device=(DOMAIN, f"{self._ctrl.data['routerboard']['serial-number']}"),
+        )
+
+        return info
+
+    async def async_added_to_hass(self):
+        """Run when entity about to be added to hass."""
+        _LOGGER.debug("New switch %s (%s)", self._inst, self.unique_id)
 
 
 # ---------------------------
@@ -352,24 +381,10 @@ class MikrotikControllerSwitch(SwitchEntity, RestoreEntity):
 class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
     """Representation of a network port switch."""
 
-    def __init__(self, inst, uid, mikrotik_controller, sid_data):
-        """Initialize."""
-        super().__init__(inst, uid, mikrotik_controller, sid_data)
-
     @property
-    def name(self) -> str:
-        """Return the name."""
-        return f"{self._inst} port {self._data[self._sid_data['sid_name']]}"
-
-    @property
-    def unique_id(self) -> str:
-        """Return a unique id for this entity."""
-        return f"{self._inst.lower()}-enable_switch-{self._data['port-mac-address']}_{self._data['default-name']}"
-
-    @property
-    def extra_state_attributes(self) -> Dict[str, Any]:
+    def extra_state_attributes(self) -> Mapping[str, Any]:
         """Return the state attributes."""
-        attributes = self._attrs
+        attributes = super().extra_state_attributes
 
         if self._data["type"] == "ether":
             for variable in DEVICE_ATTRIBUTES_IFACE_ETHER:
@@ -381,50 +396,33 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
                     if variable in self._data:
                         attributes[format_attribute(variable)] = self._data[variable]
 
-        else:
-            for variable in self._sid_data["sid_attr"]:
-                if variable in self._data:
-                    attributes[format_attribute(variable)] = self._data[variable]
-
         return attributes
 
     @property
     def icon(self) -> str:
         """Return the icon."""
         if self._data["running"]:
-            icon = "mdi:lan-connect"
+            icon = self.entity_description.icon_enabled
         else:
-            icon = "mdi:lan-pending"
+            icon = self.entity_description.icon_disabled
 
         if not self._data["enabled"]:
             icon = "mdi:lan-disconnect"
 
         return icon
 
-    @property
-    def device_info(self) -> Dict[str, Any]:
-        """Return a description for device registry."""
-        info = {
-            "connections": {(CONNECTION_NETWORK_MAC, self._data["port-mac-address"])},
-            "manufacturer": self._ctrl.data["resource"]["platform"],
-            "model": self._ctrl.data["resource"]["board-name"],
-            "name": f"{self._inst} {self._data['default-name']}",
-        }
-        return info
-
     async def async_turn_on(self) -> Optional[str]:
         """Turn on the switch."""
-        path = "/interface"
-        param = "default-name"
+        path = self.entity_description.data_switch_path
+        param = self.entity_description.data_reference
         if self._data["about"] == "managed by CAPsMAN":
             _LOGGER.error("Unable to enable %s, managed by CAPsMAN", self._data[param])
             return "managed by CAPsMAN"
         if "-" in self._data["port-mac-address"]:
             param = "name"
-        value = self._data[param]
-        mod_param = "disabled"
-        mod_value = False
-        self._ctrl.set_value(path, param, value, mod_param, mod_value)
+        value = self._data[self.entity_description.data_reference]
+        mod_param = self.entity_description.data_switch_parameter
+        self._ctrl.set_value(path, param, value, mod_param, False)
 
         if "poe-out" in self._data and self._data["poe-out"] == "off":
             path = "/interface/ethernet"
@@ -434,17 +432,16 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
 
     async def async_turn_off(self) -> Optional[str]:
         """Turn off the switch."""
-        path = "/interface"
-        param = "default-name"
+        path = self.entity_description.data_switch_path
+        param = self.entity_description.data_reference
         if self._data["about"] == "managed by CAPsMAN":
             _LOGGER.error("Unable to disable %s, managed by CAPsMAN", self._data[param])
             return "managed by CAPsMAN"
         if "-" in self._data["port-mac-address"]:
             param = "name"
-        value = self._data[param]
-        mod_param = "disabled"
-        mod_value = True
-        self._ctrl.set_value(path, param, value, mod_param, mod_value)
+        value = self._data[self.entity_description.data_reference]
+        mod_param = self.entity_description.data_switch_parameter
+        self._ctrl.set_value(path, param, value, mod_param, True)
 
         if "poe-out" in self._data and self._data["poe-out"] == "auto-on":
             path = "/interface/ethernet"
