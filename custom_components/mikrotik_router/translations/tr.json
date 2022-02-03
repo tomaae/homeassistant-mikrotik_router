@@ -30,7 +30,8 @@
                     "scan_interval": "Aralığı tara (HA yeniden başlatma gerektirir)",
                     "track_iface_clients": "Müşteri MAC'ini ve IP'sini arayüzlerde göster",
                     "unit_of_measurement": "Ölçü birimi",
-                    "track_network_hosts_timeout": "Ağ cihazı izleme zaman aşımı (saniyeler)"
+                    "track_network_hosts_timeout": "Ağ cihazı izleme zaman aşımı (saniyeler)",
+                    "zone": "Zone for device tracker"
                 },
                 "title": "Temel seçenekler"
             },

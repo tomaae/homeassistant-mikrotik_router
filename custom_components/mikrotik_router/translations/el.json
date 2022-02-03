@@ -30,7 +30,8 @@
                     "scan_interval": "Διάστημα σάρωσης (απαιτείται επανεκκίνηση του HA)",
                     "track_iface_clients": "Προβολή IP και MAC πελάτη στη διεπαφή",
                     "unit_of_measurement": "Μονάδα μέτρησης",
-                    "track_network_hosts_timeout": "Εξωχρονισμός ανίχνευσης συσκευών διαδικτύου (δευτερόλεπτα)"
+                    "track_network_hosts_timeout": "Εξωχρονισμός ανίχνευσης συσκευών διαδικτύου (δευτερόλεπτα)",
+                    "zone": "Zone for device tracker"
                 },
                 "title": "Βασικές επιογές"
             },

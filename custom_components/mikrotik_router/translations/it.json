@@ -30,7 +30,8 @@
                     "scan_interval": "Intervallo scansione (richiede riavvio HA)",
                     "track_iface_clients": "Mostra client MAC e IP sulle interfacce",
                     "unit_of_measurement": "Unità di misura",
-                    "track_network_hosts_timeout": "Traccia timeout dei dispositivi di rete (secondi)"
+                    "track_network_hosts_timeout": "Traccia timeout dei dispositivi di rete (secondi)",
+                    "zone": "Zone for device tracker"
                 },
                 "title": "Opzioni di base"
             },

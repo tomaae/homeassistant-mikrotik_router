@@ -30,7 +30,8 @@
                     "scan_interval": "Intervalo de verificação (requer reinicialização de HA)",
                     "track_iface_clients": "Mostrar MAC e IP do cliente nas interfaces",
                     "unit_of_measurement": "Unidade de medida",
-                    "track_network_hosts_timeout": "Rastrear o tempo limite dos dispositivos de rede (segundos)"
+                    "track_network_hosts_timeout": "Rastrear o tempo limite dos dispositivos de rede (segundos)",
+                    "zone": "Zone for device tracker"
                 },
                 "title": "Opções básicas"
             },

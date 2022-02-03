@@ -30,7 +30,8 @@
                     "scan_interval": "Częstotliwość skanowania (wymaga ponownego uruchomienia HA)",
                     "track_iface_clients": "Pokaż w interfejsach adres MAC i IP klienta",
                     "unit_of_measurement": "Jednostka miary",
-                    "track_network_hosts_timeout": "Śledź limity czasu dla urządzeń sieciowych (sekundy)"
+                    "track_network_hosts_timeout": "Śledź limity czasu dla urządzeń sieciowych (sekundy)",
+                    "zone": "Zone for device tracker"
                 },
                 "title": "Podstawowe opcje"
             },

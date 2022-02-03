@@ -30,7 +30,8 @@
                     "scan_interval": "Scaninterval (vereist opnieuw opstarten van HA)",
                     "track_iface_clients": "Mac en IP van client weergeven op interfaces",
                     "unit_of_measurement": "Meet eenheid",
-                    "track_network_hosts_timeout": "Volg de time-out van netwerkapparaten (seconden)"
+                    "track_network_hosts_timeout": "Volg de time-out van netwerkapparaten (seconden)",
+                    "zone": "Zone for device tracker"
                 },
                 "title": "Basisopties"
             },
