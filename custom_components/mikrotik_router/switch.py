@@ -7,7 +7,6 @@ from homeassistant.components.switch import SwitchEntity
 from homeassistant.const import CONF_NAME, CONF_HOST, ATTR_ATTRIBUTION
 from homeassistant.core import callback
 from homeassistant.helpers.entity import DeviceInfo
-from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.restore_state import RestoreEntity
 from .helper import format_attribute
