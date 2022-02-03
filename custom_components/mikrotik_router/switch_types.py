@@ -10,8 +10,129 @@ from homeassistant.components.switch import (
 
 from .const import DOMAIN
 
+DEVICE_ATTRIBUTES_IFACE = [
+    "running",
+    "enabled",
+    "comment",
+    "client-ip-address",
+    "client-mac-address",
+    "port-mac-address",
+    "last-link-down-time",
+    "last-link-up-time",
+    "link-downs",
+    "actual-mtu",
+    "type",
+    "name",
+]
 
-DEVICE_ATTRIBUTES_CLIENT_TRAFFIC = ["address", "mac-address", "host-name"]
+DEVICE_ATTRIBUTES_IFACE_ETHER = [
+    "status",
+    "auto-negotiation",
+    "rate",
+    "full-duplex",
+    "default-name",
+    "poe-out",
+]
+
+DEVICE_ATTRIBUTES_IFACE_SFP = [
+    "status",
+    "auto-negotiation",
+    "advertising",
+    "link-partner-advertising",
+    "sfp-temperature",
+    "sfp-supply-voltage",
+    "sfp-module-present",
+    "sfp-tx-bias-current",
+    "sfp-tx-power",
+    "sfp-rx-power",
+    "sfp-rx-loss",
+    "sfp-tx-fault",
+    "sfp-type",
+    "sfp-connector-type",
+    "sfp-vendor-name",
+    "sfp-vendor-part-number",
+    "sfp-vendor-revision",
+    "sfp-vendor-serial",
+    "sfp-manufacturing-date",
+    "eeprom-checksum",
+]
+
+DEVICE_ATTRIBUTES_NAT = [
+    "protocol",
+    "dst-port",
+    "in-interface",
+    "to-addresses",
+    "to-ports",
+    "comment",
+]
+
+DEVICE_ATTRIBUTES_MANGLE = [
+    "chain",
+    "action",
+    "passthrough",
+    "protocol",
+    "src-address",
+    "src-port",
+    "dst-address",
+    "dst-port",
+    "comment",
+]
+
+DEVICE_ATTRIBUTES_FILTER = [
+    "chain",
+    "action",
+    "address-list",
+    "protocol",
+    "layer7-protocol",
+    "tcp-flags",
+    "connection-state",
+    "in-interface",
+    "src-address",
+    "src-port",
+    "out-interface",
+    "dst-address",
+    "dst-port",
+    "comment",
+]
+
+DEVICE_ATTRIBUTES_PPP_SECRET = [
+    "connected",
+    "service",
+    "profile",
+    "comment",
+    "caller-id",
+    "encoding",
+]
+
+DEVICE_ATTRIBUTES_KIDCONTROL = [
+    "rate-limit",
+    "mon",
+    "tue",
+    "wed",
+    "thu",
+    "fri",
+    "sat",
+    "sun",
+]
+
+DEVICE_ATTRIBUTES_QUEUE = [
+    "target",
+    "download-rate",
+    "upload-rate",
+    "download-max-limit",
+    "upload-max-limit",
+    "upload-limit-at",
+    "download-limit-at",
+    "upload-burst-limit",
+    "download-burst-limit",
+    "upload-burst-threshold",
+    "download-burst-threshold",
+    "upload-burst-time",
+    "download-burst-time",
+    "packet-marks",
+    "parent",
+    "comment",
+]
 
 
 @dataclass
