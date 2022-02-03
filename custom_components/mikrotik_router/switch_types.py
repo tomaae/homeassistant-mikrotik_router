@@ -141,11 +141,16 @@ class MikrotikSwitchEntityDescription(SwitchEntityDescription):
 
     device_class: str = SwitchDeviceClass.SWITCH
 
+    icon_enabled: str = ""
+    icon_disabled: str = ""
     ha_group: str = ""
     ha_connection: str = ""
     ha_connection_value: str = ""
     data_path: str = ""
     data_attribute: str = ""
+    data_is_on: str = "enabled"
+    data_switch_path: str = ""
+    data_switch_parameter: str = "disabled"
     data_name: str = ""
     data_uid: str = ""
     data_reference: str = ""
