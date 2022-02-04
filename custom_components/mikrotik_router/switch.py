@@ -1,7 +1,7 @@
 """Support for the Mikrotik Router switches."""
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 from collections.abc import Mapping
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.const import CONF_NAME, CONF_HOST, ATTR_ATTRIBUTION
@@ -95,96 +95,6 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
             )
             new_switches.append(switches[item_id])
 
-    # for sid, sid_uid, sid_name, sid_ref, sid_attr, sid_func in zip(
-    #     # Data point name
-    #     [
-    #         "interface",
-    #         "nat",
-    #         "mangle",
-    #         "filter",
-    #         "ppp_secret",
-    #         "queue",
-    #         "kid-control",
-    #         "kid-control",
-    #     ],
-    #     # Data point unique id
-    #     [
-    #         "name",
-    #         "uniq-id",
-    #         "uniq-id",
-    #         "uniq-id",
-    #         "name",
-    #         "name",
-    #         "name",
-    #         "name",
-    #     ],
-    #     # Entry Name
-    #     [
-    #         "name",
-    #         "name",
-    #         "name",
-    #         "name",
-    #         "name",
-    #         "name",
-    #         "name",
-    #         "name",
-    #     ],
-    #     # Entry Unique id
-    #     [
-    #         "port-mac-address",
-    #         "uniq-id",
-    #         "uniq-id",
-    #         "uniq-id",
-    #         "name",
-    #         "name",
-    #         "name",
-    #         "name",
-    #     ],
-    #     # Attr
-    #     [
-    #         DEVICE_ATTRIBUTES_IFACE,
-    #         DEVICE_ATTRIBUTES_NAT,
-    #         DEVICE_ATTRIBUTES_MANGLE,
-    #         DEVICE_ATTRIBUTES_FILTER,
-    #         DEVICE_ATTRIBUTES_PPP_SECRET,
-    #         DEVICE_ATTRIBUTES_QUEUE,
-    #         DEVICE_ATTRIBUTES_KIDCONTROL,
-    #         DEVICE_ATTRIBUTES_KIDCONTROL,
-    #     ],
-    #     # Switch function
-    #     [
-    #         MikrotikControllerPortSwitch,
-    #         MikrotikControllerNATSwitch,
-    #         MikrotikControllerMangleSwitch,
-    #         MikrotikControllerFilterSwitch,
-    #         MikrotikControllerPPPSecretSwitch,
-    #         MikrotikControllerQueueSwitch,
-    #         MikrotikControllerKidcontrolSwitch,
-    #         MikrotikControllerKidcontrolPauseSwitch,
-    #     ],
-    # ):
-    #     for uid in mikrotik_controller.data[sid]:
-    #         item_id = f"{inst}-{sid}-{mikrotik_controller.data[sid][uid][sid_uid]}"
-    #         if sid_func.__name__ == "MikrotikControllerKidcontrolPauseSwitch":
-    #             item_id = f"{inst}-kid-control-pause-{mikrotik_controller.data[sid][uid][sid_uid]}"
-    #
-    #         _LOGGER.debug("Updating switch %s", item_id)
-    #         if item_id in switches:
-    #             if switches[item_id].enabled:
-    #                 switches[item_id].async_schedule_update_ha_state()
-    #             continue
-    #
-    #         # Create new entity
-    #         sid_data = {
-    #             "sid": sid,
-    #             "sid_uid": sid_uid,
-    #             "sid_name": sid_name,
-    #             "sid_ref": sid_ref,
-    #             "sid_attr": sid_attr,
-    #         }
-    #         switches[item_id] = sid_func(inst, uid, mikrotik_controller, sid_data)
-    #         new_switches.append(switches[item_id])
-    #
     if new_switches:
         async_add_entities(new_switches)
 
