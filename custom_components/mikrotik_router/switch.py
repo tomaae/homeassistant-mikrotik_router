@@ -62,6 +62,8 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
             "filter",
             "ppp_secret",
             "queue",
+            "kidcontrol_enable",
+            "kidcontrol_pause",
         ],
         # Entity function
         [
@@ -71,6 +73,8 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
             MikrotikControllerFilterSwitch,
             MikrotikControllerSwitch,
             MikrotikControllerQueueSwitch,
+            MikrotikControllerSwitch,
+            MikrotikControllerKidcontrolPauseSwitch,
         ],
     ):
         uid_switch = SWITCH_TYPES[switch]
@@ -550,4 +554,29 @@ class MikrotikControllerQueueSwitch(MikrotikControllerSwitch):
 
         mod_param = self.entity_description.data_switch_parameter
         self._ctrl.set_value(path, param, value, mod_param, True)
+        await self._ctrl.async_update()
+
+
+# ---------------------------
+#   MikrotikControllerKidcontrolPauseSwitch
+# ---------------------------
+class MikrotikControllerKidcontrolPauseSwitch(MikrotikControllerSwitch):
+    """Representation of a queue switch."""
+
+    async def async_turn_on(self) -> None:
+        """Turn on the switch."""
+        path = self.entity_description.data_switch_path
+        param = self.entity_description.data_reference
+        value = self._data[self.entity_description.data_reference]
+        command = "resume"
+        self._ctrl.execute(path, command, param, value)
+        await self._ctrl.force_update()
+
+    async def async_turn_off(self) -> None:
+        """Turn off the switch."""
+        path = self.entity_description.data_switch_path
+        param = self.entity_description.data_reference
+        value = self._data[self.entity_description.data_reference]
+        command = "pause"
+        self._ctrl.execute(path, command, param, value)
         await self._ctrl.async_update()
