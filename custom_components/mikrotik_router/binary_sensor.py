@@ -24,7 +24,6 @@ from .const import (
     CONF_SENSOR_PORT_TRACKER,
     DEFAULT_SENSOR_PORT_TRACKER,
 )
-
 from .binary_sensor_types import (
     MikrotikBinarySensorEntityDescription,
     SENSOR_TYPES,
