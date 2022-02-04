@@ -134,11 +134,10 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
         # Switch type name
         [
             "interface",
+            "nat",
         ],
         # Entity function
-        [
-            MikrotikControllerPortSwitch,
-        ],
+        [MikrotikControllerPortSwitch, MikrotikControllerNATSwitch],
     ):
         uid_switch = SWITCH_TYPES[switch]
         for uid in mikrotik_controller.data[SWITCH_TYPES[switch].data_path]:
@@ -460,10 +459,6 @@ class MikrotikControllerPortSwitch(MikrotikControllerSwitch):
 class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
     """Representation of a NAT switch."""
 
-    def __init__(self, inst, uid, mikrotik_controller, sid_data):
-        """Initialize."""
-        super().__init__(inst, uid, mikrotik_controller, sid_data)
-
     @property
     def name(self) -> str:
         """Return the name."""
@@ -472,43 +467,9 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
 
         return f"{self._inst} NAT {self._data['name']}"
 
-    @property
-    def unique_id(self) -> str:
-        """Return a unique id for this entity."""
-        return f"{self._inst.lower()}-enable_nat-{self._data['uniq-id']}"
-
-    @property
-    def icon(self) -> str:
-        """Return the icon."""
-        if not self._data["enabled"]:
-            icon = "mdi:network-off-outline"
-        else:
-            icon = "mdi:network-outline"
-
-        return icon
-
-    @property
-    def device_info(self) -> Dict[str, Any]:
-        """Return a description for device registry."""
-        info = {
-            "identifiers": {
-                (
-                    DOMAIN,
-                    "serial-number",
-                    f"{self._ctrl.data['routerboard']['serial-number']}",
-                    "switch",
-                    "NAT",
-                )
-            },
-            "manufacturer": self._ctrl.data["resource"]["platform"],
-            "model": self._ctrl.data["resource"]["board-name"],
-            "name": f"{self._inst} NAT",
-        }
-        return info
-
     async def async_turn_on(self) -> None:
         """Turn on the switch."""
-        path = "/ip/firewall/nat"
+        path = self.entity_description.data_switch_path
         param = ".id"
         value = None
         for uid in self._ctrl.data["nat"]:
@@ -519,14 +480,13 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
             ):
                 value = self._ctrl.data["nat"][uid][".id"]
 
-        mod_param = "disabled"
-        mod_value = False
-        self._ctrl.set_value(path, param, value, mod_param, mod_value)
+        mod_param = self.entity_description.data_switch_parameter
+        self._ctrl.set_value(path, param, value, mod_param, False)
         await self._ctrl.force_update()
 
     async def async_turn_off(self) -> None:
         """Turn off the switch."""
-        path = "/ip/firewall/nat"
+        path = self.entity_description.data_switch_path
         param = ".id"
         value = None
         for uid in self._ctrl.data["nat"]:
@@ -537,9 +497,8 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
             ):
                 value = self._ctrl.data["nat"][uid][".id"]
 
-        mod_param = "disabled"
-        mod_value = True
-        self._ctrl.set_value(path, param, value, mod_param, mod_value)
+        mod_param = self.entity_description.data_switch_parameter
+        self._ctrl.set_value(path, param, value, mod_param, True)
         await self._ctrl.async_update()
 
 

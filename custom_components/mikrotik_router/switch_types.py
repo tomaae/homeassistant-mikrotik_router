@@ -147,7 +147,6 @@ class MikrotikSwitchEntityDescription(SwitchEntityDescription):
     ha_connection: str = ""
     ha_connection_value: str = ""
     data_path: str = ""
-    data_attribute: str = ""
     data_is_on: str = "enabled"
     data_switch_path: str = ""
     data_switch_parameter: str = "disabled"
@@ -169,11 +168,27 @@ SWITCH_TYPES = {
         ha_connection=CONNECTION_NETWORK_MAC,
         ha_connection_value="data__port-mac-address",
         data_path="interface",
-        data_attribute="temperature",
         data_switch_path="/interface",
         data_name="name",
         data_uid="name",
         data_reference="default-name",
         data_attributes_list=DEVICE_ATTRIBUTES_IFACE,
+    ),
+    "nat": MikrotikSwitchEntityDescription(
+        key="nat",
+        name="NAT",
+        icon_enabled="network-outline",
+        icon_disabled="network-off-outline",
+        entity_category=None,
+        ha_group="NAT",
+        ha_connection=DOMAIN,
+        ha_connection_value="NAT",
+        data_path="nat",
+        data_switch_path="/ip/firewall/nat",
+        data_name="name",
+        data_name_comment=True,
+        data_uid="uniq-id",
+        data_reference="uniq-id",
+        data_attributes_list=DEVICE_ATTRIBUTES_NAT,
     ),
 }
