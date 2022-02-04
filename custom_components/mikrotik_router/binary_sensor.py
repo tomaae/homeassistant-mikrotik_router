@@ -1,22 +1,19 @@
 """Support for the Mikrotik Router binary sensor service."""
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any
 from collections.abc import Mapping
-from homeassistant.helpers.entity import DeviceInfo, EntityCategory
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
-    BinarySensorDeviceClass,
 )
 from homeassistant.const import (
     CONF_NAME,
     CONF_HOST,
-    ATTR_DEVICE_CLASS,
     ATTR_ATTRIBUTION,
 )
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
-from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from .helper import format_attribute
 from .const import (
     DOMAIN,
@@ -31,69 +28,11 @@ from .const import (
 from .binary_sensor_types import (
     MikrotikBinarySensorEntityDescription,
     SENSOR_TYPES,
+    DEVICE_ATTRIBUTES_IFACE_ETHER,
+    DEVICE_ATTRIBUTES_IFACE_SFP,
 )
 
 _LOGGER = logging.getLogger(__name__)
-
-
-DEVICE_ATTRIBUTES_IFACE = [
-    "running",
-    "enabled",
-    "comment",
-    "client-ip-address",
-    "client-mac-address",
-    "port-mac-address",
-    "last-link-down-time",
-    "last-link-up-time",
-    "link-downs",
-    "actual-mtu",
-    "type",
-    "name",
-]
-
-DEVICE_ATTRIBUTES_IFACE_ETHER = [
-    "running",
-    "enabled",
-    "comment",
-    "client-ip-address",
-    "client-mac-address",
-    "port-mac-address",
-    "last-link-down-time",
-    "last-link-up-time",
-    "link-downs",
-    "actual-mtu",
-    "type",
-    "name",
-    "status",
-    "auto-negotiation",
-    "rate",
-    "full-duplex",
-    "default-name",
-    "poe-out",
-]
-
-DEVICE_ATTRIBUTES_IFACE_SFP = [
-    "status",
-    "auto-negotiation",
-    "advertising",
-    "link-partner-advertising",
-    "sfp-temperature",
-    "sfp-supply-voltage",
-    "sfp-module-present",
-    "sfp-tx-bias-current",
-    "sfp-tx-power",
-    "sfp-rx-power",
-    "sfp-rx-loss",
-    "sfp-tx-fault",
-    "sfp-type",
-    "sfp-connector-type",
-    "sfp-vendor-name",
-    "sfp-vendor-part-number",
-    "sfp-vendor-revision",
-    "sfp-vendor-serial",
-    "sfp-manufacturing-date",
-    "eeprom-checksum",
-]
 
 
 # ---------------------------
