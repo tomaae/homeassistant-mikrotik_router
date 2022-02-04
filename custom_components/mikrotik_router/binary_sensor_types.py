@@ -19,7 +19,7 @@ class MikrotikBinarySensorEntityDescription(BinarySensorEntityDescription):
     ha_connection: str = ""
     ha_connection_value: str = ""
     data_path: str = ""
-    data_attribute: str = ""
+    data_is_on: str = "available"
     data_name: str = ""
     data_uid: str = ""
     data_reference: str = ""
@@ -35,7 +35,6 @@ SENSOR_TYPES = {
         entity_category=EntityCategory.DIAGNOSTIC,
         ha_group="System",
         data_path="health",
-        data_attribute="temperature",
         data_name="",
         data_uid="",
         data_reference="",
