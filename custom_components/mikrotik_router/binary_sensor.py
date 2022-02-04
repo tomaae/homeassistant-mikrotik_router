@@ -95,15 +95,6 @@ DEVICE_ATTRIBUTES_IFACE_SFP = [
     "eeprom-checksum",
 ]
 
-DEVICE_ATTRIBUTES_PPP_SECRET = [
-    "connected",
-    "service",
-    "profile",
-    "comment",
-    "caller-id",
-    "encoding",
-]
-
 
 # ---------------------------
 #   async_setup_entry
@@ -137,44 +128,38 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
     """Update sensor state from the controller."""
     new_sensors = []
 
-    # for sensor, sid_func in zip(
-    #     # Sensor type name
-    #     [
-    #         "environment",
-    #     ],
-    #     # Entity function
-    #     [
-    #         MikrotikControllerSensor,
-    #     ],
-    # ):
-    #     if sensor.startswith("traffic_") and not config_entry.options.get(
-    #         CONF_SENSOR_PORT_TRAFFIC, DEFAULT_SENSOR_PORT_TRAFFIC
-    #     ):
-    #         continue
-    #
-    #     uid_sensor = SENSOR_TYPES[sensor]
-    #     for uid in mikrotik_controller.data[SENSOR_TYPES[sensor].data_path]:
-    #         uid_data = mikrotik_controller.data[SENSOR_TYPES[sensor].data_path]
-    #         if (
-    #             uid_sensor.data_path == "interface"
-    #             and uid_data[uid]["type"] == "bridge"
-    #         ):
-    #             continue
-    #
-    #         item_id = f"{inst}-{sensor}-{uid_data[uid][uid_sensor.data_reference]}"
-    #         _LOGGER.debug("Updating binary sensor %s", item_id)
-    #         if item_id in sensors:
-    #             if sensors[item_id].enabled:
-    #                 sensors[item_id].async_schedule_update_ha_state()
-    #             continue
-    #
-    #         sensors[item_id] = sid_func(
-    #             inst=inst,
-    #             uid=uid,
-    #             mikrotik_controller=mikrotik_controller,
-    #             entity_description=uid_sensor,
-    #         )
-    #         new_sensors.append(sensors[item_id])
+    for sensor, sid_func in zip(
+        # Sensor type name
+        ["ppp_tracker", "interface"],
+        # Entity function
+        [MikrotikControllerPPPSecretBinarySensor, MikrotikControllerPortBinarySensor],
+    ):
+        if sensor == "interface" and not config_entry.options.get(
+            CONF_SENSOR_PORT_TRACKER, DEFAULT_SENSOR_PORT_TRACKER
+        ):
+            continue
+
+        uid_sensor = SENSOR_TYPES[sensor]
+        for uid in mikrotik_controller.data[uid_sensor.data_path]:
+            uid_data = mikrotik_controller.data[uid_sensor.data_path]
+            if uid_sensor.data_path == "interface" and uid_data[uid]["type"] == "wlan":
+                continue
+
+            item_id = f"{inst}-{sensor}-{uid_data[uid][uid_sensor.data_reference]}"
+            _LOGGER.debug("Updating binary sensor %s", item_id)
+            if item_id in sensors:
+                if sensors[item_id].enabled:
+                    sensors[item_id].async_schedule_update_ha_state()
+                continue
+
+            sensors[item_id] = sid_func(
+                inst=inst,
+                uid=uid,
+                mikrotik_controller=mikrotik_controller,
+                entity_description=uid_sensor,
+                config_entry=config_entry,
+            )
+            new_sensors.append(sensors[item_id])
 
     for sensor in SENSOR_TYPES:
         if sensor.startswith("system_"):
@@ -191,6 +176,7 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
                 uid="",
                 mikrotik_controller=mikrotik_controller,
                 entity_description=uid_sensor,
+                config_entry=config_entry,
             )
             new_sensors.append(sensors[item_id])
 
@@ -274,9 +260,11 @@ class MikrotikControllerBinarySensor(BinarySensorEntity):
         uid: "",
         mikrotik_controller,
         entity_description: MikrotikBinarySensorEntityDescription,
+        config_entry,
     ):
         """Initialize."""
         self.entity_description = entity_description
+        self._config_entry = config_entry
         self._inst = inst
         self._ctrl = mikrotik_controller
         self._attr_extra_state_attributes = {ATTR_ATTRIBUTION: ATTRIBUTION}
@@ -404,22 +392,10 @@ class MikrotikControllerBinarySensor(BinarySensorEntity):
 class MikrotikControllerPPPSecretBinarySensor(MikrotikControllerBinarySensor):
     """Representation of a network device."""
 
-    def __init__(self, inst, uid, mikrotik_controller, config_entry, sid_data):
-        """Initialize."""
-        super().__init__(mikrotik_controller, inst, uid)
-        self._sid_data = sid_data
-        self._data = mikrotik_controller.data[self._sid_data["sid"]][uid]
-        self._config_entry = config_entry
-
     @property
     def option_sensor_ppp(self) -> bool:
         """Config entry option."""
         return self._config_entry.options.get(CONF_SENSOR_PPP, DEFAULT_SENSOR_PPP)
-
-    @property
-    def name(self) -> str:
-        """Return the name."""
-        return f"{self._inst} PPP {self._data['name']}"
 
     @property
     def is_on(self) -> bool:
@@ -427,12 +403,7 @@ class MikrotikControllerPPPSecretBinarySensor(MikrotikControllerBinarySensor):
         if not self.option_sensor_ppp:
             return False
 
-        return self._data["connected"]
-
-    @property
-    def device_class(self) -> Optional[str]:
-        """Return the device class."""
-        return BinarySensorDeviceClass.CONNECTIVITY
+        return self._data[self.entity_description.data_is_on]
 
     @property
     def available(self) -> bool:
@@ -442,48 +413,6 @@ class MikrotikControllerPPPSecretBinarySensor(MikrotikControllerBinarySensor):
 
         return self._ctrl.connected()
 
-    @property
-    def unique_id(self) -> str:
-        """Return a unique id for this entity."""
-        return f"{self._inst.lower()}-{self._sid_data['sid']}_tracker-{self._data[self._sid_data['sid_ref']]}"
-
-    @property
-    def icon(self) -> str:
-        """Return the icon."""
-        if self._data["connected"]:
-            return "mdi:account-network-outline"
-        else:
-            return "mdi:account-off-outline"
-
-    @property
-    def extra_state_attributes(self) -> Dict[str, Any]:
-        """Return the state attributes."""
-        attributes = self._attrs
-        for variable in DEVICE_ATTRIBUTES_PPP_SECRET:
-            if variable in self._data:
-                attributes[format_attribute(variable)] = self._data[variable]
-
-        return attributes
-
-    @property
-    def device_info(self) -> Dict[str, Any]:
-        """Return a description for device registry."""
-        info = {
-            "identifiers": {
-                (
-                    DOMAIN,
-                    "serial-number",
-                    f"{self._ctrl.data['routerboard']['serial-number']}",
-                    "switch",
-                    "PPP",
-                )
-            },
-            "manufacturer": self._ctrl.data["resource"]["platform"],
-            "model": self._ctrl.data["resource"]["board-name"],
-            "name": f"{self._inst} PPP",
-        }
-        return info
-
 
 # ---------------------------
 #   MikrotikControllerPortBinarySensor
@@ -491,42 +420,12 @@ class MikrotikControllerPPPSecretBinarySensor(MikrotikControllerBinarySensor):
 class MikrotikControllerPortBinarySensor(MikrotikControllerBinarySensor):
     """Representation of a network port."""
 
-    def __init__(self, inst, uid, mikrotik_controller, config_entry, sid_data):
-        """Initialize."""
-        super().__init__(mikrotik_controller, inst, uid)
-        self._sid_data = sid_data
-        self._data = mikrotik_controller.data[self._sid_data["sid"]][uid]
-        self._config_entry = config_entry
-
     @property
     def option_sensor_port_tracker(self) -> bool:
         """Config entry option to not track ARP."""
         return self._config_entry.options.get(
             CONF_SENSOR_PORT_TRACKER, DEFAULT_SENSOR_PORT_TRACKER
         )
-
-    @property
-    def name(self) -> str:
-        """Return the name."""
-        return f"{self._inst} {self._data[self._sid_data['sid_name']]}"
-
-    @property
-    def unique_id(self) -> str:
-        """Return a unique id for this entity."""
-        return (
-            f"{self._inst.lower()}-{self._sid_data['sid']}-"
-            f"{self._data['port-mac-address']}_{self._data['default-name']}"
-        )
-
-    @property
-    def is_on(self) -> bool:
-        """Return true if device is on."""
-        return self._data["running"]
-
-    @property
-    def device_class(self) -> Optional[str]:
-        """Return the device class."""
-        return BinarySensorDeviceClass.CONNECTIVITY
 
     @property
     def available(self) -> bool:
@@ -539,10 +438,10 @@ class MikrotikControllerPortBinarySensor(MikrotikControllerBinarySensor):
     @property
     def icon(self) -> str:
         """Return the icon."""
-        if self._data["running"]:
-            icon = "mdi:lan-connect"
+        if self._data[self.entity_description.data_is_on]:
+            icon = self.entity_description.icon_enabled
         else:
-            icon = "mdi:lan-pending"
+            icon = self.entity_description.icon_disabled
 
         if not self._data["enabled"]:
             icon = "mdi:lan-disconnect"
@@ -550,9 +449,9 @@ class MikrotikControllerPortBinarySensor(MikrotikControllerBinarySensor):
         return icon
 
     @property
-    def extra_state_attributes(self) -> Dict[str, Any]:
+    def extra_state_attributes(self) -> Mapping[str, Any]:
         """Return the state attributes."""
-        attributes = self._attrs
+        attributes = super().extra_state_attributes
 
         if self._data["type"] == "ether":
             for variable in DEVICE_ATTRIBUTES_IFACE_ETHER:
@@ -564,23 +463,4 @@ class MikrotikControllerPortBinarySensor(MikrotikControllerBinarySensor):
                     if variable in self._data:
                         attributes[format_attribute(variable)] = self._data[variable]
 
-        else:
-            for variable in self._sid_data["sid_attr"]:
-                if variable in self._data:
-                    attributes[format_attribute(variable)] = self._data[variable]
-
         return attributes
-
-    @property
-    def device_info(self) -> Dict[str, Any]:
-        """Return a description for device registry."""
-        info = {
-            "connections": {
-                (CONNECTION_NETWORK_MAC, self._data[self._sid_data["sid_ref"]])
-            },
-            "manufacturer": self._ctrl.data["resource"]["platform"],
-            "model": self._ctrl.data["resource"]["board-name"],
-            "name": f"{self._inst} {self._data[self._sid_data['sid_name']]}",
-        }
-
-        return info

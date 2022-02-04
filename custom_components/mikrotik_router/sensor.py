@@ -89,8 +89,8 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
             continue
 
         uid_sensor = SENSOR_TYPES[sensor]
-        for uid in mikrotik_controller.data[SENSOR_TYPES[sensor].data_path]:
-            uid_data = mikrotik_controller.data[SENSOR_TYPES[sensor].data_path]
+        for uid in mikrotik_controller.data[uid_sensor.data_path]:
+            uid_data = mikrotik_controller.data[uid_sensor.data_path]
             if (
                 uid_sensor.data_path == "interface"
                 and uid_data[uid]["type"] == "bridge"
