@@ -15,6 +15,8 @@ from .const import DOMAIN
 class MikrotikBinarySensorEntityDescription(BinarySensorEntityDescription):
     """Class describing mikrotik entities."""
 
+    icon_enabled: str = ""
+    icon_disabled: str = ""
     ha_group: str = ""
     ha_connection: str = ""
     ha_connection_value: str = ""
@@ -30,7 +32,8 @@ SENSOR_TYPES = {
     "system_fwupdate": MikrotikBinarySensorEntityDescription(
         key="system_fwupdate",
         name="Firmware update",
-        icon="mdi:thermometer",
+        icon_enabled="",
+        icon_disabled="",
         device_class=BinarySensorDeviceClass.UPDATE,
         entity_category=EntityCategory.DIAGNOSTIC,
         ha_group="System",

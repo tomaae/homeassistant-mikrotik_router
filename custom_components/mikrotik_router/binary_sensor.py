@@ -318,6 +318,15 @@ class MikrotikControllerBinarySensor(BinarySensorEntity):
         return self._data[self.entity_description.data_is_on]
 
     @property
+    def icon(self) -> str:
+        """Return the icon."""
+        if self.entity_description.icon_enabled:
+            if self._data[self.entity_description.data_is_on]:
+                return self.entity_description.icon_enabled
+            else:
+                return self.entity_description.icon_disabled
+
+    @property
     def device_info(self) -> DeviceInfo:
         """Return a description for device registry."""
         dev_connection = DOMAIN
