@@ -23,6 +23,8 @@ from .const import (
 from .sensor_types import (
     MikrotikSensorEntityDescription,
     SENSOR_TYPES,
+    DEVICE_ATTRIBUTES_IFACE_ETHER,
+    DEVICE_ATTRIBUTES_IFACE_SFP,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -75,8 +77,8 @@ def update_items(inst, config_entry, mikrotik_controller, async_add_entities, se
         # Entity function
         [
             MikrotikControllerSensor,
-            MikrotikControllerSensor,
-            MikrotikControllerSensor,
+            MikrotikInterfaceTrafficSensor,
+            MikrotikInterfaceTrafficSensor,
             MikrotikClientTrafficSensor,
             MikrotikClientTrafficSensor,
             MikrotikClientTrafficSensor,
@@ -291,6 +293,30 @@ class MikrotikControllerSensor(SensorEntity):
     async def async_added_to_hass(self):
         """Run when entity about to be added to hass."""
         _LOGGER.debug("New sensor %s (%s)", self._inst, self.unique_id)
+
+
+# ---------------------------
+#   MikrotikInterfaceTrafficSensor
+# ---------------------------
+class MikrotikInterfaceTrafficSensor(MikrotikControllerSensor):
+    """Define an Mikrotik MikrotikInterfaceTrafficSensor sensor."""
+
+    @property
+    def extra_state_attributes(self) -> Mapping[str, Any]:
+        """Return the state attributes."""
+        attributes = super().extra_state_attributes
+
+        if self._data["type"] == "ether":
+            for variable in DEVICE_ATTRIBUTES_IFACE_ETHER:
+                if variable in self._data:
+                    attributes[format_attribute(variable)] = self._data[variable]
+
+            if "sfp-shutdown-temperature" in self._data:
+                for variable in DEVICE_ATTRIBUTES_IFACE_SFP:
+                    if variable in self._data:
+                        attributes[format_attribute(variable)] = self._data[variable]
+
+        return attributes
 
 
 # ---------------------------
