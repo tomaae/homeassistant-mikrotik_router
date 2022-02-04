@@ -21,37 +21,6 @@ from .switch_types import (
 _LOGGER = logging.getLogger(__name__)
 
 
-DEVICE_ATTRIBUTES_KIDCONTROL = [
-    "rate-limit",
-    "mon",
-    "tue",
-    "wed",
-    "thu",
-    "fri",
-    "sat",
-    "sun",
-]
-
-DEVICE_ATTRIBUTES_QUEUE = [
-    "target",
-    "download-rate",
-    "upload-rate",
-    "download-max-limit",
-    "upload-max-limit",
-    "upload-limit-at",
-    "download-limit-at",
-    "upload-burst-limit",
-    "download-burst-limit",
-    "upload-burst-threshold",
-    "download-burst-threshold",
-    "upload-burst-time",
-    "download-burst-time",
-    "packet-marks",
-    "parent",
-    "comment",
-]
-
-
 # ---------------------------
 #   async_setup_entry
 # ---------------------------
@@ -86,7 +55,14 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
     # Add switches
     for switch, sid_func in zip(
         # Switch type name
-        ["interface", "nat", "mangle", "filter", "ppp_secret"],
+        [
+            "interface",
+            "nat",
+            "mangle",
+            "filter",
+            "ppp_secret",
+            "queue",
+        ],
         # Entity function
         [
             MikrotikControllerPortSwitch,
@@ -94,6 +70,7 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
             MikrotikControllerMangleSwitch,
             MikrotikControllerFilterSwitch,
             MikrotikControllerSwitch,
+            MikrotikControllerQueueSwitch,
         ],
     ):
         uid_switch = SWITCH_TYPES[switch]
@@ -549,196 +526,28 @@ class MikrotikControllerFilterSwitch(MikrotikControllerSwitch):
 class MikrotikControllerQueueSwitch(MikrotikControllerSwitch):
     """Representation of a queue switch."""
 
-    def __init__(self, inst, uid, mikrotik_controller, sid_data):
-        """Initialize."""
-        super().__init__(inst, uid, mikrotik_controller, sid_data)
-
-    @property
-    def icon(self) -> str:
-        """Return the icon."""
-        if not self._data["enabled"]:
-            icon = "mdi:leaf-off"
-        else:
-            icon = "mdi:leaf"
-
-        return icon
-
-    @property
-    def device_info(self) -> Dict[str, Any]:
-        """Return a description for device registry."""
-        info = {
-            "identifiers": {
-                (
-                    DOMAIN,
-                    "serial-number",
-                    f"{self._ctrl.data['routerboard']['serial-number']}",
-                    "switch",
-                    "Queue",
-                )
-            },
-            "manufacturer": self._ctrl.data["resource"]["platform"],
-            "model": self._ctrl.data["resource"]["board-name"],
-            "name": f"{self._inst} Queue",
-        }
-        return info
-
     async def async_turn_on(self) -> None:
         """Turn on the switch."""
-        path = "/queue/simple"
+        path = self.entity_description.data_switch_path
         param = ".id"
         value = None
         for uid in self._ctrl.data["queue"]:
             if self._ctrl.data["queue"][uid]["name"] == f"{self._data['name']}":
                 value = self._ctrl.data["queue"][uid][".id"]
 
-        mod_param = "disabled"
-        mod_value = False
-        self._ctrl.set_value(path, param, value, mod_param, mod_value)
+        mod_param = self.entity_description.data_switch_parameter
+        self._ctrl.set_value(path, param, value, mod_param, False)
         await self._ctrl.force_update()
 
     async def async_turn_off(self) -> None:
         """Turn off the switch."""
-        path = "/queue/simple"
+        path = self.entity_description.data_switch_path
         param = ".id"
         value = None
         for uid in self._ctrl.data["queue"]:
             if self._ctrl.data["queue"][uid]["name"] == f"{self._data['name']}":
                 value = self._ctrl.data["queue"][uid][".id"]
 
-        mod_param = "disabled"
-        mod_value = True
-        self._ctrl.set_value(path, param, value, mod_param, mod_value)
-        await self._ctrl.async_update()
-
-
-# ---------------------------
-#   MikrotikControllerKidcontrolSwitch
-# ---------------------------
-class MikrotikControllerKidcontrolSwitch(MikrotikControllerSwitch):
-    """Representation of a queue switch."""
-
-    def __init__(self, inst, uid, mikrotik_controller, sid_data):
-        """Initialize."""
-        super().__init__(inst, uid, mikrotik_controller, sid_data)
-
-    @property
-    def icon(self) -> str:
-        """Return the icon."""
-        if not self._data["enabled"]:
-            icon = "mdi:account-off"
-        else:
-            icon = "mdi:account"
-
-        return icon
-
-    @property
-    def device_info(self) -> Dict[str, Any]:
-        """Return a description for device registry."""
-        info = {
-            "identifiers": {
-                (
-                    DOMAIN,
-                    "serial-number",
-                    f"{self._ctrl.data['routerboard']['serial-number']}",
-                    "switch",
-                    "Kidcontrol",
-                )
-            },
-            "manufacturer": self._ctrl.data["resource"]["platform"],
-            "model": self._ctrl.data["resource"]["board-name"],
-            "name": f"{self._inst} Kidcontrol",
-        }
-        return info
-
-    async def async_turn_on(self) -> None:
-        """Turn on the switch."""
-        path = "/ip/kid-control"
-        param = "name"
-        value = self._data["name"]
-        mod_param = "disabled"
-        mod_value = False
-        self._ctrl.set_value(path, param, value, mod_param, mod_value)
-        await self._ctrl.force_update()
-
-    async def async_turn_off(self) -> None:
-        """Turn off the switch."""
-        path = "/ip/kid-control"
-        param = "name"
-        value = self._data["name"]
-        mod_param = "disabled"
-        mod_value = True
-        self._ctrl.set_value(path, param, value, mod_param, mod_value)
-        await self._ctrl.async_update()
-
-
-# ---------------------------
-#   MikrotikControllerKidcontrolPauseSwitch
-# ---------------------------
-class MikrotikControllerKidcontrolPauseSwitch(MikrotikControllerSwitch):
-    """Representation of a queue switch."""
-
-    def __init__(self, inst, uid, mikrotik_controller, sid_data):
-        """Initialize."""
-        super().__init__(inst, uid, mikrotik_controller, sid_data)
-
-    @property
-    def name(self) -> str:
-        """Return the name."""
-        return f"{self._inst} {self._sid_data['sid']} Pause {self._data[self._sid_data['sid_name']]}"
-
-    @property
-    def unique_id(self) -> str:
-        """Return a unique id for this entity."""
-        return f"{self._inst.lower()}-{self._sid_data['sid']}-pause_switch-{self._data[self._sid_data['sid_ref']]}"
-
-    @property
-    def is_on(self) -> bool:
-        """Return true if device is on."""
-        return self._data["paused"]
-
-    @property
-    def icon(self) -> str:
-        """Return the icon."""
-        if not self._data["enabled"]:
-            icon = "mdi:account-off-outline"
-        else:
-            icon = "mdi:account-outline"
-
-        return icon
-
-    @property
-    def device_info(self) -> Dict[str, Any]:
-        """Return a description for device registry."""
-        info = {
-            "identifiers": {
-                (
-                    DOMAIN,
-                    "serial-number",
-                    f"{self._ctrl.data['routerboard']['serial-number']}",
-                    "switch",
-                    "Kidcontrol",
-                )
-            },
-            "manufacturer": self._ctrl.data["resource"]["platform"],
-            "model": self._ctrl.data["resource"]["board-name"],
-            "name": f"{self._inst} Kidcontrol",
-        }
-        return info
-
-    async def async_turn_on(self) -> None:
-        """Turn on the switch."""
-        path = "/ip/kid-control"
-        param = "name"
-        value = self._data["name"]
-        command = "resume"
-        self._ctrl.execute(path, command, param, value)
-        await self._ctrl.force_update()
-
-    async def async_turn_off(self) -> None:
-        """Turn off the switch."""
-        path = "/ip/kid-control"
-        param = "name"
-        value = self._data["name"]
-        command = "pause"
-        self._ctrl.execute(path, command, param, value)
+        mod_param = self.entity_description.data_switch_parameter
+        self._ctrl.set_value(path, param, value, mod_param, True)
         await self._ctrl.async_update()
