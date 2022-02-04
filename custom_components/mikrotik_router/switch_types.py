@@ -152,6 +152,7 @@ class MikrotikSwitchEntityDescription(SwitchEntityDescription):
     data_switch_path: str = ""
     data_switch_parameter: str = "disabled"
     data_name: str = ""
+    data_name_comment: bool = False
     data_uid: str = ""
     data_reference: str = ""
     data_attributes_list: List = field(default_factory=lambda: [])
