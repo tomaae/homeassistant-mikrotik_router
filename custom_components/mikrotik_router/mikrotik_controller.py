@@ -59,7 +59,7 @@ from .const import (
     DEFAULT_SENSOR_ENVIRONMENT,
 )
 from .exceptions import ApiEntryNotFound
-from .helper import parse_api
+from .apiparser import parse_api
 from .mikrotikapi import MikrotikAPI
 
 _LOGGER = logging.getLogger(__name__)

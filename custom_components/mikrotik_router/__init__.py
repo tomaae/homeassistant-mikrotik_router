@@ -1,15 +1,9 @@
 """Mikrotik Router integration."""
 
-import logging
 import voluptuous as vol
 
 import homeassistant.helpers.config_validation as cv
 from homeassistant.exceptions import ConfigEntryNotReady
-
-from homeassistant.const import (
-    CONF_NAME,
-    CONF_HOST,
-)
 
 from .const import (
     PLATFORMS,
@@ -18,8 +12,6 @@ from .const import (
     RUN_SCRIPT_COMMAND,
 )
 from .mikrotik_controller import MikrotikControllerData
-
-_LOGGER = logging.getLogger(__name__)
 
 SCRIPT_SCHEMA = vol.Schema(
     {vol.Required("router"): cv.string, vol.Required("script"): cv.string}
@@ -67,24 +59,6 @@ async def async_setup_entry(hass, config_entry) -> bool:
 
     hass.services.async_register(
         DOMAIN, RUN_SCRIPT_COMMAND, controller.run_script, schema=SCRIPT_SCHEMA
-    )
-
-    device_registry = await hass.helpers.device_registry.async_get_registry()
-    device_registry.async_get_or_create(
-        config_entry_id=config_entry.entry_id,
-        connections={(DOMAIN, f"{controller.data['routerboard']['serial-number']}")},
-        manufacturer=controller.data["resource"]["platform"],
-        model=controller.data["routerboard"]["model"],
-        name=f"{config_entry.data[CONF_NAME]} {controller.data['routerboard']['model']}",
-        sw_version=controller.data["resource"]["version"],
-        configuration_url=f"http://{config_entry.data[CONF_HOST]}",
-        identifiers={
-            DOMAIN,
-            "serial-number",
-            f"{controller.data['routerboard']['serial-number']}",
-            "sensor",
-            f"{config_entry.data[CONF_NAME]} {controller.data['routerboard']['model']}",
-        },
     )
 
     return True
