@@ -20,14 +20,6 @@ from .switch_types import (
 
 _LOGGER = logging.getLogger(__name__)
 
-DEVICE_ATTRIBUTES_PPP_SECRET = [
-    "connected",
-    "service",
-    "profile",
-    "comment",
-    "caller-id",
-    "encoding",
-]
 
 DEVICE_ATTRIBUTES_KIDCONTROL = [
     "rate-limit",
@@ -94,13 +86,14 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
     # Add switches
     for switch, sid_func in zip(
         # Switch type name
-        ["interface", "nat", "mangle", "filter"],
+        ["interface", "nat", "mangle", "filter", "ppp_secret"],
         # Entity function
         [
             MikrotikControllerPortSwitch,
             MikrotikControllerNATSwitch,
             MikrotikControllerMangleSwitch,
             MikrotikControllerFilterSwitch,
+            MikrotikControllerSwitch,
         ],
     ):
         uid_switch = SWITCH_TYPES[switch]
@@ -547,76 +540,6 @@ class MikrotikControllerFilterSwitch(MikrotikControllerSwitch):
 
         mod_param = self.entity_description.data_switch_parameter
         self._ctrl.set_value(path, param, value, mod_param, True)
-        await self._ctrl.async_update()
-
-
-# ---------------------------
-#   MikrotikControllerPPPSecretSwitch
-# ---------------------------
-class MikrotikControllerPPPSecretSwitch(MikrotikControllerSwitch):
-    """Representation of a PPP Secret switch."""
-
-    def __init__(self, inst, uid, mikrotik_controller, sid_data):
-        """Initialize."""
-        super().__init__(inst, uid, mikrotik_controller, sid_data)
-
-    @property
-    def name(self) -> str:
-        """Return the name."""
-        return f"{self._inst} PPP Secret {self._data['name']}"
-
-    @property
-    def unique_id(self) -> str:
-        """Return a unique id for this entity."""
-        return f"{self._inst.lower()}-enable_ppp_secret-{self._data['name']}"
-
-    @property
-    def icon(self) -> str:
-        """Return the icon."""
-        if not self._data["enabled"]:
-            icon = "mdi:account-off-outline"
-        else:
-            icon = "mdi:account-outline"
-
-        return icon
-
-    @property
-    def device_info(self) -> Dict[str, Any]:
-        """Return a description for device registry."""
-        info = {
-            "identifiers": {
-                (
-                    DOMAIN,
-                    "serial-number",
-                    f"{self._ctrl.data['routerboard']['serial-number']}",
-                    "switch",
-                    "PPP",
-                )
-            },
-            "manufacturer": self._ctrl.data["resource"]["platform"],
-            "model": self._ctrl.data["resource"]["board-name"],
-            "name": f"{self._inst} PPP",
-        }
-        return info
-
-    async def async_turn_on(self) -> None:
-        """Turn on the switch."""
-        path = "/ppp/secret"
-        param = "name"
-        value = self._data["name"]
-        mod_param = "disabled"
-        mod_value = False
-        self._ctrl.set_value(path, param, value, mod_param, mod_value)
-        await self._ctrl.force_update()
-
-    async def async_turn_off(self) -> None:
-        """Turn off the switch."""
-        path = "/ppp/secret"
-        param = "name"
-        value = self._data["name"]
-        mod_param = "disabled"
-        mod_value = True
-        self._ctrl.set_value(path, param, value, mod_param, mod_value)
         await self._ctrl.async_update()
 
 
