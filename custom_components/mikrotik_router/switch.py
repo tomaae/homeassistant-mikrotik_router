@@ -20,27 +20,6 @@ from .switch_types import (
 
 _LOGGER = logging.getLogger(__name__)
 
-DEVICE_ATTRIBUTES_NAT = [
-    "protocol",
-    "dst-port",
-    "in-interface",
-    "to-addresses",
-    "to-ports",
-    "comment",
-]
-
-DEVICE_ATTRIBUTES_MANGLE = [
-    "chain",
-    "action",
-    "passthrough",
-    "protocol",
-    "src-address",
-    "src-port",
-    "dst-address",
-    "dst-port",
-    "comment",
-]
-
 DEVICE_ATTRIBUTES_FILTER = [
     "chain",
     "action",
@@ -132,12 +111,13 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
     # Add switches
     for switch, sid_func in zip(
         # Switch type name
-        [
-            "interface",
-            "nat",
-        ],
+        ["interface", "nat", "mangle"],
         # Entity function
-        [MikrotikControllerPortSwitch, MikrotikControllerNATSwitch],
+        [
+            MikrotikControllerPortSwitch,
+            MikrotikControllerNATSwitch,
+            MikrotikControllerMangleSwitch,
+        ],
     ):
         uid_switch = SWITCH_TYPES[switch]
         for uid in mikrotik_controller.data[SWITCH_TYPES[switch].data_path]:
@@ -508,55 +488,9 @@ class MikrotikControllerNATSwitch(MikrotikControllerSwitch):
 class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
     """Representation of a Mangle switch."""
 
-    def __init__(self, inst, uid, mikrotik_controller, sid_data):
-        """Initialize."""
-        super().__init__(inst, uid, mikrotik_controller, sid_data)
-
-    @property
-    def name(self) -> str:
-        """Return the name."""
-        if self._data["comment"]:
-            return f"{self._inst} Mangle {self._data['comment']}"
-
-        return f"{self._inst} Mangle {self._data['name']}"
-
-    @property
-    def unique_id(self) -> str:
-        """Return a unique id for this entity."""
-        return f"{self._inst.lower()}-enable_mangle-{self._data['uniq-id']}"
-
-    @property
-    def icon(self) -> str:
-        """Return the icon."""
-        if not self._data["enabled"]:
-            icon = "mdi:bookmark-off-outline"
-        else:
-            icon = "mdi:bookmark-outline"
-
-        return icon
-
-    @property
-    def device_info(self) -> Dict[str, Any]:
-        """Return a description for device registry."""
-        info = {
-            "identifiers": {
-                (
-                    DOMAIN,
-                    "serial-number",
-                    f"{self._ctrl.data['routerboard']['serial-number']}",
-                    "switch",
-                    "Mangle",
-                )
-            },
-            "manufacturer": self._ctrl.data["resource"]["platform"],
-            "model": self._ctrl.data["resource"]["board-name"],
-            "name": f"{self._inst} Mangle",
-        }
-        return info
-
     async def async_turn_on(self) -> None:
         """Turn on the switch."""
-        path = "/ip/firewall/mangle"
+        path = self.entity_description.data_switch_path
         param = ".id"
         value = None
         for uid in self._ctrl.data["mangle"]:
@@ -568,14 +502,13 @@ class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
             ):
                 value = self._ctrl.data["mangle"][uid][".id"]
 
-        mod_param = "disabled"
-        mod_value = False
-        self._ctrl.set_value(path, param, value, mod_param, mod_value)
+        mod_param = self.entity_description.data_switch_parameter
+        self._ctrl.set_value(path, param, value, mod_param, False)
         await self._ctrl.force_update()
 
     async def async_turn_off(self) -> None:
         """Turn off the switch."""
-        path = "/ip/firewall/mangle"
+        path = self.entity_description.data_switch_path
         param = ".id"
         value = None
         for uid in self._ctrl.data["mangle"]:
@@ -587,9 +520,8 @@ class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
             ):
                 value = self._ctrl.data["mangle"][uid][".id"]
 
-        mod_param = "disabled"
-        mod_value = True
-        self._ctrl.set_value(path, param, value, mod_param, mod_value)
+        mod_param = self.entity_description.data_switch_parameter
+        self._ctrl.set_value(path, param, value, mod_param, True)
         await self._ctrl.async_update()
 
 
