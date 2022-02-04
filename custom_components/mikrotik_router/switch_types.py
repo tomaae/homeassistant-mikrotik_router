@@ -177,8 +177,8 @@ SWITCH_TYPES = {
     "nat": MikrotikSwitchEntityDescription(
         key="nat",
         name="NAT",
-        icon_enabled="network-outline",
-        icon_disabled="network-off-outline",
+        icon_enabled="mdi:network-outline",
+        icon_disabled="mdi:network-off-outline",
         entity_category=None,
         ha_group="NAT",
         ha_connection=DOMAIN,
