@@ -20,23 +20,6 @@ from .switch_types import (
 
 _LOGGER = logging.getLogger(__name__)
 
-DEVICE_ATTRIBUTES_FILTER = [
-    "chain",
-    "action",
-    "address-list",
-    "protocol",
-    "layer7-protocol",
-    "tcp-flags",
-    "connection-state",
-    "in-interface",
-    "src-address",
-    "src-port",
-    "out-interface",
-    "dst-address",
-    "dst-port",
-    "comment",
-]
-
 DEVICE_ATTRIBUTES_PPP_SECRET = [
     "connected",
     "service",
@@ -111,12 +94,13 @@ def update_items(inst, mikrotik_controller, async_add_entities, switches):
     # Add switches
     for switch, sid_func in zip(
         # Switch type name
-        ["interface", "nat", "mangle"],
+        ["interface", "nat", "mangle", "filter"],
         # Entity function
         [
             MikrotikControllerPortSwitch,
             MikrotikControllerNATSwitch,
             MikrotikControllerMangleSwitch,
+            MikrotikControllerFilterSwitch,
         ],
     ):
         uid_switch = SWITCH_TYPES[switch]
@@ -531,55 +515,9 @@ class MikrotikControllerMangleSwitch(MikrotikControllerSwitch):
 class MikrotikControllerFilterSwitch(MikrotikControllerSwitch):
     """Representation of a Filter switch."""
 
-    def __init__(self, inst, uid, mikrotik_controller, sid_data):
-        """Initialize."""
-        super().__init__(inst, uid, mikrotik_controller, sid_data)
-
-    @property
-    def name(self) -> str:
-        """Return the name."""
-        if self._data["comment"]:
-            return f"{self._inst} Filter {self._data['comment']}"
-
-        return f"{self._inst} Filter {self._data['name']}"
-
-    @property
-    def unique_id(self) -> str:
-        """Return a unique id for this entity."""
-        return f"{self._inst.lower()}-enable_filter-{self._data['uniq-id']}"
-
-    @property
-    def icon(self) -> str:
-        """Return the icon."""
-        if not self._data["enabled"]:
-            icon = "mdi:filter-variant-remove"
-        else:
-            icon = "mdi:filter-variant"
-
-        return icon
-
-    @property
-    def device_info(self) -> Dict[str, Any]:
-        """Return a description for device registry."""
-        info = {
-            "identifiers": {
-                (
-                    DOMAIN,
-                    "serial-number",
-                    f"{self._ctrl.data['routerboard']['serial-number']}",
-                    "switch",
-                    "Filter",
-                )
-            },
-            "manufacturer": self._ctrl.data["resource"]["platform"],
-            "model": self._ctrl.data["resource"]["board-name"],
-            "name": f"{self._inst} Filter",
-        }
-        return info
-
     async def async_turn_on(self) -> None:
         """Turn on the switch."""
-        path = "/ip/firewall/filter"
+        path = self.entity_description.data_switch_path
         param = ".id"
         value = None
         for uid in self._ctrl.data["filter"]:
@@ -590,14 +528,13 @@ class MikrotikControllerFilterSwitch(MikrotikControllerSwitch):
             ):
                 value = self._ctrl.data["filter"][uid][".id"]
 
-        mod_param = "disabled"
-        mod_value = False
-        self._ctrl.set_value(path, param, value, mod_param, mod_value)
+        mod_param = self.entity_description.data_switch_parameter
+        self._ctrl.set_value(path, param, value, mod_param, False)
         await self._ctrl.force_update()
 
     async def async_turn_off(self) -> None:
         """Turn off the switch."""
-        path = "/ip/firewall/filter"
+        path = self.entity_description.data_switch_path
         param = ".id"
         value = None
         for uid in self._ctrl.data["filter"]:
@@ -608,9 +545,8 @@ class MikrotikControllerFilterSwitch(MikrotikControllerSwitch):
             ):
                 value = self._ctrl.data["filter"][uid][".id"]
 
-        mod_param = "disabled"
-        mod_value = True
-        self._ctrl.set_value(path, param, value, mod_param, mod_value)
+        mod_param = self.entity_description.data_switch_parameter
+        self._ctrl.set_value(path, param, value, mod_param, True)
         await self._ctrl.async_update()
 
 
