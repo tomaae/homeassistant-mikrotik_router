@@ -167,6 +167,7 @@ class MikrotikControllerData:
 
         self.support_capsman = False
         self.support_wireless = False
+        self.support_wifiwave2 = False
         self.support_ppp = False
 
         self.major_fw_version = 0
@@ -412,20 +413,26 @@ class MikrotikControllerData:
             ],
         )
 
-        if "ppp" in packages:
-            self.support_ppp = packages["ppp"]["enabled"]
+        if 0 < self.major_fw_version < 7:
+            if "ppp" in packages:
+                self.support_ppp = packages["ppp"]["enabled"]
 
-        if "wireless" in packages:
-            self.support_capsman = packages["wireless"]["enabled"]
-            self.support_wireless = packages["wireless"]["enabled"]
-        else:
-            self.support_capsman = False
-            self.support_wireless = False
+            if "wireless" in packages:
+                self.support_capsman = packages["wireless"]["enabled"]
+                self.support_wireless = packages["wireless"]["enabled"]
+            else:
+                self.support_capsman = False
+                self.support_wireless = False
 
-        if self.major_fw_version >= 7:
-            self.support_capsman = True
-            self.support_wireless = True
+        elif 0 < self.major_fw_version >= 7:
             self.support_ppp = True
+            self.support_wireless = True
+            if "wifiwave2" in packages and packages["wifiwave2"]["enabled"]:
+                self.support_wifiwave2 = True
+                self.support_capsman = False
+            else:
+                self.support_wifiwave2 = False
+                self.support_capsman = True
 
     # ---------------------------
     #   async_get_host_hass
@@ -1660,9 +1667,12 @@ class MikrotikControllerData:
     # ---------------------------
     def get_wireless_hosts(self):
         """Get wireless hosts data from Mikrotik"""
+        wifimodule = "wireless"
+        if self.support_wifiwave2:
+            wifimodule = "wifiwave2"
         self.data["wireless_hosts"] = parse_api(
             data={},
-            source=self.api.path("/interface/wireless/registration-table"),
+            source=self.api.path(f"/interface/{wifimodule}/registration-table"),
             key="mac-address",
             vals=[
                 {"name": "mac-address"},
