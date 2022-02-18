@@ -4,7 +4,7 @@
         "step": {
             "user": {
                 "title": "Роутер Mikrotik",
-                "description": "Настройка интеграции маршрутизатора Mikrotik.",
+                "description": "Настройка Home Assistant для интеграции с Mikrotik.",
                 "data": {
                     "name": "Название интеграции",
                     "host": "Адрес маршрутизатора",
@@ -16,10 +16,10 @@
             }
         },
         "error": {
-            "name_exists": "Имя уже используется.",
-            "cannot_connect": "Не удается подключиться к Mikrotik.",
-            "ssl_handshake_failure": "Ошибка SSL-соединения",
-            "connection_timeout": "Таймаут подключения к Mikrotik.",
+            "name_exists": "Это название уже используется.",
+            "cannot_connect": "Не удалось подключиться.",
+            "ssl_handshake_failure": "Ошибка SSL-соединения.",
+            "connection_timeout": "Истекло время подключения к Mikrotik.",
             "wrong_login": "Неверное имя пользователя или пароль."
         }
     },
@@ -27,31 +27,31 @@
         "step": {
             "basic_options": {
                 "data": {
-                    "scan_interval": "Период сканирования (требуется перезагрузка HA)",
+                    "scan_interval": "Интервал сканирования (требуется перезагрузка HA)",
                     "track_iface_clients": "Показывать в интерфейсе MAC и IP клиентов",
                     "unit_of_measurement": "Единицы измерения",
-                    "track_network_hosts_timeout": "Таймаут отслеживания сетевых устройств (секунд)",
-                    "zone": "Zone for device tracker"
+                    "track_network_hosts_timeout": "Таймаут отслеживания сетевых устройств (в секундах)",
+                    "zone": "Зона для отслеживания устройств"
                 },
                 "title": "Базовые параметры"
             },
             "sensor_select": {
                 "data": {
                     "track_network_hosts": "Отслеживание сетевых устройств",
-                    "sensor_port_tracker": "Датчики отслеживания порта",
-                    "sensor_port_traffic": "Датчики трафика порта",
-                    "sensor_client_traffic": "Датчики клиентского трафика",
+                    "sensor_port_tracker": "Сенсоры отслеживания порта",
+                    "sensor_port_traffic": "Сенсоры трафика порта",
+                    "sensor_client_traffic": "Сенсоры клиентского трафика",
                     "sensor_simple_queues": "Переключатели простых очередей",
                     "sensor_nat": "Переключатели NAT правил",
-                    "sensor_scripts": "Переключатели сценариев",
-                    "sensor_environment": "Датчики переменных окружения",
+                    "sensor_scripts": "Переключатели скриптов",
+                    "sensor_environment": "Сенсоры переменных окружения",
                     "sensor_pppusers": "PPP пользователи",
-                    "sensor_kidcontrol": "Детский контроль",
+                    "sensor_kidcontrol": "Родительский контроль",
                     "sensor_mangle": "Переключатели правил Mangle",
                     "sensor_ppp": "PPP-пользователи",
-                    "sensor_filter": "Filter switches"
+                    "sensor_filter": "Переключатели фильтров"
                 },
-                "title": "Выбор датчиков"
+                "title": "Выберите сенсоры"
             }
         }
     }

@@ -1,0 +1,58 @@
+{
+    "config": {
+        "title": "Mikrotik Router",
+        "step": {
+            "user": {
+                "title": "Mikrotik Router",
+                "description": "Configurando uma integração de roteador (Mikrotik).",
+                "data": {
+                    "name": "Nome da mesclagem",
+                    "host": "Host",
+                    "port": "Porta",
+                    "username": "Nome de usuário",
+                    "password": "Senha",
+                    "ssl": "Usar SSL"
+                }
+            }
+        },
+        "error": {
+            "name_exists": "O nome já existe.",
+            "cannot_connect": "Não consigo conectar ao Mikrotik.",
+            "ssl_handshake_failure": "Falha no handshake SSL",
+            "connection_timeout": "Tempo limite de conexão do Mikrotik.",
+            "wrong_login": "Nome de usuário ou senha inválidos."
+        }
+    },
+    "options": {
+        "step": {
+            "basic_options": {
+                "data": {
+                    "scan_interval": "Intervalo de escaneamento (requer reinicialização do HA)",
+                    "track_iface_clients": "Mostrar MAC e IP do cliente nas interfaces",
+                    "unit_of_measurement": "Unidade de medida",
+                    "track_network_hosts_timeout": "Rastrear o tempo limite dos dispositivos de rede (segundos)",
+                    "zone": "Zona para rastreador de dispositivos"
+                },
+                "title": "Opções básicas"
+            },
+            "sensor_select": {
+                "data": {
+                    "track_network_hosts": "Rastrear dispositivos de rede",
+                    "sensor_port_tracker": "Sensores do rastreador de porta",
+                    "sensor_port_traffic": "Sensores de tráfego de porta",
+                    "sensor_client_traffic": "Sensores de tráfego do cliente",
+                    "sensor_simple_queues": "Interruptores de filas simples",
+                    "sensor_nat": "Interruptores NAT",
+                    "sensor_scripts": "Interruptores de scripts",
+                    "sensor_environment": "Sensores de variáveis de ambiente",
+                    "sensor_pppusers": "Usuários de PPP",
+                    "sensor_kidcontrol": "Controle infantil",
+                    "sensor_mangle": "Interruptores Mangle",
+                    "sensor_ppp": "Usuários de PPP",
+                    "sensor_filter": "Interruptores de filtro"
+                },
+                "title": "Selecione os sensores"
+            }
+        }
+    }
+}
