@@ -3,8 +3,37 @@
 import logging
 
 from voluptuous import Optional
+from homeassistant.components.diagnostics import async_redact_data
 
 _LOGGER = logging.getLogger(__name__)
+
+TO_REDACT = {
+    "ip-address",
+    "address",
+    "active-address",
+    "mac-address",
+    "active-mac-address",
+    "orig-mac-address",
+    "client-id",
+    "active-client-id",
+    "eeprom",
+    "sfp-vendor-serial",
+    "gateway",
+    "dns-server",
+    "wins-server",
+    "ntp-server",
+    "caps-manager",
+    "serial-number",
+    "source",
+    "from-addresses",
+    "to-addresses",
+    "src-address",
+    "dst-address",
+    "password",
+    "caller-id",
+    "target",
+    "ssid",
+}
 
 
 # ---------------------------
@@ -53,12 +82,16 @@ def parse_api(
     skip=None,
 ) -> dict:
     """Get data from API"""
+    debug = False
+    if _LOGGER.getEffectiveLevel() == 10:
+        debug = True
+
     if not source:
         if not key and not key_search:
             data = fill_defaults(data, vals)
         return data
-
-    _LOGGER.debug("Processing source %s", source)
+    if debug:
+        _LOGGER.debug("Processing source %s", async_redact_data(source, TO_REDACT))
 
     keymap = generate_keymap(data, key_search)
     for entry in source:
@@ -77,7 +110,9 @@ def parse_api(
             if uid not in data:
                 data[uid] = {}
 
-        _LOGGER.debug("Processing entry %s", entry)
+        if debug:
+            _LOGGER.debug("Processing entry %s", async_redact_data(entry, TO_REDACT))
+
         if vals:
             data = fill_vals(data, entry, uid, vals)
 
