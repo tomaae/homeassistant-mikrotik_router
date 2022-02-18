@@ -1303,6 +1303,8 @@ class MikrotikControllerData:
             ensure_vals=[
                 {"name": "uptime", "default": 0},
                 {"name": "uptime_epoch", "default": 0},
+                {"name": "clients_wired", "default": 0},
+                {"name": "clients_wireless", "default": 0},
             ],
         )
 
@@ -1804,6 +1806,8 @@ class MikrotikControllerData:
             await self.async_ping_tracked_hosts(utcnow())
 
         # Process hosts
+        self.data["resource"]["clients_wired"] = 0
+        self.data["resource"]["clients_wireless"] = 0
         for uid, vals in self.data["host"].items():
             # CAPS-MAN availability
             if vals["source"] == "capsman" and uid not in capsman_detected:
@@ -1898,6 +1902,13 @@ class MikrotikControllerData:
 
             if vals["manufacturer"] == "detect":
                 self.data["host"][uid]["manufacturer"] = ""
+
+            # Count hosts
+            if self.data["host"][uid]["available"]:
+                if vals["source"] in ["capsman", "wireless"]:
+                    self.data["resource"]["clients_wireless"] += 1
+                else:
+                    self.data["resource"]["clients_wired"] += 1
 
     # ---------------------------
     #   process_accounting
