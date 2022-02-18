@@ -20,7 +20,6 @@ from homeassistant.util.dt import get_age, utcnow
 from .helper import format_attribute, format_value
 from .const import (
     DOMAIN,
-    DATA_CLIENT,
     ATTRIBUTION,
     CONF_TRACK_HOSTS,
     DEFAULT_TRACK_HOSTS,
@@ -41,7 +40,7 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up device tracker for Mikrotik Router component."""
     inst = config_entry.data[CONF_NAME]
-    mikrotik_controller = hass.data[DOMAIN][DATA_CLIENT][config_entry.entry_id]
+    mikrotik_controller = hass.data[DOMAIN][config_entry.entry_id]
     trackers = {}
 
     @callback

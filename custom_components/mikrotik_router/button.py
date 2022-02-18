@@ -8,7 +8,7 @@ from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.restore_state import RestoreEntity
 from .helper import format_attribute
-from .const import DOMAIN, DATA_CLIENT, ATTRIBUTION
+from .const import DOMAIN, ATTRIBUTION
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ DEVICE_ATTRIBUTES_SCRIPT = [
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up buttons for Mikrotik Router component."""
     inst = config_entry.data[CONF_NAME]
-    mikrotik_controller = hass.data[DOMAIN][DATA_CLIENT][config_entry.entry_id]
+    mikrotik_controller = hass.data[DOMAIN][config_entry.entry_id]
     buttons = {}
 
     @callback

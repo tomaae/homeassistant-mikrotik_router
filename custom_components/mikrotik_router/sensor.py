@@ -17,7 +17,6 @@ from .const import (
     CONF_SENSOR_PORT_TRAFFIC,
     DEFAULT_SENSOR_PORT_TRAFFIC,
     DOMAIN,
-    DATA_CLIENT,
     ATTRIBUTION,
 )
 from .sensor_types import (
@@ -36,7 +35,7 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up device tracker for Mikrotik Router component."""
     inst = config_entry.data[CONF_NAME]
-    mikrotik_controller = hass.data[DOMAIN][DATA_CLIENT][config_entry.entry_id]
+    mikrotik_controller = hass.data[DOMAIN][config_entry.entry_id]
     sensors = {}
 
     @callback
