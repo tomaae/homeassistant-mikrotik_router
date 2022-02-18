@@ -9,11 +9,14 @@ _LOGGER = logging.getLogger(__name__)
 
 TO_REDACT = {
     "ip-address",
+    "client-ip-address",
     "address",
     "active-address",
     "mac-address",
     "active-mac-address",
     "orig-mac-address",
+    "port-mac-address",
+    "client-mac-address",
     "client-id",
     "active-client-id",
     "eeprom",
@@ -29,6 +32,7 @@ TO_REDACT = {
     "to-addresses",
     "src-address",
     "dst-address",
+    "username",
     "password",
     "caller-id",
     "target",
