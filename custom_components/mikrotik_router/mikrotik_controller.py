@@ -1231,20 +1231,25 @@ class MikrotikControllerData:
     # ---------------------------
     def get_system_routerboard(self):
         """Get routerboard data from Mikrotik"""
-        self.data["routerboard"] = parse_api(
-            data=self.data["routerboard"],
-            source=self.api.path("/system/routerboard"),
-            vals=[
-                {"name": "routerboard", "type": "bool"},
-                {"name": "model", "default": "unknown"},
-                {"name": "serial-number", "default": "unknown"},
-                {
-                    "name": "firmware",
-                    "source": "current-firmware",
-                    "default": "unknown",
-                },
-            ],
-        )
+        if self.data["resource"]["board-name"] == "x86":
+            self.data["routerboard"]["routerboard"] = False
+            self.data["routerboard"]["model"] = "x86"
+            self.data["routerboard"]["serial-number"] = "N/A"
+        else:
+            self.data["routerboard"] = parse_api(
+                data=self.data["routerboard"],
+                source=self.api.path("/system/routerboard"),
+                vals=[
+                    {"name": "routerboard", "type": "bool"},
+                    {"name": "model", "default": "unknown"},
+                    {"name": "serial-number", "default": "unknown"},
+                    {
+                        "name": "firmware",
+                        "source": "current-firmware",
+                        "default": "unknown",
+                    },
+                ],
+            )
 
     # ---------------------------
     #   get_system_health
