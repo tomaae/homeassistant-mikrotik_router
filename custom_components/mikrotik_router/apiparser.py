@@ -48,7 +48,11 @@ def from_entry(entry, param, default="") -> str:
     if param not in entry:
         return default
 
-    return entry[param]
+    return (
+        entry[param][:255]
+        if isinstance(entry[param], str) and len(entry[param]) > 255
+        else entry[param]
+    )
 
 
 # ---------------------------
