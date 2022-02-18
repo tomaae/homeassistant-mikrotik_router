@@ -462,13 +462,13 @@ class MikrotikControllerData:
         await self.hass.async_add_executor_job(self.get_firmware_update)
 
         if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_system_resource)
+
+        if self.api.connected():
             await self.hass.async_add_executor_job(self.get_capabilities)
 
         if self.api.connected():
             await self.hass.async_add_executor_job(self.get_system_routerboard)
-
-        if self.api.connected():
-            await self.hass.async_add_executor_job(self.get_system_resource)
 
         if self.api.connected() and self.option_sensor_scripts:
             await self.hass.async_add_executor_job(self.get_script)
@@ -576,10 +576,17 @@ class MikrotikControllerData:
         except:
             return
 
-        await self.hass.async_add_executor_job(self.get_interface)
-
         if self.api.connected() and "available" not in self.data["fw-update"]:
             await self.async_fwupdate_check()
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_system_resource)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_system_health)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_interface)
 
         if self.api.connected() and not self.data["host_hass"]:
             await self.async_get_host_hass()
@@ -623,9 +630,6 @@ class MikrotikControllerData:
         if self.api.connected() and self.support_ppp and self.option_sensor_ppp:
             await self.hass.async_add_executor_job(self.get_ppp)
 
-        if self.api.connected():
-            await self.hass.async_add_executor_job(self.get_system_resource)
-
         if self.api.connected() and self.option_sensor_client_traffic:
             if 0 < self.major_fw_version < 7:
                 await self.hass.async_add_executor_job(self.process_accounting)
@@ -637,9 +641,6 @@ class MikrotikControllerData:
 
         if self.api.connected() and self.option_sensor_environment:
             await self.hass.async_add_executor_job(self.get_environment)
-
-        if self.api.connected():
-            await self.hass.async_add_executor_job(self.get_system_health)
 
         async_dispatcher_send(self.hass, self.signal_update)
         self.lock.release()
@@ -1269,6 +1270,10 @@ class MikrotikControllerData:
     # ---------------------------
     def get_system_resource(self):
         """Get system resources data from Mikrotik"""
+        tmp_rebootcheck = 0
+        if "uptime_epoch" in self.data["resource"]:
+            tmp_rebootcheck = self.data["resource"]["uptime_epoch"]
+
         self.data["resource"] = parse_api(
             data=self.data["resource"],
             source=self.api.path("/system/resource"),
@@ -1285,6 +1290,7 @@ class MikrotikControllerData:
             ],
             ensure_vals=[
                 {"name": "uptime", "default": 0},
+                {"name": "uptime_epoch", "default": 0},
             ],
         )
 
@@ -1305,6 +1311,7 @@ class MikrotikControllerData:
         if len(tmp) > 1:
             tmp_uptime += int(tmp[1]) * 604800
 
+        self.data["resource"]["uptime_epoch"] = tmp_uptime
         now = datetime.now().replace(microsecond=0)
         uptime_tm = datetime.timestamp(now - timedelta(seconds=tmp_uptime))
         update_uptime = False
@@ -1349,6 +1356,10 @@ class MikrotikControllerData:
             )
         else:
             self.data["resource"]["hdd-usage"] = "unknown"
+
+        if "uptime_epoch" in self.data["resource"]:
+            if 0 < tmp_rebootcheck < self.data["resource"]["uptime_epoch"]:
+                self.get_firmware_update()
 
     # ---------------------------
     #   get_firmware_update
