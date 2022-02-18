@@ -407,8 +407,8 @@ class MikrotikControllerFilterSwitch(MikrotikControllerSwitch):
         for uid in self._ctrl.data["filter"]:
             if self._ctrl.data["filter"][uid]["uniq-id"] == (
                 f"{self._data['chain']},{self._data['action']},{self._data['protocol']},{self._data['layer7-protocol']},"
-                f"{self._data['in-interface']}:{self._data['src-address']}:{self._data['src-port']}-"
-                f"{self._data['out-interface']}:{self._data['dst-address']}:{self._data['dst-port']}"
+                f"{self._data['in-interface']},{self._data['in-interface-list']}:{self._data['src-address']},{self._data['src-address-list']}:{self._data['src-port']}-"
+                f"{self._data['out-interface']},{self._data['out-interface-list']}:{self._data['dst-address']},{self._data['dst-address-list']}:{self._data['dst-port']}"
             ):
                 value = self._ctrl.data["filter"][uid][".id"]
 
@@ -424,8 +424,8 @@ class MikrotikControllerFilterSwitch(MikrotikControllerSwitch):
         for uid in self._ctrl.data["filter"]:
             if self._ctrl.data["filter"][uid]["uniq-id"] == (
                 f"{self._data['chain']},{self._data['action']},{self._data['protocol']},{self._data['layer7-protocol']},"
-                f"{self._data['in-interface']}:{self._data['src-address']}:{self._data['src-port']}-"
-                f"{self._data['out-interface']}:{self._data['dst-address']}:{self._data['dst-port']}"
+                f"{self._data['in-interface']},{self._data['in-interface-list']}:{self._data['src-address']},{self._data['src-address-list']}:{self._data['src-port']}-"
+                f"{self._data['out-interface']},{self._data['out-interface-list']}:{self._data['dst-address']},{self._data['dst-address-list']}:{self._data['dst-port']}"
             ):
                 value = self._ctrl.data["filter"][uid][".id"]
 
