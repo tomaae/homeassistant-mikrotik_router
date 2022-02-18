@@ -775,7 +775,7 @@ class MikrotikControllerData:
         """Get traffic for all interfaces from Mikrotik"""
         interface_list = ""
         for uid in self.data["interface"]:
-            interface_list += self.data["interface"][uid]["name"] + ","
+            interface_list += str(self.data["interface"][uid]["name"]) + ","
 
         interface_list = interface_list[:-1]
 
