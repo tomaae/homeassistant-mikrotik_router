@@ -24,5 +24,5 @@ requests_mock = "==1.7.0"
 responses = "==0.10.6"
 
 [packages]
-librouteros = "==3.0.0"
-mac-vendor-lookup = "==0.1.11"
+librouteros = "==3.2.0"
+mac-vendor-lookup = "==0.1.12"
