@@ -2124,8 +2124,8 @@ class MikrotikControllerData:
                     "host-name": vals["host-name"],
                     "previous-bytes-up": 0.0,
                     "previous-bytes-down": 0.0,
-                    "wan-tx": 0.0,
-                    "wan-rx": 0.0,
+                    "tx": 0.0,
+                    "rx": 0.0,
                     "tx-rx-attr": uom_type,
                     "available": False,
                     "local_accounting": False,
@@ -2175,7 +2175,7 @@ class MikrotikControllerData:
             previous_tx = self.data["client_traffic"][uid]["previous-bytes-up"]
             if time_diff:
                 delta_tx = max(0, current_tx - previous_tx) * 8
-                self.data["client_traffic"][uid]["wan-tx"] = round(
+                self.data["client_traffic"][uid]["tx"] = round(
                     delta_tx / time_diff * uom_div, 2
                 )
             self.data["client_traffic"][uid]["previous-bytes-up"] = current_tx
@@ -2184,7 +2184,7 @@ class MikrotikControllerData:
             previous_rx = self.data["client_traffic"][uid]["previous-bytes-down"]
             if time_diff:
                 delta_rx = max(0, current_rx - previous_rx) * 8
-                self.data["client_traffic"][uid]["wan-rx"] = round(
+                self.data["client_traffic"][uid]["rx"] = round(
                     delta_rx / time_diff * uom_div, 2
                 )
             self.data["client_traffic"][uid]["previous-bytes-down"] = current_rx
