@@ -613,9 +613,6 @@ class MikrotikControllerData:
         if self.api.connected():
             await self.async_process_host()
 
-        if self.api.connected() and self.option_sensor_port_traffic:
-            await self.hass.async_add_executor_job(self.get_interface_traffic)
-
         if self.api.connected():
             await self.hass.async_add_executor_job(self.process_interface_client)
 
@@ -679,6 +676,8 @@ class MikrotikControllerData:
                 {"name": "tx-queue-drop"},
                 {"name": "actual-mtu"},
                 {"name": "about", "source": ".about", "default": ""},
+                {"name": "rx-current", "source": "rx-byte", "default": 0.0},
+                {"name": "tx-current", "source": "tx-byte", "default": 0.0},
             ],
             ensure_vals=[
                 {"name": "client-ip-address"},
@@ -698,6 +697,34 @@ class MikrotikControllerData:
                 {"name": "type", "value": "ovpn-in"},
             ],
         )
+
+        if self.option_sensor_port_traffic:
+            uom_type, uom_div = self._get_unit_of_measurement()
+            for uid, vals in self.data["interface"].items():
+                self.data["interface"][uid]["rx-attr"] = uom_type
+                self.data["interface"][uid]["tx-attr"] = uom_type
+
+                current_tx = vals["tx-current"]
+                previous_tx = vals["tx-previous"]
+                if not previous_tx:
+                    previous_tx = current_tx
+
+                delta_tx = max(0, current_tx - previous_tx) * 8
+                self.data["interface"][uid]["tx"] = round(
+                    delta_tx / self.option_scan_interval.seconds * uom_div, 2
+                )
+                self.data["interface"][uid]["tx-previous"] = current_tx
+
+                current_rx = vals["rx-current"]
+                previous_rx = vals["rx-previous"]
+                if not previous_rx:
+                    previous_rx = current_rx
+
+                delta_rx = max(0, current_rx - previous_rx) * 8
+                self.data["interface"][uid]["rx"] = round(
+                    delta_rx / self.option_scan_interval.seconds * uom_div, 2
+                )
+                self.data["interface"][uid]["rx-previous"] = current_rx
 
         self.data["interface"] = parse_api(
             data=self.data["interface"],
@@ -773,50 +800,6 @@ class MikrotikControllerData:
                             {"name": "auto-negotiation", "default": "unknown"},
                         ],
                     )
-
-    # ---------------------------
-    #   get_interface_traffic
-    # ---------------------------
-    def get_interface_traffic(self):
-        """Get traffic for all interfaces from Mikrotik"""
-        tmp_data = parse_api(
-            data={},
-            source=self.api.get_traffic(),
-            key="default-name",
-            vals=[
-                {"name": "rx-byte", "default": 0.0},
-                {"name": "tx-byte", "default": 0.0},
-            ],
-        )
-
-        uom_type, uom_div = self._get_unit_of_measurement()
-        for uid in self.data["interface"]:
-            self.data["interface"][uid]["rx-attr"] = uom_type
-            self.data["interface"][uid]["tx-attr"] = uom_type
-            if uid not in tmp_data:
-                continue
-
-            current_tx = tmp_data[uid]["tx-byte"]
-            previous_tx = self.data["interface"][uid]["tx-previous"]
-            if not previous_tx:
-                previous_tx = current_tx
-
-            delta_tx = max(0, current_tx - previous_tx) * 8
-            self.data["interface"][uid]["tx"] = round(
-                delta_tx / self.option_scan_interval.seconds * uom_div, 2
-            )
-            self.data["interface"][uid]["tx-previous"] = current_tx
-
-            current_rx = tmp_data[uid]["rx-byte"]
-            previous_rx = self.data["interface"][uid]["rx-previous"]
-            if not previous_rx:
-                previous_rx = current_rx
-
-            delta_rx = max(0, current_rx - previous_rx) * 8
-            self.data["interface"][uid]["rx"] = round(
-                delta_rx / self.option_scan_interval.seconds * uom_div, 2
-            )
-            self.data["interface"][uid]["rx-previous"] = current_rx
 
     # ---------------------------
     #   get_route
