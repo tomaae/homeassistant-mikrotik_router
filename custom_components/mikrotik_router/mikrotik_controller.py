@@ -106,6 +106,7 @@ class MikrotikControllerData:
         self.data = {
             "routerboard": {},
             "resource": {},
+            "route": {},
             "health": {},
             "health7": {},
             "interface": {},
@@ -586,6 +587,9 @@ class MikrotikControllerData:
             await self.hass.async_add_executor_job(self.get_system_health)
 
         if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_route)
+
+        if self.api.connected():
             await self.hass.async_add_executor_job(self.get_interface)
 
         if self.api.connected() and not self.data["host_hass"]:
@@ -813,6 +817,28 @@ class MikrotikControllerData:
                 delta_rx / self.option_scan_interval.seconds * uom_div, 2
             )
             self.data["interface"][uid]["rx-previous"] = current_rx
+
+    # ---------------------------
+    #   get_route
+    # ---------------------------
+    def get_route(self):
+        """Get system resources data from Mikrotik"""
+        self.data["route"] = parse_api(
+            data={},
+            source=self.api.path("/ip/route"),
+            key="dst-address",
+            vals=[
+                {"name": "dst-address"},
+                {"name": "gateway", "default": "unknown"},
+                {"name": "vrf-interface", "default": "unknown"},
+                {
+                    "name": "enabled",
+                    "source": "disabled",
+                    "type": "bool",
+                    "reverse": True,
+                },
+            ],
+        )
 
     # ---------------------------
     #   get_bridge
@@ -1561,6 +1587,13 @@ class MikrotikControllerData:
             ensure_vals=[{"name": "bridge", "default": ""}],
         )
 
+        default_gateway = ""
+        if (
+            "0.0.0.0/0" in self.data["route"]
+            and self.data["route"]["0.0.0.0/0"]["vrf-interface"]
+        ):
+            default_gateway = self.data["route"]["0.0.0.0/0"]["vrf-interface"]
+
         for uid, vals in self.data["arp"].items():
             if (
                 vals["interface"] in self.data["bridge"]
@@ -1570,6 +1603,15 @@ class MikrotikControllerData:
                 self.data["arp"][uid]["interface"] = self.data["bridge_host"][uid][
                     "interface"
                 ]
+
+        if default_gateway:
+            to_remove = []
+            for uid, vals in self.data["arp"].items():
+                if vals["interface"] == default_gateway:
+                    to_remove.append(uid)
+
+            for uid in to_remove:
+                self.data["arp"].pop(uid)
 
     # ---------------------------
     #   get_dns
