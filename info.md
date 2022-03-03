@@ -1,9 +1,3 @@
-{% if installed %}
-{% if version_installed.replace("v", "").replace(".","") | int == 16  %}
-**IMPORTANT: This update changes some HA UIDs to improve handling of duplicate entries. After an update, delete old entries and check entity names in all your automations where you use this integration.**
-{% endif %}
-{% endif %}
-
 Monitor and control your Mikrotik device from Home Assistant.
 
 ![Mikrotik Logo](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/header.png)
