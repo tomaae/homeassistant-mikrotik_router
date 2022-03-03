@@ -679,8 +679,10 @@ class MikrotikControllerData:
             ensure_vals=[
                 {"name": "client-ip-address"},
                 {"name": "client-mac-address"},
-                {"name": "rx-bits-per-second", "default": 0},
-                {"name": "tx-bits-per-second", "default": 0},
+                {"name": "rx-previous", "default": 0.0},
+                {"name": "tx-previous", "default": 0.0},
+                {"name": "rx", "default": 0.0},
+                {"name": "tx", "default": 0.0},
             ],
             skip=[
                 {"name": "type", "value": "bridge"},
@@ -773,33 +775,44 @@ class MikrotikControllerData:
     # ---------------------------
     def get_interface_traffic(self):
         """Get traffic for all interfaces from Mikrotik"""
-        interface_list = ""
-        for uid in self.data["interface"]:
-            interface_list += str(self.data["interface"][uid]["name"]) + ","
-
-        interface_list = interface_list[:-1]
-
-        self.data["interface"] = parse_api(
-            data=self.data["interface"],
-            source=self.api.get_traffic(interface_list),
-            key_search="name",
+        tmp_data = parse_api(
+            data={},
+            source=self.api.get_traffic(),
+            key="default-name",
             vals=[
-                {"name": "rx-bits-per-second", "default": 0},
-                {"name": "tx-bits-per-second", "default": 0},
+                {"name": "rx-byte", "default": 0.0},
+                {"name": "tx-byte", "default": 0.0},
             ],
         )
 
         uom_type, uom_div = self._get_unit_of_measurement()
-
         for uid in self.data["interface"]:
-            self.data["interface"][uid]["rx-bits-per-second-attr"] = uom_type
-            self.data["interface"][uid]["tx-bits-per-second-attr"] = uom_type
-            self.data["interface"][uid]["rx-bits-per-second"] = round(
-                self.data["interface"][uid]["rx-bits-per-second"] * uom_div
+            self.data["interface"][uid]["rx-attr"] = uom_type
+            self.data["interface"][uid]["tx-attr"] = uom_type
+            if uid not in tmp_data:
+                continue
+
+            current_tx = tmp_data[uid]["tx-byte"]
+            previous_tx = self.data["interface"][uid]["tx-previous"]
+            if not previous_tx:
+                previous_tx = current_tx
+
+            delta_tx = max(0, current_tx - previous_tx) * 8
+            self.data["interface"][uid]["tx"] = round(
+                delta_tx / self.option_scan_interval.seconds * uom_div, 2
             )
-            self.data["interface"][uid]["tx-bits-per-second"] = round(
-                self.data["interface"][uid]["tx-bits-per-second"] * uom_div
+            self.data["interface"][uid]["tx-previous"] = current_tx
+
+            current_rx = tmp_data[uid]["rx-byte"]
+            previous_rx = self.data["interface"][uid]["rx-previous"]
+            if not previous_rx:
+                previous_rx = current_rx
+
+            delta_rx = max(0, current_rx - previous_rx) * 8
+            self.data["interface"][uid]["rx"] = round(
+                delta_rx / self.option_scan_interval.seconds * uom_div, 2
             )
+            self.data["interface"][uid]["rx-previous"] = current_rx
 
     # ---------------------------
     #   get_bridge

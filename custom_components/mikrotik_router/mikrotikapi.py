@@ -437,7 +437,7 @@ class MikrotikAPI:
     # ---------------------------
     #   get_traffic
     # ---------------------------
-    def get_traffic(self, interfaces) -> Optional(list):
+    def get_traffic(self) -> Optional(list):
         """Get traffic stats"""
         if not self.connection_check():
             return None
@@ -446,11 +446,11 @@ class MikrotikAPI:
         if response is None:
             return None
 
-        args = {"interface": interfaces, "once": True}
+        args = {"stats": True}
         self.lock.acquire()
         try:
-            _LOGGER.debug("API query: %s", "/interface/monitor-traffic")
-            traffic = response("monitor-traffic", **args)
+            _LOGGER.debug("API query: %s", "/interface/print stats")
+            traffic = response("print", **args)
         except librouteros.exceptions.ConnectionClosed:
             self.disconnect()
             self.lock.release()
@@ -487,6 +487,7 @@ class MikrotikAPI:
             return None
 
         self.lock.release()
+
         return traffic if traffic else None
 
     # ---------------------------
