@@ -1,4 +1,4 @@
-"""Definitions for Mikrotik Router sensor entities."""
+"""Definitions for Mikrotik Router switch entities."""
 from dataclasses import dataclass, field
 from typing import List
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
