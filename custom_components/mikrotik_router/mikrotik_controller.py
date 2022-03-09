@@ -1253,9 +1253,9 @@ class MikrotikControllerData:
     # ---------------------------
     def get_system_routerboard(self):
         """Get routerboard data from Mikrotik"""
-        if self.data["resource"]["board-name"] == "x86":
+        if self.data["resource"]["board-name"] in ("x86", "CHR"):
             self.data["routerboard"]["routerboard"] = False
-            self.data["routerboard"]["model"] = "x86"
+            self.data["routerboard"]["model"] = self.data["resource"]["board-name"]
             self.data["routerboard"]["serial-number"] = "N/A"
         else:
             self.data["routerboard"] = parse_api(
