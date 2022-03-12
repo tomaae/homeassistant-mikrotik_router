@@ -38,7 +38,7 @@ If applicable, add screenshots to help explain your problem.
 <!--
 All fields in this sections are required.
 -->
- - Home Assistant version: <!-- e.g. HA v0.108.3 -->
+ - Home Assistant version: <!-- e.g. HA 2022.2.0 -->
  - Mikrotik Router integration version: <!-- e.g. v1.0.0 -->
  - Mikrotik Hardware: <!-- e.g. RB4011iGS+ -->
  - RouterOS version: <!-- e.g. v6.45 -->
