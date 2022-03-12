@@ -33,6 +33,7 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 -->
 
+
 ## Software versions
 <!--
 All fields in this sections are required.
@@ -41,6 +42,13 @@ All fields in this sections are required.
  - Mikrotik Router integration version: <!-- e.g. v1.0.0 -->
  - Mikrotik Hardware: <!-- e.g. RB4011iGS+ -->
  - RouterOS version: <!-- e.g. v6.45 -->
+
+
+## Diagnostics data
+<!--
+  If you are seing incorrect data through the integration, please upload integration diagnostics data.
+-->
+
 
 ## Traceback/Error logs
 <!--
