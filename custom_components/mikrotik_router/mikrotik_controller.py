@@ -1217,6 +1217,7 @@ class MikrotikControllerData:
             ],
             ensure_vals=[
                 {"name": "caller-id", "default": ""},
+                {"name": "address", "default": ""},
                 {"name": "encoding", "default": ""},
                 {"name": "connected", "default": False},
             ],
@@ -1230,6 +1231,7 @@ class MikrotikControllerData:
                 {"name": "name"},
                 {"name": "service"},
                 {"name": "caller-id"},
+                {"name": "address"},
                 {"name": "encoding"},
             ],
         )
@@ -1240,12 +1242,16 @@ class MikrotikControllerData:
                 self.data["ppp_secret"][uid]["caller-id"] = self.data["ppp_active"][
                     uid
                 ]["caller-id"]
+                self.data["ppp_secret"][uid]["address"] = self.data["ppp_active"][uid][
+                    "address"
+                ]
                 self.data["ppp_secret"][uid]["encoding"] = self.data["ppp_active"][uid][
                     "encoding"
                 ]
             else:
                 self.data["ppp_secret"][uid]["connected"] = False
                 self.data["ppp_secret"][uid]["caller-id"] = "not connected"
+                self.data["ppp_secret"][uid]["address"] = "not connected"
                 self.data["ppp_secret"][uid]["encoding"] = "not connected"
 
     # ---------------------------
