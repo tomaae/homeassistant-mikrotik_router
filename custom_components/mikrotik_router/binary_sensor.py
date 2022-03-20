@@ -149,13 +149,12 @@ class MikrotikControllerBinarySensor(BinarySensorEntity):
     @property
     def name(self) -> str:
         """Return the name."""
-        if self._uid:
-            if self.entity_description.name:
-                return f"{self._inst} {self._data[self.entity_description.data_name]} {self.entity_description.name}"
-
-            return f"{self._inst} {self._data[self.entity_description.data_name]}"
-        else:
+        if not self._uid:
             return f"{self._inst} {self.entity_description.name}"
+        if self.entity_description.name:
+            return f"{self._inst} {self._data[self.entity_description.data_name]} {self.entity_description.name}"
+
+        return f"{self._inst} {self._data[self.entity_description.data_name]}"
 
     @property
     def unique_id(self) -> str:
@@ -270,18 +269,16 @@ class MikrotikControllerPPPSecretBinarySensor(MikrotikControllerBinarySensor):
     @property
     def is_on(self) -> bool:
         """Return true if device is on."""
-        if not self.option_sensor_ppp:
-            return False
-
-        return self._data[self.entity_description.data_is_on]
+        return (
+            self._data[self.entity_description.data_is_on]
+            if self.option_sensor_ppp
+            else False
+        )
 
     @property
     def available(self) -> bool:
         """Return if controller is available."""
-        if not self.option_sensor_ppp:
-            return False
-
-        return self._ctrl.connected()
+        return self._ctrl.connected() if self.option_sensor_ppp else False
 
 
 # ---------------------------
@@ -300,10 +297,7 @@ class MikrotikControllerPortBinarySensor(MikrotikControllerBinarySensor):
     @property
     def available(self) -> bool:
         """Return if controller is available."""
-        if not self.option_sensor_port_tracker:
-            return False
-
-        return self._ctrl.connected()
+        return self._ctrl.connected() if self.option_sensor_port_tracker else False
 
     @property
     def icon(self) -> str:

@@ -151,7 +151,7 @@ class MikrotikAPI:
                 )
                 self.connection_error_reported = True
 
-            self.error_to_strings("%s" % api_error)
+            self.error_to_strings(f"{api_error}")
             self._connection = None
             self.lock.release()
             return False
@@ -248,7 +248,7 @@ class MikrotikAPI:
                 return None
 
         self.lock.release()
-        return response if response else None
+        return response or None
 
     # ---------------------------
     #   update
@@ -487,7 +487,7 @@ class MikrotikAPI:
             return None
 
         self.lock.release()
-        return sfpinfo if sfpinfo else None
+        return sfpinfo or None
 
     # ---------------------------
     #   arp_ping

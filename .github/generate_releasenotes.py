@@ -60,10 +60,8 @@ def last_integration_release(github, skip=True):
     """Return last release."""
     repo = github.get_repo("tomaae/homeassistant-mikrotik_router")
     tag_sha = None
-    data = {}
-    tags = list(repo.get_tags())
-    reg = "(v|^)?(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)$"
-    if tags:
+    if tags := list(repo.get_tags()):
+        reg = "(v|^)?(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)$"
         for tag in tags:
             tag_name = tag.name
             if re.match(reg, tag_name):
@@ -72,19 +70,15 @@ def last_integration_release(github, skip=True):
                     skip = False
                     continue
                 break
-    data["tag_name"] = tag_name
-    data["tag_sha"] = tag_sha
-    return data
+    return {"tag_name": tag_name, "tag_sha": tag_sha}
 
 
 def get_integration_commits(github, skip=True):
     changes = ""
     repo = github.get_repo("tomaae/homeassistant-mikrotik_router")
-    commits = new_commits(repo, last_integration_release(github, skip)["tag_sha"])
-
-    if not commits:
-        changes = NOCHANGE
-    else:
+    if commits := new_commits(
+        repo, last_integration_release(github, skip)["tag_sha"]
+    ):
         for commit in commits:
             msg = repo.get_git_commit(commit.sha).message
             if "flake" in msg:
@@ -103,12 +97,11 @@ def get_integration_commits(github, skip=True):
                 continue
             if "\n" in msg:
                 msg = msg.split("\n")[0]
-            if commit.author:
-                ath = commit.author
-            else:
-                ath = "Unknown"
+            ath = commit.author or "Unknown"
             changes += CHANGE.format(line=msg, link=commit.html_url, author=ath)
 
+    else:
+        changes = NOCHANGE
     return changes
 
 

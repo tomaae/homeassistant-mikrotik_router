@@ -1404,9 +1404,11 @@ class MikrotikControllerData:
         else:
             self.data["resource"]["hdd-usage"] = "unknown"
 
-        if "uptime_epoch" in self.data["resource"]:
-            if 0 < tmp_rebootcheck < self.data["resource"]["uptime_epoch"]:
-                self.get_firmware_update()
+        if (
+            "uptime_epoch" in self.data["resource"]
+            and 0 < tmp_rebootcheck < self.data["resource"]["uptime_epoch"]
+        ):
+            self.get_firmware_update()
 
     # ---------------------------
     #   get_firmware_update
@@ -1426,10 +1428,9 @@ class MikrotikControllerData:
 
         if "status" in self.data["fw-update"]:
             self.data["fw-update"]["available"] = (
-                True
-                if self.data["fw-update"]["status"] == "New version is available"
-                else False
+                self.data["fw-update"]["status"] == "New version is available"
             )
+
         else:
             self.data["fw-update"]["available"] = False
 
@@ -1594,10 +1595,11 @@ class MikrotikControllerData:
                 ]
 
         if default_gateway:
-            to_remove = []
-            for uid, vals in self.data["arp"].items():
-                if vals["interface"] == default_gateway:
-                    to_remove.append(uid)
+            to_remove = [
+                uid
+                for uid, vals in self.data["arp"].items()
+                if vals["interface"] == default_gateway
+            ]
 
             for uid in to_remove:
                 self.data["arp"].pop(uid)
@@ -1656,7 +1658,7 @@ class MikrotikControllerData:
                 if (
                     self.data["dhcp"][uid]["mac-address"]
                     != self.data["dhcp"][uid]["active-mac-address"]
-                    and self.data["dhcp"][uid]["active-mac-address"] != "unknown"
+                    != "unknown"
                 ):
                     self.data["dhcp"][uid]["mac-address"] = self.data["dhcp"][uid][
                         "active-mac-address"
@@ -1741,9 +1743,7 @@ class MikrotikControllerData:
     # ---------------------------
     def get_wireless_hosts(self):
         """Get wireless hosts data from Mikrotik"""
-        wifimodule = "wireless"
-        if self.support_wifiwave2:
-            wifimodule = "wifiwave2"
+        wifimodule = "wifiwave2" if self.support_wifiwave2 else "wireless"
         self.data["wireless_hosts"] = parse_api(
             data={},
             source=self.api.path(f"/interface/{wifimodule}/registration-table"),
@@ -1803,8 +1803,7 @@ class MikrotikControllerData:
         # Add hosts from DHCP
         for uid, vals in self.data["dhcp"].items():
             if uid not in self.data["host"]:
-                self.data["host"][uid] = {}
-                self.data["host"][uid]["source"] = "dhcp"
+                self.data["host"][uid] = {"source": "dhcp"}
                 for key in ["address", "mac-address", "interface"]:
                     if (
                         key not in self.data["host"][uid]
@@ -1815,8 +1814,7 @@ class MikrotikControllerData:
         # Add hosts from ARP
         for uid, vals in self.data["arp"].items():
             if uid not in self.data["host"]:
-                self.data["host"][uid] = {}
-                self.data["host"][uid]["source"] = "arp"
+                self.data["host"][uid] = {"source": "arp"}
                 for key in ["address", "mac-address", "interface"]:
                     if (
                         key not in self.data["host"][uid]
@@ -1829,8 +1827,7 @@ class MikrotikControllerData:
             self.host_hass_recovered = True
             for uid in self.data["host_hass"]:
                 if uid not in self.data["host"]:
-                    self.data["host"][uid] = {}
-                    self.data["host"][uid]["source"] = "restored"
+                    self.data["host"][uid] = {"source": "restored"}
                     self.data["host"][uid]["mac-address"] = uid
                     self.data["host"][uid]["host-name"] = self.data["host_hass"][uid]
 
@@ -1988,15 +1985,12 @@ class MikrotikControllerData:
         )
 
         # Build temp accounting values dict with ip address as key
-        tmp_accounting_values = {}
-        for uid, vals in self.data["client_traffic"].items():
-            tmp_accounting_values[vals["address"]] = {
+        tmp_accounting_values = {vals["address"]: {
                 "wan-tx": 0,
                 "wan-rx": 0,
                 "lan-tx": 0,
                 "lan-rx": 0,
-            }
-
+            } for uid, vals in self.data["client_traffic"].items()}
         time_diff = self.api.take_client_traffic_snapshot(True)
         if time_diff:
             accounting_data = parse_api(
@@ -2124,32 +2118,37 @@ class MikrotikControllerData:
     # ---------------------------
     def _address_part_of_local_network(self, address):
         address = ip_address(address)
-        for vals in self.data["dhcp-network"].values():
-            if address in vals["IPv4Network"]:
-                return True
-        return False
+        return any(
+            address in vals["IPv4Network"]
+            for vals in self.data["dhcp-network"].values()
+        )
 
     # ---------------------------
     #   _get_accounting_uid_by_ip
     # ---------------------------
     def _get_accounting_uid_by_ip(self, requested_ip):
-        for mac, vals in self.data["client_traffic"].items():
-            if vals.get("address") is requested_ip:
-                return mac
-        return None
+        return next(
+            (
+                mac
+                for mac, vals in self.data["client_traffic"].items()
+                if vals.get("address") is requested_ip
+            ),
+            None,
+        )
 
     # ---------------------------
     #   _get_iface_from_entry
     # ---------------------------
     def _get_iface_from_entry(self, entry):
         """Get interface default-name using name from interface dict"""
-        uid = None
-        for ifacename in self.data["interface"]:
-            if self.data["interface"][ifacename]["name"] == entry["interface"]:
-                uid = ifacename
-                break
-
-        return uid
+        return next(
+            (
+                ifacename
+                for ifacename in self.data["interface"]
+                if self.data["interface"][ifacename]["name"] == entry["interface"]
+            ),
+            None,
+        )
 
     # ---------------------------
     #   process_kid_control

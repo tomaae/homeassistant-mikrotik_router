@@ -177,7 +177,7 @@ class MikrotikControllerScriptButton(MikrotikControllerButton):
     @property
     def device_info(self) -> Dict[str, Any]:
         """Return a description for device registry."""
-        info = {
+        return {
             "identifiers": {
                 (
                     DOMAIN,
@@ -191,7 +191,6 @@ class MikrotikControllerScriptButton(MikrotikControllerButton):
             "model": self._ctrl.data["resource"]["board-name"],
             "name": f"{self._inst} Scripts",
         }
-        return info
 
     async def async_press(self) -> None:
         """Process the button press."""

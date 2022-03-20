@@ -183,13 +183,12 @@ class MikrotikControllerSensor(SensorEntity):
     @property
     def name(self) -> str:
         """Return the name."""
-        if self._uid:
-            if self.entity_description.name:
-                return f"{self._inst} {self._data[self.entity_description.data_name]} {self.entity_description.name}"
-
-            return f"{self._inst} {self._data[self.entity_description.data_name]}"
-        else:
+        if not self._uid:
             return f"{self._inst} {self.entity_description.name}"
+        if self.entity_description.name:
+            return f"{self._inst} {self._data[self.entity_description.data_name]} {self.entity_description.name}"
+
+        return f"{self._inst} {self._data[self.entity_description.data_name]}"
 
     @property
     def unique_id(self) -> str:

@@ -63,15 +63,7 @@ def from_entry_bool(entry, param, default=False, reverse=False) -> bool:
     if param not in entry:
         return default
 
-    if not reverse:
-        ret = entry[param]
-    else:
-        if entry[param]:
-            ret = False
-        else:
-            ret = True
-
-    return ret
+    return not entry[param] if reverse else entry[param]
 
 
 # ---------------------------
@@ -90,10 +82,7 @@ def parse_api(
     skip=None,
 ) -> dict:
     """Get data from API"""
-    debug = False
-    if _LOGGER.getEffectiveLevel() == 10:
-        debug = True
-
+    debug = _LOGGER.getEffectiveLevel() == 10
     if not source:
         if not key and not key_search:
             data = fill_defaults(data, vals)
@@ -140,10 +129,7 @@ def get_uid(entry, key, key_secondary, key_search, keymap) -> Optional(str):
     """Get UID for data list"""
     uid = None
     if not key_search:
-        key_primary_found = True
-        if key not in entry:
-            key_primary_found = False
-
+        key_primary_found = key in entry
         if key_primary_found and key not in entry and not entry[key]:
             return None
 
@@ -157,13 +143,12 @@ def get_uid(entry, key, key_secondary, key_search, keymap) -> Optional(str):
                 return None
 
             uid = entry[key_secondary]
+    elif keymap and key_search in entry and entry[key_search] in keymap:
+        uid = keymap[entry[key_search]]
     else:
-        if keymap and key_search in entry and entry[key_search] in keymap:
-            uid = keymap[entry[key_search]]
-        else:
-            return None
+        return None
 
-    return uid if uid else None
+    return uid or None
 
 
 # ---------------------------
@@ -171,17 +156,11 @@ def get_uid(entry, key, key_secondary, key_search, keymap) -> Optional(str):
 # ---------------------------
 def generate_keymap(data, key_search) -> Optional(dict):
     """Generate keymap"""
-    if not key_search:
-        return None
-
-    keymap = {}
-    for uid in data:
-        if key_search not in data[uid]:
-            continue
-
-        keymap[data[uid][key_search]] = uid
-
-    return keymap
+    return (
+        {data[uid][key_search]: uid for uid in data if key_search in data[uid]}
+        if key_search
+        else None
+    )
 
 
 # ---------------------------
@@ -293,10 +272,9 @@ def fill_ensure_vals(data, uid, ensure_vals) -> dict:
             if val["name"] not in data[uid]:
                 _default = val["default"] if "default" in val else ""
                 data[uid][val["name"]] = _default
-        else:
-            if val["name"] not in data:
-                _default = val["default"] if "default" in val else ""
-                data[val["name"]] = _default
+        elif val["name"] not in data:
+            _default = val["default"] if "default" in val else ""
+            data[val["name"]] = _default
 
     return data
 
@@ -326,18 +304,10 @@ def fill_vals_proc(data, uid, vals_proc) -> dict:
             if _action == "combine":
                 if "key" in val:
                     tmp = _data[val["key"]] if val["key"] in _data else "unknown"
-                    if not _value:
-                        _value = tmp
-                    else:
-                        _value = f"{_value}{tmp}"
-
+                    _value = f"{_value}{tmp}" if _value else tmp
                 if "text" in val:
                     tmp = val["text"]
-                    if not _value:
-                        _value = tmp
-                    else:
-                        _value = f"{_value}{tmp}"
-
+                    _value = f"{_value}{tmp}" if _value else tmp
         if _name and _value:
             if uid:
                 data[uid][_name] = _value

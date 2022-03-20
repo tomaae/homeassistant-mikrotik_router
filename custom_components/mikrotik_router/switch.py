@@ -208,7 +208,7 @@ class MikrotikControllerSwitch(SwitchEntity, RestoreEntity):
                 dev_connection_value = dev_connection_value[6:]
                 dev_connection_value = self._data[dev_connection_value]
 
-        info = DeviceInfo(
+        return DeviceInfo(
             connections={(dev_connection, f"{dev_connection_value}")},
             identifiers={(dev_connection, f"{dev_connection_value}")},
             default_name=f"{self._inst} {dev_group}",
@@ -218,8 +218,6 @@ class MikrotikControllerSwitch(SwitchEntity, RestoreEntity):
             configuration_url=f"http://{self._ctrl.config_entry.data[CONF_HOST]}",
             via_device=(DOMAIN, f"{self._ctrl.data['routerboard']['serial-number']}"),
         )
-
-        return info
 
     async def async_added_to_hass(self):
         """Run when entity about to be added to hass."""

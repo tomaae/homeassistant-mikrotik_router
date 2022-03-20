@@ -836,10 +836,7 @@ class MockDependency:
 
         def resolve(mock, path):
             """Resolve a mock."""
-            if not path:
-                return mock
-
-            return resolve(getattr(mock, path[0]), path[1:])
+            return resolve(getattr(mock, path[0]), path[1:]) if path else mock
 
         base = MagicMock()
         to_mock = {
@@ -936,9 +933,7 @@ class MockEntity(entity.Entity):
 
     def _handle(self, attr):
         """Return attribute value."""
-        if attr in self._values:
-            return self._values[attr]
-        return getattr(super(), attr)
+        return self._values[attr] if attr in self._values else getattr(super(), attr)
 
 
 @contextmanager
