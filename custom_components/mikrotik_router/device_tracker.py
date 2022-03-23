@@ -164,21 +164,6 @@ class MikrotikControllerDeviceTracker(ScannerEntity):
         return None
 
     @property
-    def device_info(self) -> Dict[str, Any]:
-        """Return a description for device registry."""
-        info = {
-            "connections": {
-                (CONNECTION_NETWORK_MAC, self._data[self._sid_data["sid_ref"]])
-            },
-            "default_manufacturer": self._ctrl.data["resource"]["platform"],
-            "default_model": self._ctrl.data["resource"]["board-name"],
-            "default_name": self._data[self._sid_data["sid_name"]],
-        }
-        if self._sid_data["sid"] == "interface":
-            info["name"] = f"{self._inst} {self._data[self._sid_data['sid_name']]}"
-        return info
-
-    @property
     def is_connected(self) -> bool:
         """Return true if device is connected."""
         return self._data[self.entity_description.data_is_on]
