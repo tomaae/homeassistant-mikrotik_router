@@ -142,10 +142,7 @@ class MikrotikControllerDeviceTracker(ScannerEntity):
     @property
     def ip_address(self) -> str:
         """Return the primary ip address of the device."""
-        if "address" in self._data:
-            return self._data["address"]
-
-        return None
+        return self._data["address"] if "address" in self._data else None
 
     @property
     def mac_address(self) -> str:
@@ -323,9 +320,7 @@ class MikrotikControllerHostDeviceTracker(MikrotikControllerDeviceTracker):
     @property
     def state(self) -> str:
         """Return the state of the device."""
-        if self.is_connected:
-            return self._ctrl.option_zone
-        return STATE_NOT_HOME
+        return self._ctrl.option_zone if self.is_connected else STATE_NOT_HOME
 
     @property
     def extra_state_attributes(self) -> Dict[str, Any]:
