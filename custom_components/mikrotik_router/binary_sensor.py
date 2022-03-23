@@ -213,8 +213,8 @@ class MikrotikControllerBinarySensor(BinarySensorEntity):
             connections={(dev_connection, f"{dev_connection_value}")},
             identifiers={(dev_connection, f"{dev_connection_value}")},
             default_name=f"{self._inst} {dev_group}",
-            model=f"{self._ctrl.data['resource']['board-name']}",
-            manufacturer=f"{self._ctrl.data['resource']['platform']}",
+            default_model=f"{self._ctrl.data['resource']['board-name']}",
+            default_manufacturer=f"{self._ctrl.data['resource']['platform']}",
             sw_version=f"{self._ctrl.data['resource']['version']}",
             configuration_url=f"http://{self._ctrl.config_entry.data[CONF_HOST]}",
             via_device=(DOMAIN, f"{self._ctrl.data['routerboard']['serial-number']}"),
@@ -232,7 +232,7 @@ class MikrotikControllerBinarySensor(BinarySensorEntity):
             info = DeviceInfo(
                 connections={(dev_connection, f"{dev_connection_value}")},
                 default_name=f"{dev_group}",
-                manufacturer=f"{dev_manufacturer}",
+                deafult_manufacturer=f"{dev_manufacturer}",
                 via_device=(
                     DOMAIN,
                     f"{self._ctrl.data['routerboard']['serial-number']}",
