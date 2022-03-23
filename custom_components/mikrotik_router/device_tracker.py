@@ -170,9 +170,9 @@ class MikrotikControllerDeviceTracker(ScannerEntity):
             "connections": {
                 (CONNECTION_NETWORK_MAC, self._data[self._sid_data["sid_ref"]])
             },
-            "manufacturer": self._ctrl.data["resource"]["platform"],
-            "model": self._ctrl.data["resource"]["board-name"],
-            "name": self._data[self._sid_data["sid_name"]],
+            "default_manufacturer": self._ctrl.data["resource"]["platform"],
+            "default_model": self._ctrl.data["resource"]["board-name"],
+            "default_name": self._data[self._sid_data["sid_name"]],
         }
         if self._sid_data["sid"] == "interface":
             info["name"] = f"{self._inst} {self._data[self._sid_data['sid_name']]}"
@@ -208,8 +208,8 @@ class MikrotikControllerDeviceTracker(ScannerEntity):
             connections={(dev_connection, f"{dev_connection_value}")},
             identifiers={(dev_connection, f"{dev_connection_value}")},
             default_name=f"{self._inst} {dev_group}",
-            model=f"{self._ctrl.data['resource']['board-name']}",
-            manufacturer=f"{self._ctrl.data['resource']['platform']}",
+            default_model=f"{self._ctrl.data['resource']['board-name']}",
+            default_manufacturer=f"{self._ctrl.data['resource']['platform']}",
             sw_version=f"{self._ctrl.data['resource']['version']}",
             configuration_url=f"http://{self._ctrl.config_entry.data[CONF_HOST]}",
             via_device=(DOMAIN, f"{self._ctrl.data['routerboard']['serial-number']}"),
@@ -227,7 +227,7 @@ class MikrotikControllerDeviceTracker(ScannerEntity):
             info = DeviceInfo(
                 connections={(dev_connection, f"{dev_connection_value}")},
                 default_name=f"{dev_group}",
-                manufacturer=f"{dev_manufacturer}",
+                default_manufacturer=f"{dev_manufacturer}",
                 via_device=(
                     DOMAIN,
                     f"{self._ctrl.data['routerboard']['serial-number']}",
