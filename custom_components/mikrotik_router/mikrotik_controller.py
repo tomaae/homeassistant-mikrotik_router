@@ -1404,9 +1404,11 @@ class MikrotikControllerData:
         else:
             self.data["resource"]["hdd-usage"] = "unknown"
 
-        if "uptime_epoch" in self.data["resource"]:
-            if 0 < tmp_rebootcheck < self.data["resource"]["uptime_epoch"]:
-                self.get_firmware_update()
+        if (
+            "uptime_epoch" in self.data["resource"]
+            and 0 < tmp_rebootcheck < self.data["resource"]["uptime_epoch"]
+        ):
+            self.get_firmware_update()
 
     # ---------------------------
     #   get_firmware_update
@@ -1426,10 +1428,9 @@ class MikrotikControllerData:
 
         if "status" in self.data["fw-update"]:
             self.data["fw-update"]["available"] = (
-                True
-                if self.data["fw-update"]["status"] == "New version is available"
-                else False
+                self.data["fw-update"]["status"] == "New version is available"
             )
+
         else:
             self.data["fw-update"]["available"] = False
 
@@ -1594,10 +1595,11 @@ class MikrotikControllerData:
                 ]
 
         if default_gateway:
-            to_remove = []
-            for uid, vals in self.data["arp"].items():
-                if vals["interface"] == default_gateway:
-                    to_remove.append(uid)
+            to_remove = [
+                uid
+                for uid, vals in self.data["arp"].items()
+                if vals["interface"] == default_gateway
+            ]
 
             for uid in to_remove:
                 self.data["arp"].pop(uid)
@@ -1644,11 +1646,10 @@ class MikrotikControllerData:
                 if not is_valid_ip(self.data["dhcp"][uid]["address"]):
                     self.data["dhcp"][uid]["address"] = "unknown"
 
-                if (
-                    self.data["dhcp"][uid]["active-address"]
-                    != self.data["dhcp"][uid]["address"]
-                    and self.data["dhcp"][uid]["active-address"] != "unknown"
-                ):
+                if self.data["dhcp"][uid]["active-address"] not in [
+                    self.data["dhcp"][uid]["address"],
+                    "unknown",
+                ]:
                     self.data["dhcp"][uid]["address"] = self.data["dhcp"][uid][
                         "active-address"
                     ]
@@ -1656,7 +1657,7 @@ class MikrotikControllerData:
                 if (
                     self.data["dhcp"][uid]["mac-address"]
                     != self.data["dhcp"][uid]["active-mac-address"]
-                    and self.data["dhcp"][uid]["active-mac-address"] != "unknown"
+                    != "unknown"
                 ):
                     self.data["dhcp"][uid]["mac-address"] = self.data["dhcp"][uid][
                         "active-mac-address"
@@ -1741,9 +1742,7 @@ class MikrotikControllerData:
     # ---------------------------
     def get_wireless_hosts(self):
         """Get wireless hosts data from Mikrotik"""
-        wifimodule = "wireless"
-        if self.support_wifiwave2:
-            wifimodule = "wifiwave2"
+        wifimodule = "wifiwave2" if self.support_wifiwave2 else "wireless"
         self.data["wireless_hosts"] = parse_api(
             data={},
             source=self.api.path(f"/interface/{wifimodule}/registration-table"),
@@ -1803,8 +1802,7 @@ class MikrotikControllerData:
         # Add hosts from DHCP
         for uid, vals in self.data["dhcp"].items():
             if uid not in self.data["host"]:
-                self.data["host"][uid] = {}
-                self.data["host"][uid]["source"] = "dhcp"
+                self.data["host"][uid] = {"source": "dhcp"}
                 for key in ["address", "mac-address", "interface"]:
                     if (
                         key not in self.data["host"][uid]
@@ -1815,8 +1813,7 @@ class MikrotikControllerData:
         # Add hosts from ARP
         for uid, vals in self.data["arp"].items():
             if uid not in self.data["host"]:
-                self.data["host"][uid] = {}
-                self.data["host"][uid]["source"] = "arp"
+                self.data["host"][uid] = {"source": "arp"}
                 for key in ["address", "mac-address", "interface"]:
                     if (
                         key not in self.data["host"][uid]
@@ -1829,8 +1826,7 @@ class MikrotikControllerData:
             self.host_hass_recovered = True
             for uid in self.data["host_hass"]:
                 if uid not in self.data["host"]:
-                    self.data["host"][uid] = {}
-                    self.data["host"][uid]["source"] = "restored"
+                    self.data["host"][uid] = {"source": "restored"}
                     self.data["host"][uid]["mac-address"] = uid
                     self.data["host"][uid]["host-name"] = self.data["host_hass"][uid]
 
