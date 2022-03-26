@@ -8,6 +8,7 @@ PLATFORMS = [
     Platform.SWITCH,
     Platform.BUTTON,
 ]
+
 DOMAIN = "mikrotik_router"
 DEFAULT_NAME = "Mikrotik Router"
 ATTRIBUTION = "Data provided by Mikrotik"
@@ -56,3 +57,35 @@ CONF_SENSOR_SCRIPTS = "sensor_scripts"
 DEFAULT_SENSOR_SCRIPTS = False
 CONF_SENSOR_ENVIRONMENT = "sensor_environment"
 DEFAULT_SENSOR_ENVIRONMENT = False
+
+TO_REDACT = {
+    "ip-address",
+    "client-ip-address",
+    "address",
+    "active-address",
+    "mac-address",
+    "active-mac-address",
+    "orig-mac-address",
+    "port-mac-address",
+    "client-mac-address",
+    "client-id",
+    "active-client-id",
+    "eeprom",
+    "sfp-vendor-serial",
+    "gateway",
+    "dns-server",
+    "wins-server",
+    "ntp-server",
+    "caps-manager",
+    "serial-number",
+    "source",
+    "from-addresses",
+    "to-addresses",
+    "src-address",
+    "dst-address",
+    "username",
+    "password",
+    "caller-id",
+    "target",
+    "ssid",
+}
