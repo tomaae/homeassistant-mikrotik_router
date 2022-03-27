@@ -198,6 +198,11 @@ After you have created your account [click here to join Mikrotik Router project 
 
 If you want to add translations for a language that is not listed please [open a Feature request](https://github.com/tomaae/homeassistant-mikrotik_router/issues/new?labels=enhancement&title=%5BLokalise%5D%20Add%20new%20translations%20language).
 
+## Diagnostics
+Download diagnostics data for investigation:
+
+![Diagnostics](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/diagnostics.png)
+
 ## Enabling debug
 To enable debug for Mikrotik router integration, add following to your configuration.yaml:
 ```
