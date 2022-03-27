@@ -77,11 +77,13 @@ class MikrotikBinarySensorEntityDescription(BinarySensorEntityDescription):
     ha_connection: str = ""
     ha_connection_value: str = ""
     data_path: str = ""
-    data_is_on: str = "available"
+    data_attribute: str = "available"
     data_name: str = ""
+    data_name_comment: bool = False
     data_uid: str = ""
     data_reference: str = ""
     data_attributes_list: List = field(default_factory=lambda: [])
+    func: str = "MikrotikBinarySensor"
 
 
 SENSOR_TYPES = {
@@ -108,11 +110,12 @@ SENSOR_TYPES = {
         ha_connection=DOMAIN,
         ha_connection_value="PPP",
         data_path="ppp_secret",
-        data_is_on="connected",
+        data_attribute="connected",
         data_name="name",
         data_uid="name",
         data_reference="name",
         data_attributes_list=DEVICE_ATTRIBUTES_PPP_SECRET,
+        func="MikrotikPPPSecretBinarySensor",
     ),
     "interface": MikrotikBinarySensorEntityDescription(
         key="interface",
@@ -124,10 +127,13 @@ SENSOR_TYPES = {
         ha_connection=CONNECTION_NETWORK_MAC,
         ha_connection_value="data__port-mac-address",
         data_path="interface",
-        data_is_on="running",
+        data_attribute="running",
         data_name="name",
         data_uid="default-name",
         data_reference="default-name",
         data_attributes_list=DEVICE_ATTRIBUTES_IFACE,
+        func="MikrotikPortBinarySensor",
     ),
 }
+
+SENSOR_SERVICES = {}
