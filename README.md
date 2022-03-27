@@ -92,7 +92,7 @@ NOTE: FastTracked packets are not processed by Simple Queues.
 ![Queue switch](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/queue_switch.png)
 
 
-### PPP
+## PPP
 Control and monitor PPP users.
 
 ![PPP switch](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/ppp_switch.png)
@@ -117,9 +117,7 @@ Monitor and control Kid Control.
 
 ## Client Traffic
 
-#### RouterOS v6
-###### Accounting
-
+### Client Traffic for RouterOS v6
 Monitor per-IP throughput tracking based on Mikrotik Accounting.
 
 Feature is present in Winbox IP-Accounting. Make sure that threshold is set to reasonable value to store all connections between user defined scan interval. Max value is 8192 so for piece of mind I recommend setting that value.
@@ -129,9 +127,7 @@ More information about Accounting can be found on [Mikrotik support page](https:
 NOTE: Accounting does not count in FastTracked packets.
 
 
-#### RouterOS v7
-###### Kid Control Devices
-
+### Client Traffic for RouterOS v7+
 In RouterOS v7 Accounting feature is deprecated so alternative approach for is to use 
 Kid Control Devices feature (IP - Kid Control - Devices).
 
