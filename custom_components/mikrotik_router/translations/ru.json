@@ -1,9 +1,8 @@
 {
     "config": {
-        "title": "Роутер Mikrotik",
         "step": {
             "user": {
-                "title": "Роутер Mikrotik",
+                "title": "Set up Mikrotik",
                 "description": "Настройка Home Assistant для интеграции с Mikrotik.",
                 "data": {
                     "name": "Название интеграции",
