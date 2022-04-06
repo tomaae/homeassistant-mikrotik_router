@@ -457,7 +457,7 @@ class MikrotikControllerData:
         """Update Mikrotik hardware info"""
         try:
             await asyncio.wait_for(self.lock.acquire(), timeout=30)
-        except:
+        except Exception:
             return
 
         await self.hass.async_add_executor_job(self.get_firmware_update)
@@ -509,7 +509,7 @@ class MikrotikControllerData:
 
         try:
             await asyncio.wait_for(self.lock_ping.acquire(), timeout=3)
-        except:
+        except Exception:
             return
 
         for uid in list(self.data["host"]):
@@ -574,7 +574,7 @@ class MikrotikControllerData:
 
         try:
             await asyncio.wait_for(self.lock.acquire(), timeout=10)
-        except:
+        except Exception:
             return
 
         if self.api.connected() and "available" not in self.data["fw-update"]:
@@ -1439,7 +1439,7 @@ class MikrotikControllerData:
                 self.major_fw_version = int(
                     self.data["fw-update"].get("installed-version").split(".")[0]
                 )
-            except:
+            except Exception:
                 _LOGGER.error(
                     "Mikrotik %s unable to determine major FW version (%s).",
                     self.host,
@@ -1942,7 +1942,7 @@ class MikrotikControllerData:
                     self.data["host"][uid][
                         "manufacturer"
                     ] = await self.async_mac_lookup.lookup(vals["mac-address"])
-                except:
+                except Exception:
                     self.data["host"][uid]["manufacturer"] = ""
 
             if vals["manufacturer"] == "detect":
