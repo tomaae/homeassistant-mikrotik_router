@@ -1984,14 +1984,15 @@ class MikrotikControllerData:
         )
 
         # Build temp accounting values dict with ip address as key
-        tmp_accounting_values = {}
-        for uid, vals in self.data["client_traffic"].items():
-            tmp_accounting_values[vals["address"]] = {
+        tmp_accounting_values = {
+            vals["address"]: {
                 "wan-tx": 0,
                 "wan-rx": 0,
                 "lan-tx": 0,
                 "lan-rx": 0,
             }
+            for uid, vals in self.data["client_traffic"].items()
+        }
 
         time_diff = self.api.take_client_traffic_snapshot(True)
         if time_diff:
@@ -2010,7 +2011,7 @@ class MikrotikControllerData:
             threshold = self.api.path("/ip/accounting")[0].get("threshold")
             entry_count = len(accounting_data)
 
-            if entry_count is threshold:
+            if entry_count == threshold:
                 _LOGGER.warning(
                     f"Accounting entries count reached the threshold of {threshold}!"
                     " Some entries were not saved by Mikrotik so accounting calculation won't be correct."
