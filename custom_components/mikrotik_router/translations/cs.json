@@ -31,7 +31,7 @@
                     "track_iface_clients": "Zobrazit klientské MAC a IP na rozhraních",
                     "unit_of_measurement": "Jednotka měření",
                     "track_network_hosts_timeout": "Časový limit sledování síťových zařízení (v sekundách)",
-                    "zone": "Zone for device tracker"
+                    "zone": "Zóna pro sledování zařízení"
                 },
                 "title": "Základní možnosti"
             },
@@ -45,11 +45,10 @@
                     "sensor_nat": "Přepínače NAT",
                     "sensor_scripts": "Přepínače skriptů",
                     "sensor_environment": "Senzory prostředí",
-                    "sensor_pppusers": "PPP users",
-                    "sensor_kidcontrol": "Kid control",
-                    "sensor_mangle": "Mangle switches",
-                    "sensor_ppp": "PPP users",
-                    "sensor_filter": "Filter switches"
+                    "sensor_kidcontrol": "Dětská kontrola",
+                    "sensor_mangle": "Mangle spínače",
+                    "sensor_ppp": "Uživatelé PPP",
+                    "sensor_filter": "Přepínače filtrů"
                 },
                 "title": "Vyberte senzory"
             }

@@ -31,7 +31,7 @@
                     "track_iface_clients": "إظهار  عنوان التحكّم في الوسائط (MAC)  و بروتوكول الإنترنت (IP) للعميل على الواجهات",
                     "unit_of_measurement": "وحدة قياس",
                     "track_network_hosts_timeout": "مهلة تتبّع أجهزة الشبكة (بالثواني)",
-                    "zone": "Zone for device tracker"
+                    "zone": "منطقة لتعقُّب الجهاز"
                 },
                 "title": "الخيارات الأساسية"
             },
@@ -45,11 +45,10 @@
                     "sensor_nat": "مُبدِّلات ترجمة عنوان الشبكة",
                     "sensor_scripts": "مُبدِّلات النصوص",
                     "sensor_environment": "مُستشعرات متغير البيئة",
-                    "sensor_pppusers": "PPP users",
-                    "sensor_kidcontrol": "Kid control",
-                    "sensor_mangle": "Mangle switches",
-                    "sensor_ppp": "PPP users",
-                    "sensor_filter": "Filter switches"
+                    "sensor_kidcontrol": "مراقبة الأطفال",
+                    "sensor_mangle": "مفاتيح المِكواة الأُسطوانية",
+                    "sensor_ppp": "مستخدمي PPP",
+                    "sensor_filter": "مفاتيح الترشيح"
                 },
                 "title": "حدد المُستشعرات"
             }

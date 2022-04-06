@@ -31,7 +31,7 @@
                     "track_iface_clients": "ग्राहक का MAC और IP इन्टरफ़ेस पर दिखाएं",
                     "unit_of_measurement": "माप का युनीट",
                     "track_network_hosts_timeout": "नेटवर्क डिवाइस ट्रैक टाइम आउट (सेकन्ड)",
-                    "zone": "Zone for device tracker"
+                    "zone": "डिवाइस ट्रैकर के लिए ज़ोन"
                 },
                 "title": "बेसिक विकल्प"
             },
@@ -45,11 +45,10 @@
                     "sensor_nat": "NAT स्विच",
                     "sensor_scripts": "स्क्रिप्ट स्विच",
                     "sensor_environment": "पारिस्थितिक वेरिएबल सेंसर",
-                    "sensor_pppusers": "PPP users",
-                    "sensor_kidcontrol": "Kid control",
-                    "sensor_mangle": "Mangle switches",
-                    "sensor_ppp": "PPP users",
-                    "sensor_filter": "Filter switches"
+                    "sensor_kidcontrol": "बच्चे के लिए कंट्रोल",
+                    "sensor_mangle": "मैंगल स्विच",
+                    "sensor_ppp": "PPP यूज़र",
+                    "sensor_filter": "फ़िल्टर स्विच"
                 },
                 "title": "सेंसर चुनें"
             }

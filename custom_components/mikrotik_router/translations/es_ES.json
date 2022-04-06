@@ -31,7 +31,7 @@
                     "track_iface_clients": "Mostrar MAC e IP de cliente en las interfaces",
                     "unit_of_measurement": "Unidad de medida",
                     "track_network_hosts_timeout": "Rastrear el tiempo de espera de los dispositivos de red (segundos)",
-                    "zone": "Zone for device tracker"
+                    "zone": "Zona para rastreador de dispositivos"
                 },
                 "title": "Opciones básicas"
             },
@@ -45,11 +45,10 @@
                     "sensor_nat": "Interruptores NAT",
                     "sensor_scripts": "Interruptores de script",
                     "sensor_environment": "Sensores de variable de entorno",
-                    "sensor_pppusers": "PPP users",
-                    "sensor_kidcontrol": "Kid control",
-                    "sensor_mangle": "Mangle switches",
-                    "sensor_ppp": "PPP users",
-                    "sensor_filter": "Filter switches"
+                    "sensor_kidcontrol": "Control parental",
+                    "sensor_mangle": "Conmutadores de mangle",
+                    "sensor_ppp": "Usuarios PPP",
+                    "sensor_filter": "Conmutadores de filtro"
                 },
                 "title": "Seleccionar sensores"
             }

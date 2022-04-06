@@ -45,7 +45,6 @@
                     "sensor_nat": "NAT rofar",
                     "sensor_scripts": "Skrifturofar",
                     "sensor_environment": "Umhverfisbreytu skynjarar",
-                    "sensor_pppusers": "PPP notendur",
                     "sensor_kidcontrol": "Krakkastjórnun",
                     "sensor_mangle": "Mangle switches",
                     "sensor_ppp": "PPP notendur",

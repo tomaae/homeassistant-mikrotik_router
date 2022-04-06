@@ -45,7 +45,6 @@
                     "sensor_nat": "NAT kārtulu slēdži",
                     "sensor_scripts": "Skriptu slēdži",
                     "sensor_environment": "Mainīgie vides sensori",
-                    "sensor_pppusers": "PPP lietotāji",
                     "sensor_kidcontrol": "Bērnu kontrole",
                     "sensor_mangle": "Mangle switches",
                     "sensor_ppp": "PPP users",

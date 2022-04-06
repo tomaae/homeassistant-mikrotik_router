@@ -31,7 +31,7 @@
                     "track_iface_clients": "Προβολή IP και MAC πελάτη στη διεπαφή",
                     "unit_of_measurement": "Μονάδα μέτρησης",
                     "track_network_hosts_timeout": "Εξωχρονισμός ανίχνευσης συσκευών διαδικτύου (δευτερόλεπτα)",
-                    "zone": "Zone for device tracker"
+                    "zone": "Ζώνη για παρακολούθηση συσκευής"
                 },
                 "title": "Βασικές επιογές"
             },
@@ -45,11 +45,10 @@
                     "sensor_nat": "Διακόπτες NAT",
                     "sensor_scripts": "Διακόπτες δέσμης ενεργειών",
                     "sensor_environment": "Αισθητήρες μεταβολών περιβάλλοντος",
-                    "sensor_pppusers": "PPP users",
-                    "sensor_kidcontrol": "Kid control",
-                    "sensor_mangle": "Mangle switches",
-                    "sensor_ppp": "PPP users",
-                    "sensor_filter": "Filter switches"
+                    "sensor_kidcontrol": "Παιδικός έλεγχος",
+                    "sensor_mangle": "Επιλογικοί διακόπτες",
+                    "sensor_ppp": "Χρήστες PPP",
+                    "sensor_filter": "Διακόπτες φίλτρου"
                 },
                 "title": "Επιλέξτε αισθητήρες"
             }

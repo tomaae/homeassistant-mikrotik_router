@@ -4,7 +4,7 @@
         "step": {
             "user": {
                 "title": "Mikrotik Router",
-                "description": "Configurar integración del Mikrotik Router.",
+                "description": "Configurar integración del Mikrotik.",
                 "data": {
                     "name": "Nombre de la integración",
                     "host": "Servidor",
@@ -27,29 +27,28 @@
         "step": {
             "basic_options": {
                 "data": {
-                    "scan_interval": "Intervalo de escaneo (requiere reinicio del HA)",
+                    "scan_interval": "Intervalo de escaneo (requiere reinicio de HA)",
                     "track_iface_clients": "Mostrar MAC e IP del cliente en las interfaces",
                     "unit_of_measurement": "Unidad de medida",
                     "track_network_hosts_timeout": "Monitorizar tiempo hasta desconexión automática de dispositivos de red (segundos)",
-                    "zone": "Zone for device tracker"
+                    "zone": "Zona para seguimiento de dispositivo"
                 },
                 "title": "Opciones básicas"
             },
             "sensor_select": {
                 "data": {
                     "track_network_hosts": "Monitorizar dispositivos de red",
-                    "sensor_port_tracker": "Sensores de seguimiento portuario",
-                    "sensor_port_traffic": "Sensores de tráfico portuario",
+                    "sensor_port_tracker": "Sensores de seguimiento de puertos",
+                    "sensor_port_traffic": "Sensores de tráfico de puertos",
                     "sensor_client_traffic": "Sensores de tráfico de clientes",
                     "sensor_simple_queues": "Interruptores de cola sencillos",
                     "sensor_nat": "Interruptores NAT",
-                    "sensor_scripts": "Interruptores de switch",
+                    "sensor_scripts": "Interruptores de script",
                     "sensor_environment": "Sensores variables de entorno",
-                    "sensor_pppusers": "PPP users",
-                    "sensor_kidcontrol": "Kid control",
-                    "sensor_mangle": "Mangle switches",
-                    "sensor_ppp": "PPP users",
-                    "sensor_filter": "Filter switches"
+                    "sensor_kidcontrol": "Control de niños",
+                    "sensor_mangle": "Interruptor Mangle",
+                    "sensor_ppp": "Usuarios PPP",
+                    "sensor_filter": "Filtros de interruptores"
                 },
                 "title": "Seleccionar sensores"
             }

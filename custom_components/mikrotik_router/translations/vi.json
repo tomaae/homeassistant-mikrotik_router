@@ -31,7 +31,7 @@
                     "track_iface_clients": "Hiển thị MAC và IP của máy khách trên giao diện",
                     "unit_of_measurement": "Đơn vị đo",
                     "track_network_hosts_timeout": "Theo dõi thời gian chờ thiết bị mạng (giây)",
-                    "zone": "Zone for device tracker"
+                    "zone": "Khu vực cho trình theo dõi thiết bị"
                 },
                 "title": "Tùy chọn cơ bản"
             },
@@ -45,11 +45,10 @@
                     "sensor_nat": "Bộ chuyển đổi NAT",
                     "sensor_scripts": "Bộ chuyển đổi mã lệnh",
                     "sensor_environment": "Cảm biến biến số môi trường",
-                    "sensor_pppusers": "PPP users",
-                    "sensor_kidcontrol": "Kid control",
-                    "sensor_mangle": "Mangle switches",
-                    "sensor_ppp": "PPP users",
-                    "sensor_filter": "Filter switches"
+                    "sensor_kidcontrol": "Kiểm soát trẻ em",
+                    "sensor_mangle": "Công tắc Mangle",
+                    "sensor_ppp": "Người dùng PPP",
+                    "sensor_filter": "Công tắc bộ lọc"
                 },
                 "title": "Chọn cảm biến"
             }

@@ -31,7 +31,7 @@
                     "track_iface_clients": "Ügyfél MAC- és IP-címének mutatása az interfészeken",
                     "unit_of_measurement": "Mértékegység",
                     "track_network_hosts_timeout": "Hálózati eszközök követésének időtúllépése (másodperc)",
-                    "zone": "Zone for device tracker"
+                    "zone": "Zóna az eszközkövető számára"
                 },
                 "title": "Alapbeállítások"
             },
@@ -45,11 +45,10 @@
                     "sensor_nat": "NAT kapcsolók",
                     "sensor_scripts": "Szkript kapcsolók",
                     "sensor_environment": "Környezeti változó érzékelők",
-                    "sensor_pppusers": "PPP felhasználók",
                     "sensor_kidcontrol": "Szülői felügyelet",
-                    "sensor_mangle": "Mangle switches",
-                    "sensor_ppp": "PPP users",
-                    "sensor_filter": "Filter switches"
+                    "sensor_mangle": "Mangle kapcsolók",
+                    "sensor_ppp": "PPP felhasználók",
+                    "sensor_filter": "Szűrő kapcsolók"
                 },
                 "title": "Válassz érzékelőket"
             }

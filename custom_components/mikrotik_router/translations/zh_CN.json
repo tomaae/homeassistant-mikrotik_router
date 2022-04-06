@@ -31,7 +31,7 @@
                     "track_iface_clients": "显示接口上的客户端 MAC 和 IP",
                     "unit_of_measurement": "测量单位",
                     "track_network_hosts_timeout": "跟踪网络设备超时（秒）",
-                    "zone": "Zone for device tracker"
+                    "zone": "设备追踪器区域"
                 },
                 "title": "基本选项"
             },
@@ -45,11 +45,10 @@
                     "sensor_nat": "NAT 交换机",
                     "sensor_scripts": "脚本交换机",
                     "sensor_environment": "环境变量传感器",
-                    "sensor_pppusers": "PPP users",
-                    "sensor_kidcontrol": "Kid control",
-                    "sensor_mangle": "Mangle switches",
-                    "sensor_ppp": "PPP users",
-                    "sensor_filter": "Filter switches"
+                    "sensor_kidcontrol": "儿童控制",
+                    "sensor_mangle": "标记开关",
+                    "sensor_ppp": "PPP 用户",
+                    "sensor_filter": "过滤器开关"
                 },
                 "title": "选择传感器"
             }

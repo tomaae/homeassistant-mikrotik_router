@@ -31,7 +31,7 @@
                     "track_iface_clients": "Mac en IP van client weergeven op interfaces",
                     "unit_of_measurement": "Meet eenheid",
                     "track_network_hosts_timeout": "Volg de time-out van netwerkapparaten (seconden)",
-                    "zone": "Zone for device tracker"
+                    "zone": "Zone voor apparaattracker"
                 },
                 "title": "Basisopties"
             },
@@ -45,11 +45,10 @@
                     "sensor_nat": "NAT-switches",
                     "sensor_scripts": "Script-switches",
                     "sensor_environment": "Omgevingsvariabelesensors",
-                    "sensor_pppusers": "PPP users",
-                    "sensor_kidcontrol": "Kid control",
-                    "sensor_mangle": "Mangle switches",
-                    "sensor_ppp": "PPP users",
-                    "sensor_filter": "Filter switches"
+                    "sensor_kidcontrol": "Kindercontrole",
+                    "sensor_mangle": "Mangelschakelaars",
+                    "sensor_ppp": "PPP-gebruikers",
+                    "sensor_filter": "Filterschakelaars"
                 },
                 "title": "Selecteer sensors"
             }
