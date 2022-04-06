@@ -1,25 +1,26 @@
 {
     "config": {
-        "error": {
-            "cannot_connect": "Cannot connect to Mikrotik.",
-            "connection_timeout": "Mikrotik connection timeout.",
-            "name_exists": "Name already exists.",
-            "ssl_handshake_failure": "SSL handshake failure",
-            "wrong_login": "Invalid user name or password."
-        },
+        "title": "Mikrotik Router",
         "step": {
             "user": {
-                "data": {
-                    "host": "Host",
-                    "name": "Name of the integration",
-                    "password": "Password",
-                    "port": "Port",
-                    "ssl": "Use SSL",
-                    "username": "Username"
-                },
+                "title": "Mikrotik Router",
                 "description": "Set up Mikrotik Router integration.",
-                "title": "Mikrotik Router"
+                "data": {
+                    "name": "Name of the integration",
+                    "host": "Host",
+                    "port": "Port",
+                    "username": "Username",
+                    "password": "Password",
+                    "ssl": "Use SSL"
+                }
             }
+        },
+        "error": {
+            "name_exists": "Name already exists.",
+            "cannot_connect": "Cannot connect to Mikrotik.",
+            "ssl_handshake_failure": "SSL handshake failure",
+            "connection_timeout": "Mikrotik connection timeout.",
+            "wrong_login": "Invalid user name or password."
         }
     },
     "options": {
@@ -36,20 +37,20 @@
             },
             "sensor_select": {
                 "data": {
+                    "track_network_hosts": "Track network devices",
                     "sensor_port_tracker": "Port tracker sensors",
                     "sensor_port_traffic": "Port traffic sensors",
-                    "track_network_hosts": "Track network devices",
                     "sensor_client_traffic": "Client traffic sensors",
                     "sensor_simple_queues": "Simple queues switches",
                     "sensor_nat": "NAT switches",
-                    "sensor_mangle": "Mangle switches",
-                    "sensor_filter": "Filter switches",
+                    "sensor_scripts": "Script switches",
+                    "sensor_environment": "Environment variable sensors",
                     "sensor_kidcontrol": "Kid control",
+                    "sensor_mangle": "Mangle switches",
                     "sensor_ppp": "PPP users",
-                    "sensor_scripts": "Scripts switches",
-                    "sensor_environment": "Environment variable sensors"
+                    "sensor_filter": "Filter switches"
                 },
-                "title": "Sensor selection"
+                "title": "Select sensors"
             }
         }
     }
