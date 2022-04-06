@@ -750,6 +750,10 @@ class MikrotikControllerData:
 
         # Udpate virtual interfaces
         for uid, vals in self.data["interface"].items():
+            self.data["interface"][uid]["comment"] = str(
+                self.data["interface"][uid]["comment"]
+            )
+
             if vals["default-name"] == "":
                 self.data["interface"][uid]["default-name"] = vals["name"]
                 self.data["interface"][uid][
@@ -949,6 +953,8 @@ class MikrotikControllerData:
         nat_uniq = {}
         nat_del = {}
         for uid in self.data["nat"]:
+            self.data["nat"][uid]["comment"] = str(self.data["nat"][uid]["comment"])
+
             tmp_name = self.data["nat"][uid]["uniq-id"]
             if tmp_name not in nat_uniq:
                 nat_uniq[tmp_name] = uid
@@ -1039,6 +1045,10 @@ class MikrotikControllerData:
         mangle_uniq = {}
         mangle_del = {}
         for uid in self.data["mangle"]:
+            self.data["mangle"][uid]["comment"] = str(
+                self.data["mangle"][uid]["comment"]
+            )
+
             tmp_name = self.data["mangle"][uid]["uniq-id"]
             if tmp_name not in mangle_uniq:
                 mangle_uniq[tmp_name] = uid
@@ -1146,6 +1156,10 @@ class MikrotikControllerData:
         filter_uniq = {}
         filter_del = {}
         for uid in self.data["filter"]:
+            self.data["filter"][uid]["comment"] = str(
+                self.data["filter"][uid]["comment"]
+            )
+
             tmp_name = self.data["filter"][uid]["uniq-id"]
             if tmp_name not in filter_uniq:
                 filter_uniq[tmp_name] = uid
@@ -1194,6 +1208,11 @@ class MikrotikControllerData:
             ],
         )
 
+        for uid in self.data["kid-control"]:
+            self.data["kid-control"][uid]["comment"] = str(
+                self.data["kid-control"][uid]["comment"]
+            )
+
     # ---------------------------
     #   get_ppp
     # ---------------------------
@@ -1237,6 +1256,10 @@ class MikrotikControllerData:
         )
 
         for uid in self.data["ppp_secret"]:
+            self.data["ppp_secret"][uid]["comment"] = str(
+                self.data["ppp_secret"][uid]["comment"]
+            )
+
             if self.data["ppp_secret"][uid]["name"] in self.data["ppp_active"]:
                 self.data["ppp_secret"][uid]["connected"] = True
                 self.data["ppp_secret"][uid]["caller-id"] = self.data["ppp_active"][
@@ -1510,6 +1533,8 @@ class MikrotikControllerData:
 
         uom_type, uom_div = self._get_unit_of_measurement()
         for uid, vals in self.data["queue"].items():
+            self.data["queue"][uid]["comment"] = str(self.data["queue"][uid]["comment"])
+
             upload_max_limit_bps, download_max_limit_bps = [
                 int(x) for x in vals["max-limit"].split("/")
             ]
@@ -1616,6 +1641,9 @@ class MikrotikControllerData:
             vals=[{"name": "name"}, {"name": "address"}, {"name": "comment"}],
         )
 
+        for uid, vals in self.data["dns"].items():
+            self.data["dns"][uid]["comment"] = str(self.data["dns"][uid]["comment"])
+
     # ---------------------------
     #   get_dhcp
     # ---------------------------
@@ -1641,6 +1669,8 @@ class MikrotikControllerData:
 
         dhcpserver_query = False
         for uid in self.data["dhcp"]:
+            self.data["dhcp"][uid]["comment"] = str(self.data["dhcp"][uid]["comment"])
+
             # is_valid_ip
             if self.data["dhcp"][uid]["address"] != "unknown":
                 if not is_valid_ip(self.data["dhcp"][uid]["address"]):
