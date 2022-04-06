@@ -15,6 +15,8 @@ from .const import (
     DEFAULT_SENSOR_PORT_TRAFFIC,
     CONF_TRACK_HOSTS,
     DEFAULT_TRACK_HOSTS,
+    CONF_SENSOR_PORT_TRACKER,
+    DEFAULT_SENSOR_PORT_TRACKER,
 )
 
 _LOGGER = getLogger(__name__)
@@ -103,8 +105,11 @@ def model_update_items(
                 new_sensors.append(sensors[item_id])
         else:
             # Sensors
-            if sensor.startswith("traffic_") and not config_entry.options.get(
-                CONF_SENSOR_PORT_TRAFFIC, DEFAULT_SENSOR_PORT_TRAFFIC
+            if (
+                uid_sensor.func == "MikrotikInterfaceTrafficSensor"
+                and not config_entry.options.get(
+                    CONF_SENSOR_PORT_TRAFFIC, DEFAULT_SENSOR_PORT_TRAFFIC
+                )
             ):
                 continue
 
@@ -113,28 +118,36 @@ def model_update_items(
 
                 # Sensors
                 if (
-                    uid_sensor.data_path == "interface"
+                    uid_sensor.func == "MikrotikInterfaceTrafficSensor"
                     and uid_data[uid]["type"] == "bridge"
                 ):
                     continue
 
                 if (
-                    uid_sensor.data_path == "client_traffic"
+                    uid_sensor.func == "MikrotikClientTrafficSensor"
                     and uid_sensor.data_attribute not in uid_data[uid].keys()
                 ):
                     continue
 
                 # Binary sensors
                 if (
-                    uid_sensor.data_path == "interface"
+                    uid_sensor.func == "MikrotikPortBinarySensor"
                     and uid_data[uid]["type"] == "wlan"
+                ):
+                    continue
+
+                if (
+                    uid_sensor.func == "MikrotikPortBinarySensor"
+                    and not config_entry.options.get(
+                        CONF_SENSOR_PORT_TRACKER, DEFAULT_SENSOR_PORT_TRACKER
+                    )
                 ):
                     continue
 
                 # Device Tracker
                 if (
                     # Skip if host tracking is disabled
-                    sensor == "host"
+                    uid_sensor.func == "MikrotikHostDeviceTracker"
                     and not config_entry.options.get(
                         CONF_TRACK_HOSTS, DEFAULT_TRACK_HOSTS
                     )
