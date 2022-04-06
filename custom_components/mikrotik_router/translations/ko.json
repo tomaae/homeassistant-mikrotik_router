@@ -1,9 +1,8 @@
 {
     "config": {
-        "title": "Mikrotik Router",
         "step": {
             "user": {
-                "title": "Mikrotik Router",
+                "title": "Set up Mikrotik",
                 "description": "Mikrotik 라우터 통합을 설정합니다.",
                 "data": {
                     "name": "통합 이름",

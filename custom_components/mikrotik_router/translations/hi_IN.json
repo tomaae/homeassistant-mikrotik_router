@@ -1,9 +1,8 @@
 {
     "config": {
-        "title": "Mikrotik Router",
         "step": {
             "user": {
-                "title": "Mikrotik Router",
+                "title": "Set up Mikrotik",
                 "description": "Mikrotik राउटर इन्टीग्रेशन सेट अप करें।",
                 "data": {
                     "name": "इन्टीग्रेशन का नाम",

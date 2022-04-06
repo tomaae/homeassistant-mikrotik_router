@@ -1,9 +1,8 @@
 {
     "config": {
-        "title": "Mikrotik Router",
         "step": {
             "user": {
-                "title": "Mikrotik Router",
+                "title": "Set up Mikrotik",
                 "description": "Configurar a integração do Mikrotik Router.",
                 "data": {
                     "name": "Nome da integração",

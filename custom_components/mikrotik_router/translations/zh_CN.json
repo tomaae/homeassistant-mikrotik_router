@@ -1,9 +1,8 @@
 {
     "config": {
-        "title": "Mikrotik Router",
         "step": {
             "user": {
-                "title": "Mikrotik Router",
+                "title": "Set up Mikrotik",
                 "description": "设置 Mikrotik 路由器集成。",
                 "data": {
                     "name": "集成名称",
