@@ -31,7 +31,7 @@
                     "track_iface_clients": "Pokaż w interfejsach adres MAC i IP klienta",
                     "unit_of_measurement": "Jednostka miary",
                     "track_network_hosts_timeout": "Śledź limity czasu dla urządzeń sieciowych (sekundy)",
-                    "zone": "Zone for device tracker"
+                    "zone": "Strefa programu do śledzenia urządzeń"
                 },
                 "title": "Podstawowe opcje"
             },
@@ -45,11 +45,10 @@
                     "sensor_nat": "Przełączniki NAT",
                     "sensor_scripts": "Przełączniki skryptów",
                     "sensor_environment": "Czujniki zmiennych środowiskowych",
-                    "sensor_pppusers": "Użytkownicy PPP",
                     "sensor_kidcontrol": "Kontrola rodzicielska",
-                    "sensor_mangle": "Mangle switches",
-                    "sensor_ppp": "PPP users",
-                    "sensor_filter": "Filter switches"
+                    "sensor_mangle": "Przełączniki mangle",
+                    "sensor_ppp": "Użytkownicy PPP",
+                    "sensor_filter": "Przełączniki filtrów"
                 },
                 "title": "Wybierz czujniki"
             }

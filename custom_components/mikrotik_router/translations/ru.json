@@ -45,9 +45,8 @@
                     "sensor_nat": "Переключатели NAT правил",
                     "sensor_scripts": "Переключатели скриптов",
                     "sensor_environment": "Сенсоры переменных окружения",
-                    "sensor_pppusers": "PPP пользователи",
                     "sensor_kidcontrol": "Родительский контроль",
-                    "sensor_mangle": "Переключатели правил Mangle",
+                    "sensor_mangle": "Переключатели Mangle",
                     "sensor_ppp": "PPP-пользователи",
                     "sensor_filter": "Переключатели фильтров"
                 },

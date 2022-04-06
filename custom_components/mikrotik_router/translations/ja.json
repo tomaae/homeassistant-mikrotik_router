@@ -31,7 +31,7 @@
                     "track_iface_clients": "クライアントのMACとインターフェイスのIPを表示します",
                     "unit_of_measurement": "測定単位",
                     "track_network_hosts_timeout": "ネットワーク デバイスのタイムアウト（秒）をトラッキングします",
-                    "zone": "Zone for device tracker"
+                    "zone": "デバイス追跡装置用ゾーン"
                 },
                 "title": "基本オプション"
             },
@@ -45,11 +45,10 @@
                     "sensor_nat": "NAT スイッチ",
                     "sensor_scripts": "スクリプトスイッチ",
                     "sensor_environment": "環境変数センサー",
-                    "sensor_pppusers": "PPP users",
-                    "sensor_kidcontrol": "Kid control",
-                    "sensor_mangle": "Mangle switches",
-                    "sensor_ppp": "PPP users",
-                    "sensor_filter": "Filter switches"
+                    "sensor_kidcontrol": "キッドコントロール",
+                    "sensor_mangle": "マングルスイッチ",
+                    "sensor_ppp": "PPPユーザー",
+                    "sensor_filter": "フィルタースイッチ"
                 },
                 "title": "センサーを選択"
             }
