@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "user": {
-                "title": "Set up Mikrotik",
+                "title": "Lestatiet Mikrotik Router",
                 "description": "Mikrotik maršrutētāja integrācijas konfigurēšana.",
                 "data": {
                     "name": "Integrācijas nosaukums",
@@ -30,9 +30,10 @@
                     "track_iface_clients": "Rādīt klienta MAC un IP interfeisā",
                     "unit_of_measurement": "Mērvienības",
                     "track_network_hosts_timeout": "Tīkla ierīces uzraudzības noilgums (sekundēs)",
-                    "zone": "Zone for device tracker"
+                    "zone": "Lerīces izsekotāja zona"
                 },
-                "title": "Pamata parametri"
+                "title": "Mikrotik Router opcijas (1\/2)",
+                "description": "Konfigurēt integrāciju"
             },
             "sensor_select": {
                 "data": {
@@ -45,11 +46,12 @@
                     "sensor_scripts": "Skriptu slēdži",
                     "sensor_environment": "Mainīgie vides sensori",
                     "sensor_kidcontrol": "Bērnu kontrole",
-                    "sensor_mangle": "Mangle switches",
-                    "sensor_ppp": "PPP users",
-                    "sensor_filter": "Filter switches"
+                    "sensor_mangle": "Manglu slēdži",
+                    "sensor_ppp": "PPP lietotāji",
+                    "sensor_filter": "Filtra slēdži"
                 },
-                "title": "Sensora izvēle"
+                "title": "Mikrotik Router opcijas (2\/2)",
+                "description": "Sensoru un slēdžu aktivizēšana"
             }
         }
     }

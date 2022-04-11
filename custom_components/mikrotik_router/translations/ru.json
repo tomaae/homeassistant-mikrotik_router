@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "user": {
-                "title": "Set up Mikrotik",
+                "title": "Настроить Mikrotik Router",
                 "description": "Настройка Home Assistant для интеграции с Mikrotik.",
                 "data": {
                     "name": "Название интеграции",
@@ -32,7 +32,8 @@
                     "track_network_hosts_timeout": "Таймаут отслеживания сетевых устройств (в секундах)",
                     "zone": "Зона для отслеживания устройств"
                 },
-                "title": "Базовые параметры"
+                "title": "Параметры Mikrotik Router (1\/2)",
+                "description": "Настроить интеграцию"
             },
             "sensor_select": {
                 "data": {
@@ -49,7 +50,8 @@
                     "sensor_ppp": "PPP-пользователи",
                     "sensor_filter": "Переключатели фильтров"
                 },
-                "title": "Выберите сенсоры"
+                "title": "Параметры Mikrotik Router (2\/2)",
+                "description": "Включить датчики и переключатели"
             }
         }
     }

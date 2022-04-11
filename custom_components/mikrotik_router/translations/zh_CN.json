@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "user": {
-                "title": "Set up Mikrotik",
+                "title": "设置Mikrotik Router",
                 "description": "设置 Mikrotik 路由器集成。",
                 "data": {
                     "name": "集成名称",
@@ -30,9 +30,10 @@
                     "track_iface_clients": "显示接口上的客户端 MAC 和 IP",
                     "unit_of_measurement": "测量单位",
                     "track_network_hosts_timeout": "跟踪网络设备超时（秒）",
-                    "zone": "设备追踪器区域"
+                    "zone": "设备跟踪器的区域"
                 },
-                "title": "基本选项"
+                "title": "Mikrotik Router 选项 (1\/2)",
+                "description": "配置集成"
             },
             "sensor_select": {
                 "data": {
@@ -49,7 +50,8 @@
                     "sensor_ppp": "PPP 用户",
                     "sensor_filter": "过滤器开关"
                 },
-                "title": "选择传感器"
+                "title": "Mikrotik Router 选项 (2\/2)",
+                "description": "启动传感器和开关"
             }
         }
     }

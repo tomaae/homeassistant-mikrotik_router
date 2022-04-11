@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "user": {
-                "title": "Set up Mikrotik",
+                "title": "Ρύθμιση του Mikrotik Router",
                 "description": "Ολοκλήρωση εγκατάστασης Mikrotik Router.",
                 "data": {
                     "name": "Όνομα ολοκλήρωσης",
@@ -32,7 +32,8 @@
                     "track_network_hosts_timeout": "Εξωχρονισμός ανίχνευσης συσκευών διαδικτύου (δευτερόλεπτα)",
                     "zone": "Ζώνη για παρακολούθηση συσκευής"
                 },
-                "title": "Βασικές επιογές"
+                "title": "Επιλογές Mikrotik Router (1\/2)",
+                "description": "Διαμόρφωση ολοκλήρωσης"
             },
             "sensor_select": {
                 "data": {
@@ -49,7 +50,8 @@
                     "sensor_ppp": "Χρήστες PPP",
                     "sensor_filter": "Διακόπτες φίλτρου"
                 },
-                "title": "Επιλέξτε αισθητήρες"
+                "title": "Επιλογές Mikrotik Router (2\/2)",
+                "description": "Ενεργοποίηση αισθητήρων και διακοπτών"
             }
         }
     }

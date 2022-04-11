@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "user": {
-                "title": "Set up Mikrotik",
+                "title": "Setja upp Mikrotik Router",
                 "description": "Setja upp Mikrotik Router samþættingu.",
                 "data": {
                     "name": "Heiti samþættingar",
@@ -30,9 +30,10 @@
                     "track_iface_clients": "Sýna MAC og IP vistfang fyrir biðlara á netkortum",
                     "unit_of_measurement": "Mælieining",
                     "track_network_hosts_timeout": "Tímamörk við rakningu á netbúnaði ( sekúndur )",
-                    "zone": "Zone for device tracker"
+                    "zone": "Svæði fyrir tækjarakningu"
                 },
-                "title": "Grunnvalkostir"
+                "title": "Mikrotik Router valkostir (1\/2)",
+                "description": "Stilla samþættingu"
             },
             "sensor_select": {
                 "data": {
@@ -45,11 +46,12 @@
                     "sensor_scripts": "Skrifturofar",
                     "sensor_environment": "Umhverfisbreytu skynjarar",
                     "sensor_kidcontrol": "Krakkastjórnun",
-                    "sensor_mangle": "Mangle switches",
+                    "sensor_mangle": "Bjögunarrofi",
                     "sensor_ppp": "PPP notendur",
-                    "sensor_filter": "Filter switches"
+                    "sensor_filter": "Síurofar"
                 },
-                "title": "Veldu skynjara"
+                "title": "Mikrotik Router valkostir (2\/2)",
+                "description": "Virkja skynjara og rofa"
             }
         }
     }

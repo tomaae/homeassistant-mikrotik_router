@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "user": {
-                "title": "Set up Mikrotik",
+                "title": "Állítsa fel a Mikrotik Router",
                 "description": "Állítsd be a Mikrotik Router integrációt.",
                 "data": {
                     "name": "Integráció neve",
@@ -32,7 +32,8 @@
                     "track_network_hosts_timeout": "Hálózati eszközök követésének időtúllépése (másodperc)",
                     "zone": "Zóna az eszközkövető számára"
                 },
-                "title": "Alapbeállítások"
+                "title": "Mikrotik Router opciók (1\/2)",
+                "description": "Az integráció konfigurálása"
             },
             "sensor_select": {
                 "data": {
@@ -49,7 +50,8 @@
                     "sensor_ppp": "PPP felhasználók",
                     "sensor_filter": "Szűrő kapcsolók"
                 },
-                "title": "Válassz érzékelőket"
+                "title": "Mikrotik Router opciók (2\/2)",
+                "description": "Érzékelők és kapcsolók engedélyezése"
             }
         }
     }

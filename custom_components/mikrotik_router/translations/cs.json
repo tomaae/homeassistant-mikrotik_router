@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "user": {
-                "title": "Set up Mikrotik",
+                "title": "Nastavit Mikrotik Router",
                 "description": "Nastavte integraci Mikrotik Router.",
                 "data": {
                     "name": "Název integrace",
@@ -32,7 +32,8 @@
                     "track_network_hosts_timeout": "Časový limit sledování síťových zařízení (v sekundách)",
                     "zone": "Zóna pro sledování zařízení"
                 },
-                "title": "Základní možnosti"
+                "title": "Nastavení Mikrotik Router (1\/2)",
+                "description": "Konfigurovat integraci"
             },
             "sensor_select": {
                 "data": {
@@ -49,7 +50,8 @@
                     "sensor_ppp": "Uživatelé PPP",
                     "sensor_filter": "Přepínače filtrů"
                 },
-                "title": "Vyberte senzory"
+                "title": "Nastavení Mikrotik Router (2\/2)",
+                "description": "Povolit senzory a přepínače"
             }
         }
     }

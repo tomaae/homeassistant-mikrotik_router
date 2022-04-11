@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "user": {
-                "title": "Set up Mikrotik",
+                "title": "मिकरोटिक राउटर सेट करें",
                 "description": "Mikrotik राउटर इन्टीग्रेशन सेट अप करें।",
                 "data": {
                     "name": "इन्टीग्रेशन का नाम",
@@ -32,7 +32,8 @@
                     "track_network_hosts_timeout": "नेटवर्क डिवाइस ट्रैक टाइम आउट (सेकन्ड)",
                     "zone": "डिवाइस ट्रैकर के लिए ज़ोन"
                 },
-                "title": "बेसिक विकल्प"
+                "title": "Mikrotik Router के विकल्प (1\/2)",
+                "description": "इंटीग्रेशन को कॉन्फ़िगर करें"
             },
             "sensor_select": {
                 "data": {
@@ -49,7 +50,8 @@
                     "sensor_ppp": "PPP यूज़र",
                     "sensor_filter": "फ़िल्टर स्विच"
                 },
-                "title": "सेंसर चुनें"
+                "title": "Mikrotik Router के विकल्प (2\/2)",
+                "description": "सेंसर और स्विच को एनेबल करें"
             }
         }
     }
