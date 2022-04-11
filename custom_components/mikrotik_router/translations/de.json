@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "user": {
-                "title": "Set up Mikrotik",
+                "title": "Mikrotik-Router einrichten",
                 "description": "Mikrotik-Router-Integration einstellen",
                 "data": {
                     "name": "Name der Integration",
@@ -32,7 +32,8 @@
                     "track_network_hosts_timeout": "Zeitlimit für Netzwerkgeräte verfolgen (Sekunden)",
                     "zone": "Zone für Gerätetracker"
                 },
-                "title": "Grundlegende Optionen"
+                "title": "Mikrotik-Router-Optionen (1\/2)",
+                "description": "Integration konfigurieren"
             },
             "sensor_select": {
                 "data": {
@@ -43,13 +44,14 @@
                     "sensor_simple_queues": "Einfache Endschalter",
                     "sensor_nat": "NAT-Schalter",
                     "sensor_scripts": "Skript-Schalter",
-                    "sensor_environment": "Umweltvariable Sensoren",
+                    "sensor_environment": "Umwelt variable Sensoren",
                     "sensor_kidcontrol": "Kinderkontrolle",
                     "sensor_mangle": "Mangle-Schalter",
                     "sensor_ppp": "PPP-Nutzer",
                     "sensor_filter": "Schalter filtern"
                 },
-                "title": "Sensoren auswählen"
+                "title": "Mikrotik-Router-Optionen (2\/2)",
+                "description": "Sensoren und Schalter aktivieren"
             }
         }
     }

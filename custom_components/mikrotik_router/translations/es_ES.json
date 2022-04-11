@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "user": {
-                "title": "Set up Mikrotik",
+                "title": "Configurar un Mikrotik Router",
                 "description": "Configura la integración del Mikrotik Router.",
                 "data": {
                     "name": "Nombre de la integración",
@@ -32,7 +32,8 @@
                     "track_network_hosts_timeout": "Rastrear el tiempo de espera de los dispositivos de red (segundos)",
                     "zone": "Zona para rastreador de dispositivos"
                 },
-                "title": "Opciones básicas"
+                "title": "Opciones del Mikrotik Router (1\/2)",
+                "description": "Configurar la integración"
             },
             "sensor_select": {
                 "data": {
@@ -49,7 +50,8 @@
                     "sensor_ppp": "Usuarios PPP",
                     "sensor_filter": "Conmutadores de filtro"
                 },
-                "title": "Seleccionar sensores"
+                "title": "Opciones del Mikrotik Router (2\/2)",
+                "description": "Activar sensores e interruptores"
             }
         }
     }

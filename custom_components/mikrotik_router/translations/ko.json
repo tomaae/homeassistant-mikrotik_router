@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "user": {
-                "title": "Set up Mikrotik",
+                "title": "Mikrotik Router 설정",
                 "description": "Mikrotik 라우터 통합을 설정합니다.",
                 "data": {
                     "name": "통합 이름",
@@ -32,7 +32,8 @@
                     "track_network_hosts_timeout": "네트워크 기기 시간 초과 추적(초)",
                     "zone": "기기 추적기용 지역"
                 },
-                "title": "기본 설정"
+                "title": "Mikrotik Router 옵션(1\/2)",
+                "description": "통합 환경설정"
             },
             "sensor_select": {
                 "data": {
@@ -49,7 +50,8 @@
                     "sensor_ppp": "PPP 사용자",
                     "sensor_filter": "필터 스위치"
                 },
-                "title": "센서 선택"
+                "title": "Mikrotik Router 옵션(2\/2)",
+                "description": "센서 및 스위치 활성화"
             }
         }
     }

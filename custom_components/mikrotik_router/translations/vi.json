@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "user": {
-                "title": "Set up Mikrotik",
+                "title": "Thiết lập Mikrotik Router",
                 "description": "Thiết lập tích hợp Bộ định tuyến Mikrotik.",
                 "data": {
                     "name": "Tên của tích hợp",
@@ -32,7 +32,8 @@
                     "track_network_hosts_timeout": "Theo dõi thời gian chờ thiết bị mạng (giây)",
                     "zone": "Khu vực cho trình theo dõi thiết bị"
                 },
-                "title": "Tùy chọn cơ bản"
+                "title": "Cài đặt Mikrotik Router (1\/2)",
+                "description": "Đặt cấu hình tích hợp"
             },
             "sensor_select": {
                 "data": {
@@ -49,7 +50,8 @@
                     "sensor_ppp": "Người dùng PPP",
                     "sensor_filter": "Công tắc bộ lọc"
                 },
-                "title": "Chọn cảm biến"
+                "title": "Cài đặt Mikrotik Router (2\/2)",
+                "description": "Bật cảm biến và công tắc"
             }
         }
     }

@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "user": {
-                "title": "Set up Mikrotik",
+                "title": "Mikrotik Router'ı Kur",
                 "description": "Mikrotik yönlendirici entegrasyonunu kur",
                 "data": {
                     "name": "Entegrasyon adı",
@@ -32,7 +32,8 @@
                     "track_network_hosts_timeout": "Ağ cihazı izleme zaman aşımı (saniyeler)",
                     "zone": "Cihaz izleyici için alan"
                 },
-                "title": "Temel seçenekler"
+                "title": "Mikrotik Router seçenekleri (1\/2)",
+                "description": "Entegrasyonu yapılandır"
             },
             "sensor_select": {
                 "data": {
@@ -49,7 +50,8 @@
                     "sensor_ppp": "PPP kullanıcıları",
                     "sensor_filter": "Filtre anahtarları"
                 },
-                "title": "Sensörleri seçin"
+                "title": "Mikrotik Router seçenekleri (2\/2)",
+                "description": "Sensör ve anahtarları etkinleştir"
             }
         }
     }
