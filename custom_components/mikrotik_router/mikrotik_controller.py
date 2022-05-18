@@ -532,8 +532,8 @@ class MikrotikControllerData:
             # Check host availability
             if (
                 self.data["host"][uid]["source"] not in ["capsman", "wireless"]
-                and self.data["host"][uid]["address"] != "unknown"
-                and self.data["host"][uid]["interface"] != "unknown"
+                and self.data["host"][uid]["address"] not in ["unknown", ""]
+                and self.data["host"][uid]["interface"] not in ["unknown", ""]
             ):
                 tmp_interface = self.data["host"][uid]["interface"]
                 if uid in self.data["arp"] and self.data["arp"][uid]["bridge"] != "":
