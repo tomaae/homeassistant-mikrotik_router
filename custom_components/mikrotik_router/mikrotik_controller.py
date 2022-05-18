@@ -1795,18 +1795,15 @@ class MikrotikControllerData:
         if self.support_capsman:
             for uid, vals in self.data["capsman_hosts"].items():
                 if uid not in self.data["host"]:
-                    self.data["host"][uid] = {}
+                    self.data["host"][uid] = {"source": "capsman"}
+                elif self.data["host"][uid]["source"] != "capsman":
+                    continue
 
-                self.data["host"][uid]["source"] = "capsman"
                 capsman_detected[uid] = True
                 self.data["host"][uid]["available"] = True
                 self.data["host"][uid]["last-seen"] = utcnow()
                 for key in ["mac-address", "interface"]:
-                    if (
-                        key not in self.data["host"][uid]
-                        or self.data["host"][uid][key] == "unknown"
-                    ):
-                        self.data["host"][uid][key] = vals[key]
+                    self.data["host"][uid][key] = vals[key]
 
         # Add hosts from wireless
         wireless_detected = {}
@@ -1816,40 +1813,35 @@ class MikrotikControllerData:
                     continue
 
                 if uid not in self.data["host"]:
-                    self.data["host"][uid] = {}
+                    self.data["host"][uid] = {"source": "wireless"}
+                elif self.data["host"][uid]["source"] != "wireless":
+                    continue
 
-                self.data["host"][uid]["source"] = "wireless"
                 wireless_detected[uid] = True
                 self.data["host"][uid]["available"] = True
                 self.data["host"][uid]["last-seen"] = utcnow()
                 for key in ["mac-address", "interface"]:
-                    if (
-                        key not in self.data["host"][uid]
-                        or self.data["host"][uid][key] == "unknown"
-                    ):
-                        self.data["host"][uid][key] = vals[key]
+                    self.data["host"][uid][key] = vals[key]
 
         # Add hosts from DHCP
         for uid, vals in self.data["dhcp"].items():
             if uid not in self.data["host"]:
                 self.data["host"][uid] = {"source": "dhcp"}
-                for key in ["address", "mac-address", "interface"]:
-                    if (
-                        key not in self.data["host"][uid]
-                        or self.data["host"][uid][key] == "unknown"
-                    ):
-                        self.data["host"][uid][key] = vals[key]
+            elif self.data["host"][uid]["source"] != "dhcp":
+                continue
+
+            for key in ["address", "mac-address", "interface"]:
+                self.data["host"][uid][key] = vals[key]
 
         # Add hosts from ARP
         for uid, vals in self.data["arp"].items():
             if uid not in self.data["host"]:
                 self.data["host"][uid] = {"source": "arp"}
-                for key in ["address", "mac-address", "interface"]:
-                    if (
-                        key not in self.data["host"][uid]
-                        or self.data["host"][uid][key] == "unknown"
-                    ):
-                        self.data["host"][uid][key] = vals[key]
+            elif self.data["host"][uid]["source"] != "arp":
+                continue
+
+            for key in ["address", "mac-address", "interface"]:
+                self.data["host"][uid][key] = vals[key]
 
         # Add restored hosts from hass registry
         if not self.host_hass_recovered:
