@@ -1171,9 +1171,10 @@ class MikrotikControllerData:
             if self.data["filter"][uid]["uniq-id"] not in self.filter_removed:
                 self.filter_removed[self.data["filter"][uid]["uniq-id"]] = 1
                 _LOGGER.error(
-                    "Mikrotik %s duplicate Filter rule %s, entity will be unavailable.",
+                    "Mikrotik %s duplicate Filter rule %s (ID %s), entity will be unavailable.",
                     self.host,
                     self.data["filter"][uid]["name"],
+                    self.data["filter"][uid][".id"],
                 )
 
             del self.data["filter"][uid]
