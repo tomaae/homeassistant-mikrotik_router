@@ -77,3 +77,11 @@ async def async_unload_entry(hass, config_entry) -> bool:
         hass.data[DOMAIN].pop(config_entry.entry_id)
 
     return unload_ok
+
+
+# ---------------------------
+#   async_remove_config_entry_device
+# ---------------------------
+async def async_remove_config_entry_device(hass, config_entry, device_entry) -> bool:
+    """Remove a config entry from a device."""
+    return True
