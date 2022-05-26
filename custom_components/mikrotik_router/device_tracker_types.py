@@ -9,6 +9,8 @@ from homeassistant.components.switch import (
 DEVICE_ATTRIBUTES_HOST = [
     "interface",
     "source",
+    "authorized",
+    "bypassed",
     "last-seen",
 ]
 

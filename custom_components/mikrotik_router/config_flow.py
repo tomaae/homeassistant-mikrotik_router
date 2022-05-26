@@ -35,6 +35,8 @@ from .const import (
     DEFAULT_SENSOR_PORT_TRAFFIC,
     CONF_SENSOR_CLIENT_TRAFFIC,
     DEFAULT_SENSOR_CLIENT_TRAFFIC,
+    CONF_SENSOR_CLIENT_CAPTIVE,
+    DEFAULT_SENSOR_CLIENT_CAPTIVE,
     CONF_SENSOR_SIMPLE_QUEUES,
     DEFAULT_SENSOR_SIMPLE_QUEUES,
     CONF_SENSOR_NAT,
@@ -248,6 +250,12 @@ class MikrotikControllerOptionsFlowHandler(OptionsFlow):
                         CONF_SENSOR_CLIENT_TRAFFIC,
                         default=self.config_entry.options.get(
                             CONF_SENSOR_CLIENT_TRAFFIC, DEFAULT_SENSOR_CLIENT_TRAFFIC
+                        ),
+                    ): bool,
+                    vol.Optional(
+                        CONF_SENSOR_CLIENT_CAPTIVE,
+                        default=self.config_entry.options.get(
+                            CONF_SENSOR_CLIENT_CAPTIVE, DEFAULT_SENSOR_CLIENT_CAPTIVE
                         ),
                     ): bool,
                     vol.Optional(

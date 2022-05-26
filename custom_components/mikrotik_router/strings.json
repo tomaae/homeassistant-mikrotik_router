@@ -41,6 +41,7 @@
                     "sensor_port_tracker": "Port tracker sensors",
                     "sensor_port_traffic": "Port traffic sensors",
                     "sensor_client_traffic": "Client traffic sensors",
+                    "sensor_client_captive": "Captive portal data",
                     "sensor_simple_queues": "Simple queues switches",
                     "sensor_nat": "NAT switches",
                     "sensor_scripts": "Script switches",

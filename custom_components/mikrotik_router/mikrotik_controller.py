@@ -41,6 +41,8 @@ from .const import (
     DEFAULT_SENSOR_PORT_TRAFFIC,
     CONF_SENSOR_CLIENT_TRAFFIC,
     DEFAULT_SENSOR_CLIENT_TRAFFIC,
+    CONF_SENSOR_CLIENT_CAPTIVE,
+    DEFAULT_SENSOR_CLIENT_CAPTIVE,
     CONF_SENSOR_SIMPLE_QUEUES,
     DEFAULT_SENSOR_SIMPLE_QUEUES,
     CONF_SENSOR_NAT,
@@ -130,6 +132,7 @@ class MikrotikControllerData:
             "wireless_hosts": {},
             "host": {},
             "host_hass": {},
+            "hostspot_host": {},
             "client_traffic": {},
             "environment": {},
         }
@@ -229,6 +232,16 @@ class MikrotikControllerData:
         """Config entry option to not track ARP."""
         return self.config_entry.options.get(
             CONF_SENSOR_CLIENT_TRAFFIC, DEFAULT_SENSOR_CLIENT_TRAFFIC
+        )
+
+    # ---------------------------
+    #   option_sensor_client_captive
+    # ---------------------------
+    @property
+    def option_sensor_client_captive(self):
+        """Config entry option to not track ARP."""
+        return self.config_entry.options.get(
+            CONF_SENSOR_CLIENT_CAPTIVE, DEFAULT_SENSOR_CLIENT_CAPTIVE
         )
 
     # ---------------------------
@@ -636,6 +649,9 @@ class MikrotikControllerData:
                 await self.hass.async_add_executor_job(self.process_accounting)
             elif 0 < self.major_fw_version >= 7:
                 await self.hass.async_add_executor_job(self.process_kid_control_devices)
+
+        if self.api.connected() and self.option_sensor_client_captive:
+            await self.hass.async_add_executor_job(self.get_captive)
 
         if self.api.connected() and self.option_sensor_simple_queues:
             await self.hass.async_add_executor_job(self.get_queue)
@@ -1502,6 +1518,32 @@ class MikrotikControllerData:
         )
 
     # ---------------------------
+    #   get_captive
+    # ---------------------------
+    def get_captive(self):
+        """Get list of all environment variables from Mikrotik"""
+        self.data["hostspot_host"] = parse_api(
+            data={},
+            source=self.api.path("/ip/hotspot/host"),
+            key="mac-address",
+            vals=[
+                {"name": "mac-address"},
+                {
+                    "name": "authorized",
+                    "source": "disabled",
+                    "type": "bool",
+                    "reverse": True,
+                },
+                {
+                    "name": "bypassed",
+                    "source": "disabled",
+                    "type": "bool",
+                    "reverse": True,
+                },
+            ],
+        )
+
+    # ---------------------------
     #   get_queue
     # ---------------------------
     def get_queue(self):
@@ -1877,6 +1919,20 @@ class MikrotikControllerData:
         self.data["resource"]["clients_wired"] = 0
         self.data["resource"]["clients_wireless"] = 0
         for uid, vals in self.data["host"].items():
+            # Captive portal data
+            if self.option_sensor_client_captive:
+                if uid in self.data["hostspot_host"]:
+                    self.data["host"][uid]["authorized"] = self.data["hostspot_host"][
+                        "authorized"
+                    ]
+                    self.data["host"][uid]["bypassed"] = self.data["hostspot_host"][
+                        "bypassed"
+                    ]
+                else:
+                    if "authorized" in self.data["host"][uid]:
+                        del self.data["host"][uid]["authorized"]
+                        del self.data["host"][uid]["bypassed"]
+
             # CAPS-MAN availability
             if vals["source"] == "capsman" and uid not in capsman_detected:
                 self.data["host"][uid]["available"] = False

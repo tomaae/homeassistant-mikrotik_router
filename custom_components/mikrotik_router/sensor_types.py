@@ -63,7 +63,13 @@ DEVICE_ATTRIBUTES_IFACE_SFP = [
     "eeprom-checksum",
 ]
 
-DEVICE_ATTRIBUTES_CLIENT_TRAFFIC = ["address", "mac-address", "host-name"]
+DEVICE_ATTRIBUTES_CLIENT_TRAFFIC = [
+    "address",
+    "mac-address",
+    "host-name",
+    "authorized",
+    "bypassed",
+]
 
 
 @dataclass
