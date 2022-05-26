@@ -48,7 +48,8 @@
                     "sensor_kidcontrol": "Παιδικός έλεγχος",
                     "sensor_mangle": "Επιλογικοί διακόπτες",
                     "sensor_ppp": "Χρήστες PPP",
-                    "sensor_filter": "Διακόπτες φίλτρου"
+                    "sensor_filter": "Διακόπτες φίλτρου",
+                    "sensor_client_captive": "Captive portal data"
                 },
                 "title": "Επιλογές Mikrotik Router (2\/2)",
                 "description": "Ενεργοποίηση αισθητήρων και διακοπτών"

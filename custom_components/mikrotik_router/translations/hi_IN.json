@@ -48,7 +48,8 @@
                     "sensor_kidcontrol": "बच्चे के लिए कंट्रोल",
                     "sensor_mangle": "मैंगल स्विच",
                     "sensor_ppp": "PPP यूज़र",
-                    "sensor_filter": "फ़िल्टर स्विच"
+                    "sensor_filter": "फ़िल्टर स्विच",
+                    "sensor_client_captive": "Captive portal data"
                 },
                 "title": "Mikrotik Router के विकल्प (2\/2)",
                 "description": "सेंसर और स्विच को एनेबल करें"

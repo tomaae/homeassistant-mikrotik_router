@@ -48,7 +48,8 @@
                     "sensor_kidcontrol": "Kiểm soát trẻ em",
                     "sensor_mangle": "Công tắc Mangle",
                     "sensor_ppp": "Người dùng PPP",
-                    "sensor_filter": "Công tắc bộ lọc"
+                    "sensor_filter": "Công tắc bộ lọc",
+                    "sensor_client_captive": "Captive portal data"
                 },
                 "title": "Cài đặt Mikrotik Router (2\/2)",
                 "description": "Bật cảm biến và công tắc"

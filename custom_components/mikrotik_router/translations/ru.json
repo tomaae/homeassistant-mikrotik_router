@@ -48,7 +48,8 @@
                     "sensor_kidcontrol": "Родительский контроль",
                     "sensor_mangle": "Переключатели Mangle",
                     "sensor_ppp": "PPP-пользователи",
-                    "sensor_filter": "Переключатели фильтров"
+                    "sensor_filter": "Переключатели фильтров",
+                    "sensor_client_captive": "Captive portal data"
                 },
                 "title": "Параметры Mikrotik Router (2\/2)",
                 "description": "Включить датчики и переключатели"

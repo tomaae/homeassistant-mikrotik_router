@@ -48,7 +48,8 @@
                     "sensor_kidcontrol": "مراقبة الأطفال",
                     "sensor_mangle": "مفاتيح المِكواة الأُسطوانية",
                     "sensor_ppp": "مستخدمي PPP",
-                    "sensor_filter": "مفاتيح الترشيح"
+                    "sensor_filter": "مفاتيح الترشيح",
+                    "sensor_client_captive": "Captive portal data"
                 },
                 "title": "خيارات جهاز Mikrotik Router (2\/2)",
                 "description": "تمكين أجهزة الاستشعار والمفاتيح"

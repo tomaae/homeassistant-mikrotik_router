@@ -48,7 +48,8 @@
                     "sensor_kidcontrol": "Kindercontrole",
                     "sensor_mangle": "Mangelschakelaars",
                     "sensor_ppp": "PPP-gebruikers",
-                    "sensor_filter": "Filterschakelaars"
+                    "sensor_filter": "Filterschakelaars",
+                    "sensor_client_captive": "Captive portal data"
                 },
                 "title": "Opties Mikrotik Router (2\/2)",
                 "description": "Sensoren en schakelaars inschakelen"

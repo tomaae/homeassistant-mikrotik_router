@@ -48,7 +48,8 @@
                     "sensor_kidcontrol": "Control de niños",
                     "sensor_mangle": "Interruptor Mangle",
                     "sensor_ppp": "Usuarios PPP",
-                    "sensor_filter": "Filtros de interruptores"
+                    "sensor_filter": "Filtros de interruptores",
+                    "sensor_client_captive": "Captive portal data"
                 },
                 "title": "Opciones del Mikrotik Router 2\/2)",
                 "description": "Activar sensores e interruptores"

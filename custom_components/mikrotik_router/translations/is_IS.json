@@ -48,7 +48,8 @@
                     "sensor_kidcontrol": "Krakkastjórnun",
                     "sensor_mangle": "Bjögunarrofi",
                     "sensor_ppp": "PPP notendur",
-                    "sensor_filter": "Síurofar"
+                    "sensor_filter": "Síurofar",
+                    "sensor_client_captive": "Captive portal data"
                 },
                 "title": "Mikrotik Router valkostir (2\/2)",
                 "description": "Virkja skynjara og rofa"

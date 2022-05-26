@@ -48,7 +48,8 @@
                     "sensor_kidcontrol": "儿童控制",
                     "sensor_mangle": "标记开关",
                     "sensor_ppp": "PPP 用户",
-                    "sensor_filter": "过滤器开关"
+                    "sensor_filter": "过滤器开关",
+                    "sensor_client_captive": "Captive portal data"
                 },
                 "title": "Mikrotik Router 选项 (2\/2)",
                 "description": "启动传感器和开关"
