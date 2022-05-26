@@ -48,7 +48,8 @@
                     "sensor_kidcontrol": "キッドコントロール",
                     "sensor_mangle": "マングルスイッチ",
                     "sensor_ppp": "PPPユーザー",
-                    "sensor_filter": "フィルタースイッチ"
+                    "sensor_filter": "フィルタースイッチ",
+                    "sensor_client_captive": "Captive portal data"
                 },
                 "title": "Mikrotik Router オプション (2\/2)",
                 "description": "センサーとスイッチを有効にする"

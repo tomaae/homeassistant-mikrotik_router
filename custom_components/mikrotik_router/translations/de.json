@@ -48,7 +48,8 @@
                     "sensor_kidcontrol": "Kinderkontrolle",
                     "sensor_mangle": "Mangle-Schalter",
                     "sensor_ppp": "PPP-Nutzer",
-                    "sensor_filter": "Schalter filtern"
+                    "sensor_filter": "Schalter filtern",
+                    "sensor_client_captive": "Captive portal data"
                 },
                 "title": "Mikrotik-Router-Optionen (2\/2)",
                 "description": "Sensoren und Schalter aktivieren"

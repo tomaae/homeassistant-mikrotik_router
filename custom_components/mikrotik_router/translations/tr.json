@@ -48,7 +48,8 @@
                     "sensor_kidcontrol": "Çocuk denetimi",
                     "sensor_mangle": "Mangle anahtarları",
                     "sensor_ppp": "PPP kullanıcıları",
-                    "sensor_filter": "Filtre anahtarları"
+                    "sensor_filter": "Filtre anahtarları",
+                    "sensor_client_captive": "Captive portal data"
                 },
                 "title": "Mikrotik Router seçenekleri (2\/2)",
                 "description": "Sensör ve anahtarları etkinleştir"

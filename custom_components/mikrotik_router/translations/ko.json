@@ -48,7 +48,8 @@
                     "sensor_kidcontrol": "어린이 이용 제어",
                     "sensor_mangle": "맹글 스위치",
                     "sensor_ppp": "PPP 사용자",
-                    "sensor_filter": "필터 스위치"
+                    "sensor_filter": "필터 스위치",
+                    "sensor_client_captive": "Captive portal data"
                 },
                 "title": "Mikrotik Router 옵션(2\/2)",
                 "description": "센서 및 스위치 활성화"

@@ -48,7 +48,8 @@
                     "sensor_kidcontrol": "Bērnu kontrole",
                     "sensor_mangle": "Manglu slēdži",
                     "sensor_ppp": "PPP lietotāji",
-                    "sensor_filter": "Filtra slēdži"
+                    "sensor_filter": "Filtra slēdži",
+                    "sensor_client_captive": "Captive portal data"
                 },
                 "title": "Mikrotik Router opcijas (2\/2)",
                 "description": "Sensoru un slēdžu aktivizēšana"

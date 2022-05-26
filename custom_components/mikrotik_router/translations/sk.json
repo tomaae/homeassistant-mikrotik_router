@@ -48,7 +48,8 @@
                     "sensor_kidcontrol": "Detská kontrola",
                     "sensor_mangle": "Mangle prepínače",
                     "sensor_ppp": "PPP používatelia",
-                    "sensor_filter": "Prepínače filtrov"
+                    "sensor_filter": "Prepínače filtrov",
+                    "sensor_client_captive": "Captive portal data"
                 },
                 "title": "Možnosti Mikrotik Router (2\/2)",
                 "description": "Povoliť senzory a spínače"

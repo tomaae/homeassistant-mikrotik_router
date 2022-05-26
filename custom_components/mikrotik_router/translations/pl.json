@@ -48,7 +48,8 @@
                     "sensor_kidcontrol": "Kontrola rodzicielska",
                     "sensor_mangle": "Przełączniki mangle",
                     "sensor_ppp": "Użytkownicy PPP",
-                    "sensor_filter": "Przełączniki filtrów"
+                    "sensor_filter": "Przełączniki filtrów",
+                    "sensor_client_captive": "Captive portal data"
                 },
                 "title": "Opcje Mikrotik Router (2\/2)",
                 "description": "Włącz czujniki i przełączniki"

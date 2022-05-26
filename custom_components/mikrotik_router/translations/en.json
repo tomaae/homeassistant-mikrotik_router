@@ -48,7 +48,8 @@
                     "sensor_kidcontrol": "Kid control",
                     "sensor_mangle": "Mangle switches",
                     "sensor_ppp": "PPP users",
-                    "sensor_filter": "Filter switches"
+                    "sensor_filter": "Filter switches",
+                    "sensor_client_captive": "Captive portal data"
                 },
                 "title": "Mikrotik Router options (2\/2)",
                 "description": "Enable sensors and switches"

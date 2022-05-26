@@ -48,7 +48,8 @@
                     "sensor_kidcontrol": "Szülői felügyelet",
                     "sensor_mangle": "Mangle kapcsolók",
                     "sensor_ppp": "PPP felhasználók",
-                    "sensor_filter": "Szűrő kapcsolók"
+                    "sensor_filter": "Szűrő kapcsolók",
+                    "sensor_client_captive": "Captive portal data"
                 },
                 "title": "Mikrotik Router opciók (2\/2)",
                 "description": "Érzékelők és kapcsolók engedélyezése"
