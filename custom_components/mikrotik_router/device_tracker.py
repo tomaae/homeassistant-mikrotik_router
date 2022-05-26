@@ -145,3 +145,15 @@ class MikrotikHostDeviceTracker(MikrotikDeviceTracker):
     def state(self) -> str:
         """Return the state of the device."""
         return self._ctrl.option_zone if self.is_connected else STATE_NOT_HOME
+
+    @property
+    def extra_state_attributes(self) -> Mapping[str, Any]:
+        """Return the state attributes."""
+        attributes = super().extra_state_attributes
+        if self.is_connected:
+            attributes[format_attribute("last-seen")] = "Now"
+
+        if not attributes[format_attribute("last-seen")]:
+            attributes[format_attribute("last-seen")] = "Unknown"
+
+        return attributes
