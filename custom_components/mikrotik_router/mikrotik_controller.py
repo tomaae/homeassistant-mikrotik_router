@@ -1455,6 +1455,7 @@ class MikrotikControllerData:
     # ---------------------------
     def get_firmware_update(self):
         """Check for firmware update on Mikrotik"""
+        self.execute("/system/package/update", "check-for-updates", None, None)
         self.data["fw-update"] = parse_api(
             data=self.data["fw-update"],
             source=self.api.path("/system/package/update"),

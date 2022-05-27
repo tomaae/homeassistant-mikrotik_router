@@ -319,6 +319,7 @@ class MikrotikAPI:
     def execute(self, path, command, param, value) -> bool:
         """Execute a command"""
         entry_found = None
+        params = {}
 
         if not self.connection_check():
             return False
@@ -327,26 +328,28 @@ class MikrotikAPI:
         if response is None:
             return False
 
-        for tmp in response:
-            if param not in tmp:
-                continue
+        if param:
+            for tmp in response:
+                if param not in tmp:
+                    continue
 
-            if tmp[param] != value:
-                continue
+                if tmp[param] != value:
+                    continue
 
-            entry_found = tmp[".id"]
+                entry_found = tmp[".id"]
 
-        if not entry_found:
-            _LOGGER.error(
-                "Mikrotik %s Execute %s parameter %s with value %s not found",
-                self._host,
-                command,
-                param,
-                value,
-            )
-            return True
+            if not entry_found:
+                _LOGGER.error(
+                    "Mikrotik %s Execute %s parameter %s with value %s not found",
+                    self._host,
+                    command,
+                    param,
+                    value,
+                )
+                return True
 
-        params = {".id": entry_found}
+            params = {".id": entry_found}
+
         self.lock.acquire()
         try:
             tuple(response(command, **params))
