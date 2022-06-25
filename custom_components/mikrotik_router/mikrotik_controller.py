@@ -13,8 +13,8 @@ from mac_vendor_lookup import AsyncMacLookup
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval
+from homeassistant.helpers import entity_registry
 from homeassistant.util.dt import utcnow
-from homeassistant.components.device_tracker import DOMAIN as DEVICE_TRACKER_DOMAIN
 
 from homeassistant.const import (
     CONF_NAME,
@@ -453,15 +453,13 @@ class MikrotikControllerData:
     # ---------------------------
     async def async_get_host_hass(self):
         """Get host data from HA entity registry"""
-        registry = await self.hass.helpers.entity_registry.async_get_registry()
+        registry = entity_registry.async_get(self.hass)
         for entity in registry.entities.values():
             if (
                 entity.config_entry_id == self.config_entry.entry_id
-                and entity.domain == DEVICE_TRACKER_DOMAIN
-                and "-host-" in entity.unique_id
+                and entity.entity_id.startswith("device_tracker.")
             ):
-                _, mac = entity.unique_id.split("-host-", 2)
-                self.data["host_hass"][mac] = entity.original_name
+                self.data["host_hass"][entity.unique_id.upper()] = entity.original_name
 
     # ---------------------------
     #   async_hwinfo_update
