@@ -1381,6 +1381,7 @@ class MikrotikControllerData:
                 {"name": "uptime_epoch", "default": 0},
                 {"name": "clients_wired", "default": 0},
                 {"name": "clients_wireless", "default": 0},
+                {"name": "captive_authorized", "default": 0},
             ],
         )
 
@@ -1546,6 +1547,13 @@ class MikrotikControllerData:
                 },
             ],
         )
+
+        auth_hosts = sum(
+            1
+            for uid in self.data["hostspot_host"]
+            if self.data["hostspot_host"][uid]["authorized"]
+        )
+        self.data["resource"]["captive_authorized"] = auth_hosts
 
     # ---------------------------
     #   get_queue
