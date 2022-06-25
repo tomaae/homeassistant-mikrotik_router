@@ -700,6 +700,8 @@ class MikrotikControllerData:
                 {"name": "tx-previous", "default": 0.0},
                 {"name": "rx", "default": 0.0},
                 {"name": "tx", "default": 0.0},
+                {"name": "rx-total", "default": 0.0},
+                {"name": "tx-total", "default": 0.0},
             ],
             skip=[
                 {"name": "type", "value": "bridge"},
@@ -739,6 +741,9 @@ class MikrotikControllerData:
                     delta_rx / self.option_scan_interval.seconds * uom_div, 2
                 )
                 self.data["interface"][uid]["rx-previous"] = current_rx
+
+                self.data["interface"][uid]["tx-total"] = current_tx
+                self.data["interface"][uid]["rx-total"] = current_rx
 
         self.data["interface"] = parse_api(
             data=self.data["interface"],
