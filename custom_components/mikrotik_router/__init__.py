@@ -3,6 +3,8 @@
 import voluptuous as vol
 
 import homeassistant.helpers.config_validation as cv
+from homeassistant.helpers import device_registry
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.exceptions import ConfigEntryNotReady
 
 from .const import (
@@ -82,6 +84,8 @@ async def async_unload_entry(hass, config_entry) -> bool:
 # ---------------------------
 #   async_remove_config_entry_device
 # ---------------------------
-async def async_remove_config_entry_device(hass, config_entry, device_entry) -> bool:
+async def async_remove_config_entry_device(
+    hass, config_entry: ConfigEntry, device_entry: device_registry.DeviceEntry
+) -> bool:
     """Remove a config entry from a device."""
     return True
