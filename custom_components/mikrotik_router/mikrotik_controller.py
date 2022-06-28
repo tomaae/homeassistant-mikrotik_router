@@ -376,7 +376,7 @@ class MikrotikControllerData:
     # ---------------------------
     def set_value(self, path, param, value, mod_param, mod_value):
         """Change value using Mikrotik API"""
-        return self.api.update(path, param, value, mod_param, mod_value)
+        return self.api.set_value(path, param, value, mod_param, mod_value)
 
     # ---------------------------
     #   execute
@@ -414,7 +414,7 @@ class MikrotikControllerData:
         """Update Mikrotik data"""
         packages = parse_api(
             data={},
-            source=self.api.path("/system/package"),
+            source=self.api.query("/system/package"),
             key="name",
             vals=[
                 {"name": "name"},
@@ -667,7 +667,7 @@ class MikrotikControllerData:
         """Get all interfaces data from Mikrotik"""
         self.data["interface"] = parse_api(
             data=self.data["interface"],
-            source=self.api.path("/interface"),
+            source=self.api.query("/interface"),
             key="default-name",
             key_secondary="name",
             vals=[
@@ -747,7 +747,7 @@ class MikrotikControllerData:
 
         self.data["interface"] = parse_api(
             data=self.data["interface"],
-            source=self.api.path("/interface/ethernet"),
+            source=self.api.query("/interface/ethernet"),
             key="default-name",
             key_secondary="name",
             vals=[
@@ -786,7 +786,7 @@ class MikrotikControllerData:
                 ):
                     self.data["interface"] = parse_api(
                         data=self.data["interface"],
-                        source=self.api.path(
+                        source=self.api.query(
                             "/interface/ethernet",
                             command="monitor",
                             args={".id": vals[".id"], "once": True},
@@ -818,7 +818,7 @@ class MikrotikControllerData:
                 else:
                     self.data["interface"] = parse_api(
                         data=self.data["interface"],
-                        source=self.api.path(
+                        source=self.api.query(
                             "/interface/ethernet",
                             command="monitor",
                             args={".id": vals[".id"], "once": True},
@@ -839,7 +839,7 @@ class MikrotikControllerData:
         """Get system resources data from Mikrotik"""
         self.data["route"] = parse_api(
             data={},
-            source=self.api.path("/ip/route"),
+            source=self.api.query("/ip/route"),
             key="dst-address",
             vals=[
                 {"name": "dst-address"},
@@ -861,7 +861,7 @@ class MikrotikControllerData:
         """Get system resources data from Mikrotik"""
         self.data["bridge_host"] = parse_api(
             data=self.data["bridge_host"],
-            source=self.api.path("/interface/bridge/host"),
+            source=self.api.query("/interface/bridge/host"),
             key="mac-address",
             vals=[
                 {"name": "mac-address"},
@@ -925,7 +925,7 @@ class MikrotikControllerData:
         """Get NAT data from Mikrotik"""
         self.data["nat"] = parse_api(
             data=self.data["nat"],
-            source=self.api.path("/ip/firewall/nat"),
+            source=self.api.query("/ip/firewall/nat"),
             key=".id",
             vals=[
                 {"name": ".id"},
@@ -1007,7 +1007,7 @@ class MikrotikControllerData:
         """Get Mangle data from Mikrotik"""
         self.data["mangle"] = parse_api(
             data=self.data["mangle"],
-            source=self.api.path("/ip/firewall/mangle"),
+            source=self.api.query("/ip/firewall/mangle"),
             key=".id",
             vals=[
                 {"name": ".id"},
@@ -1101,7 +1101,7 @@ class MikrotikControllerData:
         """Get Filter data from Mikrotik"""
         self.data["filter"] = parse_api(
             data=self.data["filter"],
-            source=self.api.path("/ip/firewall/filter"),
+            source=self.api.query("/ip/firewall/filter"),
             key=".id",
             vals=[
                 {"name": ".id"},
@@ -1213,7 +1213,7 @@ class MikrotikControllerData:
         """Get Kid-control data from Mikrotik"""
         self.data["kid-control"] = parse_api(
             data=self.data["kid-control"],
-            source=self.api.path("/ip/kid-control"),
+            source=self.api.query("/ip/kid-control"),
             key="name",
             vals=[
                 {"name": "name"},
@@ -1248,7 +1248,7 @@ class MikrotikControllerData:
         """Get PPP data from Mikrotik"""
         self.data["ppp_secret"] = parse_api(
             data=self.data["ppp_secret"],
-            source=self.api.path("/ppp/secret"),
+            source=self.api.query("/ppp/secret"),
             key="name",
             vals=[
                 {"name": "name"},
@@ -1272,7 +1272,7 @@ class MikrotikControllerData:
 
         self.data["ppp_active"] = parse_api(
             data={},
-            source=self.api.path("/ppp/active"),
+            source=self.api.query("/ppp/active"),
             key="name",
             vals=[
                 {"name": "name"},
@@ -1317,7 +1317,7 @@ class MikrotikControllerData:
         else:
             self.data["routerboard"] = parse_api(
                 data=self.data["routerboard"],
-                source=self.api.path("/system/routerboard"),
+                source=self.api.query("/system/routerboard"),
                 vals=[
                     {"name": "routerboard", "type": "bool"},
                     {"name": "model", "default": "unknown"},
@@ -1338,7 +1338,7 @@ class MikrotikControllerData:
         if 0 < self.major_fw_version < 7:
             self.data["health"] = parse_api(
                 data=self.data["health"],
-                source=self.api.path("/system/health"),
+                source=self.api.query("/system/health"),
                 vals=[
                     {"name": "temperature", "default": "unknown"},
                     {"name": "voltage", "default": "unknown"},
@@ -1352,7 +1352,7 @@ class MikrotikControllerData:
         elif 0 < self.major_fw_version >= 7:
             self.data["health7"] = parse_api(
                 data=self.data["health7"],
-                source=self.api.path("/system/health"),
+                source=self.api.query("/system/health"),
                 key="name",
                 vals=[
                     {"name": "value", "default": "unknown"},
@@ -1372,7 +1372,7 @@ class MikrotikControllerData:
 
         self.data["resource"] = parse_api(
             data=self.data["resource"],
-            source=self.api.path("/system/resource"),
+            source=self.api.query("/system/resource"),
             vals=[
                 {"name": "platform", "default": "unknown"},
                 {"name": "board-name", "default": "unknown"},
@@ -1470,7 +1470,7 @@ class MikrotikControllerData:
         self.execute("/system/package/update", "check-for-updates", None, None)
         self.data["fw-update"] = parse_api(
             data=self.data["fw-update"],
-            source=self.api.path("/system/package/update"),
+            source=self.api.query("/system/package/update"),
             vals=[
                 {"name": "status"},
                 {"name": "channel", "default": "unknown"},
@@ -1506,7 +1506,7 @@ class MikrotikControllerData:
         """Get list of all scripts from Mikrotik"""
         self.data["script"] = parse_api(
             data=self.data["script"],
-            source=self.api.path("/system/script"),
+            source=self.api.query("/system/script"),
             key="name",
             vals=[
                 {"name": "name"},
@@ -1522,7 +1522,7 @@ class MikrotikControllerData:
         """Get list of all environment variables from Mikrotik"""
         self.data["environment"] = parse_api(
             data=self.data["environment"],
-            source=self.api.path("/system/script/environment"),
+            source=self.api.query("/system/script/environment"),
             key="name",
             vals=[
                 {"name": "name"},
@@ -1537,7 +1537,7 @@ class MikrotikControllerData:
         """Get list of all environment variables from Mikrotik"""
         self.data["hostspot_host"] = parse_api(
             data={},
-            source=self.api.path("/ip/hotspot/host"),
+            source=self.api.query("/ip/hotspot/host"),
             key="mac-address",
             vals=[
                 {"name": "mac-address"},
@@ -1570,7 +1570,7 @@ class MikrotikControllerData:
         """Get Queue data from Mikrotik"""
         self.data["queue"] = parse_api(
             data=self.data["queue"],
-            source=self.api.path("/queue/simple"),
+            source=self.api.query("/queue/simple"),
             key="name",
             vals=[
                 {"name": ".id"},
@@ -1659,7 +1659,7 @@ class MikrotikControllerData:
         """Get ARP data from Mikrotik"""
         self.data["arp"] = parse_api(
             data=self.data["arp"],
-            source=self.api.path("/ip/arp"),
+            source=self.api.query("/ip/arp"),
             key="mac-address",
             vals=[{"name": "mac-address"}, {"name": "address"}, {"name": "interface"}],
             ensure_vals=[{"name": "bridge", "default": ""}],
@@ -1699,7 +1699,7 @@ class MikrotikControllerData:
         """Get static DNS data from Mikrotik"""
         self.data["dns"] = parse_api(
             data=self.data["dns"],
-            source=self.api.path("/ip/dns/static"),
+            source=self.api.query("/ip/dns/static"),
             key="name",
             vals=[{"name": "name"}, {"name": "address"}, {"name": "comment"}],
         )
@@ -1714,7 +1714,7 @@ class MikrotikControllerData:
         """Get DHCP data from Mikrotik"""
         self.data["dhcp"] = parse_api(
             data=self.data["dhcp"],
-            source=self.api.path("/ip/dhcp-server/lease"),
+            source=self.api.query("/ip/dhcp-server/lease"),
             key="mac-address",
             vals=[
                 {"name": "mac-address"},
@@ -1784,7 +1784,7 @@ class MikrotikControllerData:
         """Get DHCP server data from Mikrotik"""
         self.data["dhcp-server"] = parse_api(
             data=self.data["dhcp-server"],
-            source=self.api.path("/ip/dhcp-server"),
+            source=self.api.query("/ip/dhcp-server"),
             key="name",
             vals=[{"name": "name"}, {"name": "interface", "default": "unknown"}],
         )
@@ -1796,7 +1796,7 @@ class MikrotikControllerData:
         """Get DHCP network data from Mikrotik"""
         self.data["dhcp-network"] = parse_api(
             data=self.data["dhcp-network"],
-            source=self.api.path("/ip/dhcp-server/network"),
+            source=self.api.query("/ip/dhcp-server/network"),
             key="address",
             vals=[
                 {"name": "address"},
@@ -1821,7 +1821,7 @@ class MikrotikControllerData:
         """Get CAPS-MAN hosts data from Mikrotik"""
         self.data["capsman_hosts"] = parse_api(
             data={},
-            source=self.api.path("/caps-man/registration-table"),
+            source=self.api.query("/caps-man/registration-table"),
             key="mac-address",
             vals=[
                 {"name": "mac-address"},
@@ -1838,7 +1838,7 @@ class MikrotikControllerData:
         wifimodule = "wifiwave2" if self.support_wifiwave2 else "wireless"
         self.data["wireless_hosts"] = parse_api(
             data={},
-            source=self.api.path(f"/interface/{wifimodule}/registration-table"),
+            source=self.api.query(f"/interface/{wifimodule}/registration-table"),
             key="mac-address",
             vals=[
                 {"name": "mac-address"},
@@ -2097,7 +2097,7 @@ class MikrotikControllerData:
         if time_diff:
             accounting_data = parse_api(
                 data={},
-                source=self.api.path("/ip/accounting/snapshot"),
+                source=self.api.query("/ip/accounting/snapshot"),
                 key=".id",
                 vals=[
                     {"name": ".id"},
@@ -2107,7 +2107,7 @@ class MikrotikControllerData:
                 ],
             )
 
-            threshold = self.api.path("/ip/accounting")[0].get("threshold")
+            threshold = self.api.query("/ip/accounting")[0].get("threshold")
             entry_count = len(accounting_data)
 
             if entry_count == threshold:
@@ -2277,7 +2277,7 @@ class MikrotikControllerData:
 
         kid_control_devices_data = parse_api(
             data={},
-            source=self.api.path("/ip/kid-control/device"),
+            source=self.api.query("/ip/kid-control/device"),
             key="mac-address",
             vals=[
                 {"name": "mac-address"},

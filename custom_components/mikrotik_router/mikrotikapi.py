@@ -175,9 +175,9 @@ class MikrotikAPI:
         return self._connected
 
     # ---------------------------
-    #   path
+    #   query
     # ---------------------------
-    def path(self, path, command=None, args=None, return_list=True) -> Optional(list):
+    def query(self, path, command=None, args=None, return_list=True) -> Optional(list):
         """Retrieve data from Mikrotik API."""
         """Returns generator object, unless return_list passed as True"""
         if args is None:
@@ -215,16 +215,16 @@ class MikrotikAPI:
         return response or None
 
     # ---------------------------
-    #   update
+    #   set_value
     # ---------------------------
-    def update(self, path, param, value, mod_param, mod_value) -> bool:
+    def set_value(self, path, param, value, mod_param, mod_value) -> bool:
         """Modify a parameter"""
         entry_found = None
 
         if not self.connection_check():
             return False
 
-        response = self.path(path, return_list=False)
+        response = self.query(path, return_list=False)
         if response is None:
             return False
 
@@ -239,7 +239,7 @@ class MikrotikAPI:
 
         if not entry_found:
             _LOGGER.error(
-                "Mikrotik %s Update parameter %s with value %s not found",
+                "Mikrotik %s set_value parameter %s with value %s not found",
                 self._host,
                 param,
                 value,
@@ -251,7 +251,7 @@ class MikrotikAPI:
         try:
             response.update(**params)
         except Exception as e:
-            self.disconnect("update", e)
+            self.disconnect("set_value", e)
             self.lock.release()
             return False
 
@@ -269,7 +269,7 @@ class MikrotikAPI:
         if not self.connection_check():
             return False
 
-        response = self.path(path, return_list=False)
+        response = self.query(path, return_list=False)
         if response is None:
             return False
 
@@ -315,7 +315,7 @@ class MikrotikAPI:
         if not self.connection_check():
             return False
 
-        response = self.path("/system/script", return_list=False)
+        response = self.query("/system/script", return_list=False)
         if response is None:
             return False
 
@@ -352,7 +352,7 @@ class MikrotikAPI:
         if not self.connection_check():
             return False
 
-        response = self.path("/ping", return_list=False)
+        response = self.query("/ping", return_list=False)
         if response is None:
             return False
 
@@ -401,7 +401,7 @@ class MikrotikAPI:
         if not self.connection_check():
             return False, False
 
-        response = self.path("/ip/accounting")
+        response = self.query("/ip/accounting")
         if response is None:
             return False, False
 
@@ -429,7 +429,7 @@ class MikrotikAPI:
             return 0
 
         if use_accounting:
-            accounting = self.path("/ip/accounting", return_list=False)
+            accounting = self.query("/ip/accounting", return_list=False)
 
             self.lock.acquire()
             try:
