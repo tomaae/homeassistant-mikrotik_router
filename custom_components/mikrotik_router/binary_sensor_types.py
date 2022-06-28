@@ -66,6 +66,23 @@ DEVICE_ATTRIBUTES_IFACE_SFP = [
     "eeprom-checksum",
 ]
 
+DEVICE_ATTRIBUTES_UPS = [
+    "name",
+    "offline-time",
+    "min-runtime",
+    "alarm-setting",
+    "model",
+    "serial",
+    "manufacture-date",
+    "nominal-battery-voltage",
+    "runtime-left",
+    "battery-charge",
+    "battery-voltage",
+    "line-voltage",
+    "load",
+    "hid-self-test",
+]
+
 
 @dataclass
 class MikrotikBinarySensorEntityDescription(BinarySensorEntityDescription):
@@ -99,6 +116,20 @@ SENSOR_TYPES = {
         data_name="",
         data_uid="",
         data_reference="",
+    ),
+    "system_ups": MikrotikBinarySensorEntityDescription(
+        key="system_ups",
+        name="UPS",
+        icon_enabled="",
+        icon_disabled="",
+        device_class=BinarySensorDeviceClass.POWER,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        ha_group="System",
+        data_path="ups",
+        data_attribute="on-line",
+        data_uid="",
+        data_reference="",
+        data_attributes_list=DEVICE_ATTRIBUTES_UPS,
     ),
     "ppp_tracker": MikrotikBinarySensorEntityDescription(
         key="ppp_tracker",

@@ -135,6 +135,7 @@ class MikrotikControllerData:
             "hostspot_host": {},
             "client_traffic": {},
             "environment": {},
+            "ups": {},
         }
 
         self.notified_flags = []
@@ -173,6 +174,7 @@ class MikrotikControllerData:
         self.support_wireless = False
         self.support_wifiwave2 = False
         self.support_ppp = False
+        self.support_ups = False
 
         self.major_fw_version = 0
 
@@ -448,6 +450,9 @@ class MikrotikControllerData:
                 self.support_wifiwave2 = False
                 self.support_capsman = True
 
+        if "ups" in packages and packages["ups"]["enabled"]:
+            self.support_ups = True
+
     # ---------------------------
     #   async_get_host_hass
     # ---------------------------
@@ -656,6 +661,9 @@ class MikrotikControllerData:
 
         if self.api.connected() and self.option_sensor_environment:
             await self.hass.async_add_executor_job(self.get_environment)
+
+        if self.api.connected() and self.support_ups:
+            await self.hass.async_add_executor_job(self.get_ups)
 
         async_dispatcher_send(self.hass, self.signal_update)
         self.lock.release()
@@ -1498,6 +1506,59 @@ class MikrotikControllerData:
                     self.host,
                     self.data["fw-update"].get("installed-version"),
                 )
+
+    # ---------------------------
+    #   get_ups
+    # ---------------------------
+    def get_ups(self):
+        """Get UPS info from Mikrotik"""
+        self.data["ups"] = parse_api(
+            data=self.data["ups"],
+            source=self.api.query("/system/ups"),
+            vals=[
+                {"name": "name", "default": "unknown"},
+                {"name": "offline-time", "default": "unknown"},
+                {"name": "min-runtime", "default": "unknown"},
+                {"name": "alarm-setting", "default": "unknown"},
+                {"name": "model", "default": "unknown"},
+                {"name": "serial", "default": "unknown"},
+                {"name": "manufacture-date", "default": "unknown"},
+                {"name": "nominal-battery-voltage", "default": "unknown"},
+                {
+                    "name": "enabled",
+                    "source": "disabled",
+                    "type": "bool",
+                    "reverse": True,
+                },
+            ],
+            ensure_vals=[
+                {"name": "on-line", "type": "bool"},
+                {"name": "runtime-left", "default": "unknown"},
+                {"name": "battery-charge", "default": 0},
+                {"name": "battery-voltage", "default": 0.0},
+                {"name": "line-voltage", "default": 0},
+                {"name": "load", "default": 0},
+                {"name": "hid-self-test", "default": "unknown"},
+            ],
+        )
+        if self.data["ups"]["enabled"]:
+            self.data["ups"] = parse_api(
+                data=self.data["ups"],
+                source=self.api.query(
+                    "/system/ups",
+                    command="monitor",
+                    args={".id": 0, "once": True},
+                ),
+                vals=[
+                    {"name": "on-line", "type": "bool"},
+                    {"name": "runtime-left", "default": "unknown"},
+                    {"name": "battery-charge", "default": 0},
+                    {"name": "battery-voltage", "default": 0.0},
+                    {"name": "line-voltage", "default": 0},
+                    {"name": "load", "default": 0},
+                    {"name": "hid-self-test", "default": "unknown"},
+                ],
+            )
 
     # ---------------------------
     #   get_script
