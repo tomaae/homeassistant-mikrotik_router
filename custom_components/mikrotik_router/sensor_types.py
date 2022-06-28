@@ -71,6 +71,19 @@ DEVICE_ATTRIBUTES_CLIENT_TRAFFIC = [
     "authorized",
     "bypassed",
 ]
+DEVICE_ATTRIBUTES_GPS = [
+    "valid",
+    "latitude",
+    "longitude",
+    "altitude",
+    "speed",
+    "destination-bearing",
+    "true-bearing",
+    "magnetic-bearing",
+    "satellites",
+    "fix-quality",
+    "horizontal-dilution",
+]
 
 
 @dataclass
@@ -300,6 +313,38 @@ SENSOR_TYPES = {
         data_name="",
         data_uid="",
         data_reference="",
+    ),
+    "system_gps-latitude": MikrotikSensorEntityDescription(
+        key="system_gps-latitude",
+        name="latitude",
+        icon="mdi:latitude",
+        native_unit_of_measurement=None,
+        device_class=None,
+        state_class=None,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        ha_group="System",
+        data_path="gps",
+        data_attribute="latitude",
+        data_name="",
+        data_uid="",
+        data_reference="",
+        data_attributes_list=DEVICE_ATTRIBUTES_GPS,
+    ),
+    "system_gps-longitude": MikrotikSensorEntityDescription(
+        key="system_gps-longitude",
+        name="longitude",
+        icon="mdi:longitude",
+        native_unit_of_measurement=None,
+        device_class=None,
+        state_class=None,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        ha_group="System",
+        data_path="gps",
+        data_attribute="longitude",
+        data_name="",
+        data_uid="",
+        data_reference="",
+        data_attributes_list=DEVICE_ATTRIBUTES_GPS,
     ),
     "traffic_tx": MikrotikSensorEntityDescription(
         key="traffic_tx",

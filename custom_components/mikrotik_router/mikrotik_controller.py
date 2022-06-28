@@ -136,6 +136,7 @@ class MikrotikControllerData:
             "client_traffic": {},
             "environment": {},
             "ups": {},
+            "gps": {},
         }
 
         self.notified_flags = []
@@ -175,6 +176,7 @@ class MikrotikControllerData:
         self.support_wifiwave2 = False
         self.support_ppp = False
         self.support_ups = False
+        self.support_gps = False
 
         self.major_fw_version = 0
 
@@ -453,6 +455,9 @@ class MikrotikControllerData:
         if "ups" in packages and packages["ups"]["enabled"]:
             self.support_ups = True
 
+        if "gps" in packages and packages["gps"]["enabled"]:
+            self.support_gps = True
+
     # ---------------------------
     #   async_get_host_hass
     # ---------------------------
@@ -664,6 +669,9 @@ class MikrotikControllerData:
 
         if self.api.connected() and self.support_ups:
             await self.hass.async_add_executor_job(self.get_ups)
+
+        if self.api.connected() and self.support_gps:
+            await self.hass.async_add_executor_job(self.get_gps)
 
         async_dispatcher_send(self.hass, self.signal_update)
         self.lock.release()
@@ -1551,7 +1559,7 @@ class MikrotikControllerData:
                 ),
                 vals=[
                     {"name": "on-line", "type": "bool"},
-                    {"name": "runtime-left", "default": "unknown"},
+                    {"name": "runtime-left", "default": 0},
                     {"name": "battery-charge", "default": 0},
                     {"name": "battery-voltage", "default": 0.0},
                     {"name": "line-voltage", "default": 0},
@@ -1559,6 +1567,33 @@ class MikrotikControllerData:
                     {"name": "hid-self-test", "default": "unknown"},
                 ],
             )
+
+    # ---------------------------
+    #   get_gps
+    # ---------------------------
+    def get_gps(self):
+        """Get GPS data from Mikrotik"""
+        self.data["gps"] = parse_api(
+            data=self.data["gps"],
+            source=self.api.query(
+                "/system/gps",
+                command="monitor",
+                args={"once": True},
+            ),
+            vals=[
+                {"name": "valid", "type": "bool"},
+                {"name": "latitude", "default": "unknown"},
+                {"name": "longitude", "default": "unknown"},
+                {"name": "altitude", "default": "unknown"},
+                {"name": "speed", "default": "unknown"},
+                {"name": "destination-bearing", "default": "unknown"},
+                {"name": "true-bearing", "default": "unknown"},
+                {"name": "magnetic-bearing", "default": "unknown"},
+                {"name": "satellites", "default": 0},
+                {"name": "fix-quality", "default": 0},
+                {"name": "horizontal-dilution", "default": "unknown"},
+            ],
+        )
 
     # ---------------------------
     #   get_script
