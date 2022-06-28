@@ -177,9 +177,11 @@ class MikrotikAPI:
     # ---------------------------
     #   path
     # ---------------------------
-    def path(self, path, return_list=True) -> Optional(list):
+    def path(self, path, command=None, args=None, return_list=True) -> Optional(list):
         """Retrieve data from Mikrotik API."""
         """Returns generator object, unless return_list passed as True"""
+        if args is None:
+            args = {}
 
         if not self.connection_check():
             return None
@@ -193,11 +195,19 @@ class MikrotikAPI:
             self.lock.release()
             return None
 
-        if return_list:
+        if response and return_list and not command:
             try:
                 response = list(response)
             except Exception as e:
                 self.disconnect("building list for path", e)
+                self.lock.release()
+                return None
+        elif response and command:
+            _LOGGER.debug("API query: %s, %s, %s", path, command, args)
+            try:
+                response = list(response(command, **args))
+            except Exception as e:
+                self.disconnect("path", e)
                 self.lock.release()
                 return None
 
