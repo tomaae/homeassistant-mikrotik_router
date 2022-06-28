@@ -345,38 +345,6 @@ class MikrotikAPI:
         return True
 
     # ---------------------------
-    #   get_sfp
-    # ---------------------------
-    def get_sfp(self, interfaces) -> Optional(list):
-        """Get sfp info"""
-        if not self.connection_check():
-            return None
-
-        response = self.path("/interface/ethernet", return_list=False)
-        if response is None:
-            return None
-
-        args = {".id": interfaces, "once": True}
-        self.lock.acquire()
-        try:
-            _LOGGER.debug("API query: %s %s", "/interface/ethernet/monitor", interfaces)
-            sfpinfo = response("monitor", **args)
-        except Exception as e:
-            self.disconnect("get_sfp", e)
-            self.lock.release()
-            return None
-
-        try:
-            sfpinfo = list(sfpinfo)
-        except Exception as e:
-            self.disconnect("get_sfp", e)
-            self.lock.release()
-            return None
-
-        self.lock.release()
-        return sfpinfo or None
-
-    # ---------------------------
     #   arp_ping
     # ---------------------------
     def arp_ping(self, address, interface) -> bool:

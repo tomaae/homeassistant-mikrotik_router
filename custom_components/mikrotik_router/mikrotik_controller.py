@@ -786,7 +786,11 @@ class MikrotikControllerData:
                 ):
                     self.data["interface"] = parse_api(
                         data=self.data["interface"],
-                        source=self.api.get_sfp(vals[".id"]),
+                        source=self.api.path(
+                            "/interface/ethernet",
+                            command="monitor",
+                            args={".id": vals[".id"], "once": True},
+                        ),
                         key_search="name",
                         vals=[
                             {"name": "status", "default": "unknown"},
@@ -814,7 +818,11 @@ class MikrotikControllerData:
                 else:
                     self.data["interface"] = parse_api(
                         data=self.data["interface"],
-                        source=self.api.get_sfp(vals[".id"]),
+                        source=self.api.path(
+                            "/interface/ethernet",
+                            command="monitor",
+                            args={".id": vals[".id"], "once": True},
+                        ),
                         key_search="name",
                         vals=[
                             {"name": "status", "default": "unknown"},
