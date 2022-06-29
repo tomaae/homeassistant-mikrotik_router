@@ -1637,18 +1637,8 @@ class MikrotikControllerData:
             key="mac-address",
             vals=[
                 {"name": "mac-address"},
-                {
-                    "name": "authorized",
-                    "source": "disabled",
-                    "type": "bool",
-                    "reverse": True,
-                },
-                {
-                    "name": "bypassed",
-                    "source": "disabled",
-                    "type": "bool",
-                    "reverse": True,
-                },
+                {"name": "authorized", "type": "bool"},
+                {"name": "bypassed", "type": "bool"},
             ],
         )
 
