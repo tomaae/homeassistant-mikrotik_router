@@ -4,16 +4,13 @@ import logging
 import ssl
 from time import time
 from threading import Lock
-
 from voluptuous import Optional
-
 from .const import (
     DEFAULT_LOGIN_METHOD,
     DEFAULT_ENCODING,
 )
 
 import librouteros
-from socket import error as socket_error, timeout as socket_timeout
 
 _LOGGER = logging.getLogger(__name__)
 
