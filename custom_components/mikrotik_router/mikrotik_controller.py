@@ -2029,11 +2029,11 @@ class MikrotikControllerData:
             if self.option_sensor_client_captive:
                 if uid in self.data["hostspot_host"]:
                     self.data["host"][uid]["authorized"] = self.data["hostspot_host"][
-                        "authorized"
-                    ]
+                        uid
+                    ]["authorized"]
                     self.data["host"][uid]["bypassed"] = self.data["hostspot_host"][
-                        "bypassed"
-                    ]
+                        uid
+                    ]["bypassed"]
                 else:
                     if "authorized" in self.data["host"][uid]:
                         del self.data["host"][uid]["authorized"]
