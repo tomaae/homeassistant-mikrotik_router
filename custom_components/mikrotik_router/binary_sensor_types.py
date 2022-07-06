@@ -10,6 +10,13 @@ from homeassistant.components.binary_sensor import (
 
 from .const import DOMAIN
 
+DEVICE_ATTRIBUTES_FWUPDATE = [
+    "channel",
+    "status",
+    "installed-version",
+    "latest-version",
+]
+
 DEVICE_ATTRIBUTES_PPP_SECRET = [
     "connected",
     "service",
@@ -116,6 +123,7 @@ SENSOR_TYPES = {
         data_name="",
         data_uid="",
         data_reference="",
+        data_attributes_list=DEVICE_ATTRIBUTES_FWUPDATE,
     ),
     "system_ups": MikrotikBinarySensorEntityDescription(
         key="system_ups",
