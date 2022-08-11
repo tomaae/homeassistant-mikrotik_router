@@ -111,20 +111,6 @@ class MikrotikBinarySensorEntityDescription(BinarySensorEntityDescription):
 
 
 SENSOR_TYPES = {
-    "system_fwupdate": MikrotikBinarySensorEntityDescription(
-        key="system_fwupdate",
-        name="Firmware update",
-        icon_enabled="",
-        icon_disabled="",
-        device_class=BinarySensorDeviceClass.UPDATE,
-        entity_category=EntityCategory.DIAGNOSTIC,
-        ha_group="System",
-        data_path="fw-update",
-        data_name="",
-        data_uid="",
-        data_reference="",
-        data_attributes_list=DEVICE_ATTRIBUTES_FWUPDATE,
-    ),
     "system_ups": MikrotikBinarySensorEntityDescription(
         key="system_ups",
         name="UPS",

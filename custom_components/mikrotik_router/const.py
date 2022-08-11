@@ -7,6 +7,7 @@ PLATFORMS = [
     Platform.DEVICE_TRACKER,
     Platform.SWITCH,
     Platform.BUTTON,
+    Platform.UPDATE,
 ]
 
 DOMAIN = "mikrotik_router"
