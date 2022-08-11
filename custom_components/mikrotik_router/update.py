@@ -97,8 +97,8 @@ class MikrotikUpdate(MikrotikEntity, UpdateEntity):
             if response.status_code == 200:
                 return response.text.replace(chr(10), "<br />")
 
-        except:
-            _LOGGER.warning("Mikrotik %s failed to download release notes", self._host)
+        except Exception as e:
+            _LOGGER.warning("Failed to download release notes (%s)", e)
 
         return "Failed to download release notes"
 
