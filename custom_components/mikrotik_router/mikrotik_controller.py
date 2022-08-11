@@ -1315,11 +1315,8 @@ class MikrotikControllerData:
                     {"name": "routerboard", "type": "bool"},
                     {"name": "model", "default": "unknown"},
                     {"name": "serial-number", "default": "unknown"},
-                    {
-                        "name": "firmware",
-                        "source": "current-firmware",
-                        "default": "unknown",
-                    },
+                    {"name": "current-firmware", "default": "unknown"},
+                    {"name": "upgrade-firmware", "default": "unknown"},
                 ],
             )
 

@@ -24,7 +24,8 @@ DEVICE_UPDATE = "device_update"
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up entry for component"""
     dispatcher = {
-        "MikrotikUpdate": MikrotikUpdate,
+        "MikrotikRouterOSUpdate": MikrotikRouterOSUpdate,
+        "MikrotikRouterBoardFWUpdate": MikrotikRouterBoardFWUpdate,
     }
     await model_async_setup_entry(
         hass,
@@ -37,9 +38,9 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 
 # ---------------------------
-#   MikrotikUpdate
+#   MikrotikRouterOSUpdate
 # ---------------------------
-class MikrotikUpdate(MikrotikEntity, UpdateEntity):
+class MikrotikRouterOSUpdate(MikrotikEntity, UpdateEntity):
     """Define an Mikrotik Controller Update entity."""
 
     TYPE = DEVICE_UPDATE
@@ -84,8 +85,6 @@ class MikrotikUpdate(MikrotikEntity, UpdateEntity):
 
         self._ctrl.execute("/system/package/update", "install", None, None)
 
-        # await self.controller.api.devices.upgrade(self.device.mac)
-
     async def async_release_notes(self) -> str:
         """Return the release notes."""
         try:
@@ -106,3 +105,49 @@ class MikrotikUpdate(MikrotikEntity, UpdateEntity):
     def release_url(self) -> str:
         """URL to the full release notes of the latest version available."""
         return "https://mikrotik.com/download/changelogs"
+
+
+# ---------------------------
+#   MikrotikRouterBoardFWUpdate
+# ---------------------------
+class MikrotikRouterBoardFWUpdate(MikrotikEntity, UpdateEntity):
+    """Define an Mikrotik Controller Update entity."""
+
+    def __init__(
+        self,
+        inst,
+        uid: "",
+        mikrotik_controller,
+        entity_description,
+    ):
+        """Set up device update entity."""
+        super().__init__(inst, uid, mikrotik_controller, entity_description)
+        _LOGGER.error(self._data)
+
+        self._attr_supported_features = UpdateEntityFeature.INSTALL
+
+    @property
+    def is_on(self) -> bool:
+        """Return true if device is on."""
+        return (
+            self.data["routerboard"]["current-firmware"]
+            != self.data["routerboard"]["upgrade-firmware"]
+        )
+
+    @property
+    def installed_version(self) -> str:
+        """Version installed and in use."""
+        return self._data["current-firmware"]
+
+    @property
+    def latest_version(self) -> str:
+        """Latest version available for install."""
+        return self._data["upgrade-firmware"]
+
+    async def options_updated(self) -> None:
+        """No action needed."""
+
+    async def async_install(self, version: str, backup: bool, **kwargs: Any) -> None:
+        """Install an update."""
+        self._ctrl.execute("/system/routerboard", "upgrade", None, None)
+        self._ctrl.execute("/system", "reboot", None, None)

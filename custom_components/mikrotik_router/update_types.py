@@ -18,7 +18,7 @@ class MikrotikUpdateEntityDescription(UpdateEntityDescription):
     data_uid: str = ""
     data_reference: str = ""
     data_attributes_list: List = field(default_factory=lambda: [])
-    func: str = "MikrotikUpdate"
+    func: str = "MikrotikRouterOSUpdate"
 
 
 SENSOR_TYPES = {
@@ -30,7 +30,20 @@ SENSOR_TYPES = {
         data_name="",
         data_uid="",
         data_reference="",
+        func="MikrotikRouterOSUpdate",
+    ),
+    "system_rbfwupdate": MikrotikUpdateEntityDescription(
+        key="system_rbfwupdate",
+        name="RouterBoard firmware update",
+        ha_group="System",
+        data_path="routerboard",
+        data_attribute="current-firmware",
+        data_name="",
+        data_uid="",
+        data_reference="",
+        func="MikrotikRouterBoardFWUpdate",
     ),
 }
+
 
 SENSOR_SERVICES = {}
