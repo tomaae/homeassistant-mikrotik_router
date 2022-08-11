@@ -108,7 +108,6 @@ class MikrotikControllerData:
         self.data = {
             "routerboard": {},
             "resource": {},
-            "route": {},
             "health": {},
             "health7": {},
             "interface": {},
@@ -126,6 +125,7 @@ class MikrotikControllerData:
             "queue": {},
             "dns": {},
             "dhcp-server": {},
+            "dhcp-client": {},
             "dhcp-network": {},
             "dhcp": {},
             "capsman_hosts": {},
@@ -607,7 +607,7 @@ class MikrotikControllerData:
             await self.hass.async_add_executor_job(self.get_system_health)
 
         if self.api.connected():
-            await self.hass.async_add_executor_job(self.get_route)
+            await self.hass.async_add_executor_job(self.get_dhcp_client)
 
         if self.api.connected():
             await self.hass.async_add_executor_job(self.get_interface)
@@ -846,28 +846,6 @@ class MikrotikControllerData:
                             {"name": "auto-negotiation", "default": "unknown"},
                         ],
                     )
-
-    # ---------------------------
-    #   get_route
-    # ---------------------------
-    def get_route(self):
-        """Get system resources data from Mikrotik"""
-        self.data["route"] = parse_api(
-            data={},
-            source=self.api.query("/ip/route"),
-            key="dst-address",
-            vals=[
-                {"name": "dst-address"},
-                {"name": "gateway", "default": "unknown"},
-                {"name": "vrf-interface", "default": "unknown"},
-                {
-                    "name": "enabled",
-                    "source": "disabled",
-                    "type": "bool",
-                    "reverse": True,
-                },
-            ],
-        )
 
     # ---------------------------
     #   get_bridge
@@ -1750,13 +1728,6 @@ class MikrotikControllerData:
             ensure_vals=[{"name": "bridge", "default": ""}],
         )
 
-        default_gateway = ""
-        if (
-            "0.0.0.0/0" in self.data["route"]
-            and self.data["route"]["0.0.0.0/0"]["vrf-interface"]
-        ):
-            default_gateway = self.data["route"]["0.0.0.0/0"]["vrf-interface"]
-
         for uid, vals in self.data["arp"].items():
             if (
                 vals["interface"] in self.data["bridge"]
@@ -1767,11 +1738,11 @@ class MikrotikControllerData:
                     "interface"
                 ]
 
-        if default_gateway:
+        if self.data["dhcp-client"]:
             to_remove = [
                 uid
                 for uid, vals in self.data["arp"].items()
-                if vals["interface"] == default_gateway
+                if vals["interface"] in self.data["dhcp-client"]
             ]
 
             for uid in to_remove:
@@ -1871,7 +1842,25 @@ class MikrotikControllerData:
             data=self.data["dhcp-server"],
             source=self.api.query("/ip/dhcp-server"),
             key="name",
-            vals=[{"name": "name"}, {"name": "interface", "default": "unknown"}],
+            vals=[
+                {"name": "name"},
+                {"name": "interface", "default": "unknown"},
+            ],
+        )
+
+    # ---------------------------
+    #   get_dhcp_client
+    # ---------------------------
+    def get_dhcp_client(self):
+        """Get DHCP client data from Mikrotik"""
+        self.data["dhcp-client"] = parse_api(
+            data=self.data["dhcp-client"],
+            source=self.api.query("/ip/dhcp-client"),
+            key="interface",
+            vals=[
+                {"name": "interface", "default": "unknown"},
+                {"name": "status", "default": "unknown"},
+            ],
         )
 
     # ---------------------------
