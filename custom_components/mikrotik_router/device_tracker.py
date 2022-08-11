@@ -110,14 +110,11 @@ class MikrotikHostDeviceTracker(MikrotikDeviceTracker):
         if self._data["source"] in ["capsman", "wireless"]:
             return self._data[self.entity_description.data_attribute]
 
-        if (
+        return bool(
             self._data["last-seen"]
-            and (utcnow() - self._data["last-seen"])
+            and utcnow() - self._data["last-seen"]
             < self.option_track_network_hosts_timeout
-        ):
-            return True
-
-        return False
+        )
 
     @property
     def icon(self) -> str:
