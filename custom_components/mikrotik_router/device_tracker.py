@@ -102,11 +102,6 @@ class MikrotikHostDeviceTracker(MikrotikDeviceTracker):
         return f"{self._data[self.entity_description.data_name]}"
 
     @property
-    def unique_id(self) -> str:
-        """Return a unique id for this entity."""
-        return f"{self._data[self.entity_description.data_reference].lower()}"
-
-    @property
     def is_connected(self) -> bool:
         """Return true if the host is connected to the network."""
         if not self.option_track_network_hosts:
