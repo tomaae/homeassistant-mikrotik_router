@@ -10,13 +10,6 @@ from homeassistant.components.binary_sensor import (
 
 from .const import DOMAIN
 
-DEVICE_ATTRIBUTES_FWUPDATE = [
-    "channel",
-    "status",
-    "installed-version",
-    "latest-version",
-]
-
 DEVICE_ATTRIBUTES_PPP_SECRET = [
     "connected",
     "service",
