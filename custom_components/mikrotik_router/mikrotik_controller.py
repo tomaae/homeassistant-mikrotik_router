@@ -598,11 +598,10 @@ class MikrotikControllerData:
         except Exception:
             return
 
+        await self.hass.async_add_executor_job(self.get_system_resource)
+
         if self.api.connected() and "available" not in self.data["fw-update"]:
             await self.async_fwupdate_check()
-
-        if self.api.connected():
-            await self.hass.async_add_executor_job(self.get_system_resource)
 
         if self.api.connected():
             await self.hass.async_add_executor_job(self.get_system_health)
