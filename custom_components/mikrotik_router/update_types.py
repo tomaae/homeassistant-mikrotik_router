@@ -22,8 +22,8 @@ class MikrotikUpdateEntityDescription(UpdateEntityDescription):
 
 
 SENSOR_TYPES = {
-    "system_fwupdate": MikrotikUpdateEntityDescription(
-        key="system_fwupdate",
+    "system_rosupdate": MikrotikUpdateEntityDescription(
+        key="system_rosupdate",
         name="RouterOS update",
         ha_group="System",
         data_path="fw-update",
