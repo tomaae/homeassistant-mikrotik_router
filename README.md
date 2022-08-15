@@ -140,6 +140,19 @@ Simple dummy Kid entry can be defined with
 
 ![Accounting sensor](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/accounting_sensor.png)
 
+## UPS sensor
+Monitor your UPS.
+![UPS sensor](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/ups.png)
+
+## GPS sensors
+Monitor your GPS coordinates.
+![GPS sensor](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/gps.png)
+
+## Update sensor
+Update Mikrotik OS and firmare directly from Home Assistant.
+![RouterOS update](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/routeros_update.png)
+![Firmware update](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/firmware_update.png)
+
 # Install integration
 This integration is distributed using [HACS](https://hacs.xyz/).
 
