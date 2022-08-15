@@ -48,11 +48,14 @@ Monitor and control your Mikrotik device from Home Assistant.
  * Enable/disable Mangle switches
  * Enable/disable Filter switches
  * Monitor and control PPP users
+ * Monitor UPS
+ * Monitor GPS coordinates
+ * Captive Portal
  * Kid Control
  * Client Traffic RX/TX WAN/LAN monitoring though Accounting or Kid Control Devices (depending on RouterOS FW version)
  * Device tracker for hosts in network
  * System sensors (CPU, Memory, HDD, Temperature)
- * Check firmware update
+ * Check and update RouterOS and RouterBOARD firmware
  * Execute scripts
  * View environment variables
  * Configurable update interval
@@ -142,14 +145,17 @@ Simple dummy Kid entry can be defined with
 
 ## UPS sensor
 Monitor your UPS.
+
 ![UPS sensor](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/ups.png)
 
 ## GPS sensors
 Monitor your GPS coordinates.
+
 ![GPS sensor](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/gps.png)
 
 ## Update sensor
 Update Mikrotik OS and firmare directly from Home Assistant.
+
 ![RouterOS update](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/routeros_update.png)
 ![Firmware update](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/firmware_update.png)
 
