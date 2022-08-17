@@ -117,7 +117,7 @@ class MikrotikRouterBoardFWUpdate(MikrotikEntity, UpdateEntity):
 
     TYPE = DEVICE_UPDATE
     _attr_device_class = UpdateDeviceClass.FIRMWARE
-    
+
     def __init__(
         self,
         inst,
