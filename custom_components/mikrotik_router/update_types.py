@@ -24,7 +24,7 @@ class MikrotikUpdateEntityDescription(UpdateEntityDescription):
 SENSOR_TYPES = {
     "system_rosupdate": MikrotikUpdateEntityDescription(
         key="system_rosupdate",
-        name="RouterOS update",
+        name="RouterOS Update",
         ha_group="System",
         data_path="fw-update",
         data_name="",
@@ -34,7 +34,7 @@ SENSOR_TYPES = {
     ),
     "system_rbfwupdate": MikrotikUpdateEntityDescription(
         key="system_rbfwupdate",
-        name="RouterBoard firmware update",
+        name="RouterBoard Firmware Update",
         ha_group="System",
         data_path="routerboard",
         data_attribute="current-firmware",
