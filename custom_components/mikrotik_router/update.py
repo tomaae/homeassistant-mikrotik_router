@@ -106,6 +106,11 @@ class MikrotikRouterOSUpdate(MikrotikEntity, UpdateEntity):
         """URL to the full release notes of the latest version available."""
         return "https://mikrotik.com/download/changelogs"
 
+    @property
+    def title(self) -> str:
+        """Title of the update entity."""
+        return "Mikrotik RouterOS"
+
 
 # ---------------------------
 #   MikrotikRouterBoardFWUpdate
@@ -150,3 +155,8 @@ class MikrotikRouterBoardFWUpdate(MikrotikEntity, UpdateEntity):
         """Install an update."""
         self._ctrl.execute("/system/routerboard", "upgrade", None, None)
         self._ctrl.execute("/system", "reboot", None, None)
+
+    @property
+    def title(self) -> str:
+        """Title of the update entity."""
+        return "Mikrotik RouterBoard"
