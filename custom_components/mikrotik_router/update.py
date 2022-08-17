@@ -56,6 +56,7 @@ class MikrotikRouterOSUpdate(MikrotikEntity, UpdateEntity):
         self._attr_supported_features = UpdateEntityFeature.INSTALL
         self._attr_supported_features |= UpdateEntityFeature.BACKUP
         self._attr_supported_features |= UpdateEntityFeature.RELEASE_NOTES
+        self._attr_title = self.entity_description.title
 
     @property
     def is_on(self) -> bool:
@@ -103,11 +104,6 @@ class MikrotikRouterOSUpdate(MikrotikEntity, UpdateEntity):
         """URL to the full release notes of the latest version available."""
         return "https://mikrotik.com/download/changelogs"
 
-    @property
-    def title(self) -> str:
-        """Title of the update entity."""
-        return "Mikrotik RouterOS"
-
 
 # ---------------------------
 #   MikrotikRouterBoardFWUpdate
@@ -129,6 +125,7 @@ class MikrotikRouterBoardFWUpdate(MikrotikEntity, UpdateEntity):
         super().__init__(inst, uid, mikrotik_controller, entity_description)
 
         self._attr_supported_features = UpdateEntityFeature.INSTALL
+        self._attr_title = self.entity_description.title
 
     @property
     def is_on(self) -> bool:
@@ -155,8 +152,3 @@ class MikrotikRouterBoardFWUpdate(MikrotikEntity, UpdateEntity):
         """Install an update."""
         self._ctrl.execute("/system/routerboard", "upgrade", None, None)
         self._ctrl.execute("/system", "reboot", None, None)
-
-    @property
-    def title(self) -> str:
-        """Title of the update entity."""
-        return "Mikrotik RouterBoard"
