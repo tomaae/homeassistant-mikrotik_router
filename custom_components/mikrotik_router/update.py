@@ -43,9 +43,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 class MikrotikRouterOSUpdate(MikrotikEntity, UpdateEntity):
     """Define an Mikrotik Controller Update entity."""
 
-    TYPE = DEVICE_UPDATE
-    _attr_device_class = UpdateDeviceClass.FIRMWARE
-
     def __init__(
         self,
         inst,
@@ -118,6 +115,9 @@ class MikrotikRouterOSUpdate(MikrotikEntity, UpdateEntity):
 class MikrotikRouterBoardFWUpdate(MikrotikEntity, UpdateEntity):
     """Define an Mikrotik Controller Update entity."""
 
+    TYPE = DEVICE_UPDATE
+    _attr_device_class = UpdateDeviceClass.FIRMWARE
+    
     def __init__(
         self,
         inst,
