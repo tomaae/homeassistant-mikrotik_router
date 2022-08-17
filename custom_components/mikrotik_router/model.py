@@ -99,7 +99,6 @@ def model_update_items(
                 continue
 
             item_id = f"{inst}-{sensor}"
-            _LOGGER.debug("Updating entity %s", item_id)
             if tmp := _register_entity(sensors, item_id, "", uid_sensor):
                 sensors[item_id] = tmp
                 new_sensors.append(sensors[item_id])
@@ -155,7 +154,6 @@ def model_update_items(
                     continue
 
                 item_id = f"{inst}-{sensor}-{str(uid_data[uid][uid_sensor.data_reference]).lower()}"
-                _LOGGER.debug("Updating entity %s", item_id)
                 if tmp := _register_entity(sensors, item_id, uid, uid_sensor):
                     sensors[item_id] = tmp
                     new_sensors.append(sensors[item_id])
