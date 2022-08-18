@@ -6,7 +6,7 @@ from datetime import timedelta
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
 from homeassistant.components.device_tracker.const import SOURCE_TYPE_ROUTER
 from homeassistant.const import STATE_NOT_HOME
-from homeassistant.util.dt import get_age, utcnow
+from homeassistant.util.dt import utcnow
 from .helper import format_attribute
 from .const import (
     CONF_TRACK_HOSTS,
