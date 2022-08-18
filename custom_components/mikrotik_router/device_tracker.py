@@ -99,7 +99,7 @@ class MikrotikHostDeviceTracker(MikrotikDeviceTracker):
     @property
     def name(self) -> str:
         """Return the name."""
-        return f"{self._data[self.entity_description.data_name]}"
+        return ""
 
     @property
     def is_connected(self) -> bool:

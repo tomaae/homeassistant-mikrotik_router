@@ -36,9 +36,9 @@ SENSOR_TYPES = {
     ),
     "system_rbfwupdate": MikrotikUpdateEntityDescription(
         key="system_rbfwupdate",
-        name="RouterBoard firmware update",
+        name="RouterBOARD firmware update",
         ha_group="System",
-        title="Mikrotik RouterBoard",
+        title="Mikrotik RouterBOARD",
         data_path="routerboard",
         data_attribute="current-firmware",
         data_name="",

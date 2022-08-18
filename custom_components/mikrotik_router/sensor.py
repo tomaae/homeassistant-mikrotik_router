@@ -98,7 +98,7 @@ class MikrotikClientTrafficSensor(MikrotikSensor):
     @property
     def name(self) -> str:
         """Return the name."""
-        return f"{self._data[self.entity_description.data_name]} {self.entity_description.name}"
+        return f"{self.entity_description.name}"
 
     @property
     def available(self) -> bool:

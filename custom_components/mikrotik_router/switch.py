@@ -168,14 +168,6 @@ class MikrotikPortSwitch(MikrotikSwitch):
 class MikrotikNATSwitch(MikrotikSwitch):
     """Representation of a NAT switch."""
 
-    @property
-    def name(self) -> str:
-        """Return the name."""
-        if self._data["comment"]:
-            return f"{self._inst} NAT {self._data['comment']}"
-
-        return f"{self._inst} NAT {self._data['name']}"
-
     async def async_turn_on(self) -> None:
         """Turn on the switch."""
         path = self.entity_description.data_switch_path
