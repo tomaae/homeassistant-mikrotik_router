@@ -97,9 +97,9 @@ class MikrotikHostDeviceTracker(MikrotikDeviceTracker):
         return timedelta(seconds=track_network_hosts_timeout)
 
     @property
-    def name(self) -> str:
+    def name(self) -> Any:
         """Return the name."""
-        return ""
+        return None
 
     @property
     def is_connected(self) -> bool:
