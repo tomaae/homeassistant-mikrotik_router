@@ -106,6 +106,7 @@ class MikrotikControllerData:
         self.host = config_entry.data[CONF_HOST]
 
         self.data = {
+            "access": {},
             "routerboard": {},
             "resource": {},
             "health": {},
@@ -181,7 +182,7 @@ class MikrotikControllerData:
         self.major_fw_version = 0
 
         self.async_mac_lookup = AsyncMacLookup()
-        # self.async_mac_lookup.update_vendors()
+        self.accessrights_reported = False
 
     async def async_init(self):
         self.listeners.append(
@@ -491,7 +492,10 @@ class MikrotikControllerData:
         except Exception:
             return
 
-        await self.hass.async_add_executor_job(self.get_firmware_update)
+        await self.hass.async_add_executor_job(self.get_access)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_firmware_update)
 
         if self.api.connected():
             await self.hass.async_add_executor_job(self.get_system_resource)
@@ -684,6 +688,48 @@ class MikrotikControllerData:
 
         async_dispatcher_send(self.hass, self.signal_update)
         self.lock.release()
+
+    # ---------------------------
+    #   get_access
+    # ---------------------------
+    def get_access(self):
+        """Get access rights from Mikrotik"""
+        tmp_user = parse_api(
+            data={},
+            source=self.api.query("/user"),
+            key="name",
+            vals=[
+                {"name": "name"},
+                {"name": "group"},
+            ],
+        )
+
+        tmp_group = parse_api(
+            data={},
+            source=self.api.query("/user/group"),
+            key="name",
+            vals=[
+                {"name": "name"},
+                {"name": "policy"},
+            ],
+        )
+
+        self.data["access"] = tmp_group[
+            tmp_user[self.config_entry.data[CONF_USERNAME]]["group"]
+        ]["policy"].split(",")
+
+        if not self.accessrights_reported:
+            self.accessrights_reported = True
+            if (
+                "write" not in self.data["access"]
+                or "policy" not in self.data["access"]
+                or "reboot" not in self.data["access"]
+            ):
+                _LOGGER.warning(
+                    "Mikrotik %s user %s does not have sufficient access rights. Integration functionality will be limited.",
+                    self.host,
+                    self.config_entry.data[CONF_USERNAME],
+                )
 
     # ---------------------------
     #   get_interface
@@ -1330,11 +1376,26 @@ class MikrotikControllerData:
                 ],
             )
 
+            if (
+                "write" not in self.data["access"]
+                or "policy" not in self.data["access"]
+                or "reboot" not in self.data["access"]
+            ):
+                self.data["routerboard"].pop("current-firmware")
+                self.data["routerboard"].pop("upgrade-firmware")
+
     # ---------------------------
     #   get_system_health
     # ---------------------------
     def get_system_health(self):
         """Get routerboard data from Mikrotik"""
+        if (
+            "write" not in self.data["access"]
+            or "policy" not in self.data["access"]
+            or "reboot" not in self.data["access"]
+        ):
+            return
+
         if 0 < self.major_fw_version < 7:
             self.data["health"] = parse_api(
                 data=self.data["health"],
@@ -1467,6 +1528,9 @@ class MikrotikControllerData:
     # ---------------------------
     def get_firmware_update(self):
         """Check for firmware update on Mikrotik"""
+        if "write" not in self.data["access"] or "policy" not in self.data["access"]:
+            return
+
         self.execute("/system/package/update", "check-for-updates", None, None)
         self.data["fw-update"] = parse_api(
             data=self.data["fw-update"],
