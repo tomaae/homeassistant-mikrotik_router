@@ -22,6 +22,51 @@ from .const import (
 _LOGGER = getLogger(__name__)
 
 
+def _skip_sensor(config_entry, uid_sensor, uid_data, uid) -> bool:
+    # Sensors
+    if (
+        uid_sensor.func == "MikrotikInterfaceTrafficSensor"
+        and not config_entry.options.get(
+            CONF_SENSOR_PORT_TRAFFIC, DEFAULT_SENSOR_PORT_TRAFFIC
+        )
+    ):
+        return True
+
+    if (
+        uid_sensor.func == "MikrotikInterfaceTrafficSensor"
+        and uid_data[uid]["type"] == "bridge"
+    ):
+        return True
+
+    if (
+        uid_sensor.func == "MikrotikClientTrafficSensor"
+        and uid_sensor.data_attribute not in uid_data[uid].keys()
+    ):
+        return True
+
+    # Binary sensors
+    if (
+        uid_sensor.func == "MikrotikPortBinarySensor"
+        and uid_data[uid]["type"] == "wlan"
+    ):
+        return True
+
+    if uid_sensor.func == "MikrotikPortBinarySensor" and not config_entry.options.get(
+        CONF_SENSOR_PORT_TRACKER, DEFAULT_SENSOR_PORT_TRACKER
+    ):
+        return True
+
+    # Device Tracker
+    if (
+        # Skip if host tracking is disabled
+        uid_sensor.func == "MikrotikHostDeviceTracker"
+        and not config_entry.options.get(CONF_TRACK_HOSTS, DEFAULT_TRACK_HOSTS)
+    ):
+        return True
+
+    return False
+
+
 # ---------------------------
 #   model_async_setup_entry
 # ---------------------------
@@ -70,7 +115,7 @@ def model_update_items(
     sensor_types,
 ):
     def _register_entity(_sensors, _item_id, _uid, _uid_sensor):
-        _LOGGER.debug("Updating entity %s", _item_id)
+        _LOGGER.debug("Updating entity %s (%s)", inst, _item_id)
         if _item_id in _sensors:
             return None
 
@@ -85,7 +130,6 @@ def model_update_items(
     for sensor in sensor_types:
         uid_sensor = sensor_types[sensor]
         if not uid_sensor.data_reference:
-            uid_sensor = sensor_types[sensor]
             if (
                 uid_sensor.data_attribute
                 not in mikrotik_controller.data[uid_sensor.data_path]
@@ -101,54 +145,9 @@ def model_update_items(
                 sensors[item_id] = tmp
                 new_sensors.append(sensors[item_id])
         else:
-            # Sensors
-            if (
-                uid_sensor.func == "MikrotikInterfaceTrafficSensor"
-                and not config_entry.options.get(
-                    CONF_SENSOR_PORT_TRAFFIC, DEFAULT_SENSOR_PORT_TRAFFIC
-                )
-            ):
-                continue
-
             for uid in mikrotik_controller.data[uid_sensor.data_path]:
                 uid_data = mikrotik_controller.data[uid_sensor.data_path]
-
-                # Sensors
-                if (
-                    uid_sensor.func == "MikrotikInterfaceTrafficSensor"
-                    and uid_data[uid]["type"] == "bridge"
-                ):
-                    continue
-
-                if (
-                    uid_sensor.func == "MikrotikClientTrafficSensor"
-                    and uid_sensor.data_attribute not in uid_data[uid].keys()
-                ):
-                    continue
-
-                # Binary sensors
-                if (
-                    uid_sensor.func == "MikrotikPortBinarySensor"
-                    and uid_data[uid]["type"] == "wlan"
-                ):
-                    continue
-
-                if (
-                    uid_sensor.func == "MikrotikPortBinarySensor"
-                    and not config_entry.options.get(
-                        CONF_SENSOR_PORT_TRACKER, DEFAULT_SENSOR_PORT_TRACKER
-                    )
-                ):
-                    continue
-
-                # Device Tracker
-                if (
-                    # Skip if host tracking is disabled
-                    uid_sensor.func == "MikrotikHostDeviceTracker"
-                    and not config_entry.options.get(
-                        CONF_TRACK_HOSTS, DEFAULT_TRACK_HOSTS
-                    )
-                ):
+                if _skip_sensor(config_entry, uid_sensor, uid_data, uid):
                     continue
 
                 item_id = f"{inst}-{sensor}-{str(uid_data[uid][uid_sensor.data_reference]).lower()}"
