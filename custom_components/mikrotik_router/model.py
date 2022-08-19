@@ -294,9 +294,13 @@ class MikrotikEntity:
 
         return attributes
 
-    async def async_added_to_hass(self):
+    async def async_added_to_hass(self) -> None:
         """Run when entity about to be added to hass"""
         _LOGGER.debug("New entity %s (%s)", self._inst, self.unique_id)
+
+    async def async_will_remove_from_hass(self) -> None:
+        """Run when entity about to be removed from hass"""
+        _LOGGER.debug("Removing entity %s (%s)", self._inst, self.unique_id)
 
     async def start(self):
         """Dummy run function"""
