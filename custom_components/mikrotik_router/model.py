@@ -304,16 +304,16 @@ class MikrotikEntity:
 
     async def start(self):
         """Dummy run function"""
-        _LOGGER.error("Start functionality does not exist for %s", self.entity_id)
+        _LOGGER.error("Start functionality does not exist for %s", self.unique_id)
 
     async def stop(self):
         """Dummy stop function"""
-        _LOGGER.error("Stop functionality does not exist for %s", self.entity_id)
+        _LOGGER.error("Stop functionality does not exist for %s", self.unique_id)
 
     async def restart(self):
         """Dummy restart function"""
-        _LOGGER.error("Restart functionality does not exist for %s", self.entity_id)
+        _LOGGER.error("Restart functionality does not exist for %s", self.unique_id)
 
     async def reload(self):
         """Dummy reload function"""
-        _LOGGER.error("Reload functionality does not exist for %s", self.entity_id)
+        _LOGGER.error("Reload functionality does not exist for %s", self.unique_id)
