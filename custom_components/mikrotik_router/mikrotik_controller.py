@@ -1528,7 +1528,11 @@ class MikrotikControllerData:
     # ---------------------------
     def get_firmware_update(self):
         """Check for firmware update on Mikrotik"""
-        if "write" not in self.data["access"] or "policy" not in self.data["access"]:
+        if (
+            "write" not in self.data["access"]
+            or "policy" not in self.data["access"]
+            or "reboot" not in self.data["access"]
+        ):
             return
 
         self.execute("/system/package/update", "check-for-updates", None, None)
