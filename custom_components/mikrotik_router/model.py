@@ -72,8 +72,6 @@ def model_update_items(
     def _register_entity(_sensors, _item_id, _uid, _uid_sensor):
         _LOGGER.debug("Updating entity %s", _item_id)
         if _item_id in _sensors:
-            if _sensors[_item_id].enabled:
-                _sensors[_item_id].async_schedule_update_ha_state()
             return None
 
         return dispatcher[_uid_sensor.func](
