@@ -1,0 +1,19 @@
+name: 'Stale'
+on:
+  schedule:
+    - cron: '30 1 * * *'
+
+jobs:
+  stale:
+    name: Stale
+    runs-on: ubuntu-latest
+    steps:
+      - uses: "actions/stale@v5.1.1"
+        with:
+          stale-issue-message: 'This issue has been automatically marked as stale because it has not had recent activity. It will be closed if no further activity occurs.'
+          stale-pr-message: 'This PR has been automatically marked as stale because it has not had recent activity. It will be closed if no further activity occurs.'
+          close-issue-message: 'This issue was closed because it has been stalled for 5 days with no activity.'
+          days-before-stale: 14
+          days-before-close: 7
+          exempt-issue-labels: 'pinned,security,planned,help wanted'
+          exempt-pr-labels: 'pinned,security,planned,help wanted'
