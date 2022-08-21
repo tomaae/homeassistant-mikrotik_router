@@ -66,6 +66,29 @@ DEVICE_ATTRIBUTES_IFACE_SFP = [
     "eeprom-checksum",
 ]
 
+DEVICE_ATTRIBUTES_IFACE_WIRELESS = [
+    "ssid",
+    "mode",
+    "radio-name",
+    "interface-type",
+    "country",
+    "installation",
+    "antenna-gain",
+    "frequency",
+    "band",
+    "channel-width",
+    "secondary-frequency",
+    "wireless-protocol",
+    "rate-set",
+    "distance",
+    "tx-power-mode",
+    "vlan-id",
+    "wds-mode",
+    "wds-default-bridge",
+    "bridge-mode",
+    "hide-ssid",
+]
+
 DEVICE_ATTRIBUTES_UPS = [
     "name",
     "offline-time",
