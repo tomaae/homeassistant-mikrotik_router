@@ -130,6 +130,7 @@ class MikrotikControllerData:
             "dhcp-network": {},
             "dhcp": {},
             "capsman_hosts": {},
+            "wireless": {},
             "wireless_hosts": {},
             "host": {},
             "host_hass": {},
@@ -631,6 +632,9 @@ class MikrotikControllerData:
 
         if self.api.connected() and self.support_capsman:
             await self.hass.async_add_executor_job(self.get_capsman_hosts)
+
+        if self.api.connected() and self.support_wireless:
+            await self.hass.async_add_executor_job(self.get_wireless)
 
         if self.api.connected() and self.support_wireless:
             await self.hass.async_add_executor_job(self.get_wireless_hosts)
@@ -1978,6 +1982,56 @@ class MikrotikControllerData:
                 {"name": "ssid", "default": "unknown"},
             ],
         )
+
+    # ---------------------------
+    #   get_wireless
+    # ---------------------------
+    def get_wireless(self):
+        """Get wireless data from Mikrotik"""
+        wifimodule = "wifiwave2" if self.support_wifiwave2 else "wireless"
+        self.data["wireless"] = parse_api(
+            data=self.data["wireless"],
+            source=self.api.query(f"/interface/{wifimodule}"),
+            key="name",
+            vals=[
+                {"name": "master-interface", "default": ""},
+                {"name": "mac-address", "default": "unknown"},
+                {"name": "ssid", "default": "unknown"},
+                {"name": "mode", "default": "unknown"},
+                {"name": "radio-name", "default": "unknown"},
+                {"name": "interface-type", "default": "unknown"},
+                {"name": "country", "default": "unknown"},
+                {"name": "installation", "default": "unknown"},
+                {"name": "antenna-gain", "default": "unknown"},
+                {"name": "frequency", "default": "unknown"},
+                {"name": "band", "default": "unknown"},
+                {"name": "channel-width", "default": "unknown"},
+                {"name": "secondary-frequency", "default": "unknown"},
+                {"name": "wireless-protocol", "default": "unknown"},
+                {"name": "rate-set", "default": "unknown"},
+                {"name": "distance", "default": "unknown"},
+                {"name": "tx-power-mode", "default": "unknown"},
+                {"name": "vlan-id", "default": "unknown"},
+                {"name": "wds-mode", "default": "unknown"},
+                {"name": "wds-default-bridge", "default": "unknown"},
+                {"name": "bridge-mode", "default": "unknown"},
+                {"name": "hide-ssid", "type": "bool"},
+                {"name": "running", "type": "bool"},
+                {"name": "disabled", "type": "bool"},
+            ],
+        )
+
+        for uid in self.data["wireless"]:
+            if self.data["wireless"][uid]["master-interface"]:
+                for tmp in self.data["wireless"][uid]:
+                    if self.data["wireless"][uid][tmp] == "unknown":
+                        self.data["wireless"][uid][tmp] = self.data["wireless"][
+                            self.data["wireless"][uid]["master-interface"]
+                        ][tmp]
+
+            if uid in self.data["interface"]:
+                for tmp in self.data["wireless"][uid]:
+                    self.data["interface"][uid][tmp] = self.data["wireless"][uid][tmp]
 
     # ---------------------------
     #   get_wireless_hosts
