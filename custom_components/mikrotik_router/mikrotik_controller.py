@@ -543,6 +543,9 @@ class MikrotikControllerData:
         if not self.option_track_network_hosts:
             return
 
+        if "test" not in self.data["access"]:
+            return
+
         try:
             await asyncio.wait_for(self.lock_ping.acquire(), timeout=3)
         except Exception:
@@ -728,6 +731,7 @@ class MikrotikControllerData:
                 "write" not in self.data["access"]
                 or "policy" not in self.data["access"]
                 or "reboot" not in self.data["access"]
+                or "test" not in self.data["access"]
             ):
                 _LOGGER.warning(
                     "Mikrotik %s user %s does not have sufficient access rights. Integration functionality will be limited.",
