@@ -174,7 +174,7 @@ Use integration master branch instead of latest release to keep up with RouterOS
 
 ## Setup integration
 1. Create user for homeassistant on your mikrotik router with following permissions:
-   * read, write, api, reboot, policy
+   * read, write, api, reboot, policy, test
    * lower permissions are supported, but it will limit functionality (read and api permissions are mandatory).
    * system health sensors won't be available without write permissions. this limitation is on mikrotik side.
 2. If you want to be able to execute scripts on your mikrotik router from HA, script needs to have only following policies:
