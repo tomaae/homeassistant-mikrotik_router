@@ -193,7 +193,7 @@ class MikrotikControllerData:
         )
         self.listeners.append(
             async_track_time_interval(
-                self.hass, self.force_fwupdate_check, timedelta(hours=1)
+                self.hass, self.force_fwupdate_check, timedelta(hours=4)
             )
         )
         self.listeners.append(
