@@ -1283,6 +1283,7 @@ class MikrotikControllerData:
                 {"name": "sat", "default": "None"},
                 {"name": "sun", "default": "None"},
                 {"name": "comment"},
+                {"name": "blocked", "type": "bool", "default": False},
                 {"name": "paused", "type": "bool", "reverse": True},
                 {
                     "name": "enabled",

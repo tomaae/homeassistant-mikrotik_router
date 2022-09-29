@@ -127,6 +127,7 @@ DEVICE_ATTRIBUTES_PPP_SECRET = [
 ]
 
 DEVICE_ATTRIBUTES_KIDCONTROL = [
+    "blocked",
     "rate-limit",
     "mon",
     "tue",
