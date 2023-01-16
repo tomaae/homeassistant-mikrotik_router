@@ -184,6 +184,7 @@ class MikrotikControllerOptionsFlowHandler(OptionsFlow):
 
         return self.async_show_form(
             step_id="basic_options",
+            last_step=False,
             data_schema=vol.Schema(
                 {
                     vol.Optional(
