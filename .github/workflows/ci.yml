@@ -67,7 +67,7 @@ jobs:
           config_file: .github/bandit.yaml
           ignore_failure: false
       - name: Security check report artifacts
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: Security report
           path: output/security_report.txt
