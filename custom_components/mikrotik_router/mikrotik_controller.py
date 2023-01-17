@@ -1866,6 +1866,12 @@ class MikrotikControllerData:
                 {"name": "last-seen", "default": "unknown"},
                 {"name": "server", "default": "unknown"},
                 {"name": "comment", "default": ""},
+                {
+                    "name": "enabled",
+                    "source": "disabled",
+                    "type": "bool",
+                    "reverse": True,
+                },
             ],
             ensure_vals=[{"name": "interface", "default": "unknown"}],
         )
@@ -2096,6 +2102,9 @@ class MikrotikControllerData:
 
         # Add hosts from DHCP
         for uid, vals in self.data["dhcp"].items():
+            if not self.data["host"][uid]["source"]["enabled"]:
+                continue
+
             if uid not in self.data["host"]:
                 self.data["host"][uid] = {"source": "dhcp"}
             elif self.data["host"][uid]["source"] != "dhcp":
