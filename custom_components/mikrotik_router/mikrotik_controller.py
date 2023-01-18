@@ -2102,7 +2102,7 @@ class MikrotikControllerData:
 
         # Add hosts from DHCP
         for uid, vals in self.data["dhcp"].items():
-            if not self.data["host"][uid]["source"]["enabled"]:
+            if not vals["enabled"]:
                 continue
 
             if uid not in self.data["host"]:
