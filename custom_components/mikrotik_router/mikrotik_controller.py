@@ -2179,7 +2179,11 @@ class MikrotikControllerData:
                 self.data["host"][uid]["available"] = False
 
             # Update IP and interface (DHCP/returned host)
-            if uid in self.data["dhcp"] and "." in self.data["dhcp"][uid]["address"]:
+            if (
+                uid in self.data["dhcp"]
+                and self.data["dhcp"][uid]["enabled"]
+                and "." in self.data["dhcp"][uid]["address"]
+            ):
                 if (
                     self.data["dhcp"][uid]["address"]
                     != self.data["host"][uid]["address"]
@@ -2217,6 +2221,7 @@ class MikrotikControllerData:
                                 ].split("#", 1)[0]
                             elif (
                                 uid in self.data["dhcp"]
+                                and self.data["dhcp"][uid]["enabled"]
                                 and self.data["dhcp"][uid]["comment"].split("#", 1)[0]
                                 != ""
                             ):
@@ -2234,6 +2239,7 @@ class MikrotikControllerData:
                 if (
                     self.data["host"][uid]["host-name"] == "unknown"
                     and uid in self.data["dhcp"]
+                    and self.data["dhcp"][uid]["enabled"]
                     and self.data["dhcp"][uid]["comment"].split("#", 1)[0] != ""
                 ):
                     self.data["host"][uid]["host-name"] = self.data["dhcp"][uid][
@@ -2243,6 +2249,7 @@ class MikrotikControllerData:
                 elif (
                     self.data["host"][uid]["host-name"] == "unknown"
                     and uid in self.data["dhcp"]
+                    and self.data["dhcp"][uid]["enabled"]
                     and self.data["dhcp"][uid]["host-name"] != "unknown"
                 ):
                     self.data["host"][uid]["host-name"] = self.data["dhcp"][uid][
