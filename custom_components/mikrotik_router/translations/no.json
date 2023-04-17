@@ -1,0 +1,59 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Sett opp Mikrotik router",
+                "description": "Sett opp Mikrotik Router integrasjon",
+                "data": {
+                    "name": "Navn på integreringen",
+                    "host": "Adresse",
+                    "port": "Port",
+                    "username": "Brukernavn",
+                    "password": "Passord",
+                    "ssl": "Bruk SSL"
+                }
+            }
+        },
+        "error": {
+            "name_exists": "Navnet eksisterer allerede",
+            "cannot_connect": "Kunne ikke koble til Mikrotik",
+            "ssl_handshake_failure": "SSH håndtrykkfeil",
+            "connection_timeout": "Mikrotik tilkoblingen fikk tidsavbrudd",
+            "wrong_login": "Feil brukernavn og\/eller passord"
+        }
+    },
+    "options": {
+        "step": {
+            "basic_options": {
+                "data": {
+                    "scan_interval": "Søke interval (krever HA omstart)",
+                    "track_iface_clients": "Vis klient MAC og IP på grensesnittet",
+                    "unit_of_measurement": "Måleenhet",
+                    "track_network_hosts_timeout": "Spor nettverks enhet tidsavbrudd (sekunder)",
+                    "zone": "Sone for enhetssporer"
+                },
+                "title": "Mikrotik Router alternativer",
+                "description": "Konfigurer integrasjon"
+            },
+            "sensor_select": {
+                "data": {
+                    "track_network_hosts": "Spor nettverksenheter",
+                    "sensor_port_tracker": "Port sporings sensorer",
+                    "sensor_port_traffic": "Port trafikk sensorer",
+                    "sensor_client_traffic": "Klient trafikk sensorer",
+                    "sensor_simple_queues": "Enklel kø brytere",
+                    "sensor_nat": "NAT Brytere",
+                    "sensor_scripts": "Script brytere",
+                    "sensor_environment": "Miljøvariabel sensorer",
+                    "sensor_kidcontrol": "Barnekontroll",
+                    "sensor_mangle": "Mangle brytere",
+                    "sensor_ppp": "PPP Brukere",
+                    "sensor_filter": "Filter brytere",
+                    "sensor_client_captive": "Captive portal data"
+                },
+                "title": "Mikrotik Router options (2\/2)",
+                "description": "Skru på sensorer og brytere"
+            }
+        }
+    }
+}

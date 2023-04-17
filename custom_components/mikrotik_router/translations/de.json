@@ -17,7 +17,7 @@
         "error": {
             "name_exists": "Name existiert bereits",
             "cannot_connect": "Verbindung zu Mikrotik nicht möglich.",
-            "ssl_handshake_failure": "SSL Vereinbarung-Fehler",
+            "ssl_handshake_failure": "SSL Handshake Fehler",
             "connection_timeout": "Mikrotik-Verbindungstimeout.",
             "wrong_login": "Ungültiger Benutzername oder Passwort."
         }
@@ -38,18 +38,18 @@
             "sensor_select": {
                 "data": {
                     "track_network_hosts": "Verfolgen Sie Netzwerkgeräte",
-                    "sensor_port_tracker": "Hafentracker-Sensoren",
-                    "sensor_port_traffic": "Hafen-Verkehrssensoren",
-                    "sensor_client_traffic": "Kunden-Verkehrssensoren",
+                    "sensor_port_tracker": "Port-Statussensoren",
+                    "sensor_port_traffic": "Port-Durchsatz Sensoren",
+                    "sensor_client_traffic": "Client-Durchsatz Sensoren",
                     "sensor_simple_queues": "Einfache Endschalter",
                     "sensor_nat": "NAT-Schalter",
                     "sensor_scripts": "Skript-Schalter",
-                    "sensor_environment": "Umwelt variable Sensoren",
+                    "sensor_environment": "umgebungsvariablen-Sensoren",
                     "sensor_kidcontrol": "Kinderkontrolle",
                     "sensor_mangle": "Mangle-Schalter",
                     "sensor_ppp": "PPP-Nutzer",
-                    "sensor_filter": "Schalter filtern",
-                    "sensor_client_captive": "Captive portal data"
+                    "sensor_filter": "Schalter für Filterregeln",
+                    "sensor_client_captive": "Captive-Portal Daten"
                 },
                 "title": "Mikrotik-Router-Optionen (2\/2)",
                 "description": "Sensoren und Schalter aktivieren"

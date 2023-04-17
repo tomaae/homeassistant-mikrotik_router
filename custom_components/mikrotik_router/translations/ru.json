@@ -6,7 +6,7 @@
                 "description": "Настройка Home Assistant для интеграции с Mikrotik.",
                 "data": {
                     "name": "Название интеграции",
-                    "host": "Адрес маршрутизатора",
+                    "host": "Адрес хоста",
                     "port": "Порт",
                     "username": "Имя пользователя",
                     "password": "Пароль",
@@ -49,7 +49,7 @@
                     "sensor_mangle": "Переключатели Mangle",
                     "sensor_ppp": "PPP-пользователи",
                     "sensor_filter": "Переключатели фильтров",
-                    "sensor_client_captive": "Captive portal data"
+                    "sensor_client_captive": "Данные портала авторизации"
                 },
                 "title": "Параметры Mikrotik Router (2\/2)",
                 "description": "Включить датчики и переключатели"

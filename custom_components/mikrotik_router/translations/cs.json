@@ -49,7 +49,7 @@
                     "sensor_mangle": "Mangle spínače",
                     "sensor_ppp": "Uživatelé PPP",
                     "sensor_filter": "Přepínače filtrů",
-                    "sensor_client_captive": "Captive portal data"
+                    "sensor_client_captive": "Captive portál data"
                 },
                 "title": "Nastavení Mikrotik Router (2\/2)",
                 "description": "Povolit senzory a přepínače"

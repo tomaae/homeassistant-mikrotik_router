@@ -49,7 +49,7 @@
                     "sensor_mangle": "Interruptores Mangle",
                     "sensor_ppp": "Usuários de PPP",
                     "sensor_filter": "Interruptores de filtro",
-                    "sensor_client_captive": "Captive portal data"
+                    "sensor_client_captive": "sensores de cliente cativo"
                 },
                 "title": "Opções de roteador Mikrotik (2\/2)",
                 "description": "Ativar sensores e interruptores"
