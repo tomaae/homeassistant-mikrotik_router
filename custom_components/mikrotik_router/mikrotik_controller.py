@@ -1544,7 +1544,9 @@ class MikrotikControllerData:
         ):
             return
 
-        self.execute("/system/package/update", "check-for-updates", None, None, {"duration": 10})
+        self.execute(
+            "/system/package/update", "check-for-updates", None, None, {"duration": 10}
+        )
         self.data["fw-update"] = parse_api(
             data=self.data["fw-update"],
             source=self.api.query("/system/package/update"),
