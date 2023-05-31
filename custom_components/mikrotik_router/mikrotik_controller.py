@@ -387,9 +387,9 @@ class MikrotikControllerData:
     # ---------------------------
     #   execute
     # ---------------------------
-    def execute(self, path, command, param, value):
+    def execute(self, path, command, param, value, attributes=None):
         """Change value using Mikrotik API"""
-        return self.api.execute(path, command, param, value)
+        return self.api.execute(path, command, param, value, attributes)
 
     # ---------------------------
     #   run_script
@@ -1544,7 +1544,7 @@ class MikrotikControllerData:
         ):
             return
 
-        self.execute("/system/package/update", "check-for-updates", None, None)
+        self.execute("/system/package/update", "check-for-updates", None, None, {"duration": 10})
         self.data["fw-update"] = parse_api(
             data=self.data["fw-update"],
             source=self.api.query("/system/package/update"),
