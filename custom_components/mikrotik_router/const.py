@@ -3,11 +3,11 @@ from homeassistant.const import Platform
 
 PLATFORMS = [
     Platform.SENSOR,
-    Platform.BINARY_SENSOR,
-    Platform.DEVICE_TRACKER,
-    Platform.SWITCH,
-    Platform.BUTTON,
-    Platform.UPDATE,
+    # Platform.BINARY_SENSOR,
+    # Platform.DEVICE_TRACKER,
+    # Platform.SWITCH,
+    # Platform.BUTTON,
+    # Platform.UPDATE,
 ]
 
 DOMAIN = "mikrotik_router"
@@ -27,8 +27,6 @@ DEFAULT_SSL = False
 
 CONF_SCAN_INTERVAL = "scan_interval"
 DEFAULT_SCAN_INTERVAL = 30
-LIST_UNIT_OF_MEASUREMENT = ["bps", "Kbps", "Mbps", "B/s", "KB/s", "MB/s"]
-DEFAULT_UNIT_OF_MEASUREMENT = "Kbps"
 CONF_TRACK_IFACE_CLIENTS = "track_iface_clients"
 DEFAULT_TRACK_IFACE_CLIENTS = True
 CONF_TRACK_HOSTS = "track_network_hosts"

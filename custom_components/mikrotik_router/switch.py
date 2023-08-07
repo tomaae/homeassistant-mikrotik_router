@@ -6,7 +6,7 @@ from collections.abc import Mapping
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.helpers.restore_state import RestoreEntity
 from .helper import format_attribute
-from .model import model_async_setup_entry, MikrotikEntity
+from .entity import model_async_setup_entry, MikrotikEntity
 from .switch_types import (
     SENSOR_TYPES,
     SENSOR_SERVICES,

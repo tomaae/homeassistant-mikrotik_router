@@ -14,7 +14,7 @@ from .const import (
     CONF_TRACK_HOSTS_TIMEOUT,
     DEFAULT_TRACK_HOST_TIMEOUT,
 )
-from .model import model_async_setup_entry, MikrotikEntity
+from .entity import model_async_setup_entry, MikrotikEntity
 from .device_tracker_types import SENSOR_TYPES, SENSOR_SERVICES
 
 _LOGGER = logging.getLogger(__name__)

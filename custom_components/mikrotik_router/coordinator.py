@@ -1,26 +1,31 @@
-"""Mikrotik Controller for Mikrotik Router."""
+"""Mikrotik coordinator."""
+
+from __future__ import annotations
 
 import asyncio
 import ipaddress
 import logging
 import re
 import pytz
+from typing import Any
 
 from datetime import datetime, timedelta
 from ipaddress import ip_address, IPv4Network
 from mac_vendor_lookup import AsyncMacLookup
 
-from homeassistant.core import callback
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers import entity_registry
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval
-from homeassistant.helpers import entity_registry
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util.dt import utcnow
+
 
 from homeassistant.const import (
     CONF_NAME,
     CONF_HOST,
     CONF_PORT,
-    CONF_UNIT_OF_MEASUREMENT,
     CONF_USERNAME,
     CONF_PASSWORD,
     CONF_SSL,
@@ -36,7 +41,6 @@ from .const import (
     DEFAULT_TRACK_HOSTS,
     CONF_SCAN_INTERVAL,
     DEFAULT_SCAN_INTERVAL,
-    DEFAULT_UNIT_OF_MEASUREMENT,
     CONF_SENSOR_PORT_TRAFFIC,
     DEFAULT_SENSOR_PORT_TRAFFIC,
     CONF_SENSOR_CLIENT_TRAFFIC,
@@ -95,13 +99,21 @@ def as_local(dattim: datetime) -> datetime:
 # ---------------------------
 #   MikrotikControllerData
 # ---------------------------
-class MikrotikControllerData:
-    """MikrotikController Class"""
+class MikrotikCoordinator(DataUpdateCoordinator):
+    """MikrotikCoordinator Class"""
 
-    def __init__(self, hass, config_entry):
-        """Initialize MikrotikController."""
+    def __init__(self, hass: HomeAssistant, config_entry: ConfigEntry):
+        """Initialize MikrotikCoordinator."""
         self.hass = hass
-        self.config_entry = config_entry
+        self.config_entry: ConfigEntry = config_entry
+        super().__init__(
+            self.hass,
+            _LOGGER,
+            name=DOMAIN,
+            update_interval=timedelta(
+                seconds=10
+            ),  # update_interval=self.option_scan_interval
+        )
         self.name = config_entry.data[CONF_NAME]
         self.host = config_entry.data[CONF_HOST]
 
@@ -143,7 +155,7 @@ class MikrotikControllerData:
 
         self.notified_flags = []
 
-        self.listeners = []
+        # self.listeners = []
         self.lock = asyncio.Lock()
         self.lock_ping = asyncio.Lock()
 
@@ -185,22 +197,32 @@ class MikrotikControllerData:
         self.async_mac_lookup = AsyncMacLookup()
         self.accessrights_reported = False
 
-    async def async_init(self):
-        self.listeners.append(
-            async_track_time_interval(
-                self.hass, self.force_update, self.option_scan_interval
-            )
-        )
-        self.listeners.append(
-            async_track_time_interval(
-                self.hass, self.force_fwupdate_check, timedelta(hours=4)
-            )
-        )
-        self.listeners.append(
-            async_track_time_interval(
-                self.hass, self.async_ping_tracked_hosts, timedelta(seconds=15)
-            )
-        )
+        # self.listeners.append(
+        #     async_track_time_interval(
+        #         self.hass, self.force_fwupdate_check, timedelta(hours=4)
+        #     )
+        # )
+        # self.listeners.append(
+        #     async_track_time_interval(
+        #         self.hass, self.async_ping_tracked_hosts, timedelta(seconds=15)
+        #     )
+        # )
+
+    # ---------------------------
+    #   async_init
+    # ---------------------------
+    # async def async_init(self):
+    #     print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    #     self.listeners.append(
+    #         async_track_time_interval(
+    #             self.hass, self.force_fwupdate_check, timedelta(hours=4)
+    #         )
+    #     )
+    #     self.listeners.append(
+    #         async_track_time_interval(
+    #             self.hass, self.async_ping_tracked_hosts, timedelta(seconds=15)
+    #         )
+    #     )
 
     # ---------------------------
     #   option_track_iface_clients
@@ -334,41 +356,12 @@ class MikrotikControllerData:
         return timedelta(seconds=scan_interval)
 
     # ---------------------------
-    #   option_unit_of_measurement
-    # ---------------------------
-    @property
-    def option_unit_of_measurement(self):
-        """Config entry option to not track ARP."""
-        return self.config_entry.options.get(
-            CONF_UNIT_OF_MEASUREMENT, DEFAULT_UNIT_OF_MEASUREMENT
-        )
-
-    # ---------------------------
     #   option_zone
     # ---------------------------
     @property
     def option_zone(self):
         """Config entry option zones."""
         return self.config_entry.options.get(CONF_ZONE, STATE_HOME)
-
-    # ---------------------------
-    #   signal_update
-    # ---------------------------
-    @property
-    def signal_update(self):
-        """Event to signal new data."""
-        return f"{DOMAIN}-update-{self.name}"
-
-    # ---------------------------
-    #   async_reset
-    # ---------------------------
-    async def async_reset(self):
-        """Reset dispatchers"""
-        for unsub_dispatcher in self.listeners:
-            unsub_dispatcher()
-
-        self.listeners = []
-        return True
 
     # ---------------------------
     #   connected
@@ -490,8 +483,8 @@ class MikrotikControllerData:
         """Update Mikrotik hardware info"""
         try:
             await asyncio.wait_for(self.lock.acquire(), timeout=30)
-        except Exception:
-            return
+        except Exception as error:
+            raise UpdateFailed(error) from error
 
         await self.hass.async_add_executor_job(self.get_access)
 
@@ -532,7 +525,6 @@ class MikrotikControllerData:
     async def async_fwupdate_check(self):
         """Update Mikrotik data"""
         await self.hass.async_add_executor_job(self.get_firmware_update)
-        async_dispatcher_send(self.hass, self.signal_update)
 
     # ---------------------------
     #   async_ping_tracked_hosts
@@ -596,25 +588,20 @@ class MikrotikControllerData:
         self.lock_ping.release()
 
     # ---------------------------
-    #   force_update
+    #   _async_update_data
     # ---------------------------
-    @callback
-    async def force_update(self, _now=None):
-        """Trigger update by timer"""
-        await self.async_update()
-
-    # ---------------------------
-    #   async_update
-    # ---------------------------
-    async def async_update(self):
+    async def _async_update_data(self):
         """Update Mikrotik data"""
+        print(
+            "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        )
         if self.api.has_reconnected():
             await self.async_hwinfo_update()
 
         try:
             await asyncio.wait_for(self.lock.acquire(), timeout=10)
-        except Exception:
-            return
+        except Exception as error:
+            raise UpdateFailed(error) from error
 
         await self.hass.async_add_executor_job(self.get_system_resource)
 
@@ -693,13 +680,14 @@ class MikrotikControllerData:
         if self.api.connected() and self.support_gps:
             await self.hass.async_add_executor_job(self.get_gps)
 
-        async_dispatcher_send(self.hass, self.signal_update)
         self.lock.release()
+        # async_dispatcher_send(self.hass, "update_sensors", self)
+        return self.data
 
     # ---------------------------
     #   get_access
     # ---------------------------
-    def get_access(self):
+    def get_access(self) -> None:
         """Get access rights from Mikrotik"""
         tmp_user = parse_api(
             data={},
@@ -742,7 +730,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_interface
     # ---------------------------
-    def get_interface(self):
+    def get_interface(self) -> None:
         """Get all interfaces data from Mikrotik"""
         self.data["interface"] = parse_api(
             data=self.data["interface"],
@@ -794,30 +782,22 @@ class MikrotikControllerData:
         )
 
         if self.option_sensor_port_traffic:
-            uom_type, uom_div = self._get_unit_of_measurement()
             for uid, vals in self.data["interface"].items():
-                self.data["interface"][uid]["rx-attr"] = uom_type
-                self.data["interface"][uid]["tx-attr"] = uom_type
-
                 current_tx = vals["tx-current"]
-                previous_tx = vals["tx-previous"]
-                if not previous_tx:
-                    previous_tx = current_tx
+                previous_tx = vals["tx-previous"] or current_tx
 
-                delta_tx = max(0, current_tx - previous_tx) * 8
+                delta_tx = max(0, current_tx - previous_tx)
                 self.data["interface"][uid]["tx"] = round(
-                    delta_tx / self.option_scan_interval.seconds * uom_div, 2
+                    delta_tx / self.option_scan_interval.seconds
                 )
                 self.data["interface"][uid]["tx-previous"] = current_tx
 
                 current_rx = vals["rx-current"]
-                previous_rx = vals["rx-previous"]
-                if not previous_rx:
-                    previous_rx = current_rx
+                previous_rx = vals["rx-previous"] or current_rx
 
-                delta_rx = max(0, current_rx - previous_rx) * 8
+                delta_rx = max(0, current_rx - previous_rx)
                 self.data["interface"][uid]["rx"] = round(
-                    delta_rx / self.option_scan_interval.seconds * uom_div, 2
+                    delta_rx / self.option_scan_interval.seconds
                 )
                 self.data["interface"][uid]["rx-previous"] = current_rx
 
@@ -914,7 +894,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_bridge
     # ---------------------------
-    def get_bridge(self):
+    def get_bridge(self) -> None:
         """Get system resources data from Mikrotik"""
         self.data["bridge_host"] = parse_api(
             data=self.data["bridge_host"],
@@ -940,7 +920,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   process_interface_client
     # ---------------------------
-    def process_interface_client(self):
+    def process_interface_client(self) -> None:
         # Remove data if disabled
         if not self.option_track_iface_clients:
             for uid in self.data["interface"]:
@@ -978,7 +958,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_nat
     # ---------------------------
-    def get_nat(self):
+    def get_nat(self) -> None:
         """Get NAT data from Mikrotik"""
         self.data["nat"] = parse_api(
             data=self.data["nat"],
@@ -1060,7 +1040,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_mangle
     # ---------------------------
-    def get_mangle(self):
+    def get_mangle(self) -> None:
         """Get Mangle data from Mikrotik"""
         self.data["mangle"] = parse_api(
             data=self.data["mangle"],
@@ -1154,7 +1134,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_filter
     # ---------------------------
-    def get_filter(self):
+    def get_filter(self) -> None:
         """Get Filter data from Mikrotik"""
         self.data["filter"] = parse_api(
             data=self.data["filter"],
@@ -1266,7 +1246,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_kidcontrol
     # ---------------------------
-    def get_kidcontrol(self):
+    def get_kidcontrol(self) -> None:
         """Get Kid-control data from Mikrotik"""
         self.data["kid-control"] = parse_api(
             data=self.data["kid-control"],
@@ -1302,7 +1282,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_ppp
     # ---------------------------
-    def get_ppp(self):
+    def get_ppp(self) -> None:
         """Get PPP data from Mikrotik"""
         self.data["ppp_secret"] = parse_api(
             data=self.data["ppp_secret"],
@@ -1366,7 +1346,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_system_routerboard
     # ---------------------------
-    def get_system_routerboard(self):
+    def get_system_routerboard(self) -> None:
         """Get routerboard data from Mikrotik"""
         if self.data["resource"]["board-name"] in ("x86", "CHR"):
             self.data["routerboard"]["routerboard"] = False
@@ -1396,7 +1376,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_system_health
     # ---------------------------
-    def get_system_health(self):
+    def get_system_health(self) -> None:
         """Get routerboard data from Mikrotik"""
         if (
             "write" not in self.data["access"]
@@ -1434,7 +1414,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_system_resource
     # ---------------------------
-    def get_system_resource(self):
+    def get_system_resource(self) -> None:
         """Get system resources data from Mikrotik"""
         tmp_rebootcheck = 0
         if "uptime_epoch" in self.data["resource"]:
@@ -1487,16 +1467,12 @@ class MikrotikControllerData:
         if not self.data["resource"]["uptime"]:
             update_uptime = True
         else:
-            uptime_old = datetime.timestamp(
-                datetime.fromisoformat(self.data["resource"]["uptime"])
-            )
+            uptime_old = datetime.timestamp(self.data["resource"]["uptime"])
             if uptime_tm > uptime_old + 10:
                 update_uptime = True
 
         if update_uptime:
-            self.data["resource"]["uptime"] = str(
-                as_local(utc_from_timestamp(uptime_tm)).isoformat()
-            )
+            self.data["resource"]["uptime"] = utc_from_timestamp(uptime_tm)
 
         if self.data["resource"]["total-memory"] > 0:
             self.data["resource"]["memory-usage"] = round(
@@ -1535,7 +1511,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_firmware_update
     # ---------------------------
-    def get_firmware_update(self):
+    def get_firmware_update(self) -> None:
         """Check for firmware update on Mikrotik"""
         if (
             "write" not in self.data["access"]
@@ -1579,7 +1555,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_ups
     # ---------------------------
-    def get_ups(self):
+    def get_ups(self) -> None:
         """Get UPS info from Mikrotik"""
         self.data["ups"] = parse_api(
             data=self.data["ups"],
@@ -1632,7 +1608,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_gps
     # ---------------------------
-    def get_gps(self):
+    def get_gps(self) -> None:
         """Get GPS data from Mikrotik"""
         self.data["gps"] = parse_api(
             data=self.data["gps"],
@@ -1659,7 +1635,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_script
     # ---------------------------
-    def get_script(self):
+    def get_script(self) -> None:
         """Get list of all scripts from Mikrotik"""
         self.data["script"] = parse_api(
             data=self.data["script"],
@@ -1675,7 +1651,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_environment
     # ---------------------------
-    def get_environment(self):
+    def get_environment(self) -> None:
         """Get list of all environment variables from Mikrotik"""
         self.data["environment"] = parse_api(
             data=self.data["environment"],
@@ -1690,7 +1666,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_captive
     # ---------------------------
-    def get_captive(self):
+    def get_captive(self) -> None:
         """Get list of all environment variables from Mikrotik"""
         self.data["hostspot_host"] = parse_api(
             data={},
@@ -1713,7 +1689,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_queue
     # ---------------------------
-    def get_queue(self):
+    def get_queue(self) -> None:
         """Get Queue data from Mikrotik"""
         self.data["queue"] = parse_api(
             data=self.data["queue"],
@@ -1741,59 +1717,50 @@ class MikrotikControllerData:
             ],
         )
 
-        uom_type, uom_div = self._get_unit_of_measurement()
         for uid, vals in self.data["queue"].items():
             self.data["queue"][uid]["comment"] = str(self.data["queue"][uid]["comment"])
 
             upload_max_limit_bps, download_max_limit_bps = [
                 int(x) for x in vals["max-limit"].split("/")
             ]
-            self.data["queue"][uid][
-                "upload-max-limit"
-            ] = f"{round(upload_max_limit_bps * uom_div)} {uom_type}"
+            self.data["queue"][uid]["upload-max-limit"] = f"{upload_max_limit_bps} bps"
             self.data["queue"][uid][
                 "download-max-limit"
-            ] = f"{round(download_max_limit_bps * uom_div)} {uom_type}"
+            ] = f"{download_max_limit_bps} bps"
 
             upload_rate_bps, download_rate_bps = [
                 int(x) for x in vals["rate"].split("/")
             ]
-            self.data["queue"][uid][
-                "upload-rate"
-            ] = f"{round(upload_rate_bps * uom_div)} {uom_type}"
-            self.data["queue"][uid][
-                "download-rate"
-            ] = f"{round(download_rate_bps * uom_div)} {uom_type}"
+            self.data["queue"][uid]["upload-rate"] = f"{upload_rate_bps} bps"
+            self.data["queue"][uid]["download-rate"] = f"{download_rate_bps} bps"
 
             upload_limit_at_bps, download_limit_at_bps = [
                 int(x) for x in vals["limit-at"].split("/")
             ]
-            self.data["queue"][uid][
-                "upload-limit-at"
-            ] = f"{round(upload_limit_at_bps * uom_div)} {uom_type}"
+            self.data["queue"][uid]["upload-limit-at"] = f"{upload_limit_at_bps} bps"
             self.data["queue"][uid][
                 "download-limit-at"
-            ] = f"{round(download_limit_at_bps * uom_div)} {uom_type}"
+            ] = f"{download_limit_at_bps} bps"
 
             upload_burst_limit_bps, download_burst_limit_bps = [
                 int(x) for x in vals["burst-limit"].split("/")
             ]
             self.data["queue"][uid][
                 "upload-burst-limit"
-            ] = f"{round(upload_burst_limit_bps * uom_div)} {uom_type}"
+            ] = f"{upload_burst_limit_bps} bps"
             self.data["queue"][uid][
                 "download-burst-limit"
-            ] = f"{round(download_burst_limit_bps * uom_div)} {uom_type}"
+            ] = f"{download_burst_limit_bps} bps"
 
             upload_burst_threshold_bps, download_burst_threshold_bps = [
                 int(x) for x in vals["burst-threshold"].split("/")
             ]
             self.data["queue"][uid][
                 "upload-burst-threshold"
-            ] = f"{round(upload_burst_threshold_bps * uom_div)} {uom_type}"
+            ] = f"{upload_burst_threshold_bps} bps"
             self.data["queue"][uid][
                 "download-burst-threshold"
-            ] = f"{round(download_burst_threshold_bps * uom_div)} {uom_type}"
+            ] = f"{download_burst_threshold_bps} bps"
 
             upload_burst_time, download_burst_time = vals["burst-time"].split("/")
             self.data["queue"][uid]["upload-burst-time"] = upload_burst_time
@@ -1802,7 +1769,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_arp
     # ---------------------------
-    def get_arp(self):
+    def get_arp(self) -> None:
         """Get ARP data from Mikrotik"""
         self.data["arp"] = parse_api(
             data=self.data["arp"],
@@ -1835,7 +1802,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_dns
     # ---------------------------
-    def get_dns(self):
+    def get_dns(self) -> None:
         """Get static DNS data from Mikrotik"""
         self.data["dns"] = parse_api(
             data=self.data["dns"],
@@ -1850,7 +1817,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_dhcp
     # ---------------------------
-    def get_dhcp(self):
+    def get_dhcp(self) -> None:
         """Get DHCP data from Mikrotik"""
         self.data["dhcp"] = parse_api(
             data=self.data["dhcp"],
@@ -1926,7 +1893,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_dhcp_server
     # ---------------------------
-    def get_dhcp_server(self):
+    def get_dhcp_server(self) -> None:
         """Get DHCP server data from Mikrotik"""
         self.data["dhcp-server"] = parse_api(
             data=self.data["dhcp-server"],
@@ -1941,7 +1908,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_dhcp_client
     # ---------------------------
-    def get_dhcp_client(self):
+    def get_dhcp_client(self) -> None:
         """Get DHCP client data from Mikrotik"""
         self.data["dhcp-client"] = parse_api(
             data=self.data["dhcp-client"],
@@ -1956,7 +1923,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_dhcp_network
     # ---------------------------
-    def get_dhcp_network(self):
+    def get_dhcp_network(self) -> None:
         """Get DHCP network data from Mikrotik"""
         self.data["dhcp-network"] = parse_api(
             data=self.data["dhcp-network"],
@@ -1981,7 +1948,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_capsman_hosts
     # ---------------------------
-    def get_capsman_hosts(self):
+    def get_capsman_hosts(self) -> None:
         """Get CAPS-MAN hosts data from Mikrotik"""
         self.data["capsman_hosts"] = parse_api(
             data={},
@@ -1997,7 +1964,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_wireless
     # ---------------------------
-    def get_wireless(self):
+    def get_wireless(self) -> None:
         """Get wireless data from Mikrotik"""
         wifimodule = "wifiwave2" if self.support_wifiwave2 else "wireless"
         self.data["wireless"] = parse_api(
@@ -2047,7 +2014,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   get_wireless_hosts
     # ---------------------------
-    def get_wireless_hosts(self):
+    def get_wireless_hosts(self) -> None:
         """Get wireless hosts data from Mikrotik"""
         wifimodule = "wifiwave2" if self.support_wifiwave2 else "wireless"
         self.data["wireless_hosts"] = parse_api(
@@ -2065,7 +2032,7 @@ class MikrotikControllerData:
     # ---------------------------
     #   async_process_host
     # ---------------------------
-    async def async_process_host(self):
+    async def async_process_host(self) -> None:
         """Get host tracking data"""
         # Add hosts from CAPS-MAN
         capsman_detected = {}
@@ -2281,14 +2248,13 @@ class MikrotikControllerData:
     # ---------------------------
     #   process_accounting
     # ---------------------------
-    def process_accounting(self):
+    def process_accounting(self) -> None:
         """Get Accounting data from Mikrotik"""
         # Check if accounting and account-local-traffic is enabled
         (
             accounting_enabled,
             local_traffic_enabled,
         ) = self.api.is_accounting_and_local_traffic_enabled()
-        uom_type, uom_div = self._get_unit_of_measurement()
 
         # Build missing hosts from main hosts dict
         for uid, vals in self.data["host"].items():
@@ -2297,7 +2263,6 @@ class MikrotikControllerData:
                     "address": vals["address"],
                     "mac-address": vals["mac-address"],
                     "host-name": vals["host-name"],
-                    "tx-rx-attr": uom_type,
                     "available": False,
                     "local_accounting": False,
                 }
@@ -2351,7 +2316,7 @@ class MikrotikControllerData:
             for item in accounting_data.values():
                 source_ip = str(item.get("src-address")).strip()
                 destination_ip = str(item.get("dst-address")).strip()
-                bits_count = int(str(item.get("bytes")).strip()) * 8
+                bits_count = int(str(item.get("bytes")).strip())
 
                 if self._address_part_of_local_network(
                     source_ip
@@ -2385,7 +2350,6 @@ class MikrotikControllerData:
                 )
                 continue
 
-            self.data["client_traffic"][uid]["tx-rx-attr"] = uom_type
             self.data["client_traffic"][uid]["available"] = accounting_enabled
             self.data["client_traffic"][uid]["local_accounting"] = local_traffic_enabled
 
@@ -2394,14 +2358,10 @@ class MikrotikControllerData:
                 continue
 
             self.data["client_traffic"][uid]["wan-tx"] = (
-                round(vals["wan-tx"] / time_diff * uom_div, 2)
-                if vals["wan-tx"]
-                else 0.0
+                round(vals["wan-tx"] / time_diff) if vals["wan-tx"] else 0.0
             )
             self.data["client_traffic"][uid]["wan-rx"] = (
-                round(vals["wan-rx"] / time_diff * uom_div, 2)
-                if vals["wan-rx"]
-                else 0.0
+                round(vals["wan-rx"] / time_diff) if vals["wan-rx"] else 0.0
             )
 
             if not local_traffic_enabled:
@@ -2409,40 +2369,16 @@ class MikrotikControllerData:
                 continue
 
             self.data["client_traffic"][uid]["lan-tx"] = (
-                round(vals["lan-tx"] / time_diff * uom_div, 2)
-                if vals["lan-tx"]
-                else 0.0
+                round(vals["lan-tx"] / time_diff) if vals["lan-tx"] else 0.0
             )
             self.data["client_traffic"][uid]["lan-rx"] = (
-                round(vals["lan-rx"] / time_diff * uom_div, 2)
-                if vals["lan-rx"]
-                else 0.0
+                round(vals["lan-rx"] / time_diff) if vals["lan-rx"] else 0.0
             )
-
-    # ---------------------------
-    #   _get_unit_of_measurement
-    # ---------------------------
-    def _get_unit_of_measurement(self):
-        uom_type = self.option_unit_of_measurement
-        if uom_type == "Kbps":
-            uom_div = 0.001
-        elif uom_type == "Mbps":
-            uom_div = 0.000001
-        elif uom_type == "B/s":
-            uom_div = 0.125
-        elif uom_type == "KB/s":
-            uom_div = 0.000125
-        elif uom_type == "MB/s":
-            uom_div = 0.000000125
-        else:
-            uom_type = "bps"
-            uom_div = 1
-        return uom_type, uom_div
 
     # ---------------------------
     #   _address_part_of_local_network
     # ---------------------------
-    def _address_part_of_local_network(self, address):
+    def _address_part_of_local_network(self, address) -> bool:
         address = ip_address(address)
         for vals in self.data["dhcp-network"].values():
             if address in vals["IPv4Network"]:
@@ -2474,10 +2410,8 @@ class MikrotikControllerData:
     # ---------------------------
     #   process_kid_control
     # ---------------------------
-    def process_kid_control_devices(self):
+    def process_kid_control_devices(self) -> None:
         """Get Kid Control Device data from Mikrotik"""
-
-        uom_type, uom_div = self._get_unit_of_measurement()
 
         # Build missing hosts from main hosts dict
         for uid, vals in self.data["host"].items():
@@ -2490,7 +2424,6 @@ class MikrotikControllerData:
                     "previous-bytes-down": 0.0,
                     "tx": 0.0,
                     "rx": 0.0,
-                    "tx-rx-attr": uom_type,
                     "available": False,
                     "local_accounting": False,
                 }
@@ -2538,17 +2471,13 @@ class MikrotikControllerData:
             current_tx = vals["bytes-up"]
             previous_tx = self.data["client_traffic"][uid]["previous-bytes-up"]
             if time_diff:
-                delta_tx = max(0, current_tx - previous_tx) * 8
-                self.data["client_traffic"][uid]["tx"] = round(
-                    delta_tx / time_diff * uom_div, 2
-                )
+                delta_tx = max(0, current_tx - previous_tx)
+                self.data["client_traffic"][uid]["tx"] = round(delta_tx / time_diff)
             self.data["client_traffic"][uid]["previous-bytes-up"] = current_tx
 
             current_rx = vals["bytes-down"]
             previous_rx = self.data["client_traffic"][uid]["previous-bytes-down"]
             if time_diff:
-                delta_rx = max(0, current_rx - previous_rx) * 8
-                self.data["client_traffic"][uid]["rx"] = round(
-                    delta_rx / time_diff * uom_div, 2
-                )
+                delta_rx = max(0, current_rx - previous_rx)
+                self.data["client_traffic"][uid]["rx"] = round(delta_rx / time_diff)
             self.data["client_traffic"][uid]["previous-bytes-down"] = current_rx

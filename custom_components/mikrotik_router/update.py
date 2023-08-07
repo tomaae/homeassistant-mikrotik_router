@@ -8,7 +8,7 @@ from homeassistant.components.update import (
     UpdateDeviceClass,
     UpdateEntityFeature,
 )
-from .model import model_async_setup_entry, MikrotikEntity
+from .entity import model_async_setup_entry, MikrotikEntity
 from .update_types import (
     SENSOR_TYPES,
     SENSOR_SERVICES,

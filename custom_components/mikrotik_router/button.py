@@ -2,7 +2,7 @@
 
 import logging
 from homeassistant.components.button import ButtonEntity
-from .model import model_async_setup_entry, MikrotikEntity
+from .entity import model_async_setup_entry, MikrotikEntity
 from .button_types import (
     SENSOR_TYPES,
     SENSOR_SERVICES,

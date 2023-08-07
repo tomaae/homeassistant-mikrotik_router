@@ -13,7 +13,7 @@ from .const import (
     CONF_SENSOR_PORT_TRACKER,
     DEFAULT_SENSOR_PORT_TRACKER,
 )
-from .model import model_async_setup_entry, MikrotikEntity
+from .entity import model_async_setup_entry, MikrotikEntity
 from .binary_sensor_types import (
     SENSOR_TYPES,
     SENSOR_SERVICES,
