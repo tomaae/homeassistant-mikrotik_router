@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from logging import getLogger
-from typing import Any, Callable
+from typing import Any, Callable, TypeVar
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_ATTRIBUTION, CONF_NAME, CONF_HOST
@@ -27,7 +27,7 @@ from .const import (
     CONF_SENSOR_PORT_TRACKER,
     DEFAULT_SENSOR_PORT_TRACKER,
 )
-from .coordinator import MikrotikCoordinator
+from .coordinator import MikrotikCoordinator, MikrotikTrackerCoordinator
 from .helper import format_attribute
 
 _LOGGER = getLogger(__name__)
@@ -88,7 +88,7 @@ async def async_add_entities(
     hass: HomeAssistant, config_entry: ConfigEntry, dispatcher: dict[str, Callable]
 ):
     """Add entities."""
-    coordinator = hass.data[DOMAIN][config_entry.entry_id]
+    # coordinator = hass.data[DOMAIN][config_entry.entry_id].data_coordinator
     platform = ep.async_get_current_platform()
     services = platform.platform.SENSOR_SERVICES
     descriptions = platform.platform.SENSOR_TYPES
@@ -136,15 +136,24 @@ async def async_add_entities(
                     )
                     await async_check_exist(obj, coordinator, uid)
 
-    await async_update_controller(coordinator)
+    await async_update_controller(
+        hass.data[DOMAIN][config_entry.entry_id].data_coordinator
+    )
+
     unsub = async_dispatcher_connect(hass, "update_sensors", async_update_controller)
     config_entry.async_on_unload(unsub)
+
+
+_MikrotikCoordinatorT = TypeVar(
+    "_MikrotikCoordinatorT",
+    bound=MikrotikCoordinator | MikrotikTrackerCoordinator,
+)
 
 
 # ---------------------------
 #   MikrotikEntity
 # ---------------------------
-class MikrotikEntity(CoordinatorEntity[MikrotikCoordinator], Entity):
+class MikrotikEntity(CoordinatorEntity[_MikrotikCoordinatorT], Entity):
     """Define entity"""
 
     _attr_has_entity_name = True
@@ -247,19 +256,7 @@ class MikrotikEntity(CoordinatorEntity[MikrotikCoordinator], Entity):
                 sw_version=f"{self.coordinator.data['resource']['version']}",
                 configuration_url=f"http://{self.coordinator.config_entry.data[CONF_HOST]}",
             )
-        else:
-            info = DeviceInfo(
-                connections={(dev_connection, f"{dev_connection_value}")},
-                default_name=f"{self._inst} {dev_group}",
-                default_model=f"{self.coordinator.data['resource']['board-name']}",
-                default_manufacturer=f"{self.coordinator.data['resource']['platform']}",
-                via_device=(
-                    DOMAIN,
-                    f"{self.coordinator.data['routerboard']['serial-number']}",
-                ),
-            )
-
-        if "mac-address" in self.entity_description.data_reference:
+        elif "mac-address" in self.entity_description.data_reference:
             dev_group = self._data[self.entity_description.data_name]
             dev_manufacturer = ""
             if dev_connection_value in self.coordinator.data["host"]:
@@ -274,6 +271,17 @@ class MikrotikEntity(CoordinatorEntity[MikrotikCoordinator], Entity):
                 connections={(dev_connection, f"{dev_connection_value}")},
                 default_name=f"{dev_group}",
                 default_manufacturer=f"{dev_manufacturer}",
+                via_device=(
+                    DOMAIN,
+                    f"{self.coordinator.data['routerboard']['serial-number']}",
+                ),
+            )
+        else:
+            info = DeviceInfo(
+                connections={(dev_connection, f"{dev_connection_value}")},
+                default_name=f"{self._inst} {dev_group}",
+                default_model=f"{self.coordinator.data['resource']['board-name']}",
+                default_manufacturer=f"{self.coordinator.data['resource']['platform']}",
                 via_device=(
                     DOMAIN,
                     f"{self.coordinator.data['routerboard']['serial-number']}",

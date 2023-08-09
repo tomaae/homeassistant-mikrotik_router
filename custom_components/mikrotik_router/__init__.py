@@ -13,7 +13,7 @@ from .const import (
     DOMAIN,
     RUN_SCRIPT_COMMAND,
 )
-from .coordinator import MikrotikCoordinator
+from .coordinator import MikrotikData, MikrotikCoordinator, MikrotikTrackerCoordinator
 
 SCRIPT_SCHEMA = vol.Schema(
     {vol.Required("router"): cv.string, vol.Required("script"): cv.string}
@@ -27,7 +27,13 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     """Set up a config entry."""
     coordinator = MikrotikCoordinator(hass, config_entry)
     await coordinator.async_config_entry_first_refresh()
-    hass.data.setdefault(DOMAIN, {})[config_entry.entry_id] = coordinator
+    coordinatorTracker = MikrotikTrackerCoordinator(hass, config_entry, coordinator)
+    await coordinatorTracker.async_config_entry_first_refresh()
+    hass.data.setdefault(DOMAIN, {})[config_entry.entry_id] = MikrotikData(
+        data_coordinator=coordinator,
+        tracker_coordinator=coordinatorTracker,
+    )
+    # hass.data.setdefault(DOMAIN, {})[config_entry.entry_id]["coordinator"] = coordinator
 
     await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
 
