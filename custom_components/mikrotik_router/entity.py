@@ -50,7 +50,7 @@ def _skip_sensor(config_entry, entity_description, data, uid) -> bool:
         return True
 
     if (
-        entity_description.func == "MikrotikClientTrafficSensor"
+        entity_description.data_path == "client_traffic"
         and entity_description.data_attribute not in data[uid].keys()
     ):
         return True
