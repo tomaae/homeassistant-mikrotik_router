@@ -207,10 +207,10 @@ class MikrotikEntity(CoordinatorEntity[MikrotikCoordinator], Entity):
         else:
             return f"{self._inst.lower()}-{self.entity_description.key}"
 
-    @property
-    def available(self) -> bool:
-        """Return if controller is available"""
-        return self.coordinator.connected()
+    # @property
+    # def available(self) -> bool:
+    #     """Return if controller is available"""
+    #     return self.coordinator.connected()
 
     @property
     def device_info(self) -> DeviceInfo:
