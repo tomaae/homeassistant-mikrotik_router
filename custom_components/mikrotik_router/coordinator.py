@@ -156,8 +156,8 @@ class MikrotikCoordinator(DataUpdateCoordinator):
         self.notified_flags = []
 
         # self.listeners = []
-        self.lock = asyncio.Lock()
-        self.lock_ping = asyncio.Lock()
+        # self.lock = asyncio.Lock()
+        # self.lock_ping = asyncio.Lock()
 
         self.api = MikrotikAPI(
             config_entry.data[CONF_HOST],
@@ -481,10 +481,10 @@ class MikrotikCoordinator(DataUpdateCoordinator):
     # ---------------------------
     async def async_hwinfo_update(self):
         """Update Mikrotik hardware info"""
-        try:
-            await asyncio.wait_for(self.lock.acquire(), timeout=30)
-        except Exception as error:
-            raise UpdateFailed(error) from error
+        # try:
+        #     await asyncio.wait_for(self.lock.acquire(), timeout=30)
+        # except Exception as error:
+        #     raise UpdateFailed(error) from error
 
         await self.hass.async_add_executor_job(self.get_access)
 
@@ -509,7 +509,7 @@ class MikrotikCoordinator(DataUpdateCoordinator):
         if self.api.connected():
             await self.hass.async_add_executor_job(self.get_dns)
 
-        self.lock.release()
+        # self.lock.release()
 
     # ---------------------------
     #   force_fwupdate_check
@@ -538,10 +538,10 @@ class MikrotikCoordinator(DataUpdateCoordinator):
         if "test" not in self.data["access"]:
             return
 
-        try:
-            await asyncio.wait_for(self.lock_ping.acquire(), timeout=3)
-        except Exception:
-            return
+        # try:
+        #     await asyncio.wait_for(self.lock_ping.acquire(), timeout=3)
+        # except Exception:
+        #     return
 
         for uid in list(self.data["host"]):
             if not self.host_tracking_initialized:
@@ -585,7 +585,7 @@ class MikrotikCoordinator(DataUpdateCoordinator):
                 self.data["host"][uid]["last-seen"] = utcnow()
 
         self.host_tracking_initialized = True
-        self.lock_ping.release()
+        # self.lock_ping.release()
 
     # ---------------------------
     #   _async_update_data
@@ -598,10 +598,10 @@ class MikrotikCoordinator(DataUpdateCoordinator):
         if self.api.has_reconnected():
             await self.async_hwinfo_update()
 
-        try:
-            await asyncio.wait_for(self.lock.acquire(), timeout=10)
-        except Exception as error:
-            raise UpdateFailed(error) from error
+        # try:
+        #     await asyncio.wait_for(self.lock.acquire(), timeout=10)
+        # except Exception as error:
+        #     raise UpdateFailed(error) from error
 
         await self.hass.async_add_executor_job(self.get_system_resource)
 
@@ -680,7 +680,7 @@ class MikrotikCoordinator(DataUpdateCoordinator):
         if self.api.connected() and self.support_gps:
             await self.hass.async_add_executor_job(self.get_gps)
 
-        self.lock.release()
+        # self.lock.release()
         # async_dispatcher_send(self.hass, "update_sensors", self)
         return self.data
 
