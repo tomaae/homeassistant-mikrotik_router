@@ -237,19 +237,27 @@ class MikrotikEntity(CoordinatorEntity[MikrotikCoordinator], Entity):
                 dev_connection_value = dev_connection_value[6:]
                 dev_connection_value = self._data[dev_connection_value]
 
-        info = DeviceInfo(
-            connections={(dev_connection, f"{dev_connection_value}")},
-            identifiers={(dev_connection, f"{dev_connection_value}")},
-            default_name=f"{self._inst} {dev_group}",
-            default_model=f"{self.coordinator.data['resource']['board-name']}",
-            default_manufacturer=f"{self.coordinator.data['resource']['platform']}",
-            sw_version=f"{self.coordinator.data['resource']['version']}",
-            configuration_url=f"http://{self.coordinator.config_entry.data[CONF_HOST]}",
-            via_device=(
-                DOMAIN,
-                f"{self.coordinator.data['routerboard']['serial-number']}",
-            ),
-        )
+        if self.entity_description.ha_group == "System":
+            info = DeviceInfo(
+                connections={(dev_connection, f"{dev_connection_value}")},
+                identifiers={(dev_connection, f"{dev_connection_value}")},
+                name=f"{self._inst} {dev_group}",
+                model=f"{self.coordinator.data['resource']['board-name']}",
+                manufacturer=f"{self.coordinator.data['resource']['platform']}",
+                sw_version=f"{self.coordinator.data['resource']['version']}",
+                configuration_url=f"http://{self.coordinator.config_entry.data[CONF_HOST]}",
+            )
+        else:
+            info = DeviceInfo(
+                connections={(dev_connection, f"{dev_connection_value}")},
+                default_name=f"{self._inst} {dev_group}",
+                default_model=f"{self.coordinator.data['resource']['board-name']}",
+                default_manufacturer=f"{self.coordinator.data['resource']['platform']}",
+                via_device=(
+                    DOMAIN,
+                    f"{self.coordinator.data['routerboard']['serial-number']}",
+                ),
+            )
 
         if "mac-address" in self.entity_description.data_reference:
             dev_group = self._data[self.entity_description.data_name]
