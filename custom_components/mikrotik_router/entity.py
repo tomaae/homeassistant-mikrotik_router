@@ -157,7 +157,7 @@ class MikrotikEntity(CoordinatorEntity[MikrotikCoordinator], Entity):
     ):
         """Initialize entity"""
         super().__init__(coordinator)
-        self.coordinator = coordinator
+        # self.coordinator = coordinator
         self.entity_description = entity_description
         self._inst = coordinator.config_entry.data[CONF_NAME]
         self._config_entry = self.coordinator.config_entry

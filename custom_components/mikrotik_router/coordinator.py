@@ -212,7 +212,6 @@ class MikrotikCoordinator(DataUpdateCoordinator):
     #   async_init
     # ---------------------------
     # async def async_init(self):
-    #     print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     #     self.listeners.append(
     #         async_track_time_interval(
     #             self.hass, self.force_fwupdate_check, timedelta(hours=4)
@@ -592,9 +591,6 @@ class MikrotikCoordinator(DataUpdateCoordinator):
     # ---------------------------
     async def _async_update_data(self):
         """Update Mikrotik data"""
-        print(
-            "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-        )
         if self.api.has_reconnected():
             await self.async_hwinfo_update()
 
