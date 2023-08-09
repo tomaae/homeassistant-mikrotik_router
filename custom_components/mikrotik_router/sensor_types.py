@@ -20,6 +20,7 @@ from homeassistant.const import (
     UnitOfElectricPotential,
     UnitOfPower,
 )
+
 from .const import DOMAIN
 
 DEVICE_ATTRIBUTES_IFACE = [
