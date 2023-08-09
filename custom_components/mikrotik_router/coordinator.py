@@ -197,11 +197,8 @@ class MikrotikCoordinator(DataUpdateCoordinator):
         self.async_mac_lookup = AsyncMacLookup()
         self.accessrights_reported = False
 
-        # self.listeners.append(
-        #     async_track_time_interval(
-        #         self.hass, self.force_fwupdate_check, timedelta(hours=4)
-        #     )
-        # )
+        self.last_hwinfo_update = datetime(1970, 1, 1)
+
         # self.listeners.append(
         #     async_track_time_interval(
         #         self.hass, self.async_ping_tracked_hosts, timedelta(seconds=15)
@@ -212,11 +209,6 @@ class MikrotikCoordinator(DataUpdateCoordinator):
     #   async_init
     # ---------------------------
     # async def async_init(self):
-    #     self.listeners.append(
-    #         async_track_time_interval(
-    #             self.hass, self.force_fwupdate_check, timedelta(hours=4)
-    #         )
-    #     )
     #     self.listeners.append(
     #         async_track_time_interval(
     #             self.hass, self.async_ping_tracked_hosts, timedelta(seconds=15)
@@ -476,56 +468,6 @@ class MikrotikCoordinator(DataUpdateCoordinator):
                 self.data["host_hass"][tmp[2].upper()] = entity.original_name
 
     # ---------------------------
-    #   async_hwinfo_update
-    # ---------------------------
-    async def async_hwinfo_update(self):
-        """Update Mikrotik hardware info"""
-        # try:
-        #     await asyncio.wait_for(self.lock.acquire(), timeout=30)
-        # except Exception as error:
-        #     raise UpdateFailed(error) from error
-
-        await self.hass.async_add_executor_job(self.get_access)
-
-        if self.api.connected():
-            await self.hass.async_add_executor_job(self.get_firmware_update)
-
-        if self.api.connected():
-            await self.hass.async_add_executor_job(self.get_system_resource)
-
-        if self.api.connected():
-            await self.hass.async_add_executor_job(self.get_capabilities)
-
-        if self.api.connected():
-            await self.hass.async_add_executor_job(self.get_system_routerboard)
-
-        if self.api.connected() and self.option_sensor_scripts:
-            await self.hass.async_add_executor_job(self.get_script)
-
-        if self.api.connected():
-            await self.hass.async_add_executor_job(self.get_dhcp_network)
-
-        if self.api.connected():
-            await self.hass.async_add_executor_job(self.get_dns)
-
-        # self.lock.release()
-
-    # ---------------------------
-    #   force_fwupdate_check
-    # ---------------------------
-    @callback
-    async def force_fwupdate_check(self, _now=None):
-        """Trigger hourly update by timer"""
-        await self.async_fwupdate_check()
-
-    # ---------------------------
-    #   async_fwupdate_check
-    # ---------------------------
-    async def async_fwupdate_check(self):
-        """Update Mikrotik data"""
-        await self.hass.async_add_executor_job(self.get_firmware_update)
-
-    # ---------------------------
     #   async_ping_tracked_hosts
     # ---------------------------
     @callback
@@ -591,8 +533,36 @@ class MikrotikCoordinator(DataUpdateCoordinator):
     # ---------------------------
     async def _async_update_data(self):
         """Update Mikrotik data"""
-        if self.api.has_reconnected():
-            await self.async_hwinfo_update()
+        delta = datetime.now().replace(microsecond=0) - self.last_hwinfo_update
+        if self.api.has_reconnected() or delta.total_seconds() > 60 * 60 * 4:
+            await self.hass.async_add_executor_job(self.get_access)
+
+            if self.api.connected():
+                await self.hass.async_add_executor_job(self.get_firmware_update)
+
+            if self.api.connected():
+                await self.hass.async_add_executor_job(self.get_system_resource)
+
+            if self.api.connected():
+                await self.hass.async_add_executor_job(self.get_capabilities)
+
+            if self.api.connected():
+                await self.hass.async_add_executor_job(self.get_system_routerboard)
+
+            if self.api.connected() and self.option_sensor_scripts:
+                await self.hass.async_add_executor_job(self.get_script)
+
+            if self.api.connected():
+                await self.hass.async_add_executor_job(self.get_dhcp_network)
+
+            if self.api.connected():
+                await self.hass.async_add_executor_job(self.get_dns)
+
+            if not self.api.connected():
+                raise UpdateFailed("Mikrotik Disconnected")
+
+            if self.api.connected():
+                self.last_hwinfo_update = datetime.now().replace(microsecond=0)
 
         # try:
         #     await asyncio.wait_for(self.lock.acquire(), timeout=10)
@@ -601,8 +571,8 @@ class MikrotikCoordinator(DataUpdateCoordinator):
 
         await self.hass.async_add_executor_job(self.get_system_resource)
 
-        if self.api.connected() and "available" not in self.data["fw-update"]:
-            await self.async_fwupdate_check()
+        # if self.api.connected() and "available" not in self.data["fw-update"]:
+        #     await self.hass.async_add_executor_job(self.get_firmware_update)
 
         if self.api.connected():
             await self.hass.async_add_executor_job(self.get_system_health)
@@ -675,6 +645,9 @@ class MikrotikCoordinator(DataUpdateCoordinator):
 
         if self.api.connected() and self.support_gps:
             await self.hass.async_add_executor_job(self.get_gps)
+
+        if not self.api.connected():
+            raise UpdateFailed("Mikrotik Disconnected")
 
         # self.lock.release()
         # async_dispatcher_send(self.hass, "update_sensors", self)
