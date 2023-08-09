@@ -1,12 +1,18 @@
 """Support for the Mikrotik Router switches."""
+from __future__ import annotations
 
-import logging
-from typing import Any, Optional
+from logging import getLogger
 from collections.abc import Mapping
+from typing import Any, Optional
+
 from homeassistant.components.switch import SwitchEntity
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
+
+from .entity import MikrotikEntity, async_add_entities
 from .helper import format_attribute
-from .entity import model_async_setup_entry, MikrotikEntity
 from .switch_types import (
     SENSOR_TYPES,
     SENSOR_SERVICES,
@@ -15,13 +21,17 @@ from .switch_types import (
     DEVICE_ATTRIBUTES_IFACE_WIRELESS,
 )
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = getLogger(__name__)
 
 
 # ---------------------------
 #   async_setup_entry
 # ---------------------------
-async def async_setup_entry(hass, config_entry, async_add_entities):
+async def async_setup_entry(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    _async_add_entities: AddEntitiesCallback,
+) -> None:
     """Set up entry for component"""
     dispatcher = {
         "MikrotikSwitch": MikrotikSwitch,
@@ -32,14 +42,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         "MikrotikQueueSwitch": MikrotikQueueSwitch,
         "MikrotikKidcontrolPauseSwitch": MikrotikKidcontrolPauseSwitch,
     }
-    await model_async_setup_entry(
-        hass,
-        config_entry,
-        async_add_entities,
-        SENSOR_SERVICES,
-        SENSOR_TYPES,
-        dispatcher,
-    )
+    await async_add_entities(hass, config_entry, dispatcher)
 
 
 # ---------------------------

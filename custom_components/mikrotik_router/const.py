@@ -5,7 +5,7 @@ PLATFORMS = [
     Platform.SENSOR,
     Platform.BINARY_SENSOR,
     # Platform.DEVICE_TRACKER,
-    # Platform.SWITCH,
+    Platform.SWITCH,
     # Platform.BUTTON,
     # Platform.UPDATE,
 ]
