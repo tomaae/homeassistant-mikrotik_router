@@ -3,7 +3,7 @@ from homeassistant.const import Platform
 
 PLATFORMS = [
     Platform.SENSOR,
-    # Platform.BINARY_SENSOR,
+    Platform.BINARY_SENSOR,
     # Platform.DEVICE_TRACKER,
     # Platform.SWITCH,
     # Platform.BUTTON,
