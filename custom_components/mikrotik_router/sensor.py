@@ -13,8 +13,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .entity import MikrotikEntity, async_add_entities
 from .coordinator import MikrotikCoordinator
+from .entity import MikrotikEntity, async_add_entities
 from .helper import format_attribute
 from .sensor_types import (
     SENSOR_TYPES,
