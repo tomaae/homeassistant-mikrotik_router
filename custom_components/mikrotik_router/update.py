@@ -121,13 +121,12 @@ class MikrotikRouterBoardFWUpdate(MikrotikEntity, UpdateEntity):
 
     def __init__(
         self,
-        inst,
-        uid: "",
-        mikrotik_controller,
+        coordinator: MikrotikCoordinator,
         entity_description,
+        uid: str | None = None,
     ):
         """Set up device update entity."""
-        super().__init__(inst, uid, mikrotik_controller, entity_description)
+        super().__init__(coordinator, entity_description, uid)
 
         self._attr_supported_features = UpdateEntityFeature.INSTALL
         self._attr_title = self.entity_description.title
