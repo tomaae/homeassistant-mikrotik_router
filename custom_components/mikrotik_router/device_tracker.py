@@ -1,12 +1,22 @@
 """Support for the Mikrotik Router device tracker."""
-import logging
-from typing import Any
+from __future__ import annotations
+
+from logging import getLogger
 from collections.abc import Mapping
 from datetime import timedelta
+from typing import Any
+
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
-from homeassistant.components.device_tracker.const import SOURCE_TYPE_ROUTER
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
 from homeassistant.const import STATE_NOT_HOME
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util.dt import utcnow
+
+from homeassistant.components.device_tracker.const import SourceType
+
+from .device_tracker_types import SENSOR_TYPES, SENSOR_SERVICES
+from .entity import MikrotikEntity, async_add_entities
 from .helper import format_attribute
 from .const import (
     CONF_TRACK_HOSTS,
@@ -14,29 +24,24 @@ from .const import (
     CONF_TRACK_HOSTS_TIMEOUT,
     DEFAULT_TRACK_HOST_TIMEOUT,
 )
-from .entity import model_async_setup_entry, MikrotikEntity
-from .device_tracker_types import SENSOR_TYPES, SENSOR_SERVICES
 
-_LOGGER = logging.getLogger(__name__)
+_LOGGER = getLogger(__name__)
 
 
 # ---------------------------
 #   async_setup_entry
 # ---------------------------
-async def async_setup_entry(hass, config_entry, async_add_entities):
+async def async_setup_entry(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    _async_add_entities: AddEntitiesCallback,
+) -> None:
     """Set up entry for component"""
     dispatcher = {
         "MikrotikDeviceTracker": MikrotikDeviceTracker,
         "MikrotikHostDeviceTracker": MikrotikHostDeviceTracker,
     }
-    await model_async_setup_entry(
-        hass,
-        config_entry,
-        async_add_entities,
-        SENSOR_SERVICES,
-        SENSOR_TYPES,
-        dispatcher,
-    )
+    await async_add_entities(hass, config_entry, dispatcher)
 
 
 # ---------------------------
@@ -74,7 +79,7 @@ class MikrotikDeviceTracker(MikrotikEntity, ScannerEntity):
     @property
     def source_type(self) -> str:
         """Return the source type of the port."""
-        return SOURCE_TYPE_ROUTER
+        return SourceType.ROUTER
 
 
 # ---------------------------
@@ -136,7 +141,7 @@ class MikrotikHostDeviceTracker(MikrotikDeviceTracker):
     @property
     def state(self) -> str:
         """Return the state of the device."""
-        return self._ctrl.option_zone if self.is_connected else STATE_NOT_HOME
+        return self.coordinator.option_zone if self.is_connected else STATE_NOT_HOME
 
     @property
     def extra_state_attributes(self) -> Mapping[str, Any]:
