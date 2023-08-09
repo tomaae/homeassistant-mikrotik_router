@@ -110,9 +110,7 @@ class MikrotikCoordinator(DataUpdateCoordinator):
             self.hass,
             _LOGGER,
             name=DOMAIN,
-            update_interval=timedelta(
-                seconds=10
-            ),  # update_interval=self.option_scan_interval
+            update_interval=self.option_scan_interval,
         )
         self.name = config_entry.data[CONF_NAME]
         self.host = config_entry.data[CONF_HOST]
