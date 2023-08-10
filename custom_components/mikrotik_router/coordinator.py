@@ -2090,10 +2090,9 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                     self.ds["host"][uid]["bypassed"] = self.ds["hostspot_host"][uid][
                         "bypassed"
                     ]
-                else:
-                    if "authorized" in self.ds["host"][uid]:
-                        del self.ds["host"][uid]["authorized"]
-                        del self.ds["host"][uid]["bypassed"]
+                elif "authorized" in self.ds["host"][uid]:
+                    del self.ds["host"][uid]["authorized"]
+                    del self.ds["host"][uid]["bypassed"]
 
             # CAPS-MAN availability
             if vals["source"] == "capsman" and uid not in capsman_detected:
@@ -2152,29 +2151,28 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                                 ].split(".")[0]
                             break
 
-                # Resolve hostname from DHCP comment
-                if (
-                    self.ds["host"][uid]["host-name"] == "unknown"
-                    and uid in self.ds["dhcp"]
-                    and self.ds["dhcp"][uid]["enabled"]
-                    and self.ds["dhcp"][uid]["comment"].split("#", 1)[0] != ""
-                ):
-                    self.ds["host"][uid]["host-name"] = self.ds["dhcp"][uid][
-                        "comment"
-                    ].split("#", 1)[0]
-                # Resolve hostname from DHCP hostname
-                elif (
-                    self.ds["host"][uid]["host-name"] == "unknown"
-                    and uid in self.ds["dhcp"]
-                    and self.ds["dhcp"][uid]["enabled"]
-                    and self.ds["dhcp"][uid]["host-name"] != "unknown"
-                ):
-                    self.ds["host"][uid]["host-name"] = self.ds["dhcp"][uid][
-                        "host-name"
-                    ]
-                # Fallback to mac address for hostname
-                elif self.ds["host"][uid]["host-name"] == "unknown":
-                    self.ds["host"][uid]["host-name"] = uid
+                if self.ds["host"][uid]["host-name"] == "unknown":
+                    # Resolve hostname from DHCP comment
+                    if (
+                        uid in self.ds["dhcp"]
+                        and self.ds["dhcp"][uid]["enabled"]
+                        and self.ds["dhcp"][uid]["comment"].split("#", 1)[0] != ""
+                    ):
+                        self.ds["host"][uid]["host-name"] = self.ds["dhcp"][uid][
+                            "comment"
+                        ].split("#", 1)[0]
+                    # Resolve hostname from DHCP hostname
+                    elif (
+                        uid in self.ds["dhcp"]
+                        and self.ds["dhcp"][uid]["enabled"]
+                        and self.ds["dhcp"][uid]["host-name"] != "unknown"
+                    ):
+                        self.ds["host"][uid]["host-name"] = self.ds["dhcp"][uid][
+                            "host-name"
+                        ]
+                    # Fallback to mac address for hostname
+                    else:
+                        self.ds["host"][uid]["host-name"] = uid
 
             # Resolve manufacturer
             if vals["manufacturer"] == "detect" and vals["mac-address"] != "unknown":

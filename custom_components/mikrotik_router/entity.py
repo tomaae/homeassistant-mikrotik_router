@@ -245,7 +245,7 @@ class MikrotikEntity(CoordinatorEntity[_MikrotikCoordinatorT], Entity):
                 dev_connection_value = self._data[dev_connection_value]
 
         if self.entity_description.ha_group == "System":
-            info = DeviceInfo(
+            return DeviceInfo(
                 connections={(dev_connection, f"{dev_connection_value}")},
                 identifiers={(dev_connection, f"{dev_connection_value}")},
                 name=f"{self._inst} {dev_group}",
@@ -265,7 +265,7 @@ class MikrotikEntity(CoordinatorEntity[_MikrotikCoordinatorT], Entity):
                     "manufacturer"
                 ]
 
-            info = DeviceInfo(
+            return DeviceInfo(
                 connections={(dev_connection, f"{dev_connection_value}")},
                 default_name=f"{dev_group}",
                 default_manufacturer=f"{dev_manufacturer}",
@@ -275,7 +275,7 @@ class MikrotikEntity(CoordinatorEntity[_MikrotikCoordinatorT], Entity):
                 ),
             )
         else:
-            info = DeviceInfo(
+            return DeviceInfo(
                 connections={(dev_connection, f"{dev_connection_value}")},
                 default_name=f"{self._inst} {dev_group}",
                 default_model=f"{self.coordinator.data['resource']['board-name']}",
@@ -285,8 +285,6 @@ class MikrotikEntity(CoordinatorEntity[_MikrotikCoordinatorT], Entity):
                     f"{self.coordinator.data['routerboard']['serial-number']}",
                 ),
             )
-
-        return info
 
     @property
     def extra_state_attributes(self) -> Mapping[str, Any]:
