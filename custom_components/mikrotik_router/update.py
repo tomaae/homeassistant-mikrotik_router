@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from logging import getLogger
-from collections.abc import Mapping
 from requests import get as requests_get
 from typing import Any
 

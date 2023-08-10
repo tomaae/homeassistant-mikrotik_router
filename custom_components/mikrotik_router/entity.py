@@ -88,7 +88,6 @@ async def async_add_entities(
     hass: HomeAssistant, config_entry: ConfigEntry, dispatcher: dict[str, Callable]
 ):
     """Add entities."""
-    # coordinator = hass.data[DOMAIN][config_entry.entry_id].data_coordinator
     platform = ep.async_get_current_platform()
     services = platform.platform.SENSOR_SERVICES
     descriptions = platform.platform.SENSOR_TYPES
@@ -166,7 +165,6 @@ class MikrotikEntity(CoordinatorEntity[_MikrotikCoordinatorT], Entity):
     ):
         """Initialize entity"""
         super().__init__(coordinator)
-        # self.coordinator = coordinator
         self.entity_description = entity_description
         self._inst = coordinator.config_entry.data[CONF_NAME]
         self._config_entry = self.coordinator.config_entry

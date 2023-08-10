@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
-import asyncio
 import ipaddress
 import logging
 import re
 import pytz
-from typing import Any
 
 from datetime import datetime, timedelta
 from dataclasses import dataclass
@@ -15,10 +13,8 @@ from ipaddress import ip_address, IPv4Network
 from mac_vendor_lookup import AsyncMacLookup
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry
-from homeassistant.helpers.dispatcher import async_dispatcher_send
-from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util.dt import utcnow
 
@@ -207,7 +203,6 @@ class MikrotikTrackerCoordinator(DataUpdateCoordinator[None]):
             "host": self.coordinator.ds["host"],
             "routerboard": self.coordinator.ds["routerboard"],
         }
-        # return self.coordinator.ds
 
 
 # ---------------------------
@@ -267,19 +262,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
         self.notified_flags = []
 
-        # self.listeners = []
-        # self.lock = asyncio.Lock()
-        # self.lock_ping = asyncio.Lock()
-
         self.api = MikrotikAPI(
-            config_entry.data[CONF_HOST],
-            config_entry.data[CONF_USERNAME],
-            config_entry.data[CONF_PASSWORD],
-            config_entry.data[CONF_PORT],
-            config_entry.data[CONF_SSL],
-        )
-
-        self.api_ping = MikrotikAPI(
             config_entry.data[CONF_HOST],
             config_entry.data[CONF_USERNAME],
             config_entry.data[CONF_PASSWORD],
@@ -310,24 +293,6 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         self.accessrights_reported = False
 
         self.last_hwinfo_update = datetime(1970, 1, 1)
-        # self.async_add_listener(self.async_ping_tracked_hosts)
-        # self.async_add_listener(self.ping_tracked_hosts)
-
-        # self.listeners.append(
-        #     async_track_time_interval(
-        #         self.hass, self.async_ping_tracked_hosts, timedelta(seconds=15)
-        #     )
-        # )
-
-    # ---------------------------
-    #   async_init
-    # ---------------------------
-    # async def async_init(self):
-    #     self.listeners.append(
-    #         async_track_time_interval(
-    #             self.hass, self.async_ping_tracked_hosts, timedelta(seconds=15)
-    #         )
-    #     )
 
     # ---------------------------
     #   option_track_iface_clients
@@ -460,15 +425,6 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         )
         return timedelta(seconds=scan_interval)
 
-    #
-    # # ---------------------------
-    # #   option_zone
-    # # ---------------------------
-    # @property
-    # def option_zone(self):
-    #     """Config entry option zones."""
-    #     return self.config_entry.options.get(CONF_ZONE, STATE_HOME)
-
     # ---------------------------
     #   connected
     # ---------------------------
@@ -582,75 +538,6 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
                 self.ds["host_hass"][tmp[2].upper()] = entity.original_name
 
-    #
-    # # ---------------------------
-    # #   async_ping_tracked_hosts
-    # # ---------------------------
-    # async def async_ping_tracked_hosts(self):
-    #     """Trigger update by timer"""
-    #     print(
-    #         "1??????????????????????????????????????????????????????????????????????????????????"
-    #     )
-    #     if not self.option_track_network_hosts:
-    #         return
-    #
-    #     if "test" not in self.ds["access"]:
-    #         return
-    #
-    #     # try:
-    #     #     await asyncio.wait_for(self.lock_ping.acquire(), timeout=3)
-    #     # except Exception:
-    #     #     return
-    #
-    #     for uid in list(self.ds["host"]):
-    #         if not self.host_tracking_initialized:
-    #             # Add missing default values
-    #             for key, default in zip(
-    #                 [
-    #                     "address",
-    #                     "mac-address",
-    #                     "interface",
-    #                     "host-name",
-    #                     "last-seen",
-    #                     "available",
-    #                 ],
-    #                 ["unknown", "unknown", "unknown", "unknown", False, False],
-    #             ):
-    #                 if key not in self.ds["host"][uid]:
-    #                     self.ds["host"][uid][key] = default
-    #
-    #         # Check host availability
-    #         if (
-    #             self.ds["host"][uid]["source"] not in ["capsman", "wireless"]
-    #             and self.ds["host"][uid]["address"] not in ["unknown", ""]
-    #             and self.ds["host"][uid]["interface"] not in ["unknown", ""]
-    #         ):
-    #             tmp_interface = self.ds["host"][uid]["interface"]
-    #             if uid in self.ds["arp"] and self.ds["arp"][uid]["bridge"] != "":
-    #                 tmp_interface = self.ds["arp"][uid]["bridge"]
-    #
-    #             _LOGGER.debug("Ping host: %s", self.ds["host"][uid]["address"])
-    #
-    #             self.ds["host"][uid][
-    #                 "available"
-    #             ] = await self.hass.async_add_executor_job(
-    #                 self.api_ping.arp_ping,
-    #                 self.ds["host"][uid]["address"],
-    #                 tmp_interface,
-    #             )
-    #
-    #         # Update last seen
-    #         if self.ds["host"][uid]["available"]:
-    #             self.ds["host"][uid]["last-seen"] = utcnow()
-    #
-    #     self.host_tracking_initialized = True
-    #     print(
-    #         "1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    #     )
-    #     return self.ds
-    #
-    #     # self.lock_ping.release()
-
     # ---------------------------
     #   _async_update_data
     # ---------------------------
@@ -686,11 +573,6 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
             if self.api.connected():
                 self.last_hwinfo_update = datetime.now().replace(microsecond=0)
-
-        # try:
-        #     await asyncio.wait_for(self.lock.acquire(), timeout=10)
-        # except Exception as error:
-        #     raise UpdateFailed(error) from error
 
         await self.hass.async_add_executor_job(self.get_system_resource)
 
@@ -772,7 +654,6 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         if not self.api.connected():
             raise UpdateFailed("Mikrotik Disconnected")
 
-        # self.lock.release()
         # async_dispatcher_send(self.hass, "update_sensors", self)
         return self.ds
 

@@ -22,7 +22,7 @@ from homeassistant.util.dt import utcnow
 from homeassistant.components.device_tracker.const import SourceType
 
 from .device_tracker_types import SENSOR_TYPES, SENSOR_SERVICES
-from .entity import _skip_sensor, MikrotikEntity  # , async_add_entities
+from .entity import _skip_sensor, MikrotikEntity
 from .helper import format_attribute
 from .const import (
     DOMAIN,
@@ -39,7 +39,6 @@ async def async_add_entities(
     hass: HomeAssistant, config_entry: ConfigEntry, dispatcher: dict[str, Callable]
 ):
     """Add entities."""
-    # coordinator = hass.data[DOMAIN][config_entry.entry_id].data_coordinator
     platform = ep.async_get_current_platform()
     services = platform.platform.SENSOR_SERVICES
     descriptions = platform.platform.SENSOR_TYPES
