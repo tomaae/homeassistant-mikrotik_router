@@ -258,7 +258,7 @@ class MikrotikAPI:
     # ---------------------------
     #   execute
     # ---------------------------
-    def execute(self, path, command, param, value) -> bool:
+    def execute(self, path, command, param, value, attributes=None) -> bool:
         """Execute a command"""
         entry_found = None
         params = {}
@@ -291,6 +291,9 @@ class MikrotikAPI:
                 return True
 
             params = {".id": entry_found}
+
+        if attributes:
+            params.update(attributes)
 
         self.lock.acquire()
         try:

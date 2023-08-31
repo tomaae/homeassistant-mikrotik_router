@@ -1,0 +1,59 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Налаштувати Mikrotik Router",
+                "description": "Налаштувати Mikrotik Router інтеграцію",
+                "data": {
+                    "name": "Назва інтеграції",
+                    "host": "Хост",
+                    "port": "Порт",
+                    "username": "Користувач",
+                    "password": "Пароль",
+                    "ssl": "Використовувати SSL"
+                }
+            }
+        },
+        "error": {
+            "name_exists": "Назва вже існує.",
+            "cannot_connect": "Cannot connect to Mikrotik.",
+            "ssl_handshake_failure": "SSL handshake failure",
+            "connection_timeout": "Mikrotik connection timeout.",
+            "wrong_login": "Invalid user name or password."
+        }
+    },
+    "options": {
+        "step": {
+            "basic_options": {
+                "data": {
+                    "scan_interval": "Scan interval (requires HA restart)",
+                    "track_iface_clients": "Show client MAC and IP on interfaces",
+                    "unit_of_measurement": "Unit of measurement",
+                    "track_network_hosts_timeout": "Track network devices timeout (seconds)",
+                    "zone": "Zone for device tracker"
+                },
+                "title": "Mikrotik Router options (1\/2)",
+                "description": "Налаштувати інтеграцію"
+            },
+            "sensor_select": {
+                "data": {
+                    "track_network_hosts": "Track network devices",
+                    "sensor_port_tracker": "Port tracker sensors",
+                    "sensor_port_traffic": "Port traffic sensors",
+                    "sensor_client_traffic": "Client traffic sensors",
+                    "sensor_simple_queues": "Simple queues switches",
+                    "sensor_nat": "NAT switches",
+                    "sensor_scripts": "Script switches",
+                    "sensor_environment": "Environment variable sensors",
+                    "sensor_kidcontrol": "Дитячий контроль",
+                    "sensor_mangle": "Mangle switches",
+                    "sensor_ppp": "Користувачі PPP",
+                    "sensor_filter": "Filter switches",
+                    "sensor_client_captive": "Captive portal data"
+                },
+                "title": "Mikrotik Router options (2\/2)",
+                "description": "Enable sensors and switches"
+            }
+        }
+    }
+}

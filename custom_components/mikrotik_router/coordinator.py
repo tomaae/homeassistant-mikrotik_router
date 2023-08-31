@@ -442,9 +442,9 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
     # ---------------------------
     #   execute
     # ---------------------------
-    def execute(self, path, command, param, value):
+    def execute(self, path, command, param, value, attributes=None):
         """Change value using Mikrotik API"""
-        return self.api.execute(path, command, param, value)
+        return self.api.execute(path, command, param, value, attributes)
 
     # ---------------------------
     #   run_script
@@ -1487,7 +1487,9 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         ):
             return
 
-        self.execute("/system/package/update", "check-for-updates", None, None)
+        self.execute(
+            "/system/package/update", "check-for-updates", None, None, {"duration": 10}
+        )
         self.ds["fw-update"] = parse_api(
             data=self.ds["fw-update"],
             source=self.api.query("/system/package/update"),
