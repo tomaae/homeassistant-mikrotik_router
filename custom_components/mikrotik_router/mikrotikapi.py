@@ -44,7 +44,7 @@ class MikrotikAPI:
 
         self._connection = None
         self._connected = False
-        self._reconnected = False
+        self._reconnected = True
         self._connection_epoch = 0
         self._connection_retry_sec = 58
         self.error = None

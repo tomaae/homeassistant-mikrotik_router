@@ -1,6 +1,9 @@
-"""Definitions for Mikrotik Router sensor entities."""
+"""Definitions for sensor entities."""
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from typing import List
+
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.components.sensor import (
@@ -9,12 +12,15 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
 )
 from homeassistant.const import (
-    TEMP_CELSIUS,
-    ELECTRIC_POTENTIAL_VOLT,
-    POWER_WATT,
     PERCENTAGE,
-    DATA_BYTES,
+    REVOLUTIONS_PER_MINUTE,
+    UnitOfTemperature,
+    UnitOfDataRate,
+    UnitOfInformation,
+    UnitOfElectricPotential,
+    UnitOfPower,
 )
+
 from .const import DOMAIN
 
 DEVICE_ATTRIBUTES_IFACE = [
@@ -113,28 +119,30 @@ DEVICE_ATTRIBUTES_GPS = [
 class MikrotikSensorEntityDescription(SensorEntityDescription):
     """Class describing mikrotik entities."""
 
-    ha_group: str = ""
-    ha_connection: str = ""
-    ha_connection_value: str = ""
-    data_path: str = ""
-    data_attribute: str = ""
-    data_name: str = ""
+    ha_group: str | None = None
+    ha_connection: str | None = None
+    ha_connection_value: str | None = None
+    data_path: str | None = None
+    data_attribute: str | None = None
+    data_name: str | None = None
     data_name_comment: bool = False
-    data_uid: str = ""
-    data_reference: str = ""
+    data_uid: str | None = None
+    data_reference: str | None = None
     data_attributes_list: List = field(default_factory=lambda: [])
     func: str = "MikrotikSensor"
 
 
-SENSOR_TYPES = {
-    "system_temperature": MikrotikSensorEntityDescription(
+SENSOR_TYPES: tuple[MikrotikSensorEntityDescription, ...] = (
+    MikrotikSensorEntityDescription(
         key="system_temperature",
         name="Temperature",
         icon="mdi:thermometer",
-        native_unit_of_measurement=TEMP_CELSIUS,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        suggested_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        suggested_display_precision=0,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
-        entity_category=None,
+        entity_category=EntityCategory.DIAGNOSTIC,
         ha_group="System",
         data_path="health",
         data_attribute="temperature",
@@ -142,11 +150,13 @@ SENSOR_TYPES = {
         data_uid="",
         data_reference="",
     ),
-    "system_voltage": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="system_voltage",
         name="Voltage",
         icon="mdi:lightning-bolt",
-        native_unit_of_measurement=ELECTRIC_POTENTIAL_VOLT,
+        native_unit_of_measurement=UnitOfElectricPotential.VOLT,
+        suggested_unit_of_measurement=UnitOfElectricPotential.VOLT,
+        suggested_display_precision=1,
         device_class=SensorDeviceClass.VOLTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -157,14 +167,16 @@ SENSOR_TYPES = {
         data_uid="",
         data_reference="",
     ),
-    "system_cpu-temperature": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="system_cpu-temperature",
         name="CPU temperature",
         icon="mdi:thermometer",
-        native_unit_of_measurement=TEMP_CELSIUS,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        suggested_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        suggested_display_precision=0,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
-        entity_category=None,
+        entity_category=EntityCategory.DIAGNOSTIC,
         ha_group="System",
         data_path="health",
         data_attribute="cpu-temperature",
@@ -172,14 +184,16 @@ SENSOR_TYPES = {
         data_uid="",
         data_reference="",
     ),
-    "system_switch-temperature": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="system_switch-temperature",
         name="Switch temperature",
         icon="mdi:thermometer",
-        native_unit_of_measurement=TEMP_CELSIUS,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        suggested_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        suggested_display_precision=0,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
-        entity_category=None,
+        entity_category=EntityCategory.DIAGNOSTIC,
         ha_group="System",
         data_path="health",
         data_attribute="switch-temperature",
@@ -187,14 +201,16 @@ SENSOR_TYPES = {
         data_uid="",
         data_reference="",
     ),
-    "system_board-temperature1": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="system_board-temperature1",
         name="Board temperature",
         icon="mdi:thermometer",
-        native_unit_of_measurement=TEMP_CELSIUS,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        suggested_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        suggested_display_precision=0,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
-        entity_category=None,
+        entity_category=EntityCategory.DIAGNOSTIC,
         ha_group="System",
         data_path="health",
         data_attribute="board-temperature1",
@@ -202,14 +218,16 @@ SENSOR_TYPES = {
         data_uid="",
         data_reference="",
     ),
-    "system_power-consumption": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="system_power-consumption",
         name="Power consumption",
         icon="mdi:transmission-tower",
-        native_unit_of_measurement=POWER_WATT,
+        native_unit_of_measurement=UnitOfPower.WATT,
+        suggested_unit_of_measurement=UnitOfPower.WATT,
+        suggested_display_precision=0,
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
-        entity_category=None,
+        entity_category=EntityCategory.DIAGNOSTIC,
         ha_group="System",
         data_path="health",
         data_attribute="power-consumption",
@@ -217,14 +235,14 @@ SENSOR_TYPES = {
         data_uid="",
         data_reference="",
     ),
-    "system_fan1-speed": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="system_fan1-speed",
         name="Fan1 speed",
         icon="mdi:fan",
-        native_unit_of_measurement="RPM",
+        native_unit_of_measurement=REVOLUTIONS_PER_MINUTE,
         device_class=None,
         state_class=SensorStateClass.MEASUREMENT,
-        entity_category=None,
+        entity_category=EntityCategory.DIAGNOSTIC,
         ha_group="System",
         data_path="health",
         data_attribute="fan1-speed",
@@ -232,14 +250,14 @@ SENSOR_TYPES = {
         data_uid="",
         data_reference="",
     ),
-    "system_fan2-speed": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="system_fan2-speed",
         name="Fan2 speed",
         icon="mdi:fan",
-        native_unit_of_measurement="RPM",
+        native_unit_of_measurement=REVOLUTIONS_PER_MINUTE,
         device_class=None,
         state_class=SensorStateClass.MEASUREMENT,
-        entity_category=None,
+        entity_category=EntityCategory.DIAGNOSTIC,
         ha_group="System",
         data_path="health",
         data_attribute="fan2-speed",
@@ -247,7 +265,7 @@ SENSOR_TYPES = {
         data_uid="",
         data_reference="",
     ),
-    "system_uptime": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="system_uptime",
         name="Uptime",
         icon=None,
@@ -262,7 +280,7 @@ SENSOR_TYPES = {
         data_uid="",
         data_reference="",
     ),
-    "system_cpu-load": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="system_cpu-load",
         name="CPU load",
         icon="mdi:speedometer",
@@ -277,7 +295,7 @@ SENSOR_TYPES = {
         data_uid="",
         data_reference="",
     ),
-    "system_memory-usage": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="system_memory-usage",
         name="Memory usage",
         icon="mdi:memory",
@@ -292,7 +310,7 @@ SENSOR_TYPES = {
         data_uid="",
         data_reference="",
     ),
-    "system_hdd-usage": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="system_hdd-usage",
         name="HDD usage",
         icon="mdi:harddisk",
@@ -307,7 +325,7 @@ SENSOR_TYPES = {
         data_uid="",
         data_reference="",
     ),
-    "system_clients-wired": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="system_clients-wired",
         name="Wired clients",
         icon="mdi:lan",
@@ -322,7 +340,7 @@ SENSOR_TYPES = {
         data_uid="",
         data_reference="",
     ),
-    "system_clients-wireless": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="system_clients-wireless",
         name="Wireless clients",
         icon="mdi:wifi",
@@ -337,7 +355,7 @@ SENSOR_TYPES = {
         data_uid="",
         data_reference="",
     ),
-    "system_captive-authorized": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="system_captive-authorized",
         name="Captive portal clients",
         icon="mdi:key-wireless",
@@ -352,7 +370,7 @@ SENSOR_TYPES = {
         data_uid="",
         data_reference="",
     ),
-    "system_gps-latitude": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="system_gps-latitude",
         name="Latitude",
         icon="mdi:latitude",
@@ -368,7 +386,7 @@ SENSOR_TYPES = {
         data_reference="",
         data_attributes_list=DEVICE_ATTRIBUTES_GPS,
     ),
-    "system_gps-longitude": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="system_gps-longitude",
         name="Longitude",
         icon="mdi:longitude",
@@ -384,12 +402,14 @@ SENSOR_TYPES = {
         data_reference="",
         data_attributes_list=DEVICE_ATTRIBUTES_GPS,
     ),
-    "traffic_tx": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="traffic_tx",
         name="TX",
         icon="mdi:upload-network-outline",
-        native_unit_of_measurement="data__tx-attr",
-        device_class=None,
+        native_unit_of_measurement=UnitOfDataRate.BYTES_PER_SECOND,
+        suggested_unit_of_measurement=UnitOfDataRate.KILOBYTES_PER_SECOND,
+        suggested_display_precision=1,
+        device_class=SensorDeviceClass.DATA_RATE,
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=None,
         ha_group="data__default-name",
@@ -403,12 +423,14 @@ SENSOR_TYPES = {
         data_attributes_list=DEVICE_ATTRIBUTES_IFACE,
         func="MikrotikInterfaceTrafficSensor",
     ),
-    "traffic_rx": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="traffic_rx",
         name="RX",
         icon="mdi:download-network-outline",
-        native_unit_of_measurement="data__rx-attr",
-        device_class=None,
+        native_unit_of_measurement=UnitOfDataRate.BYTES_PER_SECOND,
+        suggested_unit_of_measurement=UnitOfDataRate.KILOBYTES_PER_SECOND,
+        suggested_display_precision=1,
+        device_class=SensorDeviceClass.DATA_RATE,
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=None,
         ha_group="data__default-name",
@@ -422,12 +444,14 @@ SENSOR_TYPES = {
         data_attributes_list=DEVICE_ATTRIBUTES_IFACE,
         func="MikrotikInterfaceTrafficSensor",
     ),
-    "total_tx": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="tx-total",
         name="TX total",
         icon="mdi:upload-network",
-        native_unit_of_measurement=DATA_BYTES,
-        device_class=None,
+        native_unit_of_measurement=UnitOfInformation.BITS,
+        suggested_unit_of_measurement=UnitOfInformation.GIGABYTES,
+        suggested_display_precision=1,
+        device_class=SensorDeviceClass.DATA_SIZE,
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_category=None,
         ha_group="data__default-name",
@@ -441,12 +465,14 @@ SENSOR_TYPES = {
         data_attributes_list=DEVICE_ATTRIBUTES_IFACE,
         func="MikrotikInterfaceTrafficSensor",
     ),
-    "total_rx": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="rx-total",
         name="RX total",
         icon="mdi:download-network",
-        native_unit_of_measurement=DATA_BYTES,
-        device_class=None,
+        native_unit_of_measurement=UnitOfInformation.BITS,
+        suggested_unit_of_measurement=UnitOfInformation.GIGABYTES,
+        suggested_display_precision=1,
+        device_class=SensorDeviceClass.DATA_SIZE,
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_category=None,
         ha_group="data__default-name",
@@ -460,12 +486,14 @@ SENSOR_TYPES = {
         data_attributes_list=DEVICE_ATTRIBUTES_IFACE,
         func="MikrotikInterfaceTrafficSensor",
     ),
-    "client_traffic_lan_tx": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="client_traffic_lan_tx",
         name="LAN TX",
         icon="mdi:upload-network",
-        native_unit_of_measurement="data__tx-rx-attr",
-        device_class=None,
+        native_unit_of_measurement=UnitOfDataRate.BYTES_PER_SECOND,
+        suggested_unit_of_measurement=UnitOfDataRate.KILOBYTES_PER_SECOND,
+        suggested_display_precision=1,
+        device_class=SensorDeviceClass.DATA_RATE,
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=None,
         ha_group="",
@@ -477,14 +505,16 @@ SENSOR_TYPES = {
         data_uid="",
         data_reference="mac-address",
         data_attributes_list=DEVICE_ATTRIBUTES_CLIENT_TRAFFIC,
-        func="MikrotikClientTrafficSensor",
+        # func="MikrotikClientTrafficSensor",
     ),
-    "client_traffic_lan_rx": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="client_traffic_lan_rx",
         name="LAN RX",
         icon="mdi:download-network",
-        native_unit_of_measurement="data__tx-rx-attr",
-        device_class=None,
+        native_unit_of_measurement=UnitOfDataRate.BYTES_PER_SECOND,
+        suggested_unit_of_measurement=UnitOfDataRate.KILOBYTES_PER_SECOND,
+        suggested_display_precision=1,
+        device_class=SensorDeviceClass.DATA_RATE,
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=None,
         ha_group="",
@@ -496,14 +526,16 @@ SENSOR_TYPES = {
         data_uid="",
         data_reference="mac-address",
         data_attributes_list=DEVICE_ATTRIBUTES_CLIENT_TRAFFIC,
-        func="MikrotikClientTrafficSensor",
+        # func="MikrotikClientTrafficSensor",
     ),
-    "client_traffic_wan_tx": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="client_traffic_wan_tx",
         name="WAN TX",
         icon="mdi:upload-network",
-        native_unit_of_measurement="data__tx-rx-attr",
-        device_class=None,
+        native_unit_of_measurement=UnitOfDataRate.BYTES_PER_SECOND,
+        suggested_unit_of_measurement=UnitOfDataRate.KILOBYTES_PER_SECOND,
+        suggested_display_precision=1,
+        device_class=SensorDeviceClass.DATA_RATE,
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=None,
         ha_group="",
@@ -515,14 +547,16 @@ SENSOR_TYPES = {
         data_uid="",
         data_reference="mac-address",
         data_attributes_list=DEVICE_ATTRIBUTES_CLIENT_TRAFFIC,
-        func="MikrotikClientTrafficSensor",
+        # func="MikrotikClientTrafficSensor",
     ),
-    "client_traffic_wan_rx": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="client_traffic_wan_rx",
         name="WAN RX",
         icon="mdi:download-network",
-        native_unit_of_measurement="data__tx-rx-attr",
-        device_class=None,
+        native_unit_of_measurement=UnitOfDataRate.BYTES_PER_SECOND,
+        suggested_unit_of_measurement=UnitOfDataRate.KILOBYTES_PER_SECOND,
+        suggested_display_precision=1,
+        device_class=SensorDeviceClass.DATA_RATE,
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=None,
         ha_group="",
@@ -534,14 +568,16 @@ SENSOR_TYPES = {
         data_uid="",
         data_reference="mac-address",
         data_attributes_list=DEVICE_ATTRIBUTES_CLIENT_TRAFFIC,
-        func="MikrotikClientTrafficSensor",
+        # func="MikrotikClientTrafficSensor",
     ),
-    "client_traffic_tx": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="client_traffic_tx",
         name="TX",
         icon="mdi:upload-network",
-        native_unit_of_measurement="data__tx-rx-attr",
-        device_class=None,
+        native_unit_of_measurement=UnitOfDataRate.BYTES_PER_SECOND,
+        suggested_unit_of_measurement=UnitOfDataRate.KILOBYTES_PER_SECOND,
+        suggested_display_precision=1,
+        device_class=SensorDeviceClass.DATA_RATE,
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=None,
         ha_group="",
@@ -553,14 +589,16 @@ SENSOR_TYPES = {
         data_uid="",
         data_reference="mac-address",
         data_attributes_list=DEVICE_ATTRIBUTES_CLIENT_TRAFFIC,
-        func="MikrotikClientTrafficSensor",
+        # func="MikrotikClientTrafficSensor",
     ),
-    "client_traffic_rx": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="client_traffic_rx",
         name="RX",
         icon="mdi:download-network",
-        native_unit_of_measurement="data__tx-rx-attr",
-        device_class=None,
+        native_unit_of_measurement=UnitOfDataRate.BYTES_PER_SECOND,
+        suggested_unit_of_measurement=UnitOfDataRate.KILOBYTES_PER_SECOND,
+        suggested_display_precision=1,
+        device_class=SensorDeviceClass.DATA_RATE,
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=None,
         ha_group="",
@@ -572,9 +610,9 @@ SENSOR_TYPES = {
         data_uid="",
         data_reference="mac-address",
         data_attributes_list=DEVICE_ATTRIBUTES_CLIENT_TRAFFIC,
-        func="MikrotikClientTrafficSensor",
+        # func="MikrotikClientTrafficSensor",
     ),
-    "environment": MikrotikSensorEntityDescription(
+    MikrotikSensorEntityDescription(
         key="environment",
         name="",
         icon="mdi:clipboard-list",
@@ -591,6 +629,6 @@ SENSOR_TYPES = {
         data_uid="name",
         data_reference="name",
     ),
-}
+)
 
-SENSOR_SERVICES = {}
+SENSOR_SERVICES = []
