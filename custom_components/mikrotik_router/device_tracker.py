@@ -22,6 +22,7 @@ from homeassistant.util.dt import utcnow
 from homeassistant.components.device_tracker.const import SourceType
 
 from .device_tracker_types import SENSOR_TYPES, SENSOR_SERVICES
+from .coordinator import MikrotikCoordinator
 from .entity import _skip_sensor, MikrotikEntity
 from .helper import format_attribute
 from .const import (
@@ -118,6 +119,16 @@ async def async_setup_entry(
 class MikrotikDeviceTracker(MikrotikEntity, ScannerEntity):
     """Representation of a device tracker."""
 
+    def __init__(
+        self,
+        coordinator: MikrotikCoordinator,
+        entity_description,
+        uid: str | None = None,
+    ):
+        """Initialize entity"""
+        super().__init__(coordinator, entity_description, uid)
+        self._attr_name = None
+
     @property
     def ip_address(self) -> str:
         """Return the primary ip address of the device."""
@@ -168,11 +179,6 @@ class MikrotikHostDeviceTracker(MikrotikDeviceTracker):
             CONF_TRACK_HOSTS_TIMEOUT, DEFAULT_TRACK_HOST_TIMEOUT
         )
         return timedelta(seconds=track_network_hosts_timeout)
-
-    @property
-    def name(self) -> Any:
-        """Return the name."""
-        return None
 
     @property
     def is_connected(self) -> bool:
