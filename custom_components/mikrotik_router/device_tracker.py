@@ -49,6 +49,8 @@ async def async_add_entities(
     @callback
     async def async_update_controller(coordinator):
         """Update the values of the controller."""
+        if coordinator.data is None:
+            return
 
         async def async_check_exist(obj, coordinator, uid: None) -> None:
             """Check entity exists."""
