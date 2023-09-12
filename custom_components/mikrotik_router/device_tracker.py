@@ -4,7 +4,7 @@ from __future__ import annotations
 from logging import getLogger
 from collections.abc import Mapping
 from datetime import timedelta
-from typing import Any
+from typing import Any, Callable
 
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
 from homeassistant.config_entries import ConfigEntry
