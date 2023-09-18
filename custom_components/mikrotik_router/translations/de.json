@@ -16,7 +16,7 @@
         },
         "error": {
             "name_exists": "Name existiert bereits",
-            "cannot_connect": "Verbindung zu Mikrotik nicht möglich.",
+            "cannot_connect": "Verbindung zum MikroTik fehlgeschlagen.",
             "ssl_handshake_failure": "SSL Handshake Fehler",
             "connection_timeout": "Mikrotik-Verbindungstimeout.",
             "wrong_login": "Ungültiger Benutzername oder Passwort."
@@ -37,15 +37,15 @@
             },
             "sensor_select": {
                 "data": {
-                    "track_network_hosts": "Verfolgen Sie Netzwerkgeräte",
+                    "track_network_hosts": "Netzwerkgeräte verfolgen",
                     "sensor_port_tracker": "Port-Statussensoren",
                     "sensor_port_traffic": "Port-Durchsatz Sensoren",
                     "sensor_client_traffic": "Client-Durchsatz Sensoren",
                     "sensor_simple_queues": "Einfache Endschalter",
                     "sensor_nat": "NAT-Schalter",
                     "sensor_scripts": "Skript-Schalter",
-                    "sensor_environment": "umgebungsvariablen-Sensoren",
-                    "sensor_kidcontrol": "Kinderkontrolle",
+                    "sensor_environment": "Umgebungsvariablen-Sensoren",
+                    "sensor_kidcontrol": "Kindersicherung",
                     "sensor_mangle": "Mangle-Schalter",
                     "sensor_ppp": "PPP-Nutzer",
                     "sensor_filter": "Schalter für Filterregeln",

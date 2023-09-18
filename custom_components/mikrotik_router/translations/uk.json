@@ -16,43 +16,43 @@
         },
         "error": {
             "name_exists": "Назва вже існує.",
-            "cannot_connect": "Cannot connect to Mikrotik.",
-            "ssl_handshake_failure": "SSL handshake failure",
-            "connection_timeout": "Mikrotik connection timeout.",
-            "wrong_login": "Invalid user name or password."
+            "cannot_connect": "Не можу з'єднатися з Mikrotik.",
+            "ssl_handshake_failure": "Помилка SSH протоколу",
+            "connection_timeout": "Тайм-аут з'єднання з Mikrotik",
+            "wrong_login": "Невірне ім'я або пароль"
         }
     },
     "options": {
         "step": {
             "basic_options": {
                 "data": {
-                    "scan_interval": "Scan interval (requires HA restart)",
-                    "track_iface_clients": "Show client MAC and IP on interfaces",
-                    "unit_of_measurement": "Unit of measurement",
-                    "track_network_hosts_timeout": "Track network devices timeout (seconds)",
-                    "zone": "Zone for device tracker"
+                    "scan_interval": "Інтервал сканування (вимагає перезавантаження HA)",
+                    "track_iface_clients": "Показувати MAC і IP адреси клієнта",
+                    "unit_of_measurement": "Одиниці вимірювання",
+                    "track_network_hosts_timeout": "Тайм-аут відстеження мережевих пристроїв (секунди)",
+                    "zone": "Зона для трекера пристроїв"
                 },
-                "title": "Mikrotik Router options (1\/2)",
+                "title": "Налаштування Mikrotik роутера (1\/2)",
                 "description": "Налаштувати інтеграцію"
             },
             "sensor_select": {
                 "data": {
-                    "track_network_hosts": "Track network devices",
-                    "sensor_port_tracker": "Port tracker sensors",
-                    "sensor_port_traffic": "Port traffic sensors",
-                    "sensor_client_traffic": "Client traffic sensors",
-                    "sensor_simple_queues": "Simple queues switches",
-                    "sensor_nat": "NAT switches",
-                    "sensor_scripts": "Script switches",
-                    "sensor_environment": "Environment variable sensors",
+                    "track_network_hosts": "Відстежувати мережеві пристрої",
+                    "sensor_port_tracker": "Сенсори трекерів портів",
+                    "sensor_port_traffic": "Сенсори трафіку портів",
+                    "sensor_client_traffic": "Сенсори трафіку клієнтів",
+                    "sensor_simple_queues": "Прості черги і перемикачі",
+                    "sensor_nat": "Перемикачі NAT",
+                    "sensor_scripts": "Перемикачі скриптів",
+                    "sensor_environment": "Сенсори змінних оточення",
                     "sensor_kidcontrol": "Дитячий контроль",
-                    "sensor_mangle": "Mangle switches",
+                    "sensor_mangle": "Керувати перемикачами",
                     "sensor_ppp": "Користувачі PPP",
-                    "sensor_filter": "Filter switches",
-                    "sensor_client_captive": "Captive portal data"
+                    "sensor_filter": "Фільтрувати перемикачі",
+                    "sensor_client_captive": "Дані Captive portal"
                 },
                 "title": "Mikrotik Router options (2\/2)",
-                "description": "Enable sensors and switches"
+                "description": "Увімкнути сенсори і перемикачі"
             }
         }
     }
