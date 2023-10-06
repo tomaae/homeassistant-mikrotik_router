@@ -487,7 +487,6 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 },
             ],
         )
-        print(packages)
 
         if 0 < self.major_fw_version < 7:
             if "ppp" in packages:
