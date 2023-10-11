@@ -106,6 +106,11 @@ Track availability of all network devices. All devices visible to Mikrotik devic
 
 ![Host tracker](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/host_tracker.png)
 
+## Netwatch Tracking
+Track netwatch status.
+
+![Netwatch](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/netwatch_tracker.png)
+
 ## Scripts
 Execute Mikrotik Router scripts.
 You can execute scripts by automatically created switches or using services.

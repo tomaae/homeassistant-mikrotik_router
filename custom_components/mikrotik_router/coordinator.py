@@ -59,7 +59,7 @@ from .const import (
     CONF_SENSOR_SCRIPTS,
     DEFAULT_SENSOR_SCRIPTS,
     CONF_SENSOR_ENVIRONMENT,
-    DEFAULT_SENSOR_ENVIRONMENT,
+    DEFAULT_SENSOR_ENVIRONMENT, CONF_SENSOR_NETWATCH_TRACKER, DEFAULT_SENSOR_NETWATCH_TRACKER,
 )
 from .exceptions import ApiEntryNotFound
 from .apiparser import parse_api
@@ -258,6 +258,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             "environment": {},
             "ups": {},
             "gps": {},
+            "netwatch": {}
         }
 
         self.notified_flags = []
@@ -385,6 +386,14 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         return self.config_entry.options.get(
             CONF_SENSOR_KIDCONTROL, DEFAULT_SENSOR_KIDCONTROL
         )
+
+    # ---------------------------
+    #   option_sensor_netwatch
+    # ---------------------------
+    @property
+    def option_sensor_netwatch(self):
+        """Config entry option to not track ARP."""
+        return self.config_entry.options.get(CONF_SENSOR_NETWATCH_TRACKER, DEFAULT_SENSOR_NETWATCH_TRACKER)
 
     # ---------------------------
     #   option_sensor_ppp
@@ -626,6 +635,9 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
         if self.api.connected() and self.option_sensor_filter:
             await self.hass.async_add_executor_job(self.get_filter)
+
+        if self.api.connected() and self.option_sensor_netwatch:
+            await self.hass.async_add_executor_job(self.get_netwatch)
 
         if self.api.connected() and self.support_ppp and self.option_sensor_ppp:
             await self.hass.async_add_executor_job(self.get_ppp)
@@ -1309,6 +1321,32 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 self.ds["ppp_secret"][uid]["caller-id"] = "not connected"
                 self.ds["ppp_secret"][uid]["address"] = "not connected"
                 self.ds["ppp_secret"][uid]["encoding"] = "not connected"
+
+    # ---------------------------
+    #   get_netwatch
+    # ---------------------------
+    def get_netwatch(self) -> None:
+        """Get netwatch data from Mikrotik"""
+        self.ds["netwatch"] = parse_api(
+            data=self.ds["netwatch"],
+            source=self.api.query("/tool/netwatch"),
+            key="host",
+            vals=[
+                {"name": "host"},
+                {"name": "type"},
+                {"name": "interval"},
+                {"name": "port"},
+                {"name": "http-codes"},
+                {"name": "status", "type": "bool", "default": "unknown"},
+                {"name": "comment"},
+                {
+                    "name": "enabled",
+                    "source": "disabled",
+                    "type": "bool",
+                    "reverse": True,
+                },
+            ],
+        )
 
     # ---------------------------
     #   get_system_routerboard
