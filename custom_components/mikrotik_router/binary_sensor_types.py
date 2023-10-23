@@ -108,6 +108,15 @@ DEVICE_ATTRIBUTES_UPS = [
     "hid-self-test",
 ]
 
+DEVICE_ATTRIBUTES_NETWATCH = [
+    "host",
+    "type",
+    "interval",
+    "port",
+    "http-codes",
+    "status",
+    "comment",
+]
 
 @dataclass
 class MikrotikBinarySensorEntityDescription(BinarySensorEntityDescription):
@@ -176,6 +185,24 @@ SENSOR_TYPES: tuple[BinarySensorEntityDescription, ...] = (
         data_reference="default-name",
         data_attributes_list=DEVICE_ATTRIBUTES_IFACE,
         func="MikrotikPortBinarySensor",
+    ),
+    MikrotikBinarySensorEntityDescription(
+        key="netwatch",
+        name="Netwatch",
+        icon_enabled="mdi:lan-connect",
+        icon_disabled="mdi:lan-pending",
+        device_class=BinarySensorDeviceClass.CONNECTIVITY,
+        ha_group="Netwatch",
+        ha_connection=DOMAIN,
+        ha_connection_value="Netwatch",
+        data_path="netwatch",
+        data_attribute="status",
+        data_name="host",
+        data_name_comment=True,
+        data_uid="host",
+        data_reference="host",
+        data_attributes_list=DEVICE_ATTRIBUTES_NETWATCH,
+        func="MikrotikBinarySensor",
     ),
 )
 

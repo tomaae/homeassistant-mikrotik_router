@@ -59,6 +59,8 @@ from .const import (
     DEFAULT_PORT,
     DEFAULT_DEVICE_NAME,
     DEFAULT_SSL,
+    DEFAULT_SENSOR_NETWATCH_TRACKER,
+    CONF_SENSOR_NETWATCH_TRACKER,
 )
 from .mikrotikapi import MikrotikAPI
 
@@ -278,6 +280,12 @@ class MikrotikControllerOptionsFlowHandler(OptionsFlow):
                         CONF_SENSOR_KIDCONTROL,
                         default=self.config_entry.options.get(
                             CONF_SENSOR_KIDCONTROL, DEFAULT_SENSOR_KIDCONTROL
+                        ),
+                    ): bool,
+                    vol.Optional(
+                        CONF_SENSOR_NETWATCH_TRACKER,
+                        default=self.config_entry.options.get(
+                            CONF_SENSOR_NETWATCH_TRACKER, DEFAULT_SENSOR_NETWATCH_TRACKER
                         ),
                     ): bool,
                     vol.Optional(
