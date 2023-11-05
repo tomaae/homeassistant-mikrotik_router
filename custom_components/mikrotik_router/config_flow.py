@@ -285,7 +285,8 @@ class MikrotikControllerOptionsFlowHandler(OptionsFlow):
                     vol.Optional(
                         CONF_SENSOR_NETWATCH_TRACKER,
                         default=self.config_entry.options.get(
-                            CONF_SENSOR_NETWATCH_TRACKER, DEFAULT_SENSOR_NETWATCH_TRACKER
+                            CONF_SENSOR_NETWATCH_TRACKER,
+                            DEFAULT_SENSOR_NETWATCH_TRACKER,
                         ),
                     ): bool,
                     vol.Optional(

@@ -118,6 +118,7 @@ DEVICE_ATTRIBUTES_NETWATCH = [
     "comment",
 ]
 
+
 @dataclass
 class MikrotikBinarySensorEntityDescription(BinarySensorEntityDescription):
     """Class describing mikrotik entities."""

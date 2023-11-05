@@ -59,7 +59,9 @@ from .const import (
     CONF_SENSOR_SCRIPTS,
     DEFAULT_SENSOR_SCRIPTS,
     CONF_SENSOR_ENVIRONMENT,
-    DEFAULT_SENSOR_ENVIRONMENT, CONF_SENSOR_NETWATCH_TRACKER, DEFAULT_SENSOR_NETWATCH_TRACKER,
+    DEFAULT_SENSOR_ENVIRONMENT,
+    CONF_SENSOR_NETWATCH_TRACKER,
+    DEFAULT_SENSOR_NETWATCH_TRACKER,
 )
 from .exceptions import ApiEntryNotFound
 from .apiparser import parse_api
@@ -258,7 +260,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             "environment": {},
             "ups": {},
             "gps": {},
-            "netwatch": {}
+            "netwatch": {},
         }
 
         self.notified_flags = []
@@ -393,7 +395,9 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
     @property
     def option_sensor_netwatch(self):
         """Config entry option to not track ARP."""
-        return self.config_entry.options.get(CONF_SENSOR_NETWATCH_TRACKER, DEFAULT_SENSOR_NETWATCH_TRACKER)
+        return self.config_entry.options.get(
+            CONF_SENSOR_NETWATCH_TRACKER, DEFAULT_SENSOR_NETWATCH_TRACKER
+        )
 
     # ---------------------------
     #   option_sensor_ppp
