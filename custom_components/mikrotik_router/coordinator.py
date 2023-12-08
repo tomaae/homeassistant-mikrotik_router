@@ -284,13 +284,16 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         self.host_tracking_initialized = False
 
         self.support_capsman = False
+        self.support_wifi = False
         self.support_wireless = False
         self.support_wifiwave2 = False
         self.support_ppp = False
         self.support_ups = False
         self.support_gps = False
+        self._wifimodule = None
 
         self.major_fw_version = 0
+        self.minor_fw_version = 0
 
         self.async_mac_lookup = AsyncMacLookup()
         self.accessrights_reported = False
@@ -517,10 +520,37 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             self.support_wireless = True
             if "wifiwave2" in packages and packages["wifiwave2"]["enabled"]:
                 self.support_wifiwave2 = True
+                self.support_wifi = False
                 self.support_capsman = False
+                self._wifimodule = "wifiwave2"
+                
+            elif "wifi" in packages and packages["wifi"]["enabled"]:
+                self.support_wifiwave2 = False
+                self.support_wifi = True
+                self.support_capsman = False
+                self._wifimodule = "wifi"
+                
+            elif "wifi-qcom" in packages and packages["wifi-qcom"]["enabled"]:
+                self.support_wifiwave2 = False
+                self.support_wifi = True
+                self.support_capsman = False
+                self._wifimodule = "wifi"
+                
+            elif "wifi-qcom-ac" in packages and packages["wifi-qcom-ac"]["enabled"]:
+                self.support_wifiwave2 = False
+                self.support_wifi = True
+                self.support_capsman = False
+                self._wifimodule = "wifi"
+                
             else:
                 self.support_wifiwave2 = False
+                self.support_wifi = False
                 self.support_capsman = True
+                
+            _LOGGER.debug("Mikrotik %s wifi module=%s",
+                    self.host,
+                    self._wifimodule,
+                    )
 
         if "ups" in packages and packages["ups"]["enabled"]:
             self.support_ups = True
@@ -1553,14 +1583,23 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
         if self.ds["fw-update"]["installed-version"] != "unknown":
             try:
-                self.major_fw_version = int(
-                    self.ds["fw-update"].get("installed-version").split(".")[0]
+                full_version = self.ds["fw-update"].get("installed-version")
+                split_end = min(len(full_version),4)
+                version = re.sub("[^0-9\.]", "", full_version[0:split_end])
+                self.major_fw_version = int(version.split(".")[0])
+                self.minor_fw_version = int(version.split(".")[1])
+                _LOGGER.debug(
+                    "Mikrotik %s FW version major=%s minor=%s (%s)",
+                    self.host,
+                    self.major_fw_version,
+                    self.minor_fw_version,
+                    full_version
                 )
             except Exception:
                 _LOGGER.error(
                     "Mikrotik %s unable to determine major FW version (%s).",
                     self.host,
-                    self.ds["fw-update"].get("installed-version"),
+                    full_version,
                 )
 
     # ---------------------------
@@ -1952,9 +1991,18 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
     # ---------------------------
     def get_capsman_hosts(self) -> None:
         """Get CAPS-MAN hosts data from Mikrotik"""
+        
+        if self.major_fw_version >= 7 and self.minor_fw_version > 12:
+            registration_path = "/interface/wifi/registration-table"
+            self._wifimodule = "wifi"
+            
+        else:
+            registration_path= "/caps-man/registration-table"
+            self._wifimodule = "wireless"
+            
         self.ds["capsman_hosts"] = parse_api(
             data={},
-            source=self.api.query("/caps-man/registration-table"),
+            source=self.api.query(registration_path),
             key="mac-address",
             vals=[
                 {"name": "mac-address"},
@@ -1968,10 +2016,10 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
     # ---------------------------
     def get_wireless(self) -> None:
         """Get wireless data from Mikrotik"""
-        wifimodule = "wifiwave2" if self.support_wifiwave2 else "wireless"
+
         self.ds["wireless"] = parse_api(
             data=self.ds["wireless"],
-            source=self.api.query(f"/interface/{wifimodule}"),
+            source=self.api.query(f"/interface/{self._wifimodule}"),
             key="name",
             vals=[
                 {"name": "master-interface", "default": ""},
@@ -2018,10 +2066,9 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
     # ---------------------------
     def get_wireless_hosts(self) -> None:
         """Get wireless hosts data from Mikrotik"""
-        wifimodule = "wifiwave2" if self.support_wifiwave2 else "wireless"
         self.ds["wireless_hosts"] = parse_api(
             data={},
-            source=self.api.query(f"/interface/{wifimodule}/registration-table"),
+            source=self.api.query(f"/interface/{self._wifimodule}/registration-table"),
             key="mac-address",
             vals=[
                 {"name": "mac-address"},
