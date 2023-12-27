@@ -534,6 +534,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 
             else:
                 self.support_capsman = True
+                self.support_wireless = bool(self.minor_fw_version < 13)
                 
             _LOGGER.debug("Mikrotik %s wifi module=%s",
                     self.host,
