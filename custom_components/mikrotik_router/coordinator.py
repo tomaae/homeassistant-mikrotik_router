@@ -1981,7 +1981,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
     def get_capsman_hosts(self) -> None:
         """Get CAPS-MAN hosts data from Mikrotik"""
         
-        if self.major_fw_version >= 7 and self.minor_fw_version > 12:
+        if self.major_fw_version > 7 or (self.major_fw_version == 7 and self.minor_fw_version >= 13):
             registration_path = "/interface/wifi/registration-table"
             
         else:
