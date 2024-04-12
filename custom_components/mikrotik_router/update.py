@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 from logging import getLogger
-from requests import get as requests_get
+import aiohttp
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.aiohttp_client import async_create_clientsession
 
 from homeassistant.components.update import (
     UpdateEntity,
@@ -91,18 +92,22 @@ class MikrotikRouterOSUpdate(MikrotikEntity, UpdateEntity):
     async def async_release_notes(self) -> str:
         """Return the release notes."""
         try:
-            response = await self.coordinator.hass.async_add_executor_job(
-                requests_get,
-                f"https://cdn.mikrotik.com/routeros/{self._data['latest-version']}/CHANGELOG",
-            )
-
-            if response.status_code == 200:
-                return response.text.replace(chr(10), "<br />").replace("*) ", "- ")
-
+            async with async_create_clientsession(self.hass) as session:
+                async with session.get(
+                    f"https://cdn.mikrotik.com/routeros/{self._data['latest-version']}/CHANGELOG"
+                ) as response:
+                    if response.status == 200:
+                        text = await response.text()
+                        return text.replace("*) ", "- ")
+                    else:
+                        _LOGGER.warning(
+                            "Failed to fetch release notes due to a network error."
+                        )
+                        return "Failed to fetch release notes due to a network error."
         except Exception as e:
             _LOGGER.warning("Failed to download release notes (%s)", e)
 
-        return "Failed to download release notes"
+        return "Error fetching release notes."
 
     @property
     def release_url(self) -> str:
