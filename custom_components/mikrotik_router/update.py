@@ -1,4 +1,5 @@
 """Support for the Mikrotik Router update service."""
+
 from __future__ import annotations
 
 from logging import getLogger
@@ -92,7 +93,7 @@ class MikrotikRouterOSUpdate(MikrotikEntity, UpdateEntity):
         try:
             response = await self.coordinator.hass.async_add_executor_job(
                 requests_get,
-                f"https://mikrotik.com/download/changelogs?ax=loadLog&val={self._data['latest-version']}",
+                f"https://cdn.mikrotik.com/routeros/{self._data['latest-version']}/CHANGELOG",
             )
 
             if response.status_code == 200:
