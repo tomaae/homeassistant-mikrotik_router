@@ -97,7 +97,7 @@ class MikrotikRouterOSUpdate(MikrotikEntity, UpdateEntity):
             )
 
             if response.status_code == 200:
-                return response.text.replace(chr(10), "<br />")
+                return response.text.replace(chr(10), "<br />").replace("*) ", "- ")
 
         except Exception as e:
             _LOGGER.warning("Failed to download release notes (%s)", e)
