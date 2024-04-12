@@ -9,7 +9,7 @@ from typing import Any
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.aiohttp_client import async_create_clientsession
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from homeassistant.components.update import (
     UpdateEntity,
@@ -92,18 +92,18 @@ class MikrotikRouterOSUpdate(MikrotikEntity, UpdateEntity):
     async def async_release_notes(self) -> str:
         """Return the release notes."""
         try:
-            async with async_create_clientsession(self.hass) as session:
-                async with session.get(
-                    f"https://cdn.mikrotik.com/routeros/{self._data['latest-version']}/CHANGELOG"
-                ) as response:
-                    if response.status == 200:
-                        text = await response.text()
-                        return text.replace("*) ", "- ")
-                    else:
-                        _LOGGER.warning(
-                            "Failed to fetch release notes due to a network error."
-                        )
-                        return "Failed to fetch release notes due to a network error."
+            session = async_get_clientsession(self.hass)
+            async with session.get(
+                f"https://cdn.mikrotik.com/routeros/{self._data['latest-version']}/CHANGELOG"
+            ) as response:
+                if response.status == 200:
+                    text = await response.text()
+                    return text.replace("*) ", "- ")
+                else:
+                    _LOGGER.warning(
+                        "Failed to fetch release notes due to a network error."
+                    )
+                    return "Failed to fetch release notes due to a network error."
         except Exception as e:
             _LOGGER.warning("Failed to download release notes (%s)", e)
 
