@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from logging import getLogger
-import aiohttp
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
