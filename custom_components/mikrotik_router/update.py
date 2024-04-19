@@ -103,7 +103,7 @@ class MikrotikRouterOSUpdate(MikrotikEntity, UpdateEntity):
             changelogs = await asyncio.gather(*tasks)
 
             # Combine all non-empty changelogs, maintaining reverse order
-            combined_changelogs = "\n".join(filter(None, changelogs))
+            combined_changelogs = "\n\n".join(filter(None, changelogs))
             return combined_changelogs.replace("*) ", "- ")
 
         except Exception as e:
