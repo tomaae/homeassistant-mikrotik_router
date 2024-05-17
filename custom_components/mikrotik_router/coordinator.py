@@ -2115,6 +2115,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
             for key in ["address", "mac-address", "interface"]:
                 self.ds["host"][uid][key] = vals[key]
+            if vals["status"] == "bound":
+                self.ds["host"][uid]["last-seen"] = utcnow()
 
         # Add hosts from ARP
         for uid, vals in self.ds["arp"].items():
