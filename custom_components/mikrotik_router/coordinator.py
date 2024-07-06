@@ -1376,7 +1376,9 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
     # ---------------------------
     def get_system_routerboard(self) -> None:
         """Get routerboard data from Mikrotik"""
-        if self.ds["resource"]["board-name"] in ("x86", "CHR"):
+        if self.ds["resource"]["board-name"].startswith("x86") or self.ds["resource"][
+            "board-name"
+        ].startswith("CHR"):
             self.ds["routerboard"]["routerboard"] = False
             self.ds["routerboard"]["model"] = self.ds["resource"]["board-name"]
             self.ds["routerboard"]["serial-number"] = "N/A"
