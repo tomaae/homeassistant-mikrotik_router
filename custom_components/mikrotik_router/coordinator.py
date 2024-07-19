@@ -1425,6 +1425,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                     {"name": "cpu-temperature", "default": 0},
                     {"name": "power-consumption", "default": 0},
                     {"name": "board-temperature1", "default": 0},
+                    {"name": "phy-temperature", "default": 0},
                     {"name": "fan1-speed", "default": 0},
                     {"name": "fan2-speed", "default": 0},
                 ],
