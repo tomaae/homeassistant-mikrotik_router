@@ -532,6 +532,10 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 self.support_capsman = False
                 self._wifimodule = "wifi"
                 
+            elif self.minor_fw_version >= 13:
+                self.support_capsman = False
+                self._wifimodule = "wifi"
+                
             else:
                 self.support_capsman = True
                 self.support_wireless = bool(self.minor_fw_version < 13)
