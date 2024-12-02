@@ -249,7 +249,8 @@ class MikrotikMangleSwitch(MikrotikSwitch):
                 f"{self._data['chain']},{self._data['action']},{self._data['protocol']},"
                 f"{self._data['src-address']}:{self._data['src-port']}-"
                 f"{self._data['dst-address']}:{self._data['dst-port']},"
-                f"{self._data['src-address-list']}-{self._data['dst-address-list']}"
+                f"{self._data['src-address-list']}-{self._data['dst-address-list']},"
+                f"{self._data['comment']}"
             ):
                 value = self.coordinator.data["mangle"][uid][".id"]
 
