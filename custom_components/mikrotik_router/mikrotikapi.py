@@ -122,7 +122,9 @@ class MikrotikAPI:
             if self._ssl_wrapper is None:
                 ssl_context = ssl.create_default_context()
                 ssl_context.check_hostname = False
-                ssl_context.verify_mode = ssl.CERT_NONE
+                # Disable strict checking
+                ssl_context.verify_flags &= ~ssl.VERIFY_X509_STRICT
+                ssl_context.verify_mode = ssl.CERT_REQUIRED
                 self._ssl_wrapper = ssl_context.wrap_socket
             kwargs["ssl_wrapper"] = self._ssl_wrapper
         self.lock.acquire()
