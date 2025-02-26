@@ -195,6 +195,9 @@ class MikrotikAPI:
         if response and return_list and not command:
             try:
                 response = list(response)
+            except librouteros.exceptions.MultiTrapError as e:
+                self.lock.release()
+                return None
             except Exception as e:
                 self.disconnect(f"building list for path {path}", e)
                 self.lock.release()
