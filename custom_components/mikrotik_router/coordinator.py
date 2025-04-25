@@ -1581,7 +1581,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             try:
                 full_version = self.ds["fw-update"].get("installed-version")
                 split_end = min(len(full_version),4)
-                version = re.sub("[^0-9\.]", "", full_version[0:split_end])
+                version = re.sub(r"[^0-9\.]", "", full_version[0:split_end])
                 self.major_fw_version = int(version.split(".")[0])
                 self.minor_fw_version = int(version.split(".")[1])
                 _LOGGER.debug(
