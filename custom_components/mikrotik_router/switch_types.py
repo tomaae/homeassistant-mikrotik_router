@@ -184,7 +184,7 @@ class MikrotikSwitchEntityDescription(SwitchEntityDescription):
     func: str = "MikrotikSwitch"
 
 
-SENSOR_TYPES: tuple[MikrotikSensorEntityDescription, ...] = (
+SENSOR_TYPES: tuple[MikrotikSwitchEntityDescription, ...] = (
     MikrotikSwitchEntityDescription(
         key="interface",
         name="Port",
