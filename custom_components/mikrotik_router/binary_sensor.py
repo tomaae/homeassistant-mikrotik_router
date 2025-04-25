@@ -1,4 +1,5 @@
 """Support for the Mikrotik Router binary sensor service."""
+
 from __future__ import annotations
 
 from logging import getLogger

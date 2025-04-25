@@ -1,4 +1,5 @@
 """Definitions for Mikrotik Router device tracker entities."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
