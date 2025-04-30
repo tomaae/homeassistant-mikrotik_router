@@ -15,6 +15,7 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_PASSWORD,
     CONF_SSL,
+    CONF_VERIFY_SSL,
     CONF_ZONE,
     STATE_HOME,
 )
@@ -59,6 +60,7 @@ from .const import (
     DEFAULT_PORT,
     DEFAULT_DEVICE_NAME,
     DEFAULT_SSL,
+    DEFAULT_VERIFY_SSL,
     DEFAULT_SENSOR_NETWATCH_TRACKER,
     CONF_SENSOR_NETWATCH_TRACKER,
 )
@@ -115,6 +117,7 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
                 password=user_input[CONF_PASSWORD],
                 port=user_input[CONF_PORT],
                 use_ssl=user_input[CONF_SSL],
+                ssl_verify=user_input[CONF_VERIFY_SSL],
             )
             if not api.connect():
                 errors[CONF_HOST] = api.error
@@ -135,6 +138,7 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
                 CONF_PASSWORD: DEFAULT_USERNAME,
                 CONF_PORT: DEFAULT_PORT,
                 CONF_SSL: DEFAULT_SSL,
+                CONF_VERIFY_SSL: DEFAULT_VERIFY_SSL,
             },
             errors=errors,
         )
@@ -154,6 +158,9 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
                     vol.Required(CONF_PASSWORD, default=user_input[CONF_PASSWORD]): str,
                     vol.Optional(CONF_PORT, default=user_input[CONF_PORT]): int,
                     vol.Optional(CONF_SSL, default=user_input[CONF_SSL]): bool,
+                    vol.Optional(
+                        CONF_VERIFY_SSL, default=user_input[CONF_VERIFY_SSL]
+                    ): bool,
                 }
             ),
             errors=errors,

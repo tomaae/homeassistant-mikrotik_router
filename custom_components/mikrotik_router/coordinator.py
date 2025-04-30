@@ -26,6 +26,7 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_PASSWORD,
     CONF_SSL,
+    CONF_VERIFY_SSL,
     CONF_ZONE,
     STATE_HOME,
 )
@@ -130,6 +131,7 @@ class MikrotikTrackerCoordinator(DataUpdateCoordinator[None]):
             config_entry.data[CONF_PASSWORD],
             config_entry.data[CONF_PORT],
             config_entry.data[CONF_SSL],
+            config_entry.data[CONF_VERIFY_SSL],
         )
 
     # ---------------------------
@@ -271,6 +273,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             config_entry.data[CONF_PASSWORD],
             config_entry.data[CONF_PORT],
             config_entry.data[CONF_SSL],
+            config_entry.data[CONF_VERIFY_SSL],
         )
 
         self.debug = False
@@ -1584,7 +1587,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             try:
                 full_version = self.ds["fw-update"].get("installed-version")
                 split_end = min(len(full_version), 4)
-                version = re.sub(r"[^0-9\.]", "", full_version[0:split_end])
+                version = re.sub("[^0-9\.]", "", full_version[0:split_end])
                 self.major_fw_version = int(version.split(".")[0])
                 self.minor_fw_version = int(version.split(".")[1])
                 _LOGGER.debug(
