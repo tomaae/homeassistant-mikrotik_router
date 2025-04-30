@@ -10,7 +10,8 @@
                     "port": "Port",
                     "username": "Kullanıcı adı",
                     "password": "Şifre",
-                    "ssl": "SSL kullan"
+                    "ssl": "SSL kullan",
+                    "verify_ssl": "Verify SSL"
                 }
             }
         },
@@ -19,7 +20,8 @@
             "cannot_connect": "Mikrotik'e bağlanılamıyor.",
             "ssl_handshake_failure": "SSL uyuşma hatası",
             "connection_timeout": "Mikrotik bağlantısı zaman aşımı.",
-            "wrong_login": "Geçersiz kullanıcı adı veya şifresi."
+            "wrong_login": "Geçersiz kullanıcı adı veya şifresi.",
+            "ssl_verify_failure": "Certificate verify failed"
         }
     },
     "options": {
@@ -49,7 +51,8 @@
                     "sensor_mangle": "Mangle anahtarları",
                     "sensor_ppp": "PPP kullanıcıları",
                     "sensor_filter": "Filtre anahtarları",
-                    "sensor_client_captive": "Captive portal data"
+                    "sensor_client_captive": "Captive portal data",
+                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
                 },
                 "title": "Mikrotik Router seçenekleri (2\/2)",
                 "description": "Sensör ve anahtarları etkinleştir"

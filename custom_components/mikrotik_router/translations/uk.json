@@ -10,7 +10,8 @@
                     "port": "Порт",
                     "username": "Користувач",
                     "password": "Пароль",
-                    "ssl": "Використовувати SSL"
+                    "ssl": "Використовувати SSL",
+                    "verify_ssl": "Verify SSL"
                 }
             }
         },
@@ -19,7 +20,8 @@
             "cannot_connect": "Не можу з'єднатися з Mikrotik.",
             "ssl_handshake_failure": "Помилка SSH протоколу",
             "connection_timeout": "Тайм-аут з'єднання з Mikrotik",
-            "wrong_login": "Невірне ім'я або пароль"
+            "wrong_login": "Невірне ім'я або пароль",
+            "ssl_verify_failure": "Certificate verify failed"
         }
     },
     "options": {
@@ -49,7 +51,8 @@
                     "sensor_mangle": "Керувати перемикачами",
                     "sensor_ppp": "Користувачі PPP",
                     "sensor_filter": "Фільтрувати перемикачі",
-                    "sensor_client_captive": "Дані Captive portal"
+                    "sensor_client_captive": "Дані Captive portal",
+                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
                 },
                 "title": "Mikrotik Router options (2\/2)",
                 "description": "Увімкнути сенсори і перемикачі"

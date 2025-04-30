@@ -10,7 +10,8 @@
                     "port": "Cổng",
                     "username": "Tên người dùng",
                     "password": "Mật khẩu",
-                    "ssl": "Sử dụng SSL"
+                    "ssl": "Sử dụng SSL",
+                    "verify_ssl": "Verify SSL"
                 }
             }
         },
@@ -19,7 +20,8 @@
             "cannot_connect": "Không thể kết nối với Mikrotik.",
             "ssl_handshake_failure": "Lỗi kết nối SSL",
             "connection_timeout": "Hết thời gian chờ kết nối Mikrotik.",
-            "wrong_login": "Tên người dùng hoặc mật khẩu không hợp lệ."
+            "wrong_login": "Tên người dùng hoặc mật khẩu không hợp lệ.",
+            "ssl_verify_failure": "Certificate verify failed"
         }
     },
     "options": {
@@ -49,7 +51,8 @@
                     "sensor_mangle": "Công tắc Mangle",
                     "sensor_ppp": "Người dùng PPP",
                     "sensor_filter": "Công tắc bộ lọc",
-                    "sensor_client_captive": "Captive portal data"
+                    "sensor_client_captive": "Captive portal data",
+                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
                 },
                 "title": "Cài đặt Mikrotik Router (2\/2)",
                 "description": "Bật cảm biến và công tắc"

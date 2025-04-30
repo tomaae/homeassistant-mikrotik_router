@@ -10,7 +10,8 @@
                     "port": "पोर्ट",
                     "username": "उपयोगकर्ता नाम",
                     "password": "पासवर्ड",
-                    "ssl": "SSL का उपयोग करें"
+                    "ssl": "SSL का उपयोग करें",
+                    "verify_ssl": "Verify SSL"
                 }
             }
         },
@@ -19,7 +20,8 @@
             "cannot_connect": "Mikrotik से कनेक्ट नही कर सकते।",
             "ssl_handshake_failure": "SSL हैन्डशेक विफ़ल हो गया",
             "connection_timeout": "Mikrotik कनेक्शन टाइम आउट हो गया।",
-            "wrong_login": "अमान्य उपयोगकर्ता नाम या पासवर्ड।"
+            "wrong_login": "अमान्य उपयोगकर्ता नाम या पासवर्ड।",
+            "ssl_verify_failure": "Certificate verify failed"
         }
     },
     "options": {
@@ -49,7 +51,8 @@
                     "sensor_mangle": "मैंगल स्विच",
                     "sensor_ppp": "PPP यूज़र",
                     "sensor_filter": "फ़िल्टर स्विच",
-                    "sensor_client_captive": "Captive portal data"
+                    "sensor_client_captive": "Captive portal data",
+                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
                 },
                 "title": "Mikrotik Router के विकल्प (2\/2)",
                 "description": "सेंसर और स्विच को एनेबल करें"
