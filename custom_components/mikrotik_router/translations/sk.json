@@ -10,7 +10,8 @@
                     "port": "Port",
                     "username": "Užívateľ",
                     "password": "Heslo",
-                    "ssl": "Použiť SSL"
+                    "ssl": "Použiť SSL",
+                    "verify_ssl": "Verify SSL"
                 }
             }
         },
@@ -19,7 +20,8 @@
             "cannot_connect": "Nedá sa pripojiť k Mikrotiku.",
             "ssl_handshake_failure": "Zlyhanie nadviazania spojenia SSL.",
             "connection_timeout": "Časový limit pripojenia vypršal.",
-            "wrong_login": "Nesprávne užívateľské meno alebo heslo."
+            "wrong_login": "Nesprávne užívateľské meno alebo heslo.",
+            "ssl_verify_failure": "Certificate verify failed"
         }
     },
     "options": {
@@ -49,7 +51,8 @@
                     "sensor_mangle": "Mangle prepínače",
                     "sensor_ppp": "PPP používatelia",
                     "sensor_filter": "Prepínače filtrov",
-                    "sensor_client_captive": "Captive portal data"
+                    "sensor_client_captive": "Captive portal data",
+                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
                 },
                 "title": "Možnosti Mikrotik Router (2\/2)",
                 "description": "Povoliť senzory a spínače"

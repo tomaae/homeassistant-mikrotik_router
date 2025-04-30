@@ -10,7 +10,8 @@
                     "port": "Θύρα",
                     "username": "Όνομα χρήστη",
                     "password": "Κωδικός πρόσβασης",
-                    "ssl": "Χρήση SSL"
+                    "ssl": "Χρήση SSL",
+                    "verify_ssl": "Verify SSL"
                 }
             }
         },
@@ -19,7 +20,8 @@
             "cannot_connect": "Αδυναμία σύνδεσης στον Mikrotik.",
             "ssl_handshake_failure": "Αποτυχίας χειραψίας SSL",
             "connection_timeout": "Διακοπή σύνδεσης με Mikrotik.",
-            "wrong_login": "Το όνομα χρήστη και ο κωδικός πρόσβασης δεν είναι έγκυρα."
+            "wrong_login": "Το όνομα χρήστη και ο κωδικός πρόσβασης δεν είναι έγκυρα.",
+            "ssl_verify_failure": "Certificate verify failed"
         }
     },
     "options": {
@@ -49,7 +51,8 @@
                     "sensor_mangle": "Επιλογικοί διακόπτες",
                     "sensor_ppp": "Χρήστες PPP",
                     "sensor_filter": "Διακόπτες φίλτρου",
-                    "sensor_client_captive": "Captive portal data"
+                    "sensor_client_captive": "Captive portal data",
+                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
                 },
                 "title": "Επιλογές Mikrotik Router (2\/2)",
                 "description": "Ενεργοποίηση αισθητήρων και διακοπτών"

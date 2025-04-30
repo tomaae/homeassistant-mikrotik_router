@@ -7,10 +7,11 @@
                 "data": {
                     "name": "Nom de l'intégration",
                     "host": "Hôte",
-                    "port": "Port",
+                    "port": "Interface",
                     "username": "Identifiant",
                     "password": "Mot de passe",
-                    "ssl": "Utiliser SSL"
+                    "ssl": "Utiliser SSL",
+                    "verify_ssl": "Verify SSL"
                 }
             }
         },
@@ -19,7 +20,8 @@
             "cannot_connect": "Impossible de se connecter à Mikrotik.",
             "ssl_handshake_failure": "Échec de la négociation SSL",
             "connection_timeout": "Expiration de connexion Mikrotik.",
-            "wrong_login": "Identifiant ou mot de passe invalide."
+            "wrong_login": "Identifiant ou mot de passe invalide.",
+            "ssl_verify_failure": "Certificate verify failed"
         }
     },
     "options": {
@@ -38,21 +40,22 @@
             "sensor_select": {
                 "data": {
                     "track_network_hosts": "Suivre les appareils du réseau",
-                    "sensor_port_tracker": "Capteurs de suivi de ports",
-                    "sensor_port_traffic": "Capteurs de trafic par ports",
+                    "sensor_port_tracker": "Capteurs d'état des interfaces",
+                    "sensor_port_traffic": "Capteurs de trafic par interface",
                     "sensor_client_traffic": "Capteurs de trafic de clients",
                     "sensor_simple_queues": "Commutateurs de files d'attente simples",
-                    "sensor_nat": "Commutateurs NAT",
+                    "sensor_nat": "Règles NAT",
                     "sensor_scripts": "Commutation de scripts",
                     "sensor_environment": "Capteurs de variables d'environnement",
                     "sensor_kidcontrol": "Contrôle parental",
-                    "sensor_mangle": "Commutateurs Mangle",
+                    "sensor_mangle": "Règles de Mangle",
                     "sensor_ppp": "Utilisateurs PPP",
-                    "sensor_filter": "Sélecteurs de filtre",
-                    "sensor_client_captive": "Captive portal data"
+                    "sensor_filter": "Règles de filtrage",
+                    "sensor_client_captive": "Données du portail captif",
+                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
                 },
                 "title": "Options Mikrotik Router (2\/2)",
-                "description": "Activer les capteurs et les interrupteurs"
+                "description": "Activer les capteurs et les sélecteurs"
             }
         }
     }

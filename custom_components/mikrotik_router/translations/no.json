@@ -10,7 +10,8 @@
                     "port": "Port",
                     "username": "Brukernavn",
                     "password": "Passord",
-                    "ssl": "Bruk SSL"
+                    "ssl": "Bruk SSL",
+                    "verify_ssl": "Verify SSL"
                 }
             }
         },
@@ -19,7 +20,8 @@
             "cannot_connect": "Kunne ikke koble til Mikrotik",
             "ssl_handshake_failure": "SSH håndtrykkfeil",
             "connection_timeout": "Mikrotik tilkoblingen fikk tidsavbrudd",
-            "wrong_login": "Feil brukernavn og\/eller passord"
+            "wrong_login": "Feil brukernavn og\/eller passord",
+            "ssl_verify_failure": "Certificate verify failed"
         }
     },
     "options": {
@@ -49,7 +51,8 @@
                     "sensor_mangle": "Mangle brytere",
                     "sensor_ppp": "PPP Brukere",
                     "sensor_filter": "Filter brytere",
-                    "sensor_client_captive": "Captive portal data"
+                    "sensor_client_captive": "Captive portal data",
+                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
                 },
                 "title": "Mikrotik Router options (2\/2)",
                 "description": "Skru på sensorer og brytere"

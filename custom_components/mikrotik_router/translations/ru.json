@@ -10,7 +10,8 @@
                     "port": "Порт",
                     "username": "Имя пользователя",
                     "password": "Пароль",
-                    "ssl": "Использовать SSL"
+                    "ssl": "Использовать SSL",
+                    "verify_ssl": "Verify SSL"
                 }
             }
         },
@@ -19,7 +20,8 @@
             "cannot_connect": "Не удалось подключиться.",
             "ssl_handshake_failure": "Ошибка SSL-соединения.",
             "connection_timeout": "Истекло время подключения к Mikrotik.",
-            "wrong_login": "Неверное имя пользователя или пароль."
+            "wrong_login": "Неверное имя пользователя или пароль.",
+            "ssl_verify_failure": "Certificate verify failed"
         }
     },
     "options": {
@@ -49,7 +51,8 @@
                     "sensor_mangle": "Переключатели Mangle",
                     "sensor_ppp": "PPP-пользователи",
                     "sensor_filter": "Переключатели фильтров",
-                    "sensor_client_captive": "Данные портала авторизации"
+                    "sensor_client_captive": "Данные портала авторизации",
+                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
                 },
                 "title": "Параметры Mikrotik Router (2\/2)",
                 "description": "Включить датчики и переключатели"

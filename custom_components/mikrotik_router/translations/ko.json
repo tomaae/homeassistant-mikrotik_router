@@ -10,7 +10,8 @@
                     "port": "포트",
                     "username": "사용자 이름",
                     "password": "비밀번호",
-                    "ssl": "SSL 사용"
+                    "ssl": "SSL 사용",
+                    "verify_ssl": "Verify SSL"
                 }
             }
         },
@@ -19,7 +20,8 @@
             "cannot_connect": "Mikrotik에 연결할 수 없습니다.",
             "ssl_handshake_failure": "SSL 핸드셰이크 실패",
             "connection_timeout": "Mikrotik 연결 시간이 초과되었습니다.",
-            "wrong_login": "사용자 이름 또는 비밀번호가 유효하지 않습니다."
+            "wrong_login": "사용자 이름 또는 비밀번호가 유효하지 않습니다.",
+            "ssl_verify_failure": "Certificate verify failed"
         }
     },
     "options": {
@@ -49,7 +51,8 @@
                     "sensor_mangle": "맹글 스위치",
                     "sensor_ppp": "PPP 사용자",
                     "sensor_filter": "필터 스위치",
-                    "sensor_client_captive": "Captive portal data"
+                    "sensor_client_captive": "Captive portal data",
+                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
                 },
                 "title": "Mikrotik Router 옵션(2\/2)",
                 "description": "센서 및 스위치 활성화"

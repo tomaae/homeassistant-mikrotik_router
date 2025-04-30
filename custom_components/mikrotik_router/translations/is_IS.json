@@ -10,7 +10,8 @@
                     "port": "Port",
                     "username": "Notandanafn",
                     "password": "Lykilorð",
-                    "ssl": "Nota SSL"
+                    "ssl": "Nota SSL",
+                    "verify_ssl": "Verify SSL"
                 }
             }
         },
@@ -19,7 +20,8 @@
             "cannot_connect": "Get ekki tengst Mikrotik.",
             "ssl_handshake_failure": "Villa við að koma á SSL samskiptum",
             "connection_timeout": "Tengin við Mikrotik rann út á tíma.",
-            "wrong_login": "Ógilt notendanafn eða lykilorð."
+            "wrong_login": "Ógilt notendanafn eða lykilorð.",
+            "ssl_verify_failure": "Certificate verify failed"
         }
     },
     "options": {
@@ -49,7 +51,8 @@
                     "sensor_mangle": "Bjögunarrofi",
                     "sensor_ppp": "PPP notendur",
                     "sensor_filter": "Síurofar",
-                    "sensor_client_captive": "Captive portal data"
+                    "sensor_client_captive": "Captive portal data",
+                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
                 },
                 "title": "Mikrotik Router valkostir (2\/2)",
                 "description": "Virkja skynjara og rofa"

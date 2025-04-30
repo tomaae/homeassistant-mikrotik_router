@@ -10,7 +10,8 @@
                     "port": "منفذ",
                     "username": "اسم المستخدم",
                     "password": "كلمة المرور",
-                    "ssl": "استعمل طبقة الوصلات الآمنة (SSL)"
+                    "ssl": "استعمل طبقة الوصلات الآمنة (SSL)",
+                    "verify_ssl": "Verify SSL"
                 }
             }
         },
@@ -19,7 +20,8 @@
             "cannot_connect": "لا يمكن الاتصال بـ (Mikrotik).",
             "ssl_handshake_failure": "فشل تأكيد الاتصال (SSL)",
             "connection_timeout": "مهلة اتصال (Mikrotik).",
-            "wrong_login": "خطأ في اسم المستخدم أو كلمة مرور."
+            "wrong_login": "خطأ في اسم المستخدم أو كلمة مرور.",
+            "ssl_verify_failure": "Certificate verify failed"
         }
     },
     "options": {
@@ -49,7 +51,8 @@
                     "sensor_mangle": "مفاتيح المِكواة الأُسطوانية",
                     "sensor_ppp": "مستخدمي PPP",
                     "sensor_filter": "مفاتيح الترشيح",
-                    "sensor_client_captive": "Captive portal data"
+                    "sensor_client_captive": "Captive portal data",
+                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
                 },
                 "title": "خيارات جهاز Mikrotik Router (2\/2)",
                 "description": "تمكين أجهزة الاستشعار والمفاتيح"
