@@ -1,4 +1,5 @@
 """Constants used by the Mikrotik Router component and platforms."""
+
 from homeassistant.const import Platform
 
 PLATFORMS = [

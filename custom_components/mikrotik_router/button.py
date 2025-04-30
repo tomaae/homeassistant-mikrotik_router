@@ -1,4 +1,5 @@
 """Support for the Mikrotik Router buttons."""
+
 from __future__ import annotations
 
 from logging import getLogger
