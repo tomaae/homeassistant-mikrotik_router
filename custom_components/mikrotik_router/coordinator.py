@@ -974,7 +974,12 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                     self.ds["interface"][uid]["client-mac-address"] = "multiple"
 
             if self.ds["interface"][uid]["client-ip-address"] == "":
-                self.ds["interface"][uid]["client-ip-address"] = "none"
+                if self.ds["interface"][uid]["name"] in self.ds["dhcp-client"]:
+                    self.ds["interface"][uid]["client-ip-address"] = self.ds[
+                        "dhcp-client"
+                    ][self.ds["interface"][uid]["name"]]["address"]
+                else:
+                    self.ds["interface"][uid]["client-ip-address"] = "none"
 
             if self.ds["interface"][uid]["client-mac-address"] == "":
                 self.ds["interface"][uid]["client-mac-address"] = "none"
@@ -1968,6 +1973,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             vals=[
                 {"name": "interface", "default": "unknown"},
                 {"name": "status", "default": "unknown"},
+                {"name": "address", "default": "unknown"},
             ],
         )
 
