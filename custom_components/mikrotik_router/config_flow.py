@@ -86,7 +86,7 @@ def configured_instances(hass):
 class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
     """MikrotikControllerConfigFlow class"""
 
-    VERSION = 1
+    VERSION = 2
     CONNECTION_CLASS = CONN_CLASS_LOCAL_POLL
 
     def __init__(self):
