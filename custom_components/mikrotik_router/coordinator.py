@@ -299,6 +299,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         self.accessrights_reported = False
 
         self.last_hwinfo_update = datetime(1970, 1, 1)
+        self.rebootcheck = 0
 
     # ---------------------------
     #   option_track_iface_clients
@@ -1434,10 +1435,6 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
     # ---------------------------
     def get_system_resource(self) -> None:
         """Get system resources data from Mikrotik"""
-        tmp_rebootcheck = 0
-        if "uptime_epoch" in self.ds["resource"]:
-            tmp_rebootcheck = self.ds["resource"]["uptime_epoch"]
-
         self.ds["resource"] = parse_api(
             data=self.ds["resource"],
             source=self.api.query("/system/resource"),
@@ -1522,9 +1519,12 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
         if (
             "uptime_epoch" in self.ds["resource"]
-            and 0 < tmp_rebootcheck < self.ds["resource"]["uptime_epoch"]
+            and self.rebootcheck > self.ds["resource"]["uptime_epoch"]
         ):
             self.get_firmware_update()
+
+        if "uptime_epoch" in self.ds["resource"]:
+            self.rebootcheck = self.ds["resource"]["uptime_epoch"]
 
     # ---------------------------
     #   get_firmware_update
