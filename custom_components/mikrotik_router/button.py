@@ -14,6 +14,7 @@ from .button_types import (
     SENSOR_TYPES,
     SENSOR_SERVICES,
 )
+from .exceptions import ApiEntryNotFound
 
 _LOGGER = getLogger(__name__)
 
@@ -54,5 +55,8 @@ class MikrotikScriptButton(MikrotikButton):
     """Representation of a script button."""
 
     async def async_press(self) -> None:
-        """Process the button press."""
-        self.coordinator.run_script(self._data["name"])
+        """Run script using Mikrotik API"""
+        try:
+            self.coordinator.api.run_script(self._data["name"])
+        except ApiEntryNotFound as error:
+            _LOGGER.error("Failed to run script: %s", error)

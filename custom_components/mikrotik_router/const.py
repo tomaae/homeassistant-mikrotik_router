@@ -15,8 +15,6 @@ DOMAIN = "mikrotik_router"
 DEFAULT_NAME = "Mikrotik Router"
 ATTRIBUTION = "Data provided by Mikrotik"
 
-RUN_SCRIPT_COMMAND = "run_script"
-
 DEFAULT_ENCODING = "ISO-8859-1"
 DEFAULT_LOGIN_METHOD = "plain"
 

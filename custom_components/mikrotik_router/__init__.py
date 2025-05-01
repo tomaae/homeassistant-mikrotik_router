@@ -12,7 +12,7 @@ from homeassistant.config_entries import ConfigEntry
 
 from homeassistant.const import CONF_VERIFY_SSL
 
-from .const import PLATFORMS, DOMAIN, RUN_SCRIPT_COMMAND, DEFAULT_VERIFY_SSL
+from .const import PLATFORMS, DOMAIN, DEFAULT_VERIFY_SSL
 from .coordinator import MikrotikData, MikrotikCoordinator, MikrotikTrackerCoordinator
 
 SCRIPT_SCHEMA = vol.Schema(
@@ -40,10 +40,6 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
 
     config_entry.async_on_unload(config_entry.add_update_listener(async_reload_entry))
 
-    hass.services.async_register(
-        DOMAIN, RUN_SCRIPT_COMMAND, coordinator.run_script, schema=SCRIPT_SCHEMA
-    )
-
     return True
 
 
@@ -64,7 +60,6 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
     if unload_ok := await hass.config_entries.async_unload_platforms(
         config_entry, PLATFORMS
     ):
-        hass.services.async_remove(DOMAIN, RUN_SCRIPT_COMMAND)
         hass.data[DOMAIN].pop(config_entry.entry_id)
 
     return unload_ok
