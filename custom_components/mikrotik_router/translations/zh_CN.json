@@ -10,7 +10,8 @@
                     "port": "端口",
                     "username": "用户名",
                     "password": "密码",
-                    "ssl": "使用 SSL"
+                    "ssl": "使用 SSL",
+                    "verify_ssl": "Verify SSL"
                 }
             }
         },
@@ -19,7 +20,8 @@
             "cannot_connect": "无法连接到 Mikrotik。",
             "ssl_handshake_failure": "SSL 交握失败",
             "connection_timeout": "Mikrotik 连接超时。",
-            "wrong_login": "无效的用户名或密码。"
+            "wrong_login": "无效的用户名或密码。",
+            "ssl_verify_failure": "Certificate verify failed"
         }
     },
     "options": {
@@ -49,7 +51,8 @@
                     "sensor_mangle": "标记开关",
                     "sensor_ppp": "PPP 用户",
                     "sensor_filter": "过滤器开关",
-                    "sensor_client_captive": "Captive portal data"
+                    "sensor_client_captive": "Captive portal data",
+                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
                 },
                 "title": "Mikrotik Router 选项 (2\/2)",
                 "description": "启动传感器和开关"

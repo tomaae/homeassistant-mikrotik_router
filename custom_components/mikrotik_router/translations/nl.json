@@ -10,7 +10,8 @@
                     "port": "Poort",
                     "username": "Gebruikersnaam",
                     "password": "Wachtwoord",
-                    "ssl": "Gebruik SSL"
+                    "ssl": "Gebruik SSL",
+                    "verify_ssl": "Verify SSL"
                 }
             }
         },
@@ -19,7 +20,8 @@
             "cannot_connect": "Kan geen verbinding maken met Mikrotik.",
             "ssl_handshake_failure": "SSL overeenkomings-storing",
             "connection_timeout": "Mikrotik verbinding time-out.",
-            "wrong_login": "Ongeldige gebruikersnaam of wachtwoord."
+            "wrong_login": "Ongeldige gebruikersnaam of wachtwoord.",
+            "ssl_verify_failure": "Certificate verify failed"
         }
     },
     "options": {
@@ -49,7 +51,8 @@
                     "sensor_mangle": "Mangelschakelaars",
                     "sensor_ppp": "PPP-gebruikers",
                     "sensor_filter": "Filterschakelaars",
-                    "sensor_client_captive": "Captive portal data"
+                    "sensor_client_captive": "Captive portal data",
+                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
                 },
                 "title": "Opties Mikrotik Router (2\/2)",
                 "description": "Sensoren en schakelaars inschakelen"

@@ -10,7 +10,8 @@
                     "port": "Porta",
                     "username": "Nome de usuário",
                     "password": "Senha",
-                    "ssl": "Usar SSL"
+                    "ssl": "Usar SSL",
+                    "verify_ssl": "Verify SSL"
                 }
             }
         },
@@ -19,7 +20,8 @@
             "cannot_connect": "Não consigo conectar ao Mikrotik.",
             "ssl_handshake_failure": "Falha no handshake SSL",
             "connection_timeout": "Tempo limite de conexão do Mikrotik.",
-            "wrong_login": "Nome de usuário ou senha inválidos."
+            "wrong_login": "Nome de usuário ou senha inválidos.",
+            "ssl_verify_failure": "Certificate verify failed"
         }
     },
     "options": {
@@ -49,7 +51,8 @@
                     "sensor_mangle": "Interruptores Mangle",
                     "sensor_ppp": "Usuários de PPP",
                     "sensor_filter": "Interruptores de filtro",
-                    "sensor_client_captive": "sensores de cliente cativo"
+                    "sensor_client_captive": "sensores de cliente cativo",
+                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
                 },
                 "title": "Opções de roteador Mikrotik (2\/2)",
                 "description": "Ativar sensores e interruptores"

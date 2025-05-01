@@ -10,7 +10,8 @@
                     "port": "Port",
                     "username": "Nazwa użytkownika",
                     "password": "Hasło",
-                    "ssl": "Użyj SSL"
+                    "ssl": "Użyj SSL",
+                    "verify_ssl": "Verify SSL"
                 }
             }
         },
@@ -19,7 +20,8 @@
             "cannot_connect": "Nie można połączyć się z Mikrotik.",
             "ssl_handshake_failure": "Błąd uzgadniania SSL",
             "connection_timeout": "Limit czasu dla połączenia Mikrotik został przekroczony.",
-            "wrong_login": "Nieprawidłowa nazwa użytkownika lub hasło."
+            "wrong_login": "Nieprawidłowa nazwa użytkownika lub hasło.",
+            "ssl_verify_failure": "Certificate verify failed"
         }
     },
     "options": {
@@ -49,7 +51,8 @@
                     "sensor_mangle": "Przełączniki mangle",
                     "sensor_ppp": "Użytkownicy PPP",
                     "sensor_filter": "Przełączniki filtrów",
-                    "sensor_client_captive": "Captive portal data"
+                    "sensor_client_captive": "Captive portal data",
+                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
                 },
                 "title": "Opcje Mikrotik Router (2\/2)",
                 "description": "Włącz czujniki i przełączniki"

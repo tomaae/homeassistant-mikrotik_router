@@ -10,7 +10,8 @@
                     "port": "Ports",
                     "username": "Lietotājvārds",
                     "password": "Parole",
-                    "ssl": "Izmantot SSL"
+                    "ssl": "Izmantot SSL",
+                    "verify_ssl": "Verify SSL"
                 }
             }
         },
@@ -19,7 +20,8 @@
             "cannot_connect": "Neizdodas savienoties ar Mikrotik.",
             "ssl_handshake_failure": "SSL savienojuma kļūda",
             "connection_timeout": "Mikrotik savienojuma noilgums.",
-            "wrong_login": "Nederīgs lietotājvārds vai parole."
+            "wrong_login": "Nederīgs lietotājvārds vai parole.",
+            "ssl_verify_failure": "Certificate verify failed"
         }
     },
     "options": {
@@ -49,7 +51,8 @@
                     "sensor_mangle": "Manglu slēdži",
                     "sensor_ppp": "PPP lietotāji",
                     "sensor_filter": "Filtra slēdži",
-                    "sensor_client_captive": "Captive portal data"
+                    "sensor_client_captive": "Captive portal data",
+                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
                 },
                 "title": "Mikrotik Router opcijas (2\/2)",
                 "description": "Sensoru un slēdžu aktivizēšana"

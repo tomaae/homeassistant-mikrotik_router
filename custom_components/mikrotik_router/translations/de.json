@@ -10,7 +10,8 @@
                     "port": "Port",
                     "username": "Benutzername",
                     "password": "Passwort",
-                    "ssl": "SSL benutzen"
+                    "ssl": "SSL benutzen",
+                    "verify_ssl": "Verify SSL"
                 }
             }
         },
@@ -19,7 +20,8 @@
             "cannot_connect": "Verbindung zum MikroTik fehlgeschlagen.",
             "ssl_handshake_failure": "SSL Handshake Fehler",
             "connection_timeout": "Mikrotik-Verbindungstimeout.",
-            "wrong_login": "Ungültiger Benutzername oder Passwort."
+            "wrong_login": "Ungültiger Benutzername oder Passwort.",
+            "ssl_verify_failure": "Certificate verify failed"
         }
     },
     "options": {
@@ -49,7 +51,8 @@
                     "sensor_mangle": "Mangle-Schalter",
                     "sensor_ppp": "PPP-Nutzer",
                     "sensor_filter": "Schalter für Filterregeln",
-                    "sensor_client_captive": "Captive-Portal Daten"
+                    "sensor_client_captive": "Captive-Portal Daten",
+                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
                 },
                 "title": "Mikrotik-Router-Optionen (2\/2)",
                 "description": "Sensoren und Schalter aktivieren"
