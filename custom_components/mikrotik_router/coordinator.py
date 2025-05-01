@@ -1428,8 +1428,9 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                     {"name": "value", "default": "unknown"},
                 ],
             )
-            for uid, vals in self.ds["health7"].items():
-                self.ds["health"][uid] = vals["value"]
+            if self.ds["health7"]:
+                for uid, vals in self.ds["health7"].items():
+                    self.ds["health"][uid] = vals["value"]
 
     # ---------------------------
     #   get_system_resource

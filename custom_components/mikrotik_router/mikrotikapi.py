@@ -52,6 +52,7 @@ class MikrotikAPI:
         self.error = None
         self.connection_error_reported = False
         self.client_traffic_last_run = None
+        self.disable_health = False
 
         # Default ports
         if not self._port:
@@ -186,6 +187,9 @@ class MikrotikAPI:
     def query(self, path, command=None, args=None, return_list=True) -> Optional(list):
         """Retrieve data from Mikrotik API."""
         """Returns generator object, unless return_list passed as True"""
+        if path == "/system/health" and self.disable_health:
+            return None
+
         if args is None:
             args = {}
 
@@ -205,9 +209,15 @@ class MikrotikAPI:
             try:
                 response = list(response)
             except Exception as e:
+                if path == "/system/health" and "no such command prefix" in str(e):
+                    self.disable_health = True
+                    self.lock.release()
+                    return None
+
                 self.disconnect(f"building list for path {path}", e)
                 self.lock.release()
                 return None
+
         elif response and command:
             _LOGGER.debug("API query: %s, %s, %s", path, command, args)
             try:
