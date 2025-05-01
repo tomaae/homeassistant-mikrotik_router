@@ -2056,6 +2056,10 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 {"name": "interface", "default": "unknown"},
                 {"name": "ap", "type": "bool"},
                 {"name": "uptime"},
+                {"name": "signal-strength"},
+                {"name": "tx-ccq"},
+                {"name": "tx-rate"},
+                {"name": "rx-rate"},
             ],
         )
 
@@ -2094,7 +2098,14 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 wireless_detected[uid] = True
                 self.ds["host"][uid]["available"] = True
                 self.ds["host"][uid]["last-seen"] = utcnow()
-                for key in ["mac-address", "interface"]:
+                for key in [
+                    "mac-address",
+                    "interface",
+                    "signal-strength",
+                    "tx-ccq",
+                    "tx-rate",
+                    "rx-rate",
+                ]:
                     self.ds["host"][uid][key] = vals[key]
 
         # Add hosts from DHCP

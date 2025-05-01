@@ -16,6 +16,10 @@ DEVICE_ATTRIBUTES_HOST = [
     "authorized",
     "bypassed",
     "last-seen",
+    "signal-strength",
+    "tx-ccq",
+    "tx-rate",
+    "rx-rate",
 ]
 
 
