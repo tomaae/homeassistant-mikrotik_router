@@ -234,6 +234,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             "health": {},
             "health7": {},
             "interface": {},
+            "bonding": {},
+            "bonding_slaves": {},
             "bridge": {},
             "bridge_host": {},
             "arp": {},
@@ -824,7 +826,11 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         )
 
         # Udpate virtual interfaces
+        bonding = False
         for uid, vals in self.ds["interface"].items():
+            if self.ds["interface"][uid]["type"] == "bond":
+                bonding = True
+
             self.ds["interface"][uid]["comment"] = str(
                 self.ds["interface"][uid]["comment"]
             )
@@ -888,6 +894,25 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                         ],
                     )
 
+        if bonding:
+            self.ds["bonding"] = parse_api(
+                data={},
+                source=self.api.query("/interface/bonding"),
+                key="name",
+                vals=[
+                    {"name": "name"},
+                    {"name": "mac-address"},
+                    {"name": "slaves"},
+                    {"name": "mode"},
+                ],
+            )
+
+            self.ds["bonding_slaves"] = {}
+            for uid, vals in self.ds["bonding"].items():
+                for tmp in vals["slaves"].split(","):
+                    self.ds["bonding_slaves"][tmp] = vals
+                    self.ds["bonding_slaves"][tmp]["master"] = uid
+
     # ---------------------------
     #   get_bridge
     # ---------------------------
@@ -929,7 +954,11 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             self.ds["interface"][uid]["client-ip-address"] = ""
             self.ds["interface"][uid]["client-mac-address"] = ""
             for arp_uid, arp_vals in self.ds["arp"].items():
-                if arp_vals["interface"] != vals["name"]:
+                if arp_vals["interface"] != vals["name"] and not (
+                    vals["name"] in self.ds["bonding_slaves"]
+                    and self.ds["bonding_slaves"][vals["name"]]["master"]
+                    == arp_vals["interface"]
+                ):
                     continue
 
                 if self.ds["interface"][uid]["client-ip-address"] == "":
