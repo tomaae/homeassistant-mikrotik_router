@@ -705,9 +705,10 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             ],
         )
 
-        self.ds["access"] = tmp_group[
-            tmp_user[self.config_entry.data[CONF_USERNAME]]["group"]
-        ]["policy"].split(",")
+        if tmp_user[self.config_entry.data[CONF_USERNAME]]["group"] in tmp_group:
+            self.ds["access"] = tmp_group[
+                tmp_user[self.config_entry.data[CONF_USERNAME]]["group"]
+            ]["policy"].split(",")
 
         if not self.accessrights_reported:
             self.accessrights_reported = True
