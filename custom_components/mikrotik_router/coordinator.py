@@ -1289,7 +1289,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 {"name": "sun", "default": "None"},
                 {"name": "comment"},
                 {"name": "blocked", "type": "bool", "default": False},
-                {"name": "paused", "type": "bool", "reverse": True},
+                {"name": "paused", "type": "bool", "default": False},
                 {
                     "name": "enabled",
                     "source": "disabled",
