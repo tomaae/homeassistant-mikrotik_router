@@ -1577,7 +1577,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
         full_version = resources["version"]
         try:
-            version_match = re.match(r"^(\d+)\.(\d+)\.(\d+)", full_version)
+            version_match = re.match(r"^(\d+)\.(\d+)", full_version)
             if not version_match:
                 raise ValueError("Version format is not recognized")
             version_major = int(version_match.group(1))
