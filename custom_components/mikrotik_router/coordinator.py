@@ -1563,10 +1563,50 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             self.rebootcheck = self.ds["resource"]["uptime_epoch"]
 
     # ---------------------------
+    # get_firmware_version
+    # ---------------------------
+    def get_firmware_version(self) -> None:
+        """Get firmware version from Mikrotik"""
+        resources = parse_api(
+            data={},
+            source=self.api.query("/system/resource"),
+            vals=[
+                {"name": "version", "default": "unknown"},
+            ],
+        )
+
+        full_version = resources["version"]
+        try:
+            version_match = re.match(r"^(\d+)\.(\d+)\.(\d+)", full_version)
+            if not version_match:
+                raise ValueError("Version format is not recognized")
+            version_major = int(version_match.group(1))
+            version_minor = int(version_match.group(2))
+        except Exception as e:
+            _LOGGER.error(
+                "Mikrotik %s unable to determine major/minor FW version ('%s'): %s.",
+                self.host,
+                full_version,
+                str(e),
+            )
+            return
+
+        self.major_fw_version = version_major
+        self.minor_fw_version = version_minor
+        _LOGGER.debug(
+            "Mikrotik %s FW version major=%s minor=%s ('%s')",
+            self.host,
+            self.major_fw_version,
+            self.minor_fw_version,
+            full_version,
+        )
+
+    # ---------------------------
     #   get_firmware_update
     # ---------------------------
     def get_firmware_update(self) -> None:
         """Check for firmware update on Mikrotik"""
+        self.get_firmware_version()
         if (
             "write" not in self.ds["access"]
             or "policy" not in self.ds["access"]
@@ -1595,27 +1635,6 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
         else:
             self.ds["fw-update"]["available"] = False
-
-        if self.ds["fw-update"]["installed-version"] != "unknown":
-            try:
-                full_version = self.ds["fw-update"].get("installed-version")
-                split_end = min(len(full_version), 4)
-                version = re.sub("[^0-9\\.]", "", full_version[0:split_end])
-                self.major_fw_version = int(version.split(".")[0])
-                self.minor_fw_version = int(version.split(".")[1])
-                _LOGGER.debug(
-                    "Mikrotik %s FW version major=%s minor=%s (%s)",
-                    self.host,
-                    self.major_fw_version,
-                    self.minor_fw_version,
-                    full_version,
-                )
-            except Exception:
-                _LOGGER.error(
-                    "Mikrotik %s unable to determine major FW version (%s).",
-                    self.host,
-                    full_version,
-                )
 
     # ---------------------------
     #   get_ups
