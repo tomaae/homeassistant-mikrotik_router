@@ -187,7 +187,21 @@ class MikrotikHostDeviceTracker(MikrotikDeviceTracker):
         if not self.option_track_network_hosts:
             return False
 
-        if self._data["source"] in ["capsman", "wireless"]:
+        # Check if device is connected to wireless interface
+        interface = self._data.get("interface", "").lower()
+        is_wireless_interface = (
+            interface.startswith("wlan") or
+            interface.startswith("wifi") or
+            self._data["source"] in ["capsman", "wireless"]
+        )
+
+        _LOGGER.debug(
+            "Device tracker %s: interface=%s, source=%s, is_wireless=%s, available=%s",
+            self.entity_id, interface, self._data["source"], is_wireless_interface,
+            self._data[self.entity_description.data_attribute]
+        )
+
+        if is_wireless_interface:
             return self._data[self.entity_description.data_attribute]
 
         return bool(
@@ -199,7 +213,15 @@ class MikrotikHostDeviceTracker(MikrotikDeviceTracker):
     @property
     def icon(self) -> str:
         """Return the icon."""
-        if self._data["source"] in ["capsman", "wireless"]:
+        # Check if device is connected to wireless interface
+        interface = self._data.get("interface", "").lower()
+        is_wireless_interface = (
+            interface.startswith("wlan") or
+            interface.startswith("wifi") or
+            self._data["source"] in ["capsman", "wireless"]
+        )
+
+        if is_wireless_interface:
             if self._data[self.entity_description.data_attribute]:
                 return self.entity_description.icon_enabled
             else:

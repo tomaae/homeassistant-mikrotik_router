@@ -2082,6 +2082,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
     # ---------------------------
     def get_wireless_hosts(self) -> None:
         """Get wireless hosts data from Mikrotik"""
+        _LOGGER.debug("Getting wireless hosts from /interface/%s/registration-table", self._wifimodule)
         self.ds["wireless_hosts"] = parse_api(
             data={},
             source=self.api.query(f"/interface/{self._wifimodule}/registration-table"),
@@ -2097,6 +2098,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 {"name": "rx-rate"},
             ],
         )
+        _LOGGER.debug("Found %d wireless hosts", len(self.ds["wireless_hosts"]))
 
     # ---------------------------
     #   async_process_host
@@ -2228,21 +2230,29 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             ):
                 if self.ds["dhcp"][uid]["address"] != self.ds["host"][uid]["address"]:
                     self.ds["host"][uid]["address"] = self.ds["dhcp"][uid]["address"]
-                    if vals["source"] not in ["capsman", "wireless"]:
-                        self.ds["host"][uid]["source"] = "dhcp"
-                        self.ds["host"][uid]["interface"] = self.ds["dhcp"][uid][
-                            "interface"
-                        ]
+
+                if vals["source"] not in ["capsman", "wireless"]:
+                    self.ds["host"][uid]["source"] = "dhcp"
+                    # Use bridge host data to get the correct physical interface
+                    if uid in self.ds["bridge_host"]:
+                        self.ds["host"][uid]["interface"] = self.ds["bridge_host"][uid]["interface"]
+                    else:
+                        self.ds["host"][uid]["interface"] = self.ds["dhcp"][uid]["interface"]
 
             elif (
                 uid in self.ds["arp"]
                 and "." in self.ds["arp"][uid]["address"]
-                and self.ds["arp"][uid]["address"] != self.ds["host"][uid]["address"]
             ):
-                self.ds["host"][uid]["address"] = self.ds["arp"][uid]["address"]
+                if self.ds["arp"][uid]["address"] != self.ds["host"][uid]["address"]:
+                    self.ds["host"][uid]["address"] = self.ds["arp"][uid]["address"]
+
                 if vals["source"] not in ["capsman", "wireless"]:
                     self.ds["host"][uid]["source"] = "arp"
-                    self.ds["host"][uid]["interface"] = self.ds["arp"][uid]["interface"]
+                    # Use bridge host data to get the correct physical interface
+                    if uid in self.ds["bridge_host"]:
+                        self.ds["host"][uid]["interface"] = self.ds["bridge_host"][uid]["interface"]
+                    else:
+                        self.ds["host"][uid]["interface"] = self.ds["arp"][uid]["interface"]
 
             if vals["host-name"] == "unknown":
                 # Resolve hostname from static DNS
@@ -2306,10 +2316,29 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
             # Count hosts
             if self.ds["host"][uid]["available"]:
-                if vals["source"] in ["capsman", "wireless"]:
+                # Check if device is connected to wireless interface
+                interface = self.ds["host"][uid].get("interface", "").lower()
+                is_wireless_interface = (
+                    interface.startswith("wlan") or
+                    interface.startswith("wifi") or
+                    self.ds["host"][uid]["source"] in ["capsman", "wireless"]
+                )
+
+                _LOGGER.debug(
+                    "Device %s: interface=%s, source=%s, is_wireless=%s",
+                    uid, interface, self.ds["host"][uid]["source"], is_wireless_interface
+                )
+
+                if is_wireless_interface:
                     self.ds["resource"]["clients_wireless"] += 1
                 else:
                     self.ds["resource"]["clients_wired"] += 1
+
+        _LOGGER.debug(
+            "Final counts: wired=%d, wireless=%d",
+            self.ds["resource"]["clients_wired"],
+            self.ds["resource"]["clients_wireless"]
+        )
 
     # ---------------------------
     #   process_accounting
