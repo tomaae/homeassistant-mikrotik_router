@@ -164,6 +164,8 @@ def get_uid(entry, key, key_secondary, key_search, keymap) -> Optional(str):
             uid = entry[key_secondary]
     elif keymap and key_search in entry and entry[key_search] in keymap:
         uid = keymap[entry[key_search]]
+    elif keymap and key in entry and entry[key] in keymap:
+        uid = keymap[entry[key]]
     else:
         return None
 
