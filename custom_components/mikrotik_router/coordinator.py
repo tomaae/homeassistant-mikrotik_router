@@ -635,7 +635,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             await self.async_process_host()
 
         if self.api.connected():
-            await self.hass.async_add_executor_job(self.process_interface_client)
+           await self.hass.async_add_executor_job(self.process_interface_client)
 
         if self.api.connected() and self.option_sensor_nat:
             await self.hass.async_add_executor_job(self.get_nat)
@@ -779,6 +779,22 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 {"name": "type", "value": "ovpn-in"},
             ],
         )
+
+        self.ds["interface"] = parse_api(
+            data=self.ds["interface"],
+            source=self.api.query("/ip/address"),
+            key_search="name",
+            key="interface",
+            vals=[
+                {"name": "interface"},
+                {"name": "actual-interface"},
+                {"name": "client-ip-address", "source": "address"},
+                {"name": "eth-slave", "source": "slave", "type": "bool"},
+            ],
+            only=[{"key": "disabled", "value": False},
+                  {"key": "invalid", "value": False}],
+        )
+
 
         if self.option_sensor_port_traffic:
             for uid, vals in self.ds["interface"].items():
@@ -951,6 +967,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             return
 
         for uid, vals in self.ds["interface"].items():
+            ori_client_ip_address = self.ds["interface"][uid]["client-ip-address"]
+            ori_client_mac_address = self.ds["interface"][uid]["client-mac-address"]
             self.ds["interface"][uid]["client-ip-address"] = ""
             self.ds["interface"][uid]["client-mac-address"] = ""
             for arp_uid, arp_vals in self.ds["arp"].items():
@@ -978,11 +996,16 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                     self.ds["interface"][uid]["client-ip-address"] = self.ds[
                         "dhcp-client"
                     ][self.ds["interface"][uid]["name"]]["address"]
+                elif ori_client_ip_address != "" and ori_client_ip_address != "none":
+                    self.ds["interface"][uid]["client-ip-address"] = ori_client_ip_address
                 else:
                     self.ds["interface"][uid]["client-ip-address"] = "none"
-
+                
             if self.ds["interface"][uid]["client-mac-address"] == "":
-                self.ds["interface"][uid]["client-mac-address"] = "none"
+                if ori_client_mac_address != "" and ori_client_mac_address != "none":
+                    self.ds["interface"][uid]["client-mac-address"] = ori_client_mac_address
+                else:
+                    self.ds["interface"][uid]["client-mac-address"] = "none"
 
     # ---------------------------
     #   get_nat
