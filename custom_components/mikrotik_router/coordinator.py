@@ -635,7 +635,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             await self.async_process_host()
 
         if self.api.connected():
-           await self.hass.async_add_executor_job(self.process_interface_client)
+            await self.hass.async_add_executor_job(self.process_interface_client)
 
         if self.api.connected() and self.option_sensor_nat:
             await self.hass.async_add_executor_job(self.get_nat)
