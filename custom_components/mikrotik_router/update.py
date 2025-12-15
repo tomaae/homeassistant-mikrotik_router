@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 from logging import getLogger
 from typing import Any
 
@@ -23,7 +22,6 @@ from .update_types import (
     SENSOR_TYPES,
     SENSOR_SERVICES,
 )
-from packaging.version import Version
 
 _LOGGER = getLogger(__name__)
 DEVICE_UPDATE = "device_update"
@@ -94,17 +92,14 @@ class MikrotikRouterOSUpdate(MikrotikEntity, UpdateEntity):
         """Return the release notes."""
         try:
             session = async_get_clientsession(self.hass)
-            """Get concatenated changelogs from installed_version to latest_version in reverse order."""
-            versions_to_fetch = generate_version_list(
-                self._data["installed-version"], self._data["latest-version"]
-            )
+            # Fetch only the latest changelog to avoid excessive requests.
+            latest = self._data.get("latest-version")
+            if not latest:
+                return "No release notes available."
 
-            tasks = [fetch_changelog(session, version) for version in versions_to_fetch]
-            changelogs = await asyncio.gather(*tasks)
-
-            # Combine all non-empty changelogs, maintaining reverse order
-            combined_changelogs = "\n\n".join(filter(None, changelogs))
-            return combined_changelogs.replace("*) ", "- ")
+            text = await fetch_changelog(session, latest)
+            if text:
+                return text.replace("*) ", "- ")
 
         except Exception as e:
             _LOGGER.warning("Failed to download release notes (%s)", e)
@@ -176,34 +171,3 @@ async def fetch_changelog(session, version: str) -> str:
     except Exception as e:
         pass
     return ""
-
-
-def generate_version_list(start_version: str, end_version: str) -> list:
-    """Generate a list of version strings from start_version to end_version in reverse order."""
-    start = Version(start_version)
-    end = Version(end_version)
-    versions = []
-
-    current = end
-    while current >= start:
-        versions.append(str(current))
-        current = decrement_version(current, start)
-
-    return versions
-
-
-def decrement_version(version: Version, start_version: Version) -> Version:
-    """Decrement version by the smallest possible step without going below start_version."""
-    if version.micro > 0:
-        next_patch = version.micro - 1
-        return Version(f"{version.major}.{version.minor}.{next_patch}")
-    elif version.minor > 0:
-        next_minor = version.minor - 1
-        return Version(
-            f"{version.major}.{next_minor}.999"
-        )  # Assuming .999 as max patch version
-    else:
-        next_major = version.major - 1
-        return Version(
-            f"{next_major}.999.999"
-        )  # Assuming .999 as max minor and patch version
