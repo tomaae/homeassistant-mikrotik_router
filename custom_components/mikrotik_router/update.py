@@ -141,10 +141,7 @@ class MikrotikRouterBoardFWUpdate(MikrotikEntity, UpdateEntity):
     @property
     def is_on(self) -> bool:
         """Return true if device is on."""
-        return (
-            self.data["routerboard"]["current-firmware"]
-            != self.data["routerboard"]["upgrade-firmware"]
-        )
+        return self._data.get("current-firmware") != self._data.get("upgrade-firmware")
 
     @property
     def installed_version(self) -> str:

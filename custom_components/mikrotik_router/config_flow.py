@@ -119,7 +119,8 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
                 use_ssl=user_input[CONF_SSL],
                 ssl_verify=user_input[CONF_VERIFY_SSL],
             )
-            if not api.connect():
+            connected = await self.hass.async_add_executor_job(api.connect)
+            if not connected:
                 errors[CONF_HOST] = api.error
 
             # Save instance

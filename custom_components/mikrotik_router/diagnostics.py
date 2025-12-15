@@ -13,7 +13,7 @@ async def async_get_config_entry_diagnostics(
 ) -> dict[str, Any]:
     """Return diagnostics for a config entry."""
     data_coordinator = hass.data[DOMAIN][config_entry.entry_id].data_coordinator
-    tracker_coordinator = hass.data[DOMAIN][config_entry.entry_id].data_coordinator
+    tracker_coordinator = hass.data[DOMAIN][config_entry.entry_id].tracker_coordinator
 
     return {
         "entry": {
