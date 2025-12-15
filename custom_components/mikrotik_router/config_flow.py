@@ -135,7 +135,7 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
                 CONF_NAME: DEFAULT_DEVICE_NAME,
                 CONF_HOST: DEFAULT_HOST,
                 CONF_USERNAME: DEFAULT_USERNAME,
-                CONF_PASSWORD: DEFAULT_USERNAME,
+                CONF_PASSWORD: "",
                 CONF_PORT: DEFAULT_PORT,
                 CONF_SSL: DEFAULT_SSL,
                 CONF_VERIFY_SSL: DEFAULT_VERIFY_SSL,

@@ -2,6 +2,7 @@
 
 import logging
 import ssl
+import ipaddress
 from time import time
 from threading import Lock
 from voluptuous import Optional
@@ -126,7 +127,16 @@ class MikrotikAPI:
             if self._use_ssl:
                 if self._ssl_wrapper is None:
                     ssl_context = ssl.create_default_context()
-                    ssl_context.check_hostname = False
+                    # For IP-based connections, hostname checks generally don't work with
+                    # MikroTik's default/self-signed certs. If the user connects via a
+                    # hostname and enables verification, do enforce hostname validation.
+                    try:
+                        ipaddress.ip_address(self._host)
+                        is_ip_address = True
+                    except ValueError:
+                        is_ip_address = False
+
+                    ssl_context.check_hostname = bool(self._ssl_verify and not is_ip_address)
                     if self._ssl_verify:
                         ssl_context.verify_mode = ssl.CERT_REQUIRED
                         ssl_context.verify_flags &= ~ssl.VERIFY_X509_STRICT
