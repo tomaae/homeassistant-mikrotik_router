@@ -714,16 +714,16 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
         if not self.accessrights_reported:
             self.accessrights_reported = True
-            if (
-                "write" not in self.ds["access"]
-                or "policy" not in self.ds["access"]
-                or "reboot" not in self.ds["access"]
-                or "test" not in self.ds["access"]
-            ):
+            required_policies = {"api", "write", "policy", "reboot", "test"}
+            missing_policies = sorted(
+                policy for policy in required_policies if policy not in self.ds["access"]
+            )
+            if missing_policies:
                 _LOGGER.warning(
-                    "Mikrotik %s user %s does not have sufficient access rights. Integration functionality will be limited.",
+                    "Mikrotik %s user %s does not have sufficient access rights (missing: %s). Integration functionality will be limited.",
                     self.host,
                     self.config_entry.data[CONF_USERNAME],
+                    ",".join(missing_policies),
                 )
 
     # ---------------------------
