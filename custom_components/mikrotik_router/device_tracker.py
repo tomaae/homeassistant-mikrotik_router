@@ -24,7 +24,7 @@ from homeassistant.components.device_tracker.const import SourceType
 
 from .device_tracker_types import SENSOR_TYPES, SENSOR_SERVICES
 from .coordinator import MikrotikCoordinator
-from .entity import _skip_sensor, MikrotikEntity
+from .entity import _skip_sensor, MikrotikEntity, _select_unique_id
 from .helper import format_attribute
 from .const import (
     DOMAIN,
@@ -54,17 +54,10 @@ async def async_add_entities(
         if coordinator.data is None:
             return
 
-        async def async_check_exist(obj, coordinator, uid: None) -> None:
+        async def async_check_exist(obj, unique_id: str) -> None:
             """Check entity exists."""
             entity_registry = er.async_get(hass)
-            if uid:
-                unique_id = f"{obj._inst.lower()}-{obj.entity_description.key}-{slugify(str(obj._data[obj.entity_description.data_reference]).lower())}"
-            else:
-                unique_id = f"{obj._inst.lower()}-{obj.entity_description.key}"
-
-            entity_id = entity_registry.async_get_entity_id(
-                platform.domain, DOMAIN, unique_id
-            )
+            entity_id = entity_registry.async_get_entity_id(platform.domain, DOMAIN, unique_id)
             entity = entity_registry.async_get(entity_id)
             if entity is None or (
                 (entity_id not in platform.entities) and (entity.disabled is False)
@@ -80,7 +73,16 @@ async def async_add_entities(
                 obj = dispatcher[entity_description.func](
                     coordinator, entity_description
                 )
-                await async_check_exist(obj, coordinator, None)
+                unique_id = _select_unique_id(
+                    hass,
+                    platform.domain,
+                    config_entry,
+                    entity_description,
+                    None,
+                    data,
+                )
+                obj._attr_unique_id = unique_id
+                await async_check_exist(obj, unique_id)
             else:
                 for uid in data:
                     if _skip_sensor(config_entry, entity_description, data, uid):
@@ -88,7 +90,16 @@ async def async_add_entities(
                     obj = dispatcher[entity_description.func](
                         coordinator, entity_description, uid
                     )
-                    await async_check_exist(obj, coordinator, uid)
+                    unique_id = _select_unique_id(
+                        hass,
+                        platform.domain,
+                        config_entry,
+                        entity_description,
+                        uid,
+                        data[uid],
+                    )
+                    obj._attr_unique_id = unique_id
+                    await async_check_exist(obj, unique_id)
 
     await async_update_controller(
         hass.data[DOMAIN][config_entry.entry_id].tracker_coordinator

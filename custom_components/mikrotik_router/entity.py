@@ -36,6 +36,60 @@ from .helper import format_attribute
 _LOGGER = getLogger(__name__)
 
 
+def _legacy_unique_id(inst: str, entity_description, data: Mapping[str, Any] | None) -> str:
+    """Legacy unique_id format used historically by this integration.
+
+    NOTE: This depends on the config entry name (inst) and slugifies a data value.
+    It is kept for backwards compatibility with existing entity registry entries.
+    """
+    base = f"{inst.lower()}-{entity_description.key}"
+    if not entity_description.data_reference:
+        return base
+
+    ref_key = entity_description.data_reference
+    ref_val = ""
+    if isinstance(data, Mapping) and ref_key in data:
+        ref_val = str(data[ref_key]).lower()
+    return f"{base}-{slugify(ref_val)}"
+
+
+def _stable_unique_id(entry_id: str, entity_description, uid: str | None) -> str:
+    """Stable unique_id format (rename-safe).
+
+    Uses the config entry id plus the per-item uid (when applicable).
+    """
+    base = f"{entry_id}-{entity_description.key}"
+    if uid:
+        return f"{base}-{uid}"
+    return base
+
+
+def _select_unique_id(
+    hass: HomeAssistant,
+    platform_domain: str,
+    config_entry: ConfigEntry,
+    entity_description,
+    uid: str | None,
+    data: Mapping[str, Any] | None,
+) -> str:
+    """Pick the correct unique_id.
+
+    - Prefer stable ID if it already exists.
+    - Otherwise prefer legacy ID if it already exists.
+    - Otherwise use stable ID for new entities.
+    """
+    entity_registry = er.async_get(hass)
+
+    stable_uid = _stable_unique_id(config_entry.entry_id, entity_description, uid)
+    legacy_uid = _legacy_unique_id(config_entry.data[CONF_NAME], entity_description, data)
+
+    if entity_registry.async_get_entity_id(platform_domain, DOMAIN, stable_uid):
+        return stable_uid
+    if entity_registry.async_get_entity_id(platform_domain, DOMAIN, legacy_uid):
+        return legacy_uid
+    return stable_uid
+
+
 def _skip_sensor(config_entry, entity_description, data, uid) -> bool:
     # Sensors
     if (
@@ -107,17 +161,10 @@ async def async_add_entities(
     async def async_update_controller(coordinator):
         """Update the values of the controller."""
 
-        async def async_check_exist(obj, coordinator, uid: None) -> None:
+        async def async_check_exist(obj, unique_id: str) -> None:
             """Check entity exists."""
             entity_registry = er.async_get(hass)
-            if uid:
-                unique_id = f"{obj._inst.lower()}-{obj.entity_description.key}-{slugify(str(obj._data[obj.entity_description.data_reference]).lower())}"
-            else:
-                unique_id = f"{obj._inst.lower()}-{obj.entity_description.key}"
-
-            entity_id = entity_registry.async_get_entity_id(
-                platform.domain, DOMAIN, unique_id
-            )
+            entity_id = entity_registry.async_get_entity_id(platform.domain, DOMAIN, unique_id)
             entity = entity_registry.async_get(entity_id)
             if entity is None or (
                 (entity_id not in platform.entities) and (entity.disabled is False)
@@ -133,7 +180,16 @@ async def async_add_entities(
                 obj = dispatcher[entity_description.func](
                     coordinator, entity_description
                 )
-                await async_check_exist(obj, coordinator, None)
+                unique_id = _select_unique_id(
+                    hass,
+                    platform.domain,
+                    config_entry,
+                    entity_description,
+                    None,
+                    data,
+                )
+                obj._attr_unique_id = unique_id
+                await async_check_exist(obj, unique_id)
             else:
                 for uid in data:
                     if _skip_sensor(config_entry, entity_description, data, uid):
@@ -141,7 +197,16 @@ async def async_add_entities(
                     obj = dispatcher[entity_description.func](
                         coordinator, entity_description, uid
                     )
-                    await async_check_exist(obj, coordinator, uid)
+                    unique_id = _select_unique_id(
+                        hass,
+                        platform.domain,
+                        config_entry,
+                        entity_description,
+                        uid,
+                        data[uid],
+                    )
+                    obj._attr_unique_id = unique_id
+                    await async_check_exist(obj, unique_id)
 
     await async_update_controller(
         hass.data[DOMAIN][config_entry.entry_id].data_coordinator
@@ -184,6 +249,13 @@ class MikrotikEntity(CoordinatorEntity[_MikrotikCoordinatorT], Entity):
 
         self._attr_name = self.custom_name
 
+        # Provide a stable default if the platform didn't override _attr_unique_id.
+        # We intentionally do not use the config entry name here.
+        if not getattr(self, "_attr_unique_id", None):
+            self._attr_unique_id = _stable_unique_id(
+                self._config_entry.entry_id, self.entity_description, self._uid
+            )
+
     @callback
     def _handle_coordinator_update(self) -> None:
         self._data = self.coordinator.data[self.entity_description.data_path]
@@ -215,14 +287,6 @@ class MikrotikEntity(CoordinatorEntity[_MikrotikCoordinatorT], Entity):
             return f"{self._data[self.entity_description.data_name]} {self.entity_description.name}"
 
         return f"{self._data[self.entity_description.data_name]}"
-
-    @property
-    def unique_id(self) -> str:
-        """Return a unique id for this entity"""
-        if self._uid:
-            return f"{self._inst.lower()}-{self.entity_description.key}-{slugify(str(self._data[self.entity_description.data_reference]).lower())}"
-        else:
-            return f"{self._inst.lower()}-{self.entity_description.key}"
 
     # @property
     # def available(self) -> bool:
