@@ -101,10 +101,12 @@ class MikrotikRouterOSUpdate(MikrotikEntity, UpdateEntity):
             if text:
                 return text.replace("*) ", "- ")
 
+            return "Release notes could not be downloaded."
+
         except Exception as e:
             _LOGGER.warning("Failed to download release notes (%s)", e)
 
-        return "Error fetching release notes."
+        return "Release notes could not be downloaded."
 
     @property
     def release_url(self) -> str:
@@ -166,8 +168,7 @@ async def fetch_changelog(session, version: str) -> str:
     try:
         async with session.get(url) as response:
             if response.status == 200:
-                text = await response.text()
-                return text.replace("*) ", "- ")
-    except Exception as e:
-        pass
+                return await response.text()
+    except Exception:
+        return ""
     return ""
