@@ -127,11 +127,18 @@ class MikrotikAPI:
             if self._use_ssl:
                 if self._ssl_wrapper is None:
                     ssl_context = ssl.create_default_context()
+
                     # For IP-based connections, hostname checks generally don't work with
                     # MikroTik's default/self-signed certs. If the user connects via a
                     # hostname and enables verification, do enforce hostname validation.
+                    host_for_ip_check = str(self._host).strip()
+                    if host_for_ip_check.startswith("[") and "]" in host_for_ip_check:
+                        host_for_ip_check = host_for_ip_check.split("]", 1)[0][1:]
+                    elif ":" in host_for_ip_check and host_for_ip_check.count(":") == 1:
+                        host_for_ip_check = host_for_ip_check.rsplit(":", 1)[0]
+
                     try:
-                        ipaddress.ip_address(self._host)
+                        ipaddress.ip_address(host_for_ip_check)
                         is_ip_address = True
                     except ValueError:
                         is_ip_address = False
