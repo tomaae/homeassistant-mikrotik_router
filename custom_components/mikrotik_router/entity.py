@@ -81,7 +81,8 @@ def _select_unique_id(
     entity_registry = er.async_get(hass)
 
     stable_uid = _stable_unique_id(config_entry.entry_id, entity_description, uid)
-    legacy_uid = _legacy_unique_id(config_entry.data[CONF_NAME], entity_description, data)
+    legacy_name = config_entry.data.get(CONF_NAME) or config_entry.title
+    legacy_uid = _legacy_unique_id(legacy_name, entity_description, data)
 
     if entity_registry.async_get_entity_id(platform_domain, DOMAIN, stable_uid):
         return stable_uid
@@ -251,7 +252,7 @@ class MikrotikEntity(CoordinatorEntity[_MikrotikCoordinatorT], Entity):
 
         # Provide a stable default if the platform didn't override _attr_unique_id.
         # We intentionally do not use the config entry name here.
-        if not getattr(self, "_attr_unique_id", None):
+        if getattr(self, "_attr_unique_id", None) is None:
             self._attr_unique_id = _stable_unique_id(
                 self._config_entry.entry_id, self.entity_description, self._uid
             )
