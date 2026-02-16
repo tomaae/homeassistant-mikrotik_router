@@ -1,2 +1,2 @@
-librouteros>=3.4.1
+librouteros>=3.4.1,<4.0.0
 mac-vendor-lookup>=0.1.12
