@@ -52,10 +52,16 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
             """Send a WoL magic packet via all connected MikroTik routers."""
             mac = call.data["mac"]
             interface = call.data.get("interface")
-            for entry_data in hass.data[DOMAIN].values():
-                await hass.async_add_executor_job(
+            for entry_data in hass.data.get(DOMAIN, {}).values():
+                success = await hass.async_add_executor_job(
                     entry_data.data_coordinator.api.wol, mac, interface
                 )
+                if not success:
+                    _LOGGER.warning(
+                        "WoL: failed to send magic packet to %s via router %s",
+                        mac,
+                        entry_data.data_coordinator.config_entry.data.get("host", "unknown"),
+                    )
 
         hass.services.async_register(
             DOMAIN,

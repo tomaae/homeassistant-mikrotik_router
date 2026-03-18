@@ -337,21 +337,19 @@ class MikrotikAPI:
         if interface and interface != "unknown":
             args["interface"] = interface
 
-        self.lock.acquire()
-        try:
-            _LOGGER.debug(
-                "WoL: sending magic packet to %s via %s",
-                mac,
-                interface or "broadcast",
-            )
-            response = self._connection.path("/tool")
-            tuple(response("wol", **args))
-        except Exception as e:
-            self.disconnect("wol", e)
-            self.lock.release()
-            return False
+        with self.lock:
+            try:
+                _LOGGER.debug(
+                    "WoL: sending magic packet to %s via %s",
+                    mac,
+                    interface or "broadcast",
+                )
+                response = self._connection.path("/tool")
+                tuple(response("wol", **args))
+            except Exception as e:
+                self.disconnect("wol", e)
+                return False
 
-        self.lock.release()
         return True
 
     # ---------------------------
