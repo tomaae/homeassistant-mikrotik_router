@@ -19,6 +19,13 @@ SCRIPT_SCHEMA = vol.Schema(
     {vol.Required("router"): cv.string, vol.Required("script"): cv.string}
 )
 
+WOL_SCHEMA = vol.Schema(
+    {
+        vol.Required("mac"): cv.string,
+        vol.Optional("interface"): cv.string,
+    }
+)
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -37,6 +44,25 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     )
 
     await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
+
+    # Register global WoL service once (shared across all config entries)
+    if not hass.services.has_service(DOMAIN, "send_magic_packet"):
+
+        async def async_send_magic_packet(call) -> None:
+            """Send a WoL magic packet via all connected MikroTik routers."""
+            mac = call.data["mac"]
+            interface = call.data.get("interface")
+            for entry_data in hass.data[DOMAIN].values():
+                await hass.async_add_executor_job(
+                    entry_data.data_coordinator.api.wol, mac, interface
+                )
+
+        hass.services.async_register(
+            DOMAIN,
+            "send_magic_packet",
+            async_send_magic_packet,
+            schema=WOL_SCHEMA,
+        )
 
     config_entry.async_on_unload(config_entry.add_update_listener(async_reload_entry))
 

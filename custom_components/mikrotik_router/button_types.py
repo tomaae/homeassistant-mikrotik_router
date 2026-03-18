@@ -53,4 +53,4 @@ SENSOR_TYPES: tuple[MikrotikButtonEntityDescription, ...] = (
     ),
 )
 
-SENSOR_SERVICES = {}
+SENSOR_SERVICES = []
