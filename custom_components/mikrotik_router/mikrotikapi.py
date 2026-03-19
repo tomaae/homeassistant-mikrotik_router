@@ -326,6 +326,33 @@ class MikrotikAPI:
         return True
 
     # ---------------------------
+    #   wol
+    # ---------------------------
+    def wol(self, mac: str, interface: str | None = None) -> bool:
+        """Send Wake-on-LAN magic packet via MikroTik /tool wol"""
+        if not self.connection_check():
+            return False
+
+        args = {"mac": mac}
+        if interface and interface != "unknown":
+            args["interface"] = interface
+
+        with self.lock:
+            try:
+                _LOGGER.debug(
+                    "WoL: sending magic packet to %s via %s",
+                    mac,
+                    interface or "broadcast",
+                )
+                response = self._connection.path("/tool")
+                tuple(response("wol", **args))
+            except Exception as e:
+                self.disconnect("wol", e)
+                return False
+
+        return True
+
+    # ---------------------------
     #   run_script
     # ---------------------------
     def run_script(self, name) -> bool:
