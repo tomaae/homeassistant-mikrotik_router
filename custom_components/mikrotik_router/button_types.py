@@ -8,6 +8,7 @@ from typing import List
 from homeassistant.components.sensor import (
     SensorEntityDescription,
 )
+from homeassistant.helpers.entity import EntityCategory
 
 from .const import DOMAIN
 
@@ -35,6 +36,17 @@ class MikrotikButtonEntityDescription(SensorEntityDescription):
 
 
 SENSOR_TYPES: tuple[MikrotikButtonEntityDescription, ...] = (
+    MikrotikButtonEntityDescription(
+        key="reboot",
+        name="Reboot",
+        icon="mdi:restart",
+        device_class=None,
+        entity_category=EntityCategory.CONFIG,
+        ha_group="System",
+        data_path="resource",
+        data_attribute="board-name",
+        func="MikrotikRebootButton",
+    ),
     MikrotikButtonEntityDescription(
         key="script",
         name="",

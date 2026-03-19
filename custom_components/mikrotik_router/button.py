@@ -31,6 +31,7 @@ async def async_setup_entry(
     dispatcher = {
         "MikrotikButton": MikrotikButton,
         "MikrotikScriptButton": MikrotikScriptButton,
+        "MikrotikRebootButton": MikrotikRebootButton,
     }
     await async_add_entities(hass, config_entry, dispatcher)
 
@@ -46,6 +47,20 @@ class MikrotikButton(MikrotikEntity, ButtonEntity):
 
     async def async_press(self) -> None:
         pass
+
+
+# ---------------------------
+#   MikrotikRebootButton
+# ---------------------------
+class MikrotikRebootButton(MikrotikButton):
+    """Representation of a reboot button."""
+
+    async def async_press(self) -> None:
+        """Reboot the MikroTik device."""
+        if "reboot" not in self.coordinator.ds["access"]:
+            _LOGGER.error("User does not have reboot access rights")
+            return
+        self.coordinator.execute("/system", "reboot", None, None)
 
 
 # ---------------------------
