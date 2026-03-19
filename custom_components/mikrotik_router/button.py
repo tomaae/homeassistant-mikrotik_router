@@ -58,9 +58,14 @@ class MikrotikRebootButton(MikrotikButton):
     async def async_press(self) -> None:
         """Reboot the MikroTik device."""
         if "reboot" not in self.coordinator.ds["access"]:
-            _LOGGER.error("User does not have reboot access rights")
+            _LOGGER.error(
+                "Mikrotik %s user does not have reboot access rights",
+                self.coordinator.host,
+            )
             return
-        self.coordinator.execute("/system", "reboot", None, None)
+        await self.hass.async_add_executor_job(
+            self.coordinator.execute, "/system", "reboot", None, None
+        )
 
 
 # ---------------------------
