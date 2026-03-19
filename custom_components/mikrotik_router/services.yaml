@@ -1,1 +1,22 @@
----
+send_magic_packet:
+  name: Send magic packet (Wake-on-LAN)
+  description: >
+    Sends a Wake-on-LAN magic packet through the MikroTik router
+    to wake up a device on the network.
+  fields:
+    mac:
+      name: MAC address
+      description: MAC address of the device to wake up.
+      required: true
+      example: "AA:BB:CC:DD:EE:FF"
+      selector:
+        text:
+    interface:
+      name: Interface
+      description: >
+        Router interface to send the magic packet from.
+        If omitted, MikroTik broadcasts from the default gateway interface.
+      required: false
+      example: "bridge"
+      selector:
+        text:
