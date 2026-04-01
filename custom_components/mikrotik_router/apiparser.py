@@ -1,10 +1,10 @@
 """API parser for JSON APIs."""
 
 from datetime import datetime
-from logging import getLogger
+from logging import getLogger, DEBUG
 
 from pytz import utc
-from voluptuous import Optional
+from typing import Optional
 
 from homeassistant.components.diagnostics import async_redact_data
 
@@ -69,9 +69,9 @@ def from_entry_bool(entry, param, default=False, reverse=False) -> bool:
         return default
 
     if isinstance(ret, str):
-        if ret in ("on", "On", "ON", "yes", "Yes", "YES", "up", "Up", "UP"):
+        if ret.lower() in ("on", "yes", "up"):
             ret = True
-        elif ret in ("off", "Off", "OFF", "no", "No", "NO", "down", "Down", "DOWN"):
+        elif ret.lower() in ("off", "no", "down"):
             ret = False
 
     if not isinstance(ret, bool):
@@ -96,10 +96,12 @@ def parse_api(
     skip=None,
 ) -> dict:
     """Get data from API."""
-    debug = _LOGGER.getEffectiveLevel() == 10
-    if type(source) == dict:
-        tmp = source
-        source = [tmp]
+    if data is None:
+        data = {}
+
+    debug = _LOGGER.getEffectiveLevel() == DEBUG
+    if isinstance(source, dict):
+        source = [source]
 
     if not source:
         if not key and not key_search:
@@ -144,7 +146,7 @@ def parse_api(
 # ---------------------------
 #   get_uid
 # ---------------------------
-def get_uid(entry, key, key_secondary, key_search, keymap) -> Optional(str):
+def get_uid(entry, key, key_secondary, key_search, keymap) -> Optional[str]:
     """Get UID for data list."""
     uid = None
     if not key_search:
@@ -173,7 +175,7 @@ def get_uid(entry, key, key_secondary, key_search, keymap) -> Optional(str):
 # ---------------------------
 #   generate_keymap
 # ---------------------------
-def generate_keymap(data, key_search) -> Optional(dict):
+def generate_keymap(data, key_search) -> Optional[dict]:
     """Generate keymap."""
     return (
         {data[uid][key_search]: uid for uid in data if key_search in data[uid]}
@@ -223,11 +225,11 @@ def fill_defaults(data, vals) -> dict:
     """Fill defaults if source is not present."""
     for val in vals:
         _name = val["name"]
-        _type = val["type"] if "type" in val else "str"
-        _source = val["source"] if "source" in val else _name
+        _type = val.get("type", "str")
+        _source = val.get("source", _name)
 
         if _type == "str":
-            _default = val["default"] if "default" in val else ""
+            _default = val.get("default", "")
             if "default_val" in val and val["default_val"] in val:
                 _default = val[val["default_val"]]
 
@@ -235,8 +237,8 @@ def fill_defaults(data, vals) -> dict:
                 data[_name] = from_entry([], _source, default=_default)
 
         elif _type == "bool":
-            _default = val["default"] if "default" in val else False
-            _reverse = val["reverse"] if "reverse" in val else False
+            _default = val.get("default", False)
+            _reverse = val.get("reverse", False)
             if _name not in data:
                 data[_name] = from_entry_bool(
                     [], _source, default=_default, reverse=_reverse
@@ -252,12 +254,12 @@ def fill_vals(data, entry, uid, vals) -> dict:
     """Fill all data."""
     for val in vals:
         _name = val["name"]
-        _type = val["type"] if "type" in val else "str"
-        _source = val["source"] if "source" in val else _name
-        _convert = val["convert"] if "convert" in val else None
+        _type = val.get("type", "str")
+        _source = val.get("source", _name)
+        _convert = val.get("convert")
 
         if _type == "str":
-            _default = val["default"] if "default" in val else ""
+            _default = val.get("default", "")
             if "default_val" in val and val["default_val"] in val:
                 _default = val[val["default_val"]]
 
@@ -267,8 +269,8 @@ def fill_vals(data, entry, uid, vals) -> dict:
                 data[_name] = from_entry(entry, _source, default=_default)
 
         elif _type == "bool":
-            _default = val["default"] if "default" in val else False
-            _reverse = val["reverse"] if "reverse" in val else False
+            _default = val.get("default", False)
+            _reverse = val.get("reverse", False)
 
             if uid:
                 data[uid][_name] = from_entry_bool(
@@ -303,11 +305,11 @@ def fill_ensure_vals(data, uid, ensure_vals) -> dict:
     for val in ensure_vals:
         if uid:
             if val["name"] not in data[uid]:
-                _default = val["default"] if "default" in val else ""
+                _default = val.get("default", "")
                 data[uid][val["name"]] = _default
 
         elif val["name"] not in data:
-            _default = val["default"] if "default" in val else ""
+            _default = val.get("default", "")
             data[val["name"]] = _default
 
     return data
