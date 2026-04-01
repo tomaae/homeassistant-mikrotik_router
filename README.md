@@ -54,6 +54,10 @@ A diagnostic sensor on the System device showing the router's public IP address 
 - **Attributes**: `ddns_enabled`, `ddns_hostname`, `ddns_status`, `back_to_home_vpn`
 - Fault-tolerant: becomes unavailable if cloud service is disabled
 
+## Bugfixes
+
+- Fixed duplicate `system_poe_out_consumption` sensor key that could cause entity registration issues
+
 # Features
 ## Interfaces
 Monitor and control status on each Mikrotik interface, both lan and wlan. Both physical and virtual.
