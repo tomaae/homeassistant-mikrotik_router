@@ -41,6 +41,7 @@ async def async_setup_entry(
         "MikrotikSensor": MikrotikSensor,
         "MikrotikInterfaceTrafficSensor": MikrotikInterfaceTrafficSensor,
         "MikrotikClientTrafficSensor": MikrotikClientTrafficSensor,
+        "MikrotikIPAddressSensor": MikrotikIPAddressSensor,
     }
     await async_add_entities(hass, config_entry, dispatcher)
 
@@ -108,6 +109,17 @@ class MikrotikInterfaceTrafficSensor(MikrotikSensor):
                     attributes[format_attribute(variable)] = self._data[variable]
 
         return attributes
+
+
+# ---------------------------
+#   MikrotikIPAddressSensor
+# ---------------------------
+class MikrotikIPAddressSensor(MikrotikSensor):
+    """IP Address sensor with static name."""
+
+    @property
+    def custom_name(self) -> str:
+        return "IP Address"
 
 
 # ---------------------------

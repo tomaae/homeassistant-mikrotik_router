@@ -264,6 +264,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             "ups": {},
             "gps": {},
             "netwatch": {},
+            "ip_address": {},
         }
 
         self.notified_flags = []
@@ -609,6 +610,9 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
         if self.api.connected():
             await self.hass.async_add_executor_job(self.get_interface)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_ip_address)
 
         if self.api.connected() and not self.ds["host_hass"]:
             await self.async_get_host_hass()
@@ -1960,6 +1964,48 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 {"name": "interface", "default": "unknown"},
             ],
         )
+
+    # ---------------------------
+    #   get_ip_address
+    # ---------------------------
+    def get_ip_address(self) -> None:
+        """Get IP address data from Mikrotik"""
+        self.ds["ip_address"] = parse_api(
+            data=self.ds["ip_address"],
+            source=self.api.query("/ip/address"),
+            key=".id",
+            vals=[
+                {"name": ".id"},
+                {"name": "address", "default": ""},
+                {"name": "network", "default": ""},
+                {"name": "interface", "default": ""},
+                {"name": "comment", "default": ""},
+                {"name": "dynamic", "type": "bool", "default": False},
+                {"name": "disabled", "type": "bool", "default": False},
+            ],
+            ensure_vals=[
+                {"name": "port-mac-address", "default": ""},
+                {"name": "ip", "default": ""},
+            ],
+        )
+        for uid in self.ds["ip_address"]:
+            iface_name = self.ds["ip_address"][uid]["interface"]
+            for iface_uid, iface_data in self.ds["interface"].items():
+                if iface_data.get("name") == iface_name or iface_uid == iface_name:
+                    self.ds["ip_address"][uid]["port-mac-address"] = iface_data.get(
+                        "port-mac-address", ""
+                    )
+                    break
+            addr = self.ds["ip_address"][uid].get("address", "")
+            self.ds["ip_address"][uid]["ip"] = addr.split("/")[0] if addr else ""
+
+        # Remove IP entries for bridge/virtual interfaces with no port-mac-address
+        uids_to_remove = [
+            uid for uid in self.ds["ip_address"]
+            if not self.ds["ip_address"][uid].get("port-mac-address")
+        ]
+        for uid in uids_to_remove:
+            del self.ds["ip_address"][uid]
 
     # ---------------------------
     #   get_dhcp_client
