@@ -169,7 +169,14 @@ When opening an issue, please attach the **diagnostics file** — it contains th
 
 # Development
 
-## Enabling debug logging
+## Debug logs in diagnostics
+
+Debug logs are **always captured automatically in the background** (last 1000 entries) and included in the diagnostics download — no configuration needed.
+
+## Showing debug logs in home-assistant.log
+
+If you also want debug messages to appear in the main HA log file, add this to `configuration.yaml`:
+
 ```yaml
 logger:
   default: info
@@ -177,4 +184,4 @@ logger:
     custom_components.mikrotik_router: debug
 ```
 
-Debug logs are always captured in the background (last 1000 entries) and included automatically in the diagnostics download — no configuration needed for basic log collection.
+This is **not required** for diagnostics — only needed if you want to watch logs live via the HA log viewer.
