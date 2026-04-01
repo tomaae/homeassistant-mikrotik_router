@@ -208,6 +208,7 @@ class MikrotikAPI:
         if response and return_list and not command:
             try:
                 response = list(response)
+                _LOGGER.debug("API query %s returned %d entries", path, len(response) if response else 0)
             except Exception as e:
                 if path == "/system/health" and "no such command prefix" in str(e):
                     self.disable_health = True
@@ -235,6 +236,10 @@ class MikrotikAPI:
     # ---------------------------
     def set_value(self, path, param, value, mod_param, mod_value) -> bool:
         """Modify a parameter"""
+        _LOGGER.debug(
+            "Mikrotik %s set_value: path=%s param=%s value=%s mod_param=%s mod_value=%s",
+            self._host, path, param, value, mod_param, mod_value,
+        )
         entry_found = None
 
         if not self.connection_check():
@@ -254,13 +259,13 @@ class MikrotikAPI:
             entry_found = tmp[".id"]
 
         if not entry_found:
-            _LOGGER.error(
+            _LOGGER.warning(
                 "Mikrotik %s set_value parameter %s with value %s not found",
                 self._host,
                 param,
                 value,
             )
-            return True
+            return False
 
         params = {".id": entry_found, mod_param: mod_value}
         self.lock.acquire()
@@ -300,14 +305,14 @@ class MikrotikAPI:
                 entry_found = tmp[".id"]
 
             if not entry_found:
-                _LOGGER.error(
+                _LOGGER.warning(
                     "Mikrotik %s Execute %s parameter %s with value %s not found",
                     self._host,
                     command,
                     param,
                     value,
                 )
-                return True
+                return False
 
             params = {".id": entry_found}
 

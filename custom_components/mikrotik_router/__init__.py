@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import voluptuous as vol
 import logging
+from collections import deque
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
@@ -28,12 +29,40 @@ WOL_SCHEMA = vol.Schema(
 
 _LOGGER = logging.getLogger(__name__)
 
+# Ring buffer for diagnostics log capture
+_LOG_BUFFER = deque(maxlen=1000)
+
+
+class _RingBufferHandler(logging.Handler):
+    """Logging handler that stores records in a ring buffer for diagnostics."""
+
+    def __init__(self, buffer):
+        super().__init__()
+        self._buffer = buffer
+
+    def emit(self, record):
+        self._buffer.append(self.format(record))
+
+
+_log_handler = _RingBufferHandler(_LOG_BUFFER)
+_log_handler.setLevel(logging.DEBUG)
+_log_handler.setFormatter(
+    logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s")
+)
+_integration_logger = logging.getLogger("custom_components.mikrotik_router")
+_integration_logger.addHandler(_log_handler)
+_integration_logger.setLevel(logging.DEBUG)
+
 
 # ---------------------------
 #   async_setup_entry
 # ---------------------------
 async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     """Set up a config entry."""
+    _LOGGER.info(
+        "Setting up Mikrotik Router integration for %s",
+        config_entry.data.get("host", "unknown"),
+    )
     coordinator = MikrotikCoordinator(hass, config_entry)
     await coordinator.async_config_entry_first_refresh()
     coordinatorTracker = MikrotikTrackerCoordinator(hass, config_entry, coordinator)

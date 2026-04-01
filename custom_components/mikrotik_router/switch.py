@@ -77,6 +77,7 @@ class MikrotikSwitch(MikrotikEntity, SwitchEntity, RestoreEntity):
     async def async_turn_on(self) -> None:
         """Turn on the switch."""
         if "write" not in self.coordinator.data["access"]:
+            _LOGGER.warning("Mikrotik %s switch operation blocked: user lacks write access", self.coordinator.host)
             return
 
         path = self.entity_description.data_switch_path
@@ -89,6 +90,7 @@ class MikrotikSwitch(MikrotikEntity, SwitchEntity, RestoreEntity):
     async def async_turn_off(self) -> None:
         """Turn off the switch."""
         if "write" not in self.coordinator.data["access"]:
+            _LOGGER.warning("Mikrotik %s switch operation blocked: user lacks write access", self.coordinator.host)
             return
 
         path = self.entity_description.data_switch_path

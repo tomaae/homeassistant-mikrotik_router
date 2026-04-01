@@ -85,6 +85,7 @@ class MikrotikRouterOSUpdate(MikrotikEntity, UpdateEntity):
 
     async def async_install(self, version: str, backup: bool, **kwargs: Any) -> None:
         """Install an update."""
+        _LOGGER.info("Installing RouterOS update on %s (backup=%s)", self.coordinator.host, backup)
         if backup:
             self.coordinator.execute("/system/backup", "save", None, None)
 
@@ -161,6 +162,7 @@ class MikrotikRouterBoardFWUpdate(MikrotikEntity, UpdateEntity):
 
     async def async_install(self, version: str, backup: bool, **kwargs: Any) -> None:
         """Install an update."""
+        _LOGGER.info("Upgrading RouterBoard firmware on %s and rebooting", self.coordinator.host)
         self.coordinator.execute("/system/routerboard", "upgrade", None, None)
         self.coordinator.execute("/system", "reboot", None, None)
 
@@ -174,7 +176,7 @@ async def fetch_changelog(session, version: str) -> str:
                 text = await response.text()
                 return text.replace("*) ", "- ")
     except Exception as e:
-        pass
+        _LOGGER.debug("Failed to fetch changelog for %s: %s", version, e)
     return ""
 
 

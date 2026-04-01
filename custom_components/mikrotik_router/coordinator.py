@@ -580,6 +580,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
     # ---------------------------
     async def _async_update_data(self):
         """Update Mikrotik data"""
+        _LOGGER.debug("Mikrotik %s starting data update cycle", self.host)
         delta = datetime.now().replace(microsecond=0) - self.last_hwinfo_update
         if self.api.has_reconnected() or delta.total_seconds() > 60 * 60 * 4:
             await self.hass.async_add_executor_job(self.get_access)
@@ -703,6 +704,13 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         if not self.api.connected():
             raise UpdateFailed("Mikrotik Disconnected")
 
+        _LOGGER.debug(
+            "Mikrotik %s data update cycle complete (interfaces=%d, hosts=%d, routing_rules=%d)",
+            self.host,
+            len(self.ds.get("interface", {})),
+            len(self.ds.get("host", {})),
+            len(self.ds.get("routing_rules", {})),
+        )
         # async_dispatcher_send(self.hass, "update_sensors", self)
         return self.ds
 
@@ -1082,7 +1090,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         for uid in nat_del:
             if self.ds["nat"][uid]["uniq-id"] not in self.nat_removed:
                 self.nat_removed[self.ds["nat"][uid]["uniq-id"]] = 1
-                _LOGGER.error(
+                _LOGGER.warning(
                     "Mikrotik %s duplicate NAT rule %s, entity will be unavailable.",
                     self.host,
                     self.ds["nat"][uid]["name"],
@@ -1174,7 +1182,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         for uid in mangle_del:
             if self.ds["mangle"][uid]["uniq-id"] not in self.mangle_removed:
                 self.mangle_removed[self.ds["mangle"][uid]["uniq-id"]] = 1
-                _LOGGER.error(
+                _LOGGER.warning(
                     "Mikrotik %s duplicate Mangle rule %s, entity will be unavailable.",
                     self.host,
                     self.ds["mangle"][uid]["name"],
@@ -1187,6 +1195,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
     # ---------------------------
     def get_routing_rules(self) -> None:
         """Get Routing Rules data from Mikrotik"""
+        _LOGGER.debug("Mikrotik %s fetching routing rules", self.host)
         self.ds["routing_rules"] = parse_api(
             data=self.ds["routing_rules"],
             source=self.api.query("/routing/rule"),
@@ -1256,7 +1265,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         for uid in routing_rules_del:
             if self.ds["routing_rules"][uid]["uniq-id"] not in self.routing_rules_removed:
                 self.routing_rules_removed[self.ds["routing_rules"][uid]["uniq-id"]] = 1
-                _LOGGER.error(
+                _LOGGER.warning(
                     "Mikrotik %s duplicate Routing Rules rule %s, entity will be unavailable.",
                     self.host,
                     self.ds["routing_rules"][uid]["name"],
@@ -1365,7 +1374,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         for uid in filter_del:
             if self.ds["filter"][uid]["uniq-id"] not in self.filter_removed:
                 self.filter_removed[self.ds["filter"][uid]["uniq-id"]] = 1
-                _LOGGER.error(
+                _LOGGER.warning(
                     "Mikrotik %s duplicate Filter rule %s (ID %s), entity will be unavailable.",
                     self.host,
                     self.ds["filter"][uid]["name"],
