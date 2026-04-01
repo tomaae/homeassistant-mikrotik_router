@@ -126,22 +126,27 @@ async def async_add_entities(
                 await platform.async_add_entities([obj])
 
         for entity_description in descriptions:
-            data = coordinator.data[entity_description.data_path]
+            data = coordinator.data.get(entity_description.data_path)
+            if data is None:
+                continue
             if not entity_description.data_reference:
                 if data.get(entity_description.data_attribute) is None:
                     continue
-                obj = dispatcher[entity_description.func](
-                    coordinator, entity_description
-                )
+                func = dispatcher.get(entity_description.func)
+                if func is None:
+                    continue
+                obj = func(coordinator, entity_description)
                 await async_check_exist(obj, coordinator, None)
             else:
-                for uid in data:
-                    if _skip_sensor(config_entry, entity_description, data, uid):
-                        continue
-                    obj = dispatcher[entity_description.func](
-                        coordinator, entity_description, uid
-                    )
-                    await async_check_exist(obj, coordinator, uid)
+                if isinstance(data, (dict, list)):
+                    for uid in data:
+                        if _skip_sensor(config_entry, entity_description, data, uid):
+                            continue
+                        func = dispatcher.get(entity_description.func)
+                        if func is None:
+                            continue
+                        obj = func(coordinator, entity_description, uid)
+                        await async_check_exist(obj, coordinator, uid)
 
     await async_update_controller(
         hass.data[DOMAIN][config_entry.entry_id].data_coordinator
