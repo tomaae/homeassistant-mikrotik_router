@@ -780,6 +780,22 @@ SENSOR_TYPES: tuple[MikrotikSensorEntityDescription, ...] = (
         data_uid="name",
         data_reference="name",
     ),
+    MikrotikSensorEntityDescription(
+        key="ip_address",
+        name="IP Address",
+        icon="mdi:ip",
+        entity_category=None,
+        ha_group="data__interface",
+        ha_connection=CONNECTION_NETWORK_MAC,
+        ha_connection_value="data__port-mac-address",
+        data_path="ip_address",
+        data_attribute="ip",
+        data_name=".id",
+        data_uid=".id",
+        data_reference=".id",
+        data_attributes_list=["address", "network", "comment", "disabled"],
+        func="MikrotikIPAddressSensor",
+    ),
 )
 
 SENSOR_SERVICES = []
