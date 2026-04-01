@@ -265,6 +265,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             "gps": {},
             "netwatch": {},
             "ip_address": {},
+            "cloud": {},
         }
 
         self.notified_flags = []
@@ -293,6 +294,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         self.support_ppp = False
         self.support_ups = False
         self.support_gps = False
+        self.support_cloud = False
         self._wifimodule = "wireless"
 
         self.major_fw_version = 0
@@ -613,6 +615,9 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
         if self.api.connected():
             await self.hass.async_add_executor_job(self.get_ip_address)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_cloud)
 
         if self.api.connected() and not self.ds["host_hass"]:
             await self.async_get_host_hass()
@@ -2006,6 +2011,28 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         ]
         for uid in uids_to_remove:
             del self.ds["ip_address"][uid]
+
+    # ---------------------------
+    #   get_cloud
+    # ---------------------------
+    def get_cloud(self) -> None:
+        """Get IP cloud data from Mikrotik"""
+        try:
+            self.ds["cloud"] = parse_api(
+                data=self.ds["cloud"],
+                source=self.api.query("/ip/cloud"),
+                vals=[
+                    {"name": "public-address", "default": ""},
+                    {"name": "ddns-enabled", "default": ""},
+                    {"name": "dns-name", "default": ""},
+                    {"name": "status", "default": ""},
+                    {"name": "back-to-home-vpn", "default": ""},
+                ],
+            )
+            self.ds["cloud"]["ddns-hostname"] = self.ds["cloud"].pop("dns-name", "")
+            self.ds["cloud"]["ddns-status"] = self.ds["cloud"].pop("status", "")
+        except Exception as e:
+            _LOGGER.warning("Mikrotik get_cloud failed: %s", e)
 
     # ---------------------------
     #   get_dhcp_client
