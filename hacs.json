@@ -1,7 +1,5 @@
 {
     "name": "Mikrotik Router",
     "homeassistant": "2024.3.0",
-    "render_readme": false,
-    "zip_release": true,
-    "filename": "mikrotik_router.zip"
+    "render_readme": false
 }
