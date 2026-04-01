@@ -103,6 +103,15 @@ DEVICE_ATTRIBUTES_MANGLE = [
     "comment",
 ]
 
+DEVICE_ATTRIBUTES_ROUTING_RULES = [
+    "action",
+    "src-address",
+    "dst-address",
+    "routing-mark",
+    "interface",
+    "comment",
+]
+
 DEVICE_ATTRIBUTES_FILTER = [
     "chain",
     "action",
@@ -237,6 +246,24 @@ SENSOR_TYPES: tuple[MikrotikSwitchEntityDescription, ...] = (
         data_reference="uniq-id",
         data_attributes_list=DEVICE_ATTRIBUTES_MANGLE,
         func="MikrotikMangleSwitch",
+    ),
+    MikrotikSwitchEntityDescription(
+        key="routing_rules",
+        name="",
+        icon_enabled="mdi:bookmark-outline",
+        icon_disabled="mdi:bookmark-off-outline",
+        entity_category=None,
+        ha_group="data__comment",
+        ha_connection=DOMAIN,
+        ha_connection_value="data__src-address",
+        data_path="routing_rules",
+        data_switch_path="/routing/rule",
+        data_name="name",
+        data_name_comment=True,
+        data_uid="uniq-id",
+        data_reference="uniq-id",
+        data_attributes_list=DEVICE_ATTRIBUTES_ROUTING_RULES,
+        func="MikrotikRoutingRulesSwitch",
     ),
     MikrotikSwitchEntityDescription(
         key="filter",
