@@ -154,12 +154,27 @@ If you find this integration useful, consider supporting the project:
 
 Have an idea for a new feature or found a bug? Don't hesitate to [open an issue](https://github.com/Csontikka/homeassistant-mikrotik_router/issues) — feedback and feature requests are always welcome!
 
+## Reporting a bug
+
+When opening an issue, please attach the **diagnostics file** — it contains the integration state and the last 1000 debug log lines, which makes it much easier to diagnose problems.
+
+**How to download diagnostics:**
+1. **Settings → Devices & Services**
+2. Find **Mikrotik Router** → click on it
+3. Click the **3-dot menu** next to the integration entry
+4. Select **Download diagnostics**
+5. Attach the downloaded `.json` file to your GitHub issue
+
+> The diagnostics file automatically redacts sensitive data (passwords, IP addresses, MAC addresses) before download.
+
 # Development
 
-## Enabling debug
+## Enabling debug logging
 ```yaml
 logger:
   default: info
   logs:
     custom_components.mikrotik_router: debug
 ```
+
+Debug logs are always captured in the background (last 1000 entries) and included automatically in the diagnostics download — no configuration needed for basic log collection.
