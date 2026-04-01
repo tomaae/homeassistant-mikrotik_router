@@ -54,6 +54,19 @@ A diagnostic sensor on the System device showing the router's public IP address 
 - **Attributes**: `ddns_enabled`, `ddns_hostname`, `ddns_status`, `back_to_home_vpn`
 - Fault-tolerant: becomes unavailable if cloud service is disabled
 
+## Wake-on-LAN Service
+Send a Wake-on-LAN magic packet through the MikroTik router to wake up any device on the network.
+
+- HA service: `mikrotik_router.send_magic_packet`
+- Parameters: `mac` (required), `interface` (optional)
+- Works across all configured MikroTik routers simultaneously
+
+## Reboot Button
+Each router device gets a **Reboot** button entity in Home Assistant.
+
+- Press to reboot the MikroTik device directly from HA
+- Requires `reboot` permission on the API user
+
 ## Bugfixes
 
 - Fixed duplicate `system_poe_out_consumption` sensor key that could cause entity registration issues
