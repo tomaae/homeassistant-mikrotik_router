@@ -39,6 +39,7 @@ async def async_setup_entry(
         "MikrotikPortSwitch": MikrotikPortSwitch,
         "MikrotikNATSwitch": MikrotikNATSwitch,
         "MikrotikMangleSwitch": MikrotikMangleSwitch,
+        "MikrotikRoutingRulesSwitch": MikrotikRoutingRulesSwitch,
         "MikrotikFilterSwitch": MikrotikFilterSwitch,
         "MikrotikQueueSwitch": MikrotikQueueSwitch,
         "MikrotikKidcontrolPauseSwitch": MikrotikKidcontrolPauseSwitch,
@@ -274,6 +275,55 @@ class MikrotikMangleSwitch(MikrotikSwitch):
                 f"{self._data['src-address-list']}-{self._data['dst-address-list']}"
             ):
                 value = self.coordinator.data["mangle"][uid][".id"]
+
+        mod_param = self.entity_description.data_switch_parameter
+        self.coordinator.set_value(path, param, value, mod_param, True)
+        await self.coordinator.async_refresh()
+
+
+# ---------------------------
+#   MikrotikRoutingRulesSwitch
+# ---------------------------
+class MikrotikRoutingRulesSwitch(MikrotikSwitch):
+    """Representation of a Routing Rules switch."""
+
+    async def async_turn_on(self) -> None:
+        """Turn on the switch."""
+        if "write" not in self.coordinator.data["access"]:
+            return
+
+        path = self.entity_description.data_switch_path
+        param = ".id"
+        value = None
+        for uid in self.coordinator.data["routing_rules"]:
+            if self.coordinator.data["routing_rules"][uid]["uniq-id"] == (
+                f"{self._data['comment']},{self._data['action']},"
+                f"{self._data['src-address']},"
+                f"{self._data['dst-address']},"
+                f"{self._data['routing-mark']},{self._data['interface']}"
+            ):
+                value = self.coordinator.data["routing_rules"][uid][".id"]
+
+        mod_param = self.entity_description.data_switch_parameter
+        self.coordinator.set_value(path, param, value, mod_param, False)
+        await self.coordinator.async_refresh()
+
+    async def async_turn_off(self) -> None:
+        """Turn off the switch."""
+        if "write" not in self.coordinator.data["access"]:
+            return
+
+        path = self.entity_description.data_switch_path
+        param = ".id"
+        value = None
+        for uid in self.coordinator.data["routing_rules"]:
+            if self.coordinator.data["routing_rules"][uid]["uniq-id"] == (
+                f"{self._data['comment']},{self._data['action']},"
+                f"{self._data['src-address']},"
+                f"{self._data['dst-address']},"
+                f"{self._data['routing-mark']},{self._data['interface']}"
+            ):
+                value = self.coordinator.data["routing_rules"][uid][".id"]
 
         mod_param = self.entity_description.data_switch_parameter
         self.coordinator.set_value(path, param, value, mod_param, True)

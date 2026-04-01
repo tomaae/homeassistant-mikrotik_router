@@ -51,6 +51,8 @@ from .const import (
     DEFAULT_SENSOR_NAT,
     CONF_SENSOR_MANGLE,
     DEFAULT_SENSOR_MANGLE,
+    CONF_SENSOR_ROUTING_RULES,
+    DEFAULT_SENSOR_ROUTING_RULES,
     CONF_SENSOR_FILTER,
     DEFAULT_SENSOR_FILTER,
     CONF_SENSOR_KIDCONTROL,
@@ -242,6 +244,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             "nat": {},
             "kid-control": {},
             "mangle": {},
+            "routing_rules": {},
             "filter": {},
             "ppp_secret": {},
             "ppp_active": {},
@@ -285,6 +288,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
         self.nat_removed = {}
         self.mangle_removed = {}
+        self.routing_rules_removed = {}
         self.filter_removed = {}
         self.host_hass_recovered = False
         self.host_tracking_initialized = False
@@ -379,6 +383,14 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
     def option_sensor_mangle(self):
         """Config entry option to not track ARP."""
         return self.config_entry.options.get(CONF_SENSOR_MANGLE, DEFAULT_SENSOR_MANGLE)
+
+    # ---------------------------
+    #   option_sensor_routing_rules
+    # ---------------------------
+    @property
+    def option_sensor_routing_rules(self):
+        """Config entry option for routing rules."""
+        return self.config_entry.options.get(CONF_SENSOR_ROUTING_RULES, DEFAULT_SENSOR_ROUTING_RULES)
 
     # ---------------------------
     #   option_sensor_filter
@@ -654,6 +666,9 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
         if self.api.connected() and self.option_sensor_mangle:
             await self.hass.async_add_executor_job(self.get_mangle)
+
+        if self.api.connected() and self.option_sensor_routing_rules:
+            await self.hass.async_add_executor_job(self.get_routing_rules)
 
         if self.api.connected() and self.option_sensor_filter:
             await self.hass.async_add_executor_job(self.get_filter)
@@ -1166,6 +1181,88 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 )
 
             del self.ds["mangle"][uid]
+
+    # ---------------------------
+    #   get_routing_rules
+    # ---------------------------
+    def get_routing_rules(self) -> None:
+        """Get Routing Rules data from Mikrotik"""
+        self.ds["routing_rules"] = parse_api(
+            data=self.ds["routing_rules"],
+            source=self.api.query("/routing/rule"),
+            key=".id",
+            vals=[
+                {"name": ".id"},
+                {"name": "comment", "default_val": "src-address"},
+                {"name": "action"},
+                {"name": "src-address", "default": "any"},
+                {"name": "dst-address", "default": "any"},
+                {"name": "routing-mark", "default": "any"},
+                {"name": "interface", "default": "any"},
+                {
+                    "name": "enabled",
+                    "source": "disabled",
+                    "type": "bool",
+                    "reverse": True,
+                },
+            ],
+            val_proc=[
+                [
+                    {"name": "uniq-id"},
+                    {"action": "combine"},
+                    {"key": "comment"},
+                    {"text": ","},
+                    {"key": "action"},
+                    {"text": ","},
+                    {"key": "src-address"},
+                    {"text": ","},
+                    {"key": "dst-address"},
+                    {"text": ","},
+                    {"key": "routing-mark"},
+                    {"text": ","},
+                    {"key": "interface"},
+                ],
+                [
+                    {"name": "name"},
+                    {"action": "combine"},
+                    {"key": "comment"},
+                    {"text": ","},
+                    {"key": "action"},
+                    {"text": ","},
+                    {"key": "src-address"},
+                    {"text": ","},
+                    {"key": "dst-address"},
+                ],
+            ],
+            skip=[
+                {"name": "dynamic", "value": True},
+                {"name": "action", "value": "jump"},
+            ],
+        )
+
+        # Remove duplicate Routing Rules entries to prevent crash
+        routing_rules_uniq = {}
+        routing_rules_del = {}
+        for uid in self.ds["routing_rules"]:
+            self.ds["routing_rules"][uid]["comment"] = str(self.ds["routing_rules"][uid]["comment"])
+
+            tmp_name = self.ds["routing_rules"][uid]["uniq-id"]
+            if tmp_name not in routing_rules_uniq:
+                routing_rules_uniq[tmp_name] = uid
+            else:
+                routing_rules_del[uid] = 1
+                routing_rules_del[routing_rules_uniq[tmp_name]] = 1
+
+        for uid in routing_rules_del:
+            if self.ds["routing_rules"][uid]["uniq-id"] not in self.routing_rules_removed:
+                self.routing_rules_removed[self.ds["routing_rules"][uid]["uniq-id"]] = 1
+                _LOGGER.error(
+                    "Mikrotik %s duplicate Routing Rules rule %s, entity will be unavailable.",
+                    self.host,
+                    self.ds["routing_rules"][uid]["name"],
+                )
+
+            del self.ds["routing_rules"][uid]
 
     # ---------------------------
     #   get_filter
