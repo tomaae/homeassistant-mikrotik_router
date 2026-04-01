@@ -146,6 +146,14 @@ Minimum requirements:
    * read, write, api, reboot, policy, test
 2. Setup this integration in Home Assistant via `Configuration -> Integrations -> Add -> Mikrotik Router`.
 
+# Support & Feature Requests
+
+If you find this integration useful, consider supporting the project:
+
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-support-yellow?style=for-the-badge&logo=buy-me-a-coffee)](https://buymeacoffee.com/csontikka)
+
+Have an idea for a new feature or found a bug? Don't hesitate to [open an issue](https://github.com/Csontikka/homeassistant-mikrotik_router/issues) — feedback and feature requests are always welcome!
+
 # Development
 
 ## Enabling debug
