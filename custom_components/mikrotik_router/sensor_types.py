@@ -796,6 +796,17 @@ SENSOR_TYPES: tuple[MikrotikSensorEntityDescription, ...] = (
         data_attributes_list=["address", "network", "comment", "disabled"],
         func="MikrotikIPAddressSensor",
     ),
+    MikrotikSensorEntityDescription(
+        key="cloud_public_address",
+        name="Public Address",
+        icon="mdi:ip-network-outline",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        ha_group="System",
+        data_path="cloud",
+        data_attribute="public-address",
+        data_attributes_list=["ddns-enabled", "ddns-hostname", "ddns-status", "back-to-home-vpn"],
+        func="MikrotikSensor",
+    ),
 )
 
 SENSOR_SERVICES = []
