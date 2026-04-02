@@ -51,6 +51,7 @@
                     "sensor_mangle": "Mangle switches",
                     "sensor_routing_rules": "Routing Rules switches",
                     "sensor_wireguard": "WireGuard peer sensors",
+                    "sensor_containers": "Container sensors",
                     "sensor_ppp": "PPP users",
                     "sensor_filter": "Filter switches",
                     "sensor_client_captive": "Captive portal data",

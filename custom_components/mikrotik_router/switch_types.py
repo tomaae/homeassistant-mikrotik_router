@@ -200,6 +200,20 @@ DEVICE_ATTRIBUTES_WIREGUARD_PEER = [
     "last-handshake",
 ]
 
+DEVICE_ATTRIBUTES_CONTAINER = [
+    "tag",
+    "os",
+    "arch",
+    "interface",
+    "root-dir",
+    "mounts",
+    "status",
+    "memory-current",
+    "cpu-usage",
+    "comment",
+    "start-on-boot",
+]
+
 
 SENSOR_TYPES: tuple[MikrotikSwitchEntityDescription, ...] = (
     MikrotikSwitchEntityDescription(
@@ -375,6 +389,25 @@ SENSOR_TYPES: tuple[MikrotikSwitchEntityDescription, ...] = (
         data_reference="uniq-id",
         data_attributes_list=DEVICE_ATTRIBUTES_WIREGUARD_PEER,
         func="MikrotikWireguardPeerSwitch",
+    ),
+    MikrotikSwitchEntityDescription(
+        key="container",
+        name="",
+        icon_enabled="mdi:docker",
+        icon_disabled="mdi:docker",
+        entity_category=None,
+        ha_group="Container",
+        ha_connection=DOMAIN,
+        ha_connection_value="Container",
+        data_path="containers",
+        data_attribute="running",
+        data_switch_path="/container",
+        data_name="display-name",
+        data_name_comment=False,
+        data_uid=".id",
+        data_reference=".id",
+        data_attributes_list=DEVICE_ATTRIBUTES_CONTAINER,
+        func="MikrotikContainerSwitch",
     ),
 )
 

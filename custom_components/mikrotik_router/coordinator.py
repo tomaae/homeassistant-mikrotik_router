@@ -55,6 +55,8 @@ from .const import (
     DEFAULT_SENSOR_ROUTING_RULES,
     CONF_SENSOR_WIREGUARD,
     DEFAULT_SENSOR_WIREGUARD,
+    CONF_SENSOR_CONTAINERS,
+    DEFAULT_SENSOR_CONTAINERS,
     CONF_SENSOR_FILTER,
     DEFAULT_SENSOR_FILTER,
     CONF_SENSOR_KIDCONTROL,
@@ -290,6 +292,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             "ip_address": {},
             "cloud": {},
             "wireguard_peers": {},
+            "containers": {},
             "system_device_mode": {},
             "system_packages": {},
         }
@@ -322,6 +325,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         self.support_ups = False
         self.support_gps = False
         self.support_wireguard = False
+        self.support_containers = False
         self.support_cloud = False
         self._wifimodule = "wireless"
 
@@ -423,6 +427,14 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
     def option_sensor_wireguard(self):
         """Config entry option for wireguard peers."""
         return self.config_entry.options.get(CONF_SENSOR_WIREGUARD, DEFAULT_SENSOR_WIREGUARD)
+
+    # ---------------------------
+    #   option_sensor_containers
+    # ---------------------------
+    @property
+    def option_sensor_containers(self):
+        """Config entry option for container sensors."""
+        return self.config_entry.options.get(CONF_SENSOR_CONTAINERS, DEFAULT_SENSOR_CONTAINERS)
 
     # ---------------------------
     #   option_sensor_filter
@@ -590,6 +602,10 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         elif "wireguard" in packages and packages["wireguard"]["enabled"]:
             self.support_wireguard = True
 
+        # Container support available from RouterOS v7
+        if self.major_fw_version >= 7:
+            self.support_containers = True
+
     # ---------------------------
     #   async_get_host_hass
     # ---------------------------
@@ -711,6 +727,9 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
         if self.api.connected() and self.support_wireguard and self.option_sensor_wireguard:
             await self.hass.async_add_executor_job(self.get_wireguard_peers)
+
+        if self.api.connected() and self.support_containers and self.option_sensor_containers:
+            await self.hass.async_add_executor_job(self.get_containers)
 
         if self.api.connected():
             await self.hass.async_add_executor_job(self.get_device_mode)
@@ -1422,6 +1441,42 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             result[pkg] = active[pkg] if pkg in active else False
 
         self.ds["system_packages"] = result
+
+    # ---------------------------
+    #   get_containers
+    # ---------------------------
+    def get_containers(self) -> None:
+        """Get Container data from Mikrotik"""
+        _LOGGER.debug("Mikrotik %s fetching containers", self.host)
+        self.ds["containers"] = parse_api(
+            data=self.ds["containers"],
+            source=self.api.query("/container"),
+            key=".id",
+            vals=[
+                {"name": ".id"},
+                {"name": "name", "default": ""},
+                {"name": "tag", "default": ""},
+                {"name": "os", "default": ""},
+                {"name": "arch", "default": ""},
+                {"name": "interface", "default": ""},
+                {"name": "root-dir", "default": ""},
+                {"name": "mounts", "default": ""},
+                {"name": "comment", "default": ""},
+                {"name": "start-on-boot", "default": "false"},
+                {"name": "running", "type": "bool", "default": False},
+                {"name": "memory-current", "default": ""},
+                {"name": "cpu-usage", "default": ""},
+            ],
+        )
+
+        for uid in self.ds["containers"]:
+            container = self.ds["containers"][uid]
+            container["uniq-id"] = uid
+            cname = str(container.get("name", "")).strip()
+            comment = str(container.get("comment", "")).strip()
+            tag = str(container.get("tag", "")).strip()
+            container["display-name"] = cname or comment or tag or uid
+            container["status"] = "running" if container.get("running", False) else "stopped"
 
     # ---------------------------
     #   get_filter

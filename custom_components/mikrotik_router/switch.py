@@ -44,6 +44,7 @@ async def async_setup_entry(
         "MikrotikQueueSwitch": MikrotikQueueSwitch,
         "MikrotikKidcontrolPauseSwitch": MikrotikKidcontrolPauseSwitch,
         "MikrotikWireguardPeerSwitch": MikrotikWireguardPeerSwitch,
+        "MikrotikContainerSwitch": MikrotikContainerSwitch,
     }
     await async_add_entities(hass, config_entry, dispatcher)
 
@@ -478,4 +479,55 @@ class MikrotikWireguardPeerSwitch(MikrotikSwitch):
         value = self._data[".id"]
         mod_param = self.entity_description.data_switch_parameter
         self.coordinator.set_value(path, param, value, mod_param, True)
+        await self.coordinator.async_refresh()
+
+
+# ---------------------------
+#   MikrotikContainerSwitch
+# ---------------------------
+class MikrotikContainerSwitch(MikrotikSwitch):
+    """Representation of a container start/stop switch."""
+
+    @property
+    def is_on(self) -> bool:
+        """Return true if container is running."""
+        return self._data.get("status", "stopped") == "running"
+
+    @property
+    def icon(self) -> str:
+        """Return the icon."""
+        if self.is_on:
+            return self.entity_description.icon_enabled
+        return self.entity_description.icon_disabled
+
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        """Start the container."""
+        if "write" not in self.coordinator.data["access"]:
+            _LOGGER.warning(
+                "Mikrotik %s container start blocked: user lacks write access",
+                self.coordinator.host,
+            )
+            return
+        self.coordinator.execute(
+            self.entity_description.data_switch_path,
+            "start",
+            ".id",
+            self._data[".id"],
+        )
+        await self.coordinator.async_refresh()
+
+    async def async_turn_off(self, **kwargs: Any) -> None:
+        """Stop the container."""
+        if "write" not in self.coordinator.data["access"]:
+            _LOGGER.warning(
+                "Mikrotik %s container stop blocked: user lacks write access",
+                self.coordinator.host,
+            )
+            return
+        self.coordinator.execute(
+            self.entity_description.data_switch_path,
+            "stop",
+            ".id",
+            self._data[".id"],
+        )
         await self.coordinator.async_refresh()

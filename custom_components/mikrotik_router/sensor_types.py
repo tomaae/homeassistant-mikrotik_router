@@ -159,6 +159,19 @@ DEVICE_ATTRIBUTES_PACKAGES = [
     "tr069-client",
 ]
 
+DEVICE_ATTRIBUTES_CONTAINER_SENSOR = [
+    "tag",
+    "os",
+    "arch",
+    "interface",
+    "root-dir",
+    "mounts",
+    "memory-current",
+    "cpu-usage",
+    "comment",
+    "start-on-boot",
+]
+
 
 @dataclass
 class MikrotikSensorEntityDescription(SensorEntityDescription):
@@ -923,6 +936,23 @@ SENSOR_TYPES: tuple[MikrotikSensorEntityDescription, ...] = (
         data_uid="",
         data_reference="",
         data_attributes_list=DEVICE_ATTRIBUTES_PACKAGES,
+        func="MikrotikSensor",
+    ),
+    MikrotikSensorEntityDescription(
+        key="container_status",
+        name="Status",
+        icon="mdi:docker",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        ha_group="Container",
+        ha_connection=DOMAIN,
+        ha_connection_value="Container",
+        data_path="containers",
+        data_attribute="status",
+        data_name="display-name",
+        data_name_comment=False,
+        data_uid=".id",
+        data_reference=".id",
+        data_attributes_list=DEVICE_ATTRIBUTES_CONTAINER_SENSOR,
         func="MikrotikSensor",
     ),
 )
