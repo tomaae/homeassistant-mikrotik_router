@@ -117,6 +117,13 @@ DEVICE_ATTRIBUTES_GPS = [
 ]
 
 
+DEVICE_ATTRIBUTES_WIREGUARD_PEER = [
+    "interface",
+    "allowed-address",
+    "comment",
+]
+
+
 @dataclass
 class MikrotikSensorEntityDescription(SensorEntityDescription):
     """Class describing mikrotik entities."""
@@ -788,6 +795,66 @@ SENSOR_TYPES: tuple[MikrotikSensorEntityDescription, ...] = (
         data_path="cloud",
         data_attribute="public-address",
         data_attributes_list=["ddns-enabled", "ddns-hostname", "ddns-status", "back-to-home-vpn"],
+        func="MikrotikSensor",
+    ),
+    MikrotikSensorEntityDescription(
+        key="wireguard_peer_rx",
+        name="RX",
+        icon="mdi:download-network-outline",
+        native_unit_of_measurement=UnitOfInformation.BYTES,
+        device_class=SensorDeviceClass.DATA_SIZE,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        ha_group="WireGuard",
+        ha_connection=DOMAIN,
+        ha_connection_value="WireGuard",
+        data_path="wireguard_peers",
+        data_attribute="rx",
+        data_name="name",
+        data_name_comment=True,
+        data_uid="uniq-id",
+        data_reference="uniq-id",
+        data_attributes_list=DEVICE_ATTRIBUTES_WIREGUARD_PEER,
+        func="MikrotikSensor",
+    ),
+    MikrotikSensorEntityDescription(
+        key="wireguard_peer_tx",
+        name="TX",
+        icon="mdi:upload-network-outline",
+        native_unit_of_measurement=UnitOfInformation.BYTES,
+        device_class=SensorDeviceClass.DATA_SIZE,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        ha_group="WireGuard",
+        ha_connection=DOMAIN,
+        ha_connection_value="WireGuard",
+        data_path="wireguard_peers",
+        data_attribute="tx",
+        data_name="name",
+        data_name_comment=True,
+        data_uid="uniq-id",
+        data_reference="uniq-id",
+        data_attributes_list=DEVICE_ATTRIBUTES_WIREGUARD_PEER,
+        func="MikrotikSensor",
+    ),
+    MikrotikSensorEntityDescription(
+        key="wireguard_peer_handshake",
+        name="Last Handshake",
+        icon="mdi:handshake-outline",
+        native_unit_of_measurement="s",
+        device_class=SensorDeviceClass.DURATION,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        ha_group="WireGuard",
+        ha_connection=DOMAIN,
+        ha_connection_value="WireGuard",
+        data_path="wireguard_peers",
+        data_attribute="last-handshake-seconds",
+        data_name="name",
+        data_name_comment=True,
+        data_uid="uniq-id",
+        data_reference="uniq-id",
+        data_attributes_list=DEVICE_ATTRIBUTES_WIREGUARD_PEER,
         func="MikrotikSensor",
     ),
 )

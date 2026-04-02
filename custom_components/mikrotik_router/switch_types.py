@@ -193,6 +193,14 @@ class MikrotikSwitchEntityDescription(SwitchEntityDescription):
     func: str = "MikrotikSwitch"
 
 
+DEVICE_ATTRIBUTES_WIREGUARD_PEER = [
+    "interface",
+    "allowed-address",
+    "comment",
+    "last-handshake",
+]
+
+
 SENSOR_TYPES: tuple[MikrotikSwitchEntityDescription, ...] = (
     MikrotikSwitchEntityDescription(
         key="interface",
@@ -349,6 +357,24 @@ SENSOR_TYPES: tuple[MikrotikSwitchEntityDescription, ...] = (
         data_reference="name",
         data_attributes_list=DEVICE_ATTRIBUTES_KIDCONTROL,
         func="MikrotikKidcontrolPauseSwitch",
+    ),
+    MikrotikSwitchEntityDescription(
+        key="wireguard_peer",
+        name="",
+        icon_enabled="mdi:vpn",
+        icon_disabled="mdi:vpn",
+        entity_category=None,
+        ha_group="WireGuard",
+        ha_connection=DOMAIN,
+        ha_connection_value="WireGuard",
+        data_path="wireguard_peers",
+        data_switch_path="/interface/wireguard/peers",
+        data_name="name",
+        data_name_comment=True,
+        data_uid="uniq-id",
+        data_reference="uniq-id",
+        data_attributes_list=DEVICE_ATTRIBUTES_WIREGUARD_PEER,
+        func="MikrotikWireguardPeerSwitch",
     ),
 )
 
