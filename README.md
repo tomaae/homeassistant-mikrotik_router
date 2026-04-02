@@ -3,8 +3,6 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=plastic)](https://github.com/hacs/integration)
 ![Project Stage](https://img.shields.io/badge/project%20stage-Production%20Ready-green.svg?style=plastic)
 
-[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-support-yellow?style=plastic&logo=buy-me-a-coffee)](https://buymeacoffee.com/csontikka)
-
 > **Fork** of [tomaae/homeassistant-mikrotik_router](https://github.com/tomaae/homeassistant-mikrotik_router) with additional features.
 
 ![Mikrotik Logo](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/header.png)
@@ -174,10 +172,6 @@ Minimum requirements:
 2. Setup this integration in Home Assistant via `Configuration -> Integrations -> Add -> Mikrotik Router`.
 
 # Support & Feature Requests
-
-If you find this integration useful, consider supporting the project:
-
-[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-support-yellow?style=for-the-badge&logo=buy-me-a-coffee)](https://buymeacoffee.com/csontikka)
 
 Have an idea for a new feature or found a bug? Don't hesitate to [open an issue](https://github.com/Csontikka/homeassistant-mikrotik_router/issues) — feedback and feature requests are always welcome!
 
