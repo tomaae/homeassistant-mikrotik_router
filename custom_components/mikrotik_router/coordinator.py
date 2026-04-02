@@ -290,6 +290,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             "ip_address": {},
             "cloud": {},
             "wireguard_peers": {},
+            "system_device_mode": {},
+            "system_packages": {},
         }
 
         self.notified_flags = []
@@ -709,6 +711,11 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
         if self.api.connected() and self.support_wireguard and self.option_sensor_wireguard:
             await self.hass.async_add_executor_job(self.get_wireguard_peers)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_device_mode)
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_packages)
 
         if self.api.connected() and self.option_sensor_filter:
             await self.hass.async_add_executor_job(self.get_filter)
@@ -1359,6 +1366,62 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             peer_name = str(peer.get("peer-name", "")).strip()
             comment = str(peer.get("comment", "")).strip()
             peer["name"] = peer_name or comment or peer.get("public-key", "")[:8]
+
+    # ---------------------------
+    #   get_device_mode
+    # ---------------------------
+    def get_device_mode(self) -> None:
+        """Get Device Mode data from Mikrotik"""
+        _LOGGER.debug("Mikrotik %s fetching device mode", self.host)
+        self.ds["system_device_mode"] = parse_api(
+            data=self.ds["system_device_mode"],
+            source=self.api.query("/system/device-mode"),
+            vals=[
+                {"name": "mode", "default": ""},
+                {"name": "container", "type": "bool", "default": False},
+                {"name": "zerotier", "type": "bool", "default": False},
+                {"name": "ipsec", "type": "bool", "default": False},
+                {"name": "hotspot", "type": "bool", "default": False},
+                {"name": "bandwidth-test", "type": "bool", "default": False},
+                {"name": "traffic-gen", "type": "bool", "default": False},
+                {"name": "sniffer", "type": "bool", "default": False},
+                {"name": "proxy", "type": "bool", "default": False},
+                {"name": "scheduler", "type": "bool", "default": False},
+                {"name": "socks", "type": "bool", "default": False},
+                {"name": "fetch", "type": "bool", "default": False},
+                {"name": "pptp", "type": "bool", "default": False},
+                {"name": "l2tp", "type": "bool", "default": False},
+                {"name": "romon", "type": "bool", "default": False},
+                {"name": "smb", "type": "bool", "default": False},
+                {"name": "email", "type": "bool", "default": False},
+            ],
+        )
+
+    # ---------------------------
+    #   get_packages
+    # ---------------------------
+    def get_packages(self) -> None:
+        """Get installed packages data from Mikrotik"""
+        _LOGGER.debug("Mikrotik %s fetching packages", self.host)
+        raw = self.api.query("/system/package") or []
+
+        active = {
+            p["name"]: p.get("version", "")
+            for p in raw
+            if not p.get("disabled", True) and p.get("name") != "routeros"
+        }
+
+        known = [
+            "container", "gps", "ups", "zerotier", "dude", "iot",
+            "wireless", "wifi-qcom", "wifi-qcom-be", "calea",
+            "rose-storage", "user-manager", "tr069-client",
+        ]
+
+        result = {"count": len(active)}
+        for pkg in known:
+            result[pkg] = active[pkg] if pkg in active else False
+
+        self.ds["system_packages"] = result
 
     # ---------------------------
     #   get_filter

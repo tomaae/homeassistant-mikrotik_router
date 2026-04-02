@@ -124,6 +124,42 @@ DEVICE_ATTRIBUTES_WIREGUARD_PEER = [
 ]
 
 
+DEVICE_ATTRIBUTES_DEVICE_MODE = [
+    "container",
+    "zerotier",
+    "ipsec",
+    "hotspot",
+    "bandwidth-test",
+    "traffic-gen",
+    "sniffer",
+    "proxy",
+    "scheduler",
+    "socks",
+    "fetch",
+    "pptp",
+    "l2tp",
+    "romon",
+    "smb",
+    "email",
+]
+
+DEVICE_ATTRIBUTES_PACKAGES = [
+    "container",
+    "gps",
+    "ups",
+    "zerotier",
+    "dude",
+    "iot",
+    "wireless",
+    "wifi-qcom",
+    "wifi-qcom-be",
+    "calea",
+    "rose-storage",
+    "user-manager",
+    "tr069-client",
+]
+
+
 @dataclass
 class MikrotikSensorEntityDescription(SensorEntityDescription):
     """Class describing mikrotik entities."""
@@ -855,6 +891,38 @@ SENSOR_TYPES: tuple[MikrotikSensorEntityDescription, ...] = (
         data_uid="uniq-id",
         data_reference="uniq-id",
         data_attributes_list=DEVICE_ATTRIBUTES_WIREGUARD_PEER,
+        func="MikrotikSensor",
+    ),
+    MikrotikSensorEntityDescription(
+        key="system_device_mode",
+        name="Device Mode",
+        icon="mdi:cog-outline",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        ha_group="System",
+        ha_connection=DOMAIN,
+        ha_connection_value="",
+        data_path="system_device_mode",
+        data_attribute="mode",
+        data_name="",
+        data_uid="",
+        data_reference="",
+        data_attributes_list=DEVICE_ATTRIBUTES_DEVICE_MODE,
+        func="MikrotikSensor",
+    ),
+    MikrotikSensorEntityDescription(
+        key="system_packages",
+        name="Packages",
+        icon="mdi:package-variant",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        ha_group="System",
+        ha_connection=DOMAIN,
+        ha_connection_value="",
+        data_path="system_packages",
+        data_attribute="count",
+        data_name="",
+        data_uid="",
+        data_reference="",
+        data_attributes_list=DEVICE_ATTRIBUTES_PACKAGES,
         func="MikrotikSensor",
     ),
 )
