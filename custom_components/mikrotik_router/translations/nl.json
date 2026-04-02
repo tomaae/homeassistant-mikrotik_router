@@ -12,6 +12,9 @@
           "password": "Wachtwoord",
           "ssl": "Gebruik SSL",
           "verify_ssl": "Verify SSL"
+        },
+        "data_description": {
+          "verify_ssl": "Enable certificate and hostname validation. Only enable if your MikroTik has a valid SSL certificate with a matching hostname. Leave disabled for self-signed certificates (default)."
         }
       }
     },
