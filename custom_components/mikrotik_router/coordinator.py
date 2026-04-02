@@ -1911,6 +1911,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         if "status" in self.ds["fw-update"]:
             self.ds["fw-update"]["available"] = (
                 self.ds["fw-update"]["status"] == "New version is available"
+                and self.ds["fw-update"].get("latest-version", "unknown") != "unknown"
             )
 
         else:
