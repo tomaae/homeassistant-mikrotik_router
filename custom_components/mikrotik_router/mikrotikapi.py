@@ -126,11 +126,11 @@ class MikrotikAPI:
             if self._use_ssl:
                 if self._ssl_wrapper is None:
                     ssl_context = ssl.create_default_context()
-                    ssl_context.check_hostname = False
                     if self._ssl_verify:
                         ssl_context.verify_mode = ssl.CERT_REQUIRED
                         ssl_context.verify_flags &= ~ssl.VERIFY_X509_STRICT
                     else:
+                        ssl_context.check_hostname = False
                         ssl_context.verify_mode = ssl.CERT_NONE
                     self._ssl_wrapper = ssl_context.wrap_socket
                 kwargs["ssl_wrapper"] = self._ssl_wrapper
@@ -208,9 +208,16 @@ class MikrotikAPI:
         if response and return_list and not command:
             try:
                 response = list(response)
+                _LOGGER.debug("API query %s returned %d entries", path, len(response) if response else 0)
+                _LOGGER.debug("API query %s raw response: %s", path, response)
             except Exception as e:
                 if path == "/system/health" and "no such command prefix" in str(e):
                     self.disable_health = True
+                    self.lock.release()
+                    return None
+
+                if "no such command prefix" in str(e):
+                    _LOGGER.debug("Mikrotik %s path %s not available: %s", self._host, path, e)
                     self.lock.release()
                     return None
 
@@ -235,6 +242,10 @@ class MikrotikAPI:
     # ---------------------------
     def set_value(self, path, param, value, mod_param, mod_value) -> bool:
         """Modify a parameter"""
+        _LOGGER.debug(
+            "Mikrotik %s set_value: path=%s param=%s value=%s mod_param=%s mod_value=%s",
+            self._host, path, param, value, mod_param, mod_value,
+        )
         entry_found = None
 
         if not self.connection_check():
@@ -254,13 +265,13 @@ class MikrotikAPI:
             entry_found = tmp[".id"]
 
         if not entry_found:
-            _LOGGER.error(
+            _LOGGER.warning(
                 "Mikrotik %s set_value parameter %s with value %s not found",
                 self._host,
                 param,
                 value,
             )
-            return True
+            return False
 
         params = {".id": entry_found, mod_param: mod_value}
         self.lock.acquire()
@@ -300,14 +311,14 @@ class MikrotikAPI:
                 entry_found = tmp[".id"]
 
             if not entry_found:
-                _LOGGER.error(
+                _LOGGER.warning(
                     "Mikrotik %s Execute %s parameter %s with value %s not found",
                     self._host,
                     command,
                     param,
                     value,
                 )
-                return True
+                return False
 
             params = {".id": entry_found}
 
@@ -323,6 +334,33 @@ class MikrotikAPI:
             return False
 
         self.lock.release()
+        return True
+
+    # ---------------------------
+    #   wol
+    # ---------------------------
+    def wol(self, mac: str, interface: str | None = None) -> bool:
+        """Send Wake-on-LAN magic packet via MikroTik /tool wol"""
+        if not self.connection_check():
+            return False
+
+        args = {"mac": mac}
+        if interface and interface != "unknown":
+            args["interface"] = interface
+
+        with self.lock:
+            try:
+                _LOGGER.debug(
+                    "WoL: sending magic packet to %s via %s",
+                    mac,
+                    interface or "broadcast",
+                )
+                response = self._connection.path("/tool")
+                tuple(response("wol", **args))
+            except Exception as e:
+                self.disconnect("wol", e)
+                return False
+
         return True
 
     # ---------------------------

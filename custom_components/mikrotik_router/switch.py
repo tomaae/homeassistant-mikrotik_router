@@ -39,9 +39,12 @@ async def async_setup_entry(
         "MikrotikPortSwitch": MikrotikPortSwitch,
         "MikrotikNATSwitch": MikrotikNATSwitch,
         "MikrotikMangleSwitch": MikrotikMangleSwitch,
+        "MikrotikRoutingRulesSwitch": MikrotikRoutingRulesSwitch,
         "MikrotikFilterSwitch": MikrotikFilterSwitch,
         "MikrotikQueueSwitch": MikrotikQueueSwitch,
         "MikrotikKidcontrolPauseSwitch": MikrotikKidcontrolPauseSwitch,
+        "MikrotikWireguardPeerSwitch": MikrotikWireguardPeerSwitch,
+        "MikrotikContainerSwitch": MikrotikContainerSwitch,
     }
     await async_add_entities(hass, config_entry, dispatcher)
 
@@ -76,6 +79,7 @@ class MikrotikSwitch(MikrotikEntity, SwitchEntity, RestoreEntity):
     async def async_turn_on(self) -> None:
         """Turn on the switch."""
         if "write" not in self.coordinator.data["access"]:
+            _LOGGER.warning("Mikrotik %s switch operation blocked: user lacks write access", self.coordinator.host)
             return
 
         path = self.entity_description.data_switch_path
@@ -88,6 +92,7 @@ class MikrotikSwitch(MikrotikEntity, SwitchEntity, RestoreEntity):
     async def async_turn_off(self) -> None:
         """Turn off the switch."""
         if "write" not in self.coordinator.data["access"]:
+            _LOGGER.warning("Mikrotik %s switch operation blocked: user lacks write access", self.coordinator.host)
             return
 
         path = self.entity_description.data_switch_path
@@ -281,6 +286,55 @@ class MikrotikMangleSwitch(MikrotikSwitch):
 
 
 # ---------------------------
+#   MikrotikRoutingRulesSwitch
+# ---------------------------
+class MikrotikRoutingRulesSwitch(MikrotikSwitch):
+    """Representation of a Routing Rules switch."""
+
+    async def async_turn_on(self) -> None:
+        """Turn on the switch."""
+        if "write" not in self.coordinator.data["access"]:
+            return
+
+        path = self.entity_description.data_switch_path
+        param = ".id"
+        value = None
+        for uid in self.coordinator.data["routing_rules"]:
+            if self.coordinator.data["routing_rules"][uid]["uniq-id"] == (
+                f"{self._data['comment']},{self._data['action']},"
+                f"{self._data['src-address']},"
+                f"{self._data['dst-address']},"
+                f"{self._data['routing-mark']},{self._data['interface']}"
+            ):
+                value = self.coordinator.data["routing_rules"][uid][".id"]
+
+        mod_param = self.entity_description.data_switch_parameter
+        self.coordinator.set_value(path, param, value, mod_param, False)
+        await self.coordinator.async_refresh()
+
+    async def async_turn_off(self) -> None:
+        """Turn off the switch."""
+        if "write" not in self.coordinator.data["access"]:
+            return
+
+        path = self.entity_description.data_switch_path
+        param = ".id"
+        value = None
+        for uid in self.coordinator.data["routing_rules"]:
+            if self.coordinator.data["routing_rules"][uid]["uniq-id"] == (
+                f"{self._data['comment']},{self._data['action']},"
+                f"{self._data['src-address']},"
+                f"{self._data['dst-address']},"
+                f"{self._data['routing-mark']},{self._data['interface']}"
+            ):
+                value = self.coordinator.data["routing_rules"][uid][".id"]
+
+        mod_param = self.entity_description.data_switch_parameter
+        self.coordinator.set_value(path, param, value, mod_param, True)
+        await self.coordinator.async_refresh()
+
+
+# ---------------------------
 #   MikrotikFilterSwitch
 # ---------------------------
 class MikrotikFilterSwitch(MikrotikSwitch):
@@ -394,4 +448,86 @@ class MikrotikKidcontrolPauseSwitch(MikrotikSwitch):
         value = self._data[self.entity_description.data_reference]
         command = "pause"
         self.coordinator.execute(path, command, param, value)
+        await self.coordinator.async_refresh()
+
+
+# ---------------------------
+#   MikrotikWireguardPeerSwitch
+# ---------------------------
+class MikrotikWireguardPeerSwitch(MikrotikSwitch):
+    """Representation of a WireGuard peer switch."""
+
+    async def async_turn_on(self) -> None:
+        """Enable the WireGuard peer."""
+        if "write" not in self.coordinator.data["access"]:
+            _LOGGER.warning("Mikrotik %s switch operation blocked: user lacks write access", self.coordinator.host)
+            return
+        path = self.entity_description.data_switch_path
+        param = ".id"
+        value = self._data[".id"]
+        mod_param = self.entity_description.data_switch_parameter
+        self.coordinator.set_value(path, param, value, mod_param, False)
+        await self.coordinator.async_refresh()
+
+    async def async_turn_off(self) -> None:
+        """Disable the WireGuard peer."""
+        if "write" not in self.coordinator.data["access"]:
+            _LOGGER.warning("Mikrotik %s switch operation blocked: user lacks write access", self.coordinator.host)
+            return
+        path = self.entity_description.data_switch_path
+        param = ".id"
+        value = self._data[".id"]
+        mod_param = self.entity_description.data_switch_parameter
+        self.coordinator.set_value(path, param, value, mod_param, True)
+        await self.coordinator.async_refresh()
+
+
+# ---------------------------
+#   MikrotikContainerSwitch
+# ---------------------------
+class MikrotikContainerSwitch(MikrotikSwitch):
+    """Representation of a container start/stop switch."""
+
+    @property
+    def is_on(self) -> bool:
+        """Return true if container is running."""
+        return self._data.get("status", "stopped") == "running"
+
+    @property
+    def icon(self) -> str:
+        """Return the icon."""
+        if self.is_on:
+            return self.entity_description.icon_enabled
+        return self.entity_description.icon_disabled
+
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        """Start the container."""
+        if "write" not in self.coordinator.data["access"]:
+            _LOGGER.warning(
+                "Mikrotik %s container start blocked: user lacks write access",
+                self.coordinator.host,
+            )
+            return
+        self.coordinator.execute(
+            self.entity_description.data_switch_path,
+            "start",
+            ".id",
+            self._data[".id"],
+        )
+        await self.coordinator.async_refresh()
+
+    async def async_turn_off(self, **kwargs: Any) -> None:
+        """Stop the container."""
+        if "write" not in self.coordinator.data["access"]:
+            _LOGGER.warning(
+                "Mikrotik %s container stop blocked: user lacks write access",
+                self.coordinator.host,
+            )
+            return
+        self.coordinator.execute(
+            self.entity_description.data_switch_path,
+            "stop",
+            ".id",
+            self._data[".id"],
+        )
         await self.coordinator.async_refresh()

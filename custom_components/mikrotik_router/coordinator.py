@@ -51,6 +51,12 @@ from .const import (
     DEFAULT_SENSOR_NAT,
     CONF_SENSOR_MANGLE,
     DEFAULT_SENSOR_MANGLE,
+    CONF_SENSOR_ROUTING_RULES,
+    DEFAULT_SENSOR_ROUTING_RULES,
+    CONF_SENSOR_WIREGUARD,
+    DEFAULT_SENSOR_WIREGUARD,
+    CONF_SENSOR_CONTAINERS,
+    DEFAULT_SENSOR_CONTAINERS,
     CONF_SENSOR_FILTER,
     DEFAULT_SENSOR_FILTER,
     CONF_SENSOR_KIDCONTROL,
@@ -70,6 +76,24 @@ from .mikrotikapi import MikrotikAPI
 _LOGGER = logging.getLogger(__name__)
 
 DEFAULT_TIME_ZONE = None
+
+
+def _parse_duration_seconds(s: str) -> int:
+    """Parse a MikroTik duration string like '3m45s' into total seconds."""
+    if not s or s.lower() in ("never", ""):
+        return 0
+    total = 0
+    for pattern, multiplier in [
+        (r"(\d+)w", 604800),
+        (r"(\d+)d", 86400),
+        (r"(\d+)h", 3600),
+        (r"(\d+)m", 60),
+        (r"(\d+)s", 1),
+    ]:
+        m = re.search(pattern, s)
+        if m:
+            total += int(m.group(1)) * multiplier
+    return total
 
 
 def is_valid_ip(address):
@@ -242,6 +266,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             "nat": {},
             "kid-control": {},
             "mangle": {},
+            "routing_rules": {},
             "filter": {},
             "ppp_secret": {},
             "ppp_active": {},
@@ -264,6 +289,12 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             "ups": {},
             "gps": {},
             "netwatch": {},
+            "ip_address": {},
+            "cloud": {},
+            "wireguard_peers": {},
+            "containers": {},
+            "system_device_mode": {},
+            "system_packages": {},
         }
 
         self.notified_flags = []
@@ -283,6 +314,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
         self.nat_removed = {}
         self.mangle_removed = {}
+        self.routing_rules_removed = {}
         self.filter_removed = {}
         self.host_hass_recovered = False
         self.host_tracking_initialized = False
@@ -292,6 +324,9 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         self.support_ppp = False
         self.support_ups = False
         self.support_gps = False
+        self.support_wireguard = False
+        self.support_containers = False
+        self.support_cloud = False
         self._wifimodule = "wireless"
 
         self.major_fw_version = 0
@@ -376,6 +411,30 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
     def option_sensor_mangle(self):
         """Config entry option to not track ARP."""
         return self.config_entry.options.get(CONF_SENSOR_MANGLE, DEFAULT_SENSOR_MANGLE)
+
+    # ---------------------------
+    #   option_sensor_routing_rules
+    # ---------------------------
+    @property
+    def option_sensor_routing_rules(self):
+        """Config entry option for routing rules."""
+        return self.config_entry.options.get(CONF_SENSOR_ROUTING_RULES, DEFAULT_SENSOR_ROUTING_RULES)
+
+    # ---------------------------
+    #   option_sensor_wireguard
+    # ---------------------------
+    @property
+    def option_sensor_wireguard(self):
+        """Config entry option for wireguard peers."""
+        return self.config_entry.options.get(CONF_SENSOR_WIREGUARD, DEFAULT_SENSOR_WIREGUARD)
+
+    # ---------------------------
+    #   option_sensor_containers
+    # ---------------------------
+    @property
+    def option_sensor_containers(self):
+        """Config entry option for container sensors."""
+        return self.config_entry.options.get(CONF_SENSOR_CONTAINERS, DEFAULT_SENSOR_CONTAINERS)
 
     # ---------------------------
     #   option_sensor_filter
@@ -537,6 +596,16 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         if "gps" in packages and packages["gps"]["enabled"]:
             self.support_gps = True
 
+        # WireGuard is built-in from RouterOS v7
+        if self.major_fw_version >= 7:
+            self.support_wireguard = True
+        elif "wireguard" in packages and packages["wireguard"]["enabled"]:
+            self.support_wireguard = True
+
+        # Container support available from RouterOS v7
+        if self.major_fw_version >= 7:
+            self.support_containers = True
+
     # ---------------------------
     #   async_get_host_hass
     # ---------------------------
@@ -565,6 +634,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
     # ---------------------------
     async def _async_update_data(self):
         """Update Mikrotik data"""
+        _LOGGER.debug("Mikrotik %s starting data update cycle", self.host)
         delta = datetime.now().replace(microsecond=0) - self.last_hwinfo_update
         if self.api.has_reconnected() or delta.total_seconds() > 60 * 60 * 4:
             await self.hass.async_add_executor_job(self.get_access)
@@ -610,6 +680,12 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         if self.api.connected():
             await self.hass.async_add_executor_job(self.get_interface)
 
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_ip_address)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_cloud)
+
         if self.api.connected() and not self.ds["host_hass"]:
             await self.async_get_host_hass()
 
@@ -646,6 +722,20 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         if self.api.connected() and self.option_sensor_mangle:
             await self.hass.async_add_executor_job(self.get_mangle)
 
+        if self.api.connected() and self.option_sensor_routing_rules:
+            await self.hass.async_add_executor_job(self.get_routing_rules)
+
+        if self.api.connected() and self.support_wireguard and self.option_sensor_wireguard:
+            await self.hass.async_add_executor_job(self.get_wireguard_peers)
+
+        if self.api.connected() and self.support_containers and self.option_sensor_containers:
+            await self.hass.async_add_executor_job(self.get_containers)
+
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_device_mode)
+        if self.api.connected():
+            await self.hass.async_add_executor_job(self.get_packages)
+
         if self.api.connected() and self.option_sensor_filter:
             await self.hass.async_add_executor_job(self.get_filter)
 
@@ -679,6 +769,13 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         if not self.api.connected():
             raise UpdateFailed("Mikrotik Disconnected")
 
+        _LOGGER.debug(
+            "Mikrotik %s data update cycle complete (interfaces=%d, hosts=%d, routing_rules=%d)",
+            self.host,
+            len(self.ds.get("interface", {})),
+            len(self.ds.get("host", {})),
+            len(self.ds.get("routing_rules", {})),
+        )
         # async_dispatcher_send(self.hass, "update_sensors", self)
         return self.ds
 
@@ -1058,7 +1155,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         for uid in nat_del:
             if self.ds["nat"][uid]["uniq-id"] not in self.nat_removed:
                 self.nat_removed[self.ds["nat"][uid]["uniq-id"]] = 1
-                _LOGGER.error(
+                _LOGGER.warning(
                     "Mikrotik %s duplicate NAT rule %s, entity will be unavailable.",
                     self.host,
                     self.ds["nat"][uid]["name"],
@@ -1150,13 +1247,236 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         for uid in mangle_del:
             if self.ds["mangle"][uid]["uniq-id"] not in self.mangle_removed:
                 self.mangle_removed[self.ds["mangle"][uid]["uniq-id"]] = 1
-                _LOGGER.error(
+                _LOGGER.warning(
                     "Mikrotik %s duplicate Mangle rule %s, entity will be unavailable.",
                     self.host,
                     self.ds["mangle"][uid]["name"],
                 )
 
             del self.ds["mangle"][uid]
+
+    # ---------------------------
+    #   get_routing_rules
+    # ---------------------------
+    def get_routing_rules(self) -> None:
+        """Get Routing Rules data from Mikrotik"""
+        _LOGGER.debug("Mikrotik %s fetching routing rules", self.host)
+        self.ds["routing_rules"] = parse_api(
+            data=self.ds["routing_rules"],
+            source=self.api.query("/routing/rule"),
+            key=".id",
+            vals=[
+                {"name": ".id"},
+                {"name": "comment", "default_val": "src-address"},
+                {"name": "action"},
+                {"name": "src-address", "default": "any"},
+                {"name": "dst-address", "default": "any"},
+                {"name": "routing-mark", "default": "any"},
+                {"name": "interface", "default": "any"},
+                {
+                    "name": "enabled",
+                    "source": "disabled",
+                    "type": "bool",
+                    "reverse": True,
+                },
+            ],
+            val_proc=[
+                [
+                    {"name": "uniq-id"},
+                    {"action": "combine"},
+                    {"key": "comment"},
+                    {"text": ","},
+                    {"key": "action"},
+                    {"text": ","},
+                    {"key": "src-address"},
+                    {"text": ","},
+                    {"key": "dst-address"},
+                    {"text": ","},
+                    {"key": "routing-mark"},
+                    {"text": ","},
+                    {"key": "interface"},
+                ],
+                [
+                    {"name": "name"},
+                    {"action": "combine"},
+                    {"key": "comment"},
+                    {"text": ","},
+                    {"key": "action"},
+                    {"text": ","},
+                    {"key": "src-address"},
+                    {"text": ","},
+                    {"key": "dst-address"},
+                ],
+            ],
+            skip=[
+                {"name": "dynamic", "value": True},
+                {"name": "action", "value": "jump"},
+            ],
+        )
+
+        # Remove duplicate Routing Rules entries to prevent crash
+        routing_rules_uniq = {}
+        routing_rules_del = {}
+        for uid in self.ds["routing_rules"]:
+            self.ds["routing_rules"][uid]["comment"] = str(self.ds["routing_rules"][uid]["comment"])
+
+            tmp_name = self.ds["routing_rules"][uid]["uniq-id"]
+            if tmp_name not in routing_rules_uniq:
+                routing_rules_uniq[tmp_name] = uid
+            else:
+                routing_rules_del[uid] = 1
+                routing_rules_del[routing_rules_uniq[tmp_name]] = 1
+
+        for uid in routing_rules_del:
+            if self.ds["routing_rules"][uid]["uniq-id"] not in self.routing_rules_removed:
+                self.routing_rules_removed[self.ds["routing_rules"][uid]["uniq-id"]] = 1
+                _LOGGER.warning(
+                    "Mikrotik %s duplicate Routing Rules rule %s, entity will be unavailable.",
+                    self.host,
+                    self.ds["routing_rules"][uid]["name"],
+                )
+
+            del self.ds["routing_rules"][uid]
+
+    # ---------------------------
+    #   get_wireguard_peers
+    # ---------------------------
+    def get_wireguard_peers(self) -> None:
+        """Get WireGuard peers data from Mikrotik"""
+        _LOGGER.debug("Mikrotik %s fetching wireguard peers", self.host)
+        self.ds["wireguard_peers"] = parse_api(
+            data=self.ds["wireguard_peers"],
+            source=self.api.query("/interface/wireguard/peers"),
+            key=".id",
+            vals=[
+                {"name": ".id"},
+                {"name": "public-key"},
+                {"name": "interface"},
+                {"name": "peer-name", "source": "name", "default": ""},
+                {"name": "comment", "default": ""},
+                {"name": "allowed-address", "default": ""},
+                {"name": "rx", "default": "0"},
+                {"name": "tx", "default": "0"},
+                {"name": "last-handshake", "default": ""},
+                {
+                    "name": "enabled",
+                    "source": "disabled",
+                    "type": "bool",
+                    "reverse": True,
+                },
+            ],
+        )
+
+        for uid in self.ds["wireguard_peers"]:
+            peer = self.ds["wireguard_peers"][uid]
+
+            # Parse last-handshake string to seconds
+            peer["last-handshake-seconds"] = _parse_duration_seconds(
+                str(peer.get("last-handshake", ""))
+            )
+
+            # Connected if handshake within last 3 minutes
+            peer["connected"] = 0 < peer["last-handshake-seconds"] < 180
+
+            # uniq-id = public-key
+            peer["uniq-id"] = peer.get("public-key", uid)
+
+            # name = peer-name > comment > first 8 chars of public-key
+            peer_name = str(peer.get("peer-name", "")).strip()
+            comment = str(peer.get("comment", "")).strip()
+            peer["name"] = peer_name or comment or peer.get("public-key", "")[:8]
+
+    # ---------------------------
+    #   get_device_mode
+    # ---------------------------
+    def get_device_mode(self) -> None:
+        """Get Device Mode data from Mikrotik"""
+        _LOGGER.debug("Mikrotik %s fetching device mode", self.host)
+        self.ds["system_device_mode"] = parse_api(
+            data=self.ds["system_device_mode"],
+            source=self.api.query("/system/device-mode"),
+            vals=[
+                {"name": "mode", "default": ""},
+                {"name": "container", "type": "bool", "default": False},
+                {"name": "zerotier", "type": "bool", "default": False},
+                {"name": "ipsec", "type": "bool", "default": False},
+                {"name": "hotspot", "type": "bool", "default": False},
+                {"name": "bandwidth-test", "type": "bool", "default": False},
+                {"name": "traffic-gen", "type": "bool", "default": False},
+                {"name": "sniffer", "type": "bool", "default": False},
+                {"name": "proxy", "type": "bool", "default": False},
+                {"name": "scheduler", "type": "bool", "default": False},
+                {"name": "socks", "type": "bool", "default": False},
+                {"name": "fetch", "type": "bool", "default": False},
+                {"name": "pptp", "type": "bool", "default": False},
+                {"name": "l2tp", "type": "bool", "default": False},
+                {"name": "romon", "type": "bool", "default": False},
+                {"name": "smb", "type": "bool", "default": False},
+                {"name": "email", "type": "bool", "default": False},
+            ],
+        )
+
+    # ---------------------------
+    #   get_packages
+    # ---------------------------
+    def get_packages(self) -> None:
+        """Get installed packages data from Mikrotik"""
+        _LOGGER.debug("Mikrotik %s fetching packages", self.host)
+        raw = self.api.query("/system/package") or []
+
+        active = {
+            p["name"]: p.get("version", "")
+            for p in raw
+            if not p.get("disabled", True) and p.get("name") != "routeros"
+        }
+
+        known = [
+            "container", "gps", "ups", "zerotier", "dude", "iot",
+            "wireless", "wifi-qcom", "wifi-qcom-be", "calea",
+            "rose-storage", "user-manager", "tr069-client",
+        ]
+
+        result = {"count": len(active)}
+        for pkg in known:
+            result[pkg] = active[pkg] if pkg in active else False
+
+        self.ds["system_packages"] = result
+
+    # ---------------------------
+    #   get_containers
+    # ---------------------------
+    def get_containers(self) -> None:
+        """Get Container data from Mikrotik"""
+        _LOGGER.debug("Mikrotik %s fetching containers", self.host)
+        self.ds["containers"] = parse_api(
+            data=self.ds["containers"],
+            source=self.api.query("/container"),
+            key=".id",
+            vals=[
+                {"name": ".id"},
+                {"name": "name", "default": ""},
+                {"name": "tag", "default": ""},
+                {"name": "os", "default": ""},
+                {"name": "arch", "default": ""},
+                {"name": "interface", "default": ""},
+                {"name": "root-dir", "default": ""},
+                {"name": "mounts", "default": ""},
+                {"name": "comment", "default": ""},
+                {"name": "start-on-boot", "default": "false"},
+                {"name": "running", "type": "bool", "default": False},
+                {"name": "memory-current", "default": ""},
+                {"name": "cpu-usage", "default": ""},
+            ],
+        )
+
+        for uid in self.ds["containers"]:
+            container = self.ds["containers"][uid]
+            container["uniq-id"] = uid
+            cname = str(container.get("name", "")).strip()
+            comment = str(container.get("comment", "")).strip()
+            tag = str(container.get("tag", "")).strip()
+            container["display-name"] = cname or comment or tag or uid
+            container["status"] = "running" if container.get("running", False) else "stopped"
 
     # ---------------------------
     #   get_filter
@@ -1259,7 +1579,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         for uid in filter_del:
             if self.ds["filter"][uid]["uniq-id"] not in self.filter_removed:
                 self.filter_removed[self.ds["filter"][uid]["uniq-id"]] = 1
-                _LOGGER.error(
+                _LOGGER.warning(
                     "Mikrotik %s duplicate Filter rule %s (ID %s), entity will be unavailable.",
                     self.host,
                     self.ds["filter"][uid]["name"],
@@ -1591,6 +1911,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         if "status" in self.ds["fw-update"]:
             self.ds["fw-update"]["available"] = (
                 self.ds["fw-update"]["status"] == "New version is available"
+                and self.ds["fw-update"].get("latest-version", "unknown") != "unknown"
             )
 
         else:
@@ -1960,6 +2281,70 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 {"name": "interface", "default": "unknown"},
             ],
         )
+
+    # ---------------------------
+    #   get_ip_address
+    # ---------------------------
+    def get_ip_address(self) -> None:
+        """Get IP address data from Mikrotik"""
+        self.ds["ip_address"] = parse_api(
+            data=self.ds["ip_address"],
+            source=self.api.query("/ip/address"),
+            key=".id",
+            vals=[
+                {"name": ".id"},
+                {"name": "address", "default": ""},
+                {"name": "network", "default": ""},
+                {"name": "interface", "default": ""},
+                {"name": "comment", "default": ""},
+                {"name": "dynamic", "type": "bool", "default": False},
+                {"name": "disabled", "type": "bool", "default": False},
+            ],
+            ensure_vals=[
+                {"name": "port-mac-address", "default": ""},
+                {"name": "ip", "default": ""},
+            ],
+        )
+        for uid in self.ds["ip_address"]:
+            iface_name = self.ds["ip_address"][uid]["interface"]
+            for iface_uid, iface_data in self.ds["interface"].items():
+                if iface_data.get("name") == iface_name or iface_uid == iface_name:
+                    self.ds["ip_address"][uid]["port-mac-address"] = iface_data.get(
+                        "port-mac-address", ""
+                    )
+                    break
+            addr = self.ds["ip_address"][uid].get("address", "")
+            self.ds["ip_address"][uid]["ip"] = addr.split("/")[0] if addr else ""
+
+        # Remove IP entries for bridge/virtual interfaces with no port-mac-address
+        uids_to_remove = [
+            uid for uid in self.ds["ip_address"]
+            if not self.ds["ip_address"][uid].get("port-mac-address")
+        ]
+        for uid in uids_to_remove:
+            del self.ds["ip_address"][uid]
+
+    # ---------------------------
+    #   get_cloud
+    # ---------------------------
+    def get_cloud(self) -> None:
+        """Get IP cloud data from Mikrotik"""
+        try:
+            self.ds["cloud"] = parse_api(
+                data=self.ds["cloud"],
+                source=self.api.query("/ip/cloud"),
+                vals=[
+                    {"name": "public-address", "default": ""},
+                    {"name": "ddns-enabled", "default": ""},
+                    {"name": "dns-name", "default": ""},
+                    {"name": "status", "default": ""},
+                    {"name": "back-to-home-vpn", "default": ""},
+                ],
+            )
+            self.ds["cloud"]["ddns-hostname"] = self.ds["cloud"].pop("dns-name", "")
+            self.ds["cloud"]["ddns-status"] = self.ds["cloud"].pop("status", "")
+        except Exception as e:
+            _LOGGER.warning("Mikrotik get_cloud failed: %s", e)
 
     # ---------------------------
     #   get_dhcp_client

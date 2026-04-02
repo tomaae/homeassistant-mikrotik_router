@@ -103,6 +103,15 @@ DEVICE_ATTRIBUTES_MANGLE = [
     "comment",
 ]
 
+DEVICE_ATTRIBUTES_ROUTING_RULES = [
+    "action",
+    "src-address",
+    "dst-address",
+    "routing-mark",
+    "interface",
+    "comment",
+]
+
 DEVICE_ATTRIBUTES_FILTER = [
     "chain",
     "action",
@@ -184,6 +193,28 @@ class MikrotikSwitchEntityDescription(SwitchEntityDescription):
     func: str = "MikrotikSwitch"
 
 
+DEVICE_ATTRIBUTES_WIREGUARD_PEER = [
+    "interface",
+    "allowed-address",
+    "comment",
+    "last-handshake",
+]
+
+DEVICE_ATTRIBUTES_CONTAINER = [
+    "tag",
+    "os",
+    "arch",
+    "interface",
+    "root-dir",
+    "mounts",
+    "status",
+    "memory-current",
+    "cpu-usage",
+    "comment",
+    "start-on-boot",
+]
+
+
 SENSOR_TYPES: tuple[MikrotikSwitchEntityDescription, ...] = (
     MikrotikSwitchEntityDescription(
         key="interface",
@@ -237,6 +268,24 @@ SENSOR_TYPES: tuple[MikrotikSwitchEntityDescription, ...] = (
         data_reference="uniq-id",
         data_attributes_list=DEVICE_ATTRIBUTES_MANGLE,
         func="MikrotikMangleSwitch",
+    ),
+    MikrotikSwitchEntityDescription(
+        key="routing_rules",
+        name="",
+        icon_enabled="mdi:bookmark-outline",
+        icon_disabled="mdi:bookmark-off-outline",
+        entity_category=None,
+        ha_group="Routing Rules",
+        ha_connection=DOMAIN,
+        ha_connection_value="Routing Rules",
+        data_path="routing_rules",
+        data_switch_path="/routing/rule",
+        data_name="name",
+        data_name_comment=True,
+        data_uid="uniq-id",
+        data_reference="uniq-id",
+        data_attributes_list=DEVICE_ATTRIBUTES_ROUTING_RULES,
+        func="MikrotikRoutingRulesSwitch",
     ),
     MikrotikSwitchEntityDescription(
         key="filter",
@@ -322,6 +371,43 @@ SENSOR_TYPES: tuple[MikrotikSwitchEntityDescription, ...] = (
         data_reference="name",
         data_attributes_list=DEVICE_ATTRIBUTES_KIDCONTROL,
         func="MikrotikKidcontrolPauseSwitch",
+    ),
+    MikrotikSwitchEntityDescription(
+        key="wireguard_peer",
+        name="",
+        icon_enabled="mdi:vpn",
+        icon_disabled="mdi:vpn",
+        entity_category=None,
+        ha_group="WireGuard",
+        ha_connection=DOMAIN,
+        ha_connection_value="WireGuard",
+        data_path="wireguard_peers",
+        data_switch_path="/interface/wireguard/peers",
+        data_name="name",
+        data_name_comment=True,
+        data_uid="uniq-id",
+        data_reference="uniq-id",
+        data_attributes_list=DEVICE_ATTRIBUTES_WIREGUARD_PEER,
+        func="MikrotikWireguardPeerSwitch",
+    ),
+    MikrotikSwitchEntityDescription(
+        key="container",
+        name="",
+        icon_enabled="mdi:docker",
+        icon_disabled="mdi:docker",
+        entity_category=None,
+        ha_group="Container",
+        ha_connection=DOMAIN,
+        ha_connection_value="Container",
+        data_path="containers",
+        data_attribute="running",
+        data_switch_path="/container",
+        data_name="display-name",
+        data_name_comment=False,
+        data_uid=".id",
+        data_reference=".id",
+        data_attributes_list=DEVICE_ATTRIBUTES_CONTAINER,
+        func="MikrotikContainerSwitch",
     ),
 )
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import voluptuous as vol
 import logging
+from collections import deque
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
@@ -19,7 +20,38 @@ SCRIPT_SCHEMA = vol.Schema(
     {vol.Required("router"): cv.string, vol.Required("script"): cv.string}
 )
 
+WOL_SCHEMA = vol.Schema(
+    {
+        vol.Required("mac"): cv.string,
+        vol.Optional("interface"): cv.string,
+    }
+)
+
 _LOGGER = logging.getLogger(__name__)
+
+# Ring buffer for diagnostics log capture
+_LOG_BUFFER = deque(maxlen=1000)
+
+
+class _RingBufferHandler(logging.Handler):
+    """Logging handler that stores records in a ring buffer for diagnostics."""
+
+    def __init__(self, buffer):
+        super().__init__()
+        self._buffer = buffer
+
+    def emit(self, record):
+        self._buffer.append(self.format(record))
+
+
+_log_handler = _RingBufferHandler(_LOG_BUFFER)
+_log_handler.setLevel(logging.DEBUG)
+_log_handler.setFormatter(
+    logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s")
+)
+_integration_logger = logging.getLogger("custom_components.mikrotik_router")
+_integration_logger.addHandler(_log_handler)
+_integration_logger.setLevel(logging.DEBUG)
 
 
 # ---------------------------
@@ -27,6 +59,10 @@ _LOGGER = logging.getLogger(__name__)
 # ---------------------------
 async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     """Set up a config entry."""
+    _LOGGER.info(
+        "Setting up Mikrotik Router integration for %s",
+        config_entry.data.get("host", "unknown"),
+    )
     coordinator = MikrotikCoordinator(hass, config_entry)
     await coordinator.async_config_entry_first_refresh()
     coordinatorTracker = MikrotikTrackerCoordinator(hass, config_entry, coordinator)
@@ -37,6 +73,31 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     )
 
     await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
+
+    # Register global WoL service once (shared across all config entries)
+    if not hass.services.has_service(DOMAIN, "send_magic_packet"):
+
+        async def async_send_magic_packet(call) -> None:
+            """Send a WoL magic packet via all connected MikroTik routers."""
+            mac = call.data["mac"]
+            interface = call.data.get("interface")
+            for entry_data in hass.data.get(DOMAIN, {}).values():
+                success = await hass.async_add_executor_job(
+                    entry_data.data_coordinator.api.wol, mac, interface
+                )
+                if not success:
+                    _LOGGER.warning(
+                        "WoL: failed to send magic packet to %s via router %s",
+                        mac,
+                        entry_data.data_coordinator.config_entry.data.get("host", "unknown"),
+                    )
+
+        hass.services.async_register(
+            DOMAIN,
+            "send_magic_packet",
+            async_send_magic_packet,
+            schema=WOL_SCHEMA,
+        )
 
     config_entry.async_on_unload(config_entry.add_update_listener(async_reload_entry))
 

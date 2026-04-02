@@ -31,6 +31,7 @@ async def async_setup_entry(
     dispatcher = {
         "MikrotikButton": MikrotikButton,
         "MikrotikScriptButton": MikrotikScriptButton,
+        "MikrotikRebootButton": MikrotikRebootButton,
     }
     await async_add_entities(hass, config_entry, dispatcher)
 
@@ -49,6 +50,26 @@ class MikrotikButton(MikrotikEntity, ButtonEntity):
 
 
 # ---------------------------
+#   MikrotikRebootButton
+# ---------------------------
+class MikrotikRebootButton(MikrotikButton):
+    """Representation of a reboot button."""
+
+    async def async_press(self) -> None:
+        """Reboot the MikroTik device."""
+        if "reboot" not in self.coordinator.ds["access"]:
+            _LOGGER.warning(
+                "Mikrotik %s user does not have reboot access rights",
+                self.coordinator.host,
+            )
+            return
+        _LOGGER.info("Rebooting Mikrotik device %s", self.coordinator.host)
+        await self.hass.async_add_executor_job(
+            self.coordinator.execute, "/system", "reboot", None, None
+        )
+
+
+# ---------------------------
 #   MikrotikScriptButton
 # ---------------------------
 class MikrotikScriptButton(MikrotikButton):
@@ -56,7 +77,6 @@ class MikrotikScriptButton(MikrotikButton):
 
     async def async_press(self) -> None:
         """Run script using Mikrotik API"""
-        try:
-            self.coordinator.api.run_script(self._data["name"])
-        except ApiEntryNotFound as error:
-            _LOGGER.error("Failed to run script: %s", error)
+        _LOGGER.debug("Running script %s on %s", self._data["name"], self.coordinator.host)
+        if not self.coordinator.api.run_script(self._data["name"]):
+            _LOGGER.error("Failed to run script: %s", self._data["name"])

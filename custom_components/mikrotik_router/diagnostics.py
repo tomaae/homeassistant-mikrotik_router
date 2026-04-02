@@ -6,6 +6,7 @@ from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from .const import DOMAIN, TO_REDACT
+from . import _LOG_BUFFER
 
 
 async def async_get_config_entry_diagnostics(
@@ -22,4 +23,5 @@ async def async_get_config_entry_diagnostics(
         },
         "data": async_redact_data(data_coordinator.data, TO_REDACT),
         "tracker": async_redact_data(tracker_coordinator.data, TO_REDACT),
+        "logs": list(_LOG_BUFFER),
     }

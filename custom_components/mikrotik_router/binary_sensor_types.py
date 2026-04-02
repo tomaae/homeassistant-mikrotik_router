@@ -139,6 +139,16 @@ class MikrotikBinarySensorEntityDescription(BinarySensorEntityDescription):
     func: str = "MikrotikBinarySensor"
 
 
+DEVICE_ATTRIBUTES_WIREGUARD_PEER = [
+    "interface",
+    "allowed-address",
+    "last-handshake",
+    "last-handshake-seconds",
+    "rx",
+    "tx",
+]
+
+
 SENSOR_TYPES: tuple[BinarySensorEntityDescription, ...] = (
     MikrotikBinarySensorEntityDescription(
         key="system_ups",
@@ -205,6 +215,24 @@ SENSOR_TYPES: tuple[BinarySensorEntityDescription, ...] = (
         data_reference="host",
         data_attributes_list=DEVICE_ATTRIBUTES_NETWATCH,
         func="MikrotikBinarySensor",
+    ),
+    MikrotikBinarySensorEntityDescription(
+        key="wireguard_peer",
+        name="Connected",
+        icon_enabled="mdi:vpn",
+        icon_disabled="mdi:vpn",
+        device_class=BinarySensorDeviceClass.CONNECTIVITY,
+        ha_group="WireGuard",
+        ha_connection=DOMAIN,
+        ha_connection_value="WireGuard",
+        data_path="wireguard_peers",
+        data_attribute="connected",
+        data_name="name",
+        data_name_comment=True,
+        data_uid="uniq-id",
+        data_reference="uniq-id",
+        data_attributes_list=DEVICE_ATTRIBUTES_WIREGUARD_PEER,
+        func="MikrotikWireguardPeerBinarySensor",
     ),
 )
 
