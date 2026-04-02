@@ -18,6 +18,8 @@ Monitor and control your Mikrotik device from Home Assistant.
    * Monitor device presence per interface
    * IP, MAC, Link information per an interface for connected devices
    * **IP address sensor per interface** *(added in this fork)*
+ * **WireGuard peer sensors and switches** *(added in this fork)*
+ * **Container sensors and switches** *(added in this fork)*
  * Enable/disable NAT rule switches
  * Enable/disable Simple Queue switches
  * Enable/disable Mangle switches
@@ -31,6 +33,7 @@ Monitor and control your Mikrotik device from Home Assistant.
  * Device tracker for hosts in network
  * System sensors (CPU, Memory, HDD, Temperature)
  * **Public IP address via IP Cloud** *(added in this fork)*
+ * **Device Mode and Packages diagnostic sensors** *(added in this fork)*
  * Check and update RouterOS and RouterBOARD firmware
  * Execute scripts
  * View environment variables
@@ -69,9 +72,33 @@ Each router device gets a **Reboot** button entity in Home Assistant.
 - Press to reboot the MikroTik device directly from HA
 - Requires `reboot` permission on the API user
 
+## WireGuard Peer Sensors
+Each WireGuard peer gets its own device with sensors and a switch (RouterOS 7+).
+
+- **Switch**: enable/disable peer
+- **Binary sensor**: connected/disconnected (based on last handshake < 3 minutes)
+- **Sensors**: RX bytes, TX bytes, Last Handshake (seconds)
+- Peer display name: `name` field → `comment` → first 8 chars of public key
+- Enable via integration options → **WireGuard peer sensors**
+
+## Container Sensors
+Each MikroTik container gets its own device with a switch and a status sensor (RouterOS 7+ with container package).
+
+- **Switch**: start/stop container
+- **Sensor**: status (`running` / `stopped` / `pulling` / `building` / `error`)
+- **Attributes**: tag, OS, arch, interface, memory usage, CPU usage
+- Enable via integration options → **Container sensors**
+
+## Device Mode & Packages Sensors
+Two diagnostic sensors on the System device showing router capabilities.
+
+- **Device Mode**: current mode + all feature flags (container, zerotier, ipsec, hotspot, etc.) as attributes
+- **Packages**: count of installed packages + version per package (or `false` if not installed)
+
 ## Bugfixes
 
 - Fixed duplicate `system_poe_out_consumption` sensor key that could cause entity registration issues
+- Fixed disconnect on routers without container support (graceful handling of unsupported API paths)
 
 # Features
 ## Interfaces
