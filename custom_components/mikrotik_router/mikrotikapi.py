@@ -209,9 +209,15 @@ class MikrotikAPI:
             try:
                 response = list(response)
                 _LOGGER.debug("API query %s returned %d entries", path, len(response) if response else 0)
+                _LOGGER.debug("API query %s raw response: %s", path, response)
             except Exception as e:
                 if path == "/system/health" and "no such command prefix" in str(e):
                     self.disable_health = True
+                    self.lock.release()
+                    return None
+
+                if "no such command prefix" in str(e):
+                    _LOGGER.debug("Mikrotik %s path %s not available: %s", self._host, path, e)
                     self.lock.release()
                     return None
 
