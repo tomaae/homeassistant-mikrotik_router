@@ -1,62 +1,65 @@
 {
-    "config": {
-        "step": {
-            "user": {
-                "title": "Ρύθμιση του Mikrotik Router",
-                "description": "Ολοκλήρωση εγκατάστασης Mikrotik Router.",
-                "data": {
-                    "name": "Όνομα ολοκλήρωσης",
-                    "host": "Εξυπηρετητής",
-                    "port": "Θύρα",
-                    "username": "Όνομα χρήστη",
-                    "password": "Κωδικός πρόσβασης",
-                    "ssl": "Χρήση SSL",
-                    "verify_ssl": "Verify SSL"
-                }
-            }
-        },
-        "error": {
-            "name_exists": "Το όνομα υπάρχει ήδη.",
-            "cannot_connect": "Αδυναμία σύνδεσης στον Mikrotik.",
-            "ssl_handshake_failure": "Αποτυχίας χειραψίας SSL",
-            "connection_timeout": "Διακοπή σύνδεσης με Mikrotik.",
-            "wrong_login": "Το όνομα χρήστη και ο κωδικός πρόσβασης δεν είναι έγκυρα.",
-            "ssl_verify_failure": "Certificate verify failed"
+  "config": {
+    "step": {
+      "user": {
+        "title": "Ρύθμιση του Mikrotik Router",
+        "description": "Ολοκλήρωση εγκατάστασης Mikrotik Router.",
+        "data": {
+          "name": "Όνομα ολοκλήρωσης",
+          "host": "Εξυπηρετητής",
+          "port": "Θύρα",
+          "username": "Όνομα χρήστη",
+          "password": "Κωδικός πρόσβασης",
+          "ssl": "Χρήση SSL",
+          "verify_ssl": "Verify SSL"
         }
+      }
     },
-    "options": {
-        "step": {
-            "basic_options": {
-                "data": {
-                    "scan_interval": "Διάστημα σάρωσης (απαιτείται επανεκκίνηση του HA)",
-                    "track_iface_clients": "Προβολή IP και MAC πελάτη στη διεπαφή",
-                    "unit_of_measurement": "Μονάδα μέτρησης",
-                    "track_network_hosts_timeout": "Εξωχρονισμός ανίχνευσης συσκευών διαδικτύου (δευτερόλεπτα)",
-                    "zone": "Ζώνη για παρακολούθηση συσκευής"
-                },
-                "title": "Επιλογές Mikrotik Router (1\/2)",
-                "description": "Διαμόρφωση ολοκλήρωσης"
-            },
-            "sensor_select": {
-                "data": {
-                    "track_network_hosts": "Ανίχνευση των συσκευών δικτύου",
-                    "sensor_port_tracker": "Αισθητήρες παρακολούθησης θυρών",
-                    "sensor_port_traffic": "Αισθητήρες κίνησης θυρών",
-                    "sensor_client_traffic": "Αισθητήρες κίνησης πελατών",
-                    "sensor_simple_queues": "Διακόπτες απλών ουρών",
-                    "sensor_nat": "Διακόπτες NAT",
-                    "sensor_scripts": "Διακόπτες δέσμης ενεργειών",
-                    "sensor_environment": "Αισθητήρες μεταβολών περιβάλλοντος",
-                    "sensor_kidcontrol": "Παιδικός έλεγχος",
-                    "sensor_mangle": "Επιλογικοί διακόπτες",
-                    "sensor_ppp": "Χρήστες PPP",
-                    "sensor_filter": "Διακόπτες φίλτρου",
-                    "sensor_client_captive": "Captive portal data",
-                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
-                },
-                "title": "Επιλογές Mikrotik Router (2\/2)",
-                "description": "Ενεργοποίηση αισθητήρων και διακοπτών"
-            }
-        }
+    "error": {
+      "name_exists": "Το όνομα υπάρχει ήδη.",
+      "cannot_connect": "Αδυναμία σύνδεσης στον Mikrotik.",
+      "ssl_handshake_failure": "Αποτυχίας χειραψίας SSL",
+      "connection_timeout": "Διακοπή σύνδεσης με Mikrotik.",
+      "wrong_login": "Το όνομα χρήστη και ο κωδικός πρόσβασης δεν είναι έγκυρα.",
+      "ssl_verify_failure": "Certificate verify failed"
     }
+  },
+  "options": {
+    "step": {
+      "basic_options": {
+        "data": {
+          "scan_interval": "Διάστημα σάρωσης (απαιτείται επανεκκίνηση του HA)",
+          "track_iface_clients": "Προβολή IP και MAC πελάτη στη διεπαφή",
+          "unit_of_measurement": "Μονάδα μέτρησης",
+          "track_network_hosts_timeout": "Εξωχρονισμός ανίχνευσης συσκευών διαδικτύου (δευτερόλεπτα)",
+          "zone": "Ζώνη για παρακολούθηση συσκευής"
+        },
+        "title": "Επιλογές Mikrotik Router (1/2)",
+        "description": "Διαμόρφωση ολοκλήρωσης"
+      },
+      "sensor_select": {
+        "data": {
+          "track_network_hosts": "Ανίχνευση των συσκευών δικτύου",
+          "sensor_port_tracker": "Αισθητήρες παρακολούθησης θυρών",
+          "sensor_port_traffic": "Αισθητήρες κίνησης θυρών",
+          "sensor_client_traffic": "Αισθητήρες κίνησης πελατών",
+          "sensor_simple_queues": "Διακόπτες απλών ουρών",
+          "sensor_nat": "Διακόπτες NAT",
+          "sensor_scripts": "Διακόπτες δέσμης ενεργειών",
+          "sensor_environment": "Αισθητήρες μεταβολών περιβάλλοντος",
+          "sensor_kidcontrol": "Παιδικός έλεγχος",
+          "sensor_mangle": "Επιλογικοί διακόπτες",
+          "sensor_ppp": "Χρήστες PPP",
+          "sensor_filter": "Διακόπτες φίλτρου",
+          "sensor_client_captive": "Captive portal data",
+          "sensor_netwatch_tracker": "Netwatch tracker sensors",
+          "sensor_wireguard": "WireGuard peer sensors",
+          "sensor_containers": "Container sensors",
+          "sensor_routing_rules": "Routing Rules switches"
+        },
+        "title": "Επιλογές Mikrotik Router (2/2)",
+        "description": "Ενεργοποίηση αισθητήρων και διακοπτών"
+      }
+    }
+  }
 }

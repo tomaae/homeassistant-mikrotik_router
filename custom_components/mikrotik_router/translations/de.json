@@ -1,62 +1,65 @@
 {
-    "config": {
-        "step": {
-            "user": {
-                "title": "Mikrotik-Router einrichten",
-                "description": "Mikrotik-Router-Integration einstellen",
-                "data": {
-                    "name": "Name der Integration",
-                    "host": "Host",
-                    "port": "Port",
-                    "username": "Benutzername",
-                    "password": "Passwort",
-                    "ssl": "SSL benutzen",
-                    "verify_ssl": "Verify SSL"
-                }
-            }
-        },
-        "error": {
-            "name_exists": "Name existiert bereits",
-            "cannot_connect": "Verbindung zum MikroTik fehlgeschlagen.",
-            "ssl_handshake_failure": "SSL Handshake Fehler",
-            "connection_timeout": "Mikrotik-Verbindungstimeout.",
-            "wrong_login": "Ungültiger Benutzername oder Passwort.",
-            "ssl_verify_failure": "Certificate verify failed"
+  "config": {
+    "step": {
+      "user": {
+        "title": "Mikrotik-Router einrichten",
+        "description": "Mikrotik-Router-Integration einstellen",
+        "data": {
+          "name": "Name der Integration",
+          "host": "Host",
+          "port": "Port",
+          "username": "Benutzername",
+          "password": "Passwort",
+          "ssl": "SSL benutzen",
+          "verify_ssl": "Verify SSL"
         }
+      }
     },
-    "options": {
-        "step": {
-            "basic_options": {
-                "data": {
-                    "scan_interval": "Scan-Intervall (erfordert HA-Neustart)",
-                    "track_iface_clients": "Client MAC und IP auf dem Interface anzeigen",
-                    "unit_of_measurement": "Maßeinheit",
-                    "track_network_hosts_timeout": "Zeitlimit für Netzwerkgeräte verfolgen (Sekunden)",
-                    "zone": "Zone für Gerätetracker"
-                },
-                "title": "Mikrotik-Router-Optionen (1\/2)",
-                "description": "Integration konfigurieren"
-            },
-            "sensor_select": {
-                "data": {
-                    "track_network_hosts": "Netzwerkgeräte verfolgen",
-                    "sensor_port_tracker": "Port-Statussensoren",
-                    "sensor_port_traffic": "Port-Durchsatz Sensoren",
-                    "sensor_client_traffic": "Client-Durchsatz Sensoren",
-                    "sensor_simple_queues": "Einfache Endschalter",
-                    "sensor_nat": "NAT-Schalter",
-                    "sensor_scripts": "Skript-Schalter",
-                    "sensor_environment": "Umgebungsvariablen-Sensoren",
-                    "sensor_kidcontrol": "Kindersicherung",
-                    "sensor_mangle": "Mangle-Schalter",
-                    "sensor_ppp": "PPP-Nutzer",
-                    "sensor_filter": "Schalter für Filterregeln",
-                    "sensor_client_captive": "Captive-Portal Daten",
-                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
-                },
-                "title": "Mikrotik-Router-Optionen (2\/2)",
-                "description": "Sensoren und Schalter aktivieren"
-            }
-        }
+    "error": {
+      "name_exists": "Name existiert bereits",
+      "cannot_connect": "Verbindung zum MikroTik fehlgeschlagen.",
+      "ssl_handshake_failure": "SSL Handshake Fehler",
+      "connection_timeout": "Mikrotik-Verbindungstimeout.",
+      "wrong_login": "Ungültiger Benutzername oder Passwort.",
+      "ssl_verify_failure": "Certificate verify failed"
     }
+  },
+  "options": {
+    "step": {
+      "basic_options": {
+        "data": {
+          "scan_interval": "Scan-Intervall (erfordert HA-Neustart)",
+          "track_iface_clients": "Client MAC und IP auf dem Interface anzeigen",
+          "unit_of_measurement": "Maßeinheit",
+          "track_network_hosts_timeout": "Zeitlimit für Netzwerkgeräte verfolgen (Sekunden)",
+          "zone": "Zone für Gerätetracker"
+        },
+        "title": "Mikrotik-Router-Optionen (1/2)",
+        "description": "Integration konfigurieren"
+      },
+      "sensor_select": {
+        "data": {
+          "track_network_hosts": "Netzwerkgeräte verfolgen",
+          "sensor_port_tracker": "Port-Statussensoren",
+          "sensor_port_traffic": "Port-Durchsatz Sensoren",
+          "sensor_client_traffic": "Client-Durchsatz Sensoren",
+          "sensor_simple_queues": "Einfache Endschalter",
+          "sensor_nat": "NAT-Schalter",
+          "sensor_scripts": "Skript-Schalter",
+          "sensor_environment": "Umgebungsvariablen-Sensoren",
+          "sensor_kidcontrol": "Kindersicherung",
+          "sensor_mangle": "Mangle-Schalter",
+          "sensor_ppp": "PPP-Nutzer",
+          "sensor_filter": "Schalter für Filterregeln",
+          "sensor_client_captive": "Captive-Portal Daten",
+          "sensor_netwatch_tracker": "Netwatch tracker sensors",
+          "sensor_wireguard": "WireGuard peer sensors",
+          "sensor_containers": "Container sensors",
+          "sensor_routing_rules": "Routing Rules switches"
+        },
+        "title": "Mikrotik-Router-Optionen (2/2)",
+        "description": "Sensoren und Schalter aktivieren"
+      }
+    }
+  }
 }

@@ -1,62 +1,65 @@
 {
-    "config": {
-        "step": {
-            "user": {
-                "title": "设置Mikrotik Router",
-                "description": "设置 Mikrotik 路由器集成。",
-                "data": {
-                    "name": "集成名称",
-                    "host": "主机",
-                    "port": "端口",
-                    "username": "用户名",
-                    "password": "密码",
-                    "ssl": "使用 SSL",
-                    "verify_ssl": "Verify SSL"
-                }
-            }
-        },
-        "error": {
-            "name_exists": "名称已存在。",
-            "cannot_connect": "无法连接到 Mikrotik。",
-            "ssl_handshake_failure": "SSL 交握失败",
-            "connection_timeout": "Mikrotik 连接超时。",
-            "wrong_login": "无效的用户名或密码。",
-            "ssl_verify_failure": "Certificate verify failed"
+  "config": {
+    "step": {
+      "user": {
+        "title": "设置Mikrotik Router",
+        "description": "设置 Mikrotik 路由器集成。",
+        "data": {
+          "name": "集成名称",
+          "host": "主机",
+          "port": "端口",
+          "username": "用户名",
+          "password": "密码",
+          "ssl": "使用 SSL",
+          "verify_ssl": "Verify SSL"
         }
+      }
     },
-    "options": {
-        "step": {
-            "basic_options": {
-                "data": {
-                    "scan_interval": "扫描间隔（需要重新启动 HA）",
-                    "track_iface_clients": "显示接口上的客户端 MAC 和 IP",
-                    "unit_of_measurement": "测量单位",
-                    "track_network_hosts_timeout": "跟踪网络设备超时（秒）",
-                    "zone": "设备跟踪器的区域"
-                },
-                "title": "Mikrotik Router 选项 (1\/2)",
-                "description": "配置集成"
-            },
-            "sensor_select": {
-                "data": {
-                    "track_network_hosts": "跟踪网络设备",
-                    "sensor_port_tracker": "端口跟踪传感器",
-                    "sensor_port_traffic": "端口流量传感器",
-                    "sensor_client_traffic": "客户端流量传感器",
-                    "sensor_simple_queues": "简单队列交换机",
-                    "sensor_nat": "NAT 交换机",
-                    "sensor_scripts": "脚本交换机",
-                    "sensor_environment": "环境变量传感器",
-                    "sensor_kidcontrol": "儿童控制",
-                    "sensor_mangle": "标记开关",
-                    "sensor_ppp": "PPP 用户",
-                    "sensor_filter": "过滤器开关",
-                    "sensor_client_captive": "Captive portal data",
-                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
-                },
-                "title": "Mikrotik Router 选项 (2\/2)",
-                "description": "启动传感器和开关"
-            }
-        }
+    "error": {
+      "name_exists": "名称已存在。",
+      "cannot_connect": "无法连接到 Mikrotik。",
+      "ssl_handshake_failure": "SSL 交握失败",
+      "connection_timeout": "Mikrotik 连接超时。",
+      "wrong_login": "无效的用户名或密码。",
+      "ssl_verify_failure": "Certificate verify failed"
     }
+  },
+  "options": {
+    "step": {
+      "basic_options": {
+        "data": {
+          "scan_interval": "扫描间隔（需要重新启动 HA）",
+          "track_iface_clients": "显示接口上的客户端 MAC 和 IP",
+          "unit_of_measurement": "测量单位",
+          "track_network_hosts_timeout": "跟踪网络设备超时（秒）",
+          "zone": "设备跟踪器的区域"
+        },
+        "title": "Mikrotik Router 选项 (1/2)",
+        "description": "配置集成"
+      },
+      "sensor_select": {
+        "data": {
+          "track_network_hosts": "跟踪网络设备",
+          "sensor_port_tracker": "端口跟踪传感器",
+          "sensor_port_traffic": "端口流量传感器",
+          "sensor_client_traffic": "客户端流量传感器",
+          "sensor_simple_queues": "简单队列交换机",
+          "sensor_nat": "NAT 交换机",
+          "sensor_scripts": "脚本交换机",
+          "sensor_environment": "环境变量传感器",
+          "sensor_kidcontrol": "儿童控制",
+          "sensor_mangle": "标记开关",
+          "sensor_ppp": "PPP 用户",
+          "sensor_filter": "过滤器开关",
+          "sensor_client_captive": "Captive portal data",
+          "sensor_netwatch_tracker": "Netwatch tracker sensors",
+          "sensor_wireguard": "WireGuard peer sensors",
+          "sensor_containers": "Container sensors",
+          "sensor_routing_rules": "Routing Rules switches"
+        },
+        "title": "Mikrotik Router 选项 (2/2)",
+        "description": "启动传感器和开关"
+      }
+    }
+  }
 }

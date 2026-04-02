@@ -1,62 +1,65 @@
 {
-    "config": {
-        "step": {
-            "user": {
-                "title": "Nastavit Mikrotik Router",
-                "description": "Nastavte integraci Mikrotik Router.",
-                "data": {
-                    "name": "Název integrace",
-                    "host": "Zařízení",
-                    "port": "Port",
-                    "username": "Uživatel",
-                    "password": "Heslo",
-                    "ssl": "Použití SSL",
-                    "verify_ssl": "Verify SSL"
-                }
-            }
-        },
-        "error": {
-            "name_exists": "Název již existuje.",
-            "cannot_connect": "Nelze se připojit k Mikrotiku.",
-            "ssl_handshake_failure": "Selhání handshake SSL",
-            "connection_timeout": "Časový limit připojení vypršel.",
-            "wrong_login": "Neplatné uživatelské jméno nebo heslo.",
-            "ssl_verify_failure": "Certificate verify failed"
+  "config": {
+    "step": {
+      "user": {
+        "title": "Nastavit Mikrotik Router",
+        "description": "Nastavte integraci Mikrotik Router.",
+        "data": {
+          "name": "Název integrace",
+          "host": "Zařízení",
+          "port": "Port",
+          "username": "Uživatel",
+          "password": "Heslo",
+          "ssl": "Použití SSL",
+          "verify_ssl": "Verify SSL"
         }
+      }
     },
-    "options": {
-        "step": {
-            "basic_options": {
-                "data": {
-                    "scan_interval": "Interval skenování (vyžaduje restartování HA)",
-                    "track_iface_clients": "Zobrazit klientské MAC a IP na rozhraních",
-                    "unit_of_measurement": "Jednotka měření",
-                    "track_network_hosts_timeout": "Časový limit sledování síťových zařízení (v sekundách)",
-                    "zone": "Zóna pro sledování zařízení"
-                },
-                "title": "Nastavení Mikrotik Router (1\/2)",
-                "description": "Konfigurovat integraci"
-            },
-            "sensor_select": {
-                "data": {
-                    "track_network_hosts": "Sledování síťových zařízení",
-                    "sensor_port_tracker": "Senzory pro sledování portů",
-                    "sensor_port_traffic": "Senzory provozu portu",
-                    "sensor_client_traffic": "Senzory provozu klienta",
-                    "sensor_simple_queues": "Přepínače jednoduchých front",
-                    "sensor_nat": "Přepínače NAT",
-                    "sensor_scripts": "Přepínače skriptů",
-                    "sensor_environment": "Senzory prostředí",
-                    "sensor_kidcontrol": "Dětská kontrola",
-                    "sensor_mangle": "Mangle spínače",
-                    "sensor_ppp": "Uživatelé PPP",
-                    "sensor_filter": "Přepínače filtrů",
-                    "sensor_client_captive": "Captive portál data",
-                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
-                },
-                "title": "Nastavení Mikrotik Router (2\/2)",
-                "description": "Povolit senzory a přepínače"
-            }
-        }
+    "error": {
+      "name_exists": "Název již existuje.",
+      "cannot_connect": "Nelze se připojit k Mikrotiku.",
+      "ssl_handshake_failure": "Selhání handshake SSL",
+      "connection_timeout": "Časový limit připojení vypršel.",
+      "wrong_login": "Neplatné uživatelské jméno nebo heslo.",
+      "ssl_verify_failure": "Certificate verify failed"
     }
+  },
+  "options": {
+    "step": {
+      "basic_options": {
+        "data": {
+          "scan_interval": "Interval skenování (vyžaduje restartování HA)",
+          "track_iface_clients": "Zobrazit klientské MAC a IP na rozhraních",
+          "unit_of_measurement": "Jednotka měření",
+          "track_network_hosts_timeout": "Časový limit sledování síťových zařízení (v sekundách)",
+          "zone": "Zóna pro sledování zařízení"
+        },
+        "title": "Nastavení Mikrotik Router (1/2)",
+        "description": "Konfigurovat integraci"
+      },
+      "sensor_select": {
+        "data": {
+          "track_network_hosts": "Sledování síťových zařízení",
+          "sensor_port_tracker": "Senzory pro sledování portů",
+          "sensor_port_traffic": "Senzory provozu portu",
+          "sensor_client_traffic": "Senzory provozu klienta",
+          "sensor_simple_queues": "Přepínače jednoduchých front",
+          "sensor_nat": "Přepínače NAT",
+          "sensor_scripts": "Přepínače skriptů",
+          "sensor_environment": "Senzory prostředí",
+          "sensor_kidcontrol": "Dětská kontrola",
+          "sensor_mangle": "Mangle spínače",
+          "sensor_ppp": "Uživatelé PPP",
+          "sensor_filter": "Přepínače filtrů",
+          "sensor_client_captive": "Captive portál data",
+          "sensor_netwatch_tracker": "Netwatch tracker sensors",
+          "sensor_wireguard": "WireGuard peer sensors",
+          "sensor_containers": "Container sensors",
+          "sensor_routing_rules": "Routing Rules switches"
+        },
+        "title": "Nastavení Mikrotik Router (2/2)",
+        "description": "Povolit senzory a přepínače"
+      }
+    }
+  }
 }

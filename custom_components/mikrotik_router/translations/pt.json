@@ -1,62 +1,65 @@
 {
-    "config": {
-        "step": {
-            "user": {
-                "title": "Configurar o Mikrotik Router",
-                "description": "Configurar a integração do Mikrotik Router.",
-                "data": {
-                    "name": "Nome da integração",
-                    "host": "Anfitrião",
-                    "port": "Porta",
-                    "username": "Nome de utilizador",
-                    "password": "Palavra-passe",
-                    "ssl": "Usar SSL",
-                    "verify_ssl": "Verify SSL"
-                }
-            }
-        },
-        "error": {
-            "name_exists": "O nome já existe.",
-            "cannot_connect": "Não é possível ligar à Mikrotik.",
-            "ssl_handshake_failure": "Falha no reconhecimento SSL",
-            "connection_timeout": "Tempo limite da ligação à Mikrotik.",
-            "wrong_login": "Nome de utilizador ou palavra-passe inválidos.",
-            "ssl_verify_failure": "Certificate verify failed"
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configurar o Mikrotik Router",
+        "description": "Configurar a integração do Mikrotik Router.",
+        "data": {
+          "name": "Nome da integração",
+          "host": "Anfitrião",
+          "port": "Porta",
+          "username": "Nome de utilizador",
+          "password": "Palavra-passe",
+          "ssl": "Usar SSL",
+          "verify_ssl": "Verify SSL"
         }
+      }
     },
-    "options": {
-        "step": {
-            "basic_options": {
-                "data": {
-                    "scan_interval": "Intervalo de verificação (requer reinicialização de HA)",
-                    "track_iface_clients": "Mostrar MAC e IP do cliente nas interfaces",
-                    "unit_of_measurement": "Unidade de medida",
-                    "track_network_hosts_timeout": "Rastrear o tempo limite dos dispositivos de rede (segundos)",
-                    "zone": "Zona para o rastreador do dispositivo"
-                },
-                "title": "Opções do Mikrotik Router (1\/2)",
-                "description": "Configurar integração"
-            },
-            "sensor_select": {
-                "data": {
-                    "track_network_hosts": "Rastrear dispositivos de rede",
-                    "sensor_port_tracker": "Sensores de rastreamento das portas",
-                    "sensor_port_traffic": "Sensores de tráfego das portas",
-                    "sensor_client_traffic": "Sensores de tráfego do cliente",
-                    "sensor_simple_queues": "Comutadores simples de filas de espera",
-                    "sensor_nat": "Comutadores NAT",
-                    "sensor_scripts": "Comutadores de script",
-                    "sensor_environment": "Sensores de variáveis de ambiente",
-                    "sensor_kidcontrol": "Controlo de crianças",
-                    "sensor_mangle": "Interruptores mangle",
-                    "sensor_ppp": "Utilizadores PPP",
-                    "sensor_filter": "Interruptores de filtro",
-                    "sensor_client_captive": "Captive portal data",
-                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
-                },
-                "title": "Opções do Mikrotik Router (2\/2)",
-                "description": "Ativar sensores e interruptores"
-            }
-        }
+    "error": {
+      "name_exists": "O nome já existe.",
+      "cannot_connect": "Não é possível ligar à Mikrotik.",
+      "ssl_handshake_failure": "Falha no reconhecimento SSL",
+      "connection_timeout": "Tempo limite da ligação à Mikrotik.",
+      "wrong_login": "Nome de utilizador ou palavra-passe inválidos.",
+      "ssl_verify_failure": "Certificate verify failed"
     }
+  },
+  "options": {
+    "step": {
+      "basic_options": {
+        "data": {
+          "scan_interval": "Intervalo de verificação (requer reinicialização de HA)",
+          "track_iface_clients": "Mostrar MAC e IP do cliente nas interfaces",
+          "unit_of_measurement": "Unidade de medida",
+          "track_network_hosts_timeout": "Rastrear o tempo limite dos dispositivos de rede (segundos)",
+          "zone": "Zona para o rastreador do dispositivo"
+        },
+        "title": "Opções do Mikrotik Router (1/2)",
+        "description": "Configurar integração"
+      },
+      "sensor_select": {
+        "data": {
+          "track_network_hosts": "Rastrear dispositivos de rede",
+          "sensor_port_tracker": "Sensores de rastreamento das portas",
+          "sensor_port_traffic": "Sensores de tráfego das portas",
+          "sensor_client_traffic": "Sensores de tráfego do cliente",
+          "sensor_simple_queues": "Comutadores simples de filas de espera",
+          "sensor_nat": "Comutadores NAT",
+          "sensor_scripts": "Comutadores de script",
+          "sensor_environment": "Sensores de variáveis de ambiente",
+          "sensor_kidcontrol": "Controlo de crianças",
+          "sensor_mangle": "Interruptores mangle",
+          "sensor_ppp": "Utilizadores PPP",
+          "sensor_filter": "Interruptores de filtro",
+          "sensor_client_captive": "Captive portal data",
+          "sensor_netwatch_tracker": "Netwatch tracker sensors",
+          "sensor_wireguard": "WireGuard peer sensors",
+          "sensor_containers": "Container sensors",
+          "sensor_routing_rules": "Routing Rules switches"
+        },
+        "title": "Opções do Mikrotik Router (2/2)",
+        "description": "Ativar sensores e interruptores"
+      }
+    }
+  }
 }

@@ -1,62 +1,65 @@
 {
-    "config": {
-        "step": {
-            "user": {
-                "title": "Mikrotik Router'ı Kur",
-                "description": "Mikrotik yönlendirici entegrasyonunu kur",
-                "data": {
-                    "name": "Entegrasyon adı",
-                    "host": "Sunucu",
-                    "port": "Port",
-                    "username": "Kullanıcı adı",
-                    "password": "Şifre",
-                    "ssl": "SSL kullan",
-                    "verify_ssl": "Verify SSL"
-                }
-            }
-        },
-        "error": {
-            "name_exists": "Bu ad zaten var.",
-            "cannot_connect": "Mikrotik'e bağlanılamıyor.",
-            "ssl_handshake_failure": "SSL uyuşma hatası",
-            "connection_timeout": "Mikrotik bağlantısı zaman aşımı.",
-            "wrong_login": "Geçersiz kullanıcı adı veya şifresi.",
-            "ssl_verify_failure": "Certificate verify failed"
+  "config": {
+    "step": {
+      "user": {
+        "title": "Mikrotik Router'ı Kur",
+        "description": "Mikrotik yönlendirici entegrasyonunu kur",
+        "data": {
+          "name": "Entegrasyon adı",
+          "host": "Sunucu",
+          "port": "Port",
+          "username": "Kullanıcı adı",
+          "password": "Şifre",
+          "ssl": "SSL kullan",
+          "verify_ssl": "Verify SSL"
         }
+      }
     },
-    "options": {
-        "step": {
-            "basic_options": {
-                "data": {
-                    "scan_interval": "Aralığı tara (HA yeniden başlatma gerektirir)",
-                    "track_iface_clients": "Müşteri MAC'ini ve IP'sini arayüzlerde göster",
-                    "unit_of_measurement": "Ölçü birimi",
-                    "track_network_hosts_timeout": "Ağ cihazı izleme zaman aşımı (saniyeler)",
-                    "zone": "Cihaz izleyici için alan"
-                },
-                "title": "Mikrotik Router seçenekleri (1\/2)",
-                "description": "Entegrasyonu yapılandır"
-            },
-            "sensor_select": {
-                "data": {
-                    "track_network_hosts": "Ağ cihazlarını izle",
-                    "sensor_port_tracker": "Port izleme sensörleri",
-                    "sensor_port_traffic": "Port trafiği sensörleri",
-                    "sensor_client_traffic": "İstemci trafik sensörleri",
-                    "sensor_simple_queues": "Basit kuyruk switchleri",
-                    "sensor_nat": "NAT switchler",
-                    "sensor_scripts": "Betik switchleri",
-                    "sensor_environment": "Çevre değişkeni sensörleri",
-                    "sensor_kidcontrol": "Çocuk denetimi",
-                    "sensor_mangle": "Mangle anahtarları",
-                    "sensor_ppp": "PPP kullanıcıları",
-                    "sensor_filter": "Filtre anahtarları",
-                    "sensor_client_captive": "Captive portal data",
-                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
-                },
-                "title": "Mikrotik Router seçenekleri (2\/2)",
-                "description": "Sensör ve anahtarları etkinleştir"
-            }
-        }
+    "error": {
+      "name_exists": "Bu ad zaten var.",
+      "cannot_connect": "Mikrotik'e bağlanılamıyor.",
+      "ssl_handshake_failure": "SSL uyuşma hatası",
+      "connection_timeout": "Mikrotik bağlantısı zaman aşımı.",
+      "wrong_login": "Geçersiz kullanıcı adı veya şifresi.",
+      "ssl_verify_failure": "Certificate verify failed"
     }
+  },
+  "options": {
+    "step": {
+      "basic_options": {
+        "data": {
+          "scan_interval": "Aralığı tara (HA yeniden başlatma gerektirir)",
+          "track_iface_clients": "Müşteri MAC'ini ve IP'sini arayüzlerde göster",
+          "unit_of_measurement": "Ölçü birimi",
+          "track_network_hosts_timeout": "Ağ cihazı izleme zaman aşımı (saniyeler)",
+          "zone": "Cihaz izleyici için alan"
+        },
+        "title": "Mikrotik Router seçenekleri (1/2)",
+        "description": "Entegrasyonu yapılandır"
+      },
+      "sensor_select": {
+        "data": {
+          "track_network_hosts": "Ağ cihazlarını izle",
+          "sensor_port_tracker": "Port izleme sensörleri",
+          "sensor_port_traffic": "Port trafiği sensörleri",
+          "sensor_client_traffic": "İstemci trafik sensörleri",
+          "sensor_simple_queues": "Basit kuyruk switchleri",
+          "sensor_nat": "NAT switchler",
+          "sensor_scripts": "Betik switchleri",
+          "sensor_environment": "Çevre değişkeni sensörleri",
+          "sensor_kidcontrol": "Çocuk denetimi",
+          "sensor_mangle": "Mangle anahtarları",
+          "sensor_ppp": "PPP kullanıcıları",
+          "sensor_filter": "Filtre anahtarları",
+          "sensor_client_captive": "Captive portal data",
+          "sensor_netwatch_tracker": "Netwatch tracker sensors",
+          "sensor_wireguard": "WireGuard peer sensors",
+          "sensor_containers": "Container sensors",
+          "sensor_routing_rules": "Routing Rules switches"
+        },
+        "title": "Mikrotik Router seçenekleri (2/2)",
+        "description": "Sensör ve anahtarları etkinleştir"
+      }
+    }
+  }
 }

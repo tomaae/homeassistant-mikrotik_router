@@ -1,62 +1,65 @@
 {
-    "config": {
-        "step": {
-            "user": {
-                "title": "Lestatiet Mikrotik Router",
-                "description": "Mikrotik maršrutētāja integrācijas konfigurēšana.",
-                "data": {
-                    "name": "Integrācijas nosaukums",
-                    "host": "Maršrutētāja adrese",
-                    "port": "Ports",
-                    "username": "Lietotājvārds",
-                    "password": "Parole",
-                    "ssl": "Izmantot SSL",
-                    "verify_ssl": "Verify SSL"
-                }
-            }
-        },
-        "error": {
-            "name_exists": "Nosaukums jau eksistē.",
-            "cannot_connect": "Neizdodas savienoties ar Mikrotik.",
-            "ssl_handshake_failure": "SSL savienojuma kļūda",
-            "connection_timeout": "Mikrotik savienojuma noilgums.",
-            "wrong_login": "Nederīgs lietotājvārds vai parole.",
-            "ssl_verify_failure": "Certificate verify failed"
+  "config": {
+    "step": {
+      "user": {
+        "title": "Lestatiet Mikrotik Router",
+        "description": "Mikrotik maršrutētāja integrācijas konfigurēšana.",
+        "data": {
+          "name": "Integrācijas nosaukums",
+          "host": "Maršrutētāja adrese",
+          "port": "Ports",
+          "username": "Lietotājvārds",
+          "password": "Parole",
+          "ssl": "Izmantot SSL",
+          "verify_ssl": "Verify SSL"
         }
+      }
     },
-    "options": {
-        "step": {
-            "basic_options": {
-                "data": {
-                    "scan_interval": "Skenēšanas periods (nepieciešama HA restartēšana)",
-                    "track_iface_clients": "Rādīt klienta MAC un IP interfeisā",
-                    "unit_of_measurement": "Mērvienības",
-                    "track_network_hosts_timeout": "Tīkla ierīces uzraudzības noilgums (sekundēs)",
-                    "zone": "Lerīces izsekotāja zona"
-                },
-                "title": "Mikrotik Router opcijas (1\/2)",
-                "description": "Konfigurēt integrāciju"
-            },
-            "sensor_select": {
-                "data": {
-                    "track_network_hosts": "Tīkla ierīču izsekošana",
-                    "sensor_port_tracker": "Porta izsekošanas sensori",
-                    "sensor_port_traffic": "Porta datu plūsmas sensori",
-                    "sensor_client_traffic": "Klientu datu plūsmas sensori",
-                    "sensor_simple_queues": "Vienkāršo rindu slēdži",
-                    "sensor_nat": "NAT kārtulu slēdži",
-                    "sensor_scripts": "Skriptu slēdži",
-                    "sensor_environment": "Mainīgie vides sensori",
-                    "sensor_kidcontrol": "Bērnu kontrole",
-                    "sensor_mangle": "Manglu slēdži",
-                    "sensor_ppp": "PPP lietotāji",
-                    "sensor_filter": "Filtra slēdži",
-                    "sensor_client_captive": "Captive portal data",
-                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
-                },
-                "title": "Mikrotik Router opcijas (2\/2)",
-                "description": "Sensoru un slēdžu aktivizēšana"
-            }
-        }
+    "error": {
+      "name_exists": "Nosaukums jau eksistē.",
+      "cannot_connect": "Neizdodas savienoties ar Mikrotik.",
+      "ssl_handshake_failure": "SSL savienojuma kļūda",
+      "connection_timeout": "Mikrotik savienojuma noilgums.",
+      "wrong_login": "Nederīgs lietotājvārds vai parole.",
+      "ssl_verify_failure": "Certificate verify failed"
     }
+  },
+  "options": {
+    "step": {
+      "basic_options": {
+        "data": {
+          "scan_interval": "Skenēšanas periods (nepieciešama HA restartēšana)",
+          "track_iface_clients": "Rādīt klienta MAC un IP interfeisā",
+          "unit_of_measurement": "Mērvienības",
+          "track_network_hosts_timeout": "Tīkla ierīces uzraudzības noilgums (sekundēs)",
+          "zone": "Lerīces izsekotāja zona"
+        },
+        "title": "Mikrotik Router opcijas (1/2)",
+        "description": "Konfigurēt integrāciju"
+      },
+      "sensor_select": {
+        "data": {
+          "track_network_hosts": "Tīkla ierīču izsekošana",
+          "sensor_port_tracker": "Porta izsekošanas sensori",
+          "sensor_port_traffic": "Porta datu plūsmas sensori",
+          "sensor_client_traffic": "Klientu datu plūsmas sensori",
+          "sensor_simple_queues": "Vienkāršo rindu slēdži",
+          "sensor_nat": "NAT kārtulu slēdži",
+          "sensor_scripts": "Skriptu slēdži",
+          "sensor_environment": "Mainīgie vides sensori",
+          "sensor_kidcontrol": "Bērnu kontrole",
+          "sensor_mangle": "Manglu slēdži",
+          "sensor_ppp": "PPP lietotāji",
+          "sensor_filter": "Filtra slēdži",
+          "sensor_client_captive": "Captive portal data",
+          "sensor_netwatch_tracker": "Netwatch tracker sensors",
+          "sensor_wireguard": "WireGuard peer sensors",
+          "sensor_containers": "Container sensors",
+          "sensor_routing_rules": "Routing Rules switches"
+        },
+        "title": "Mikrotik Router opcijas (2/2)",
+        "description": "Sensoru un slēdžu aktivizēšana"
+      }
+    }
+  }
 }

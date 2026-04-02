@@ -1,62 +1,65 @@
 {
-    "config": {
-        "step": {
-            "user": {
-                "title": "Setja upp Mikrotik Router",
-                "description": "Setja upp Mikrotik Router samþættingu.",
-                "data": {
-                    "name": "Heiti samþættingar",
-                    "host": "Hýsill",
-                    "port": "Port",
-                    "username": "Notandanafn",
-                    "password": "Lykilorð",
-                    "ssl": "Nota SSL",
-                    "verify_ssl": "Verify SSL"
-                }
-            }
-        },
-        "error": {
-            "name_exists": "Nafn er þegar til.",
-            "cannot_connect": "Get ekki tengst Mikrotik.",
-            "ssl_handshake_failure": "Villa við að koma á SSL samskiptum",
-            "connection_timeout": "Tengin við Mikrotik rann út á tíma.",
-            "wrong_login": "Ógilt notendanafn eða lykilorð.",
-            "ssl_verify_failure": "Certificate verify failed"
+  "config": {
+    "step": {
+      "user": {
+        "title": "Setja upp Mikrotik Router",
+        "description": "Setja upp Mikrotik Router samþættingu.",
+        "data": {
+          "name": "Heiti samþættingar",
+          "host": "Hýsill",
+          "port": "Port",
+          "username": "Notandanafn",
+          "password": "Lykilorð",
+          "ssl": "Nota SSL",
+          "verify_ssl": "Verify SSL"
         }
+      }
     },
-    "options": {
-        "step": {
-            "basic_options": {
-                "data": {
-                    "scan_interval": "Tíðni skönnunar ( krefst endurræsingar á HA )",
-                    "track_iface_clients": "Sýna MAC og IP vistfang fyrir biðlara á netkortum",
-                    "unit_of_measurement": "Mælieining",
-                    "track_network_hosts_timeout": "Tímamörk við rakningu á netbúnaði ( sekúndur )",
-                    "zone": "Svæði fyrir tækjarakningu"
-                },
-                "title": "Mikrotik Router valkostir (1\/2)",
-                "description": "Stilla samþættingu"
-            },
-            "sensor_select": {
-                "data": {
-                    "track_network_hosts": "Rekja netbúnað",
-                    "sensor_port_tracker": "Port rakningarskynjarar",
-                    "sensor_port_traffic": "Port umferðarskynjarar",
-                    "sensor_client_traffic": "Biðlaraumferð skynjarar",
-                    "sensor_simple_queues": "Einfaldir biðraðir rofar",
-                    "sensor_nat": "NAT rofar",
-                    "sensor_scripts": "Skrifturofar",
-                    "sensor_environment": "Umhverfisbreytu skynjarar",
-                    "sensor_kidcontrol": "Krakkastjórnun",
-                    "sensor_mangle": "Bjögunarrofi",
-                    "sensor_ppp": "PPP notendur",
-                    "sensor_filter": "Síurofar",
-                    "sensor_client_captive": "Captive portal data",
-                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
-                },
-                "title": "Mikrotik Router valkostir (2\/2)",
-                "description": "Virkja skynjara og rofa"
-            }
-        }
+    "error": {
+      "name_exists": "Nafn er þegar til.",
+      "cannot_connect": "Get ekki tengst Mikrotik.",
+      "ssl_handshake_failure": "Villa við að koma á SSL samskiptum",
+      "connection_timeout": "Tengin við Mikrotik rann út á tíma.",
+      "wrong_login": "Ógilt notendanafn eða lykilorð.",
+      "ssl_verify_failure": "Certificate verify failed"
     }
+  },
+  "options": {
+    "step": {
+      "basic_options": {
+        "data": {
+          "scan_interval": "Tíðni skönnunar ( krefst endurræsingar á HA )",
+          "track_iface_clients": "Sýna MAC og IP vistfang fyrir biðlara á netkortum",
+          "unit_of_measurement": "Mælieining",
+          "track_network_hosts_timeout": "Tímamörk við rakningu á netbúnaði ( sekúndur )",
+          "zone": "Svæði fyrir tækjarakningu"
+        },
+        "title": "Mikrotik Router valkostir (1/2)",
+        "description": "Stilla samþættingu"
+      },
+      "sensor_select": {
+        "data": {
+          "track_network_hosts": "Rekja netbúnað",
+          "sensor_port_tracker": "Port rakningarskynjarar",
+          "sensor_port_traffic": "Port umferðarskynjarar",
+          "sensor_client_traffic": "Biðlaraumferð skynjarar",
+          "sensor_simple_queues": "Einfaldir biðraðir rofar",
+          "sensor_nat": "NAT rofar",
+          "sensor_scripts": "Skrifturofar",
+          "sensor_environment": "Umhverfisbreytu skynjarar",
+          "sensor_kidcontrol": "Krakkastjórnun",
+          "sensor_mangle": "Bjögunarrofi",
+          "sensor_ppp": "PPP notendur",
+          "sensor_filter": "Síurofar",
+          "sensor_client_captive": "Captive portal data",
+          "sensor_netwatch_tracker": "Netwatch tracker sensors",
+          "sensor_wireguard": "WireGuard peer sensors",
+          "sensor_containers": "Container sensors",
+          "sensor_routing_rules": "Routing Rules switches"
+        },
+        "title": "Mikrotik Router valkostir (2/2)",
+        "description": "Virkja skynjara og rofa"
+      }
+    }
+  }
 }

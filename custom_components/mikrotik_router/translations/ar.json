@@ -1,62 +1,65 @@
 {
-    "config": {
-        "step": {
-            "user": {
-                "title": "ضبط جهاز Mikrotik Router",
-                "description": "إعداد دمج موجِّه (Mikrotik).",
-                "data": {
-                    "name": "اسم الدّمج",
-                    "host": "المُضيف",
-                    "port": "منفذ",
-                    "username": "اسم المستخدم",
-                    "password": "كلمة المرور",
-                    "ssl": "استعمل طبقة الوصلات الآمنة (SSL)",
-                    "verify_ssl": "Verify SSL"
-                }
-            }
-        },
-        "error": {
-            "name_exists": "الاسم موجود بالفعل.",
-            "cannot_connect": "لا يمكن الاتصال بـ (Mikrotik).",
-            "ssl_handshake_failure": "فشل تأكيد الاتصال (SSL)",
-            "connection_timeout": "مهلة اتصال (Mikrotik).",
-            "wrong_login": "خطأ في اسم المستخدم أو كلمة مرور.",
-            "ssl_verify_failure": "Certificate verify failed"
+  "config": {
+    "step": {
+      "user": {
+        "title": "ضبط جهاز Mikrotik Router",
+        "description": "إعداد دمج موجِّه (Mikrotik).",
+        "data": {
+          "name": "اسم الدّمج",
+          "host": "المُضيف",
+          "port": "منفذ",
+          "username": "اسم المستخدم",
+          "password": "كلمة المرور",
+          "ssl": "استعمل طبقة الوصلات الآمنة (SSL)",
+          "verify_ssl": "Verify SSL"
         }
+      }
     },
-    "options": {
-        "step": {
-            "basic_options": {
-                "data": {
-                    "scan_interval": "الفاصل الزمني للمسح الضوئي (يتطلب إعادة تشغيل HA)",
-                    "track_iface_clients": "إظهار  عنوان التحكّم في الوسائط (MAC)  و بروتوكول الإنترنت (IP) للعميل على الواجهات",
-                    "unit_of_measurement": "وحدة قياس",
-                    "track_network_hosts_timeout": "مهلة تتبّع أجهزة الشبكة (بالثواني)",
-                    "zone": "منطقة لتعقُّب الجهاز"
-                },
-                "title": "خيارات جهاز Mikrotik Router (1\/2)",
-                "description": "تهيئة التكامل"
-            },
-            "sensor_select": {
-                "data": {
-                    "track_network_hosts": "تتبّع أجهزة الشبكة",
-                    "sensor_port_tracker": "مُستشعرات تعقُب منفذ الشبكة",
-                    "sensor_port_traffic": "مُستشعرات حركة المرور عبر منفذ الشبكة",
-                    "sensor_client_traffic": "مُستشعرات حركة المرور على شبكات العميل",
-                    "sensor_simple_queues": "مُبدِّل الاِصْطِفاف البسيط",
-                    "sensor_nat": "مُبدِّلات ترجمة عنوان الشبكة",
-                    "sensor_scripts": "مُبدِّلات النصوص",
-                    "sensor_environment": "مُستشعرات متغير البيئة",
-                    "sensor_kidcontrol": "مراقبة الأطفال",
-                    "sensor_mangle": "مفاتيح المِكواة الأُسطوانية",
-                    "sensor_ppp": "مستخدمي PPP",
-                    "sensor_filter": "مفاتيح الترشيح",
-                    "sensor_client_captive": "Captive portal data",
-                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
-                },
-                "title": "خيارات جهاز Mikrotik Router (2\/2)",
-                "description": "تمكين أجهزة الاستشعار والمفاتيح"
-            }
-        }
+    "error": {
+      "name_exists": "الاسم موجود بالفعل.",
+      "cannot_connect": "لا يمكن الاتصال بـ (Mikrotik).",
+      "ssl_handshake_failure": "فشل تأكيد الاتصال (SSL)",
+      "connection_timeout": "مهلة اتصال (Mikrotik).",
+      "wrong_login": "خطأ في اسم المستخدم أو كلمة مرور.",
+      "ssl_verify_failure": "Certificate verify failed"
     }
+  },
+  "options": {
+    "step": {
+      "basic_options": {
+        "data": {
+          "scan_interval": "الفاصل الزمني للمسح الضوئي (يتطلب إعادة تشغيل HA)",
+          "track_iface_clients": "إظهار  عنوان التحكّم في الوسائط (MAC)  و بروتوكول الإنترنت (IP) للعميل على الواجهات",
+          "unit_of_measurement": "وحدة قياس",
+          "track_network_hosts_timeout": "مهلة تتبّع أجهزة الشبكة (بالثواني)",
+          "zone": "منطقة لتعقُّب الجهاز"
+        },
+        "title": "خيارات جهاز Mikrotik Router (1/2)",
+        "description": "تهيئة التكامل"
+      },
+      "sensor_select": {
+        "data": {
+          "track_network_hosts": "تتبّع أجهزة الشبكة",
+          "sensor_port_tracker": "مُستشعرات تعقُب منفذ الشبكة",
+          "sensor_port_traffic": "مُستشعرات حركة المرور عبر منفذ الشبكة",
+          "sensor_client_traffic": "مُستشعرات حركة المرور على شبكات العميل",
+          "sensor_simple_queues": "مُبدِّل الاِصْطِفاف البسيط",
+          "sensor_nat": "مُبدِّلات ترجمة عنوان الشبكة",
+          "sensor_scripts": "مُبدِّلات النصوص",
+          "sensor_environment": "مُستشعرات متغير البيئة",
+          "sensor_kidcontrol": "مراقبة الأطفال",
+          "sensor_mangle": "مفاتيح المِكواة الأُسطوانية",
+          "sensor_ppp": "مستخدمي PPP",
+          "sensor_filter": "مفاتيح الترشيح",
+          "sensor_client_captive": "Captive portal data",
+          "sensor_netwatch_tracker": "Netwatch tracker sensors",
+          "sensor_wireguard": "WireGuard peer sensors",
+          "sensor_containers": "Container sensors",
+          "sensor_routing_rules": "Routing Rules switches"
+        },
+        "title": "خيارات جهاز Mikrotik Router (2/2)",
+        "description": "تمكين أجهزة الاستشعار والمفاتيح"
+      }
+    }
+  }
 }

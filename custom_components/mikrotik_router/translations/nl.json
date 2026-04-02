@@ -1,62 +1,65 @@
 {
-    "config": {
-        "step": {
-            "user": {
-                "title": "Mikrotik Router instellen",
-                "description": "Stel Mikrotik Router-integratie in.",
-                "data": {
-                    "name": "Naam van de integratie",
-                    "host": "Host",
-                    "port": "Poort",
-                    "username": "Gebruikersnaam",
-                    "password": "Wachtwoord",
-                    "ssl": "Gebruik SSL",
-                    "verify_ssl": "Verify SSL"
-                }
-            }
-        },
-        "error": {
-            "name_exists": "Naam al in gebruik",
-            "cannot_connect": "Kan geen verbinding maken met Mikrotik.",
-            "ssl_handshake_failure": "SSL overeenkomings-storing",
-            "connection_timeout": "Mikrotik verbinding time-out.",
-            "wrong_login": "Ongeldige gebruikersnaam of wachtwoord.",
-            "ssl_verify_failure": "Certificate verify failed"
+  "config": {
+    "step": {
+      "user": {
+        "title": "Mikrotik Router instellen",
+        "description": "Stel Mikrotik Router-integratie in.",
+        "data": {
+          "name": "Naam van de integratie",
+          "host": "Host",
+          "port": "Poort",
+          "username": "Gebruikersnaam",
+          "password": "Wachtwoord",
+          "ssl": "Gebruik SSL",
+          "verify_ssl": "Verify SSL"
         }
+      }
     },
-    "options": {
-        "step": {
-            "basic_options": {
-                "data": {
-                    "scan_interval": "Scaninterval (vereist opnieuw opstarten van HA)",
-                    "track_iface_clients": "Mac en IP van client weergeven op interfaces",
-                    "unit_of_measurement": "Meet eenheid",
-                    "track_network_hosts_timeout": "Volg de time-out van netwerkapparaten (seconden)",
-                    "zone": "Zone voor apparaattracker"
-                },
-                "title": "Opties Mikrotik Router (1\/2)",
-                "description": "Integratie configureren"
-            },
-            "sensor_select": {
-                "data": {
-                    "track_network_hosts": "Volg netwerkapparaten",
-                    "sensor_port_tracker": "Poorttrackersensors",
-                    "sensor_port_traffic": "Poortverkeersensors",
-                    "sensor_client_traffic": "Clientverkeersensors",
-                    "sensor_simple_queues": "Eenvoudige wachtrijswitches",
-                    "sensor_nat": "NAT-switches",
-                    "sensor_scripts": "Script-switches",
-                    "sensor_environment": "Omgevingsvariabelesensors",
-                    "sensor_kidcontrol": "Kindercontrole",
-                    "sensor_mangle": "Mangelschakelaars",
-                    "sensor_ppp": "PPP-gebruikers",
-                    "sensor_filter": "Filterschakelaars",
-                    "sensor_client_captive": "Captive portal data",
-                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
-                },
-                "title": "Opties Mikrotik Router (2\/2)",
-                "description": "Sensoren en schakelaars inschakelen"
-            }
-        }
+    "error": {
+      "name_exists": "Naam al in gebruik",
+      "cannot_connect": "Kan geen verbinding maken met Mikrotik.",
+      "ssl_handshake_failure": "SSL overeenkomings-storing",
+      "connection_timeout": "Mikrotik verbinding time-out.",
+      "wrong_login": "Ongeldige gebruikersnaam of wachtwoord.",
+      "ssl_verify_failure": "Certificate verify failed"
     }
+  },
+  "options": {
+    "step": {
+      "basic_options": {
+        "data": {
+          "scan_interval": "Scaninterval (vereist opnieuw opstarten van HA)",
+          "track_iface_clients": "Mac en IP van client weergeven op interfaces",
+          "unit_of_measurement": "Meet eenheid",
+          "track_network_hosts_timeout": "Volg de time-out van netwerkapparaten (seconden)",
+          "zone": "Zone voor apparaattracker"
+        },
+        "title": "Opties Mikrotik Router (1/2)",
+        "description": "Integratie configureren"
+      },
+      "sensor_select": {
+        "data": {
+          "track_network_hosts": "Volg netwerkapparaten",
+          "sensor_port_tracker": "Poorttrackersensors",
+          "sensor_port_traffic": "Poortverkeersensors",
+          "sensor_client_traffic": "Clientverkeersensors",
+          "sensor_simple_queues": "Eenvoudige wachtrijswitches",
+          "sensor_nat": "NAT-switches",
+          "sensor_scripts": "Script-switches",
+          "sensor_environment": "Omgevingsvariabelesensors",
+          "sensor_kidcontrol": "Kindercontrole",
+          "sensor_mangle": "Mangelschakelaars",
+          "sensor_ppp": "PPP-gebruikers",
+          "sensor_filter": "Filterschakelaars",
+          "sensor_client_captive": "Captive portal data",
+          "sensor_netwatch_tracker": "Netwatch tracker sensors",
+          "sensor_wireguard": "WireGuard peer sensors",
+          "sensor_containers": "Container sensors",
+          "sensor_routing_rules": "Routing Rules switches"
+        },
+        "title": "Opties Mikrotik Router (2/2)",
+        "description": "Sensoren en schakelaars inschakelen"
+      }
+    }
+  }
 }

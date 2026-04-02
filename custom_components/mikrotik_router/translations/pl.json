@@ -1,62 +1,65 @@
 {
-    "config": {
-        "step": {
-            "user": {
-                "title": "Skonfiguruj Mikrotik Router",
-                "description": "Skonfiguruj integrację z Mikrotik Router.",
-                "data": {
-                    "name": "Nazwa integracji",
-                    "host": "Host",
-                    "port": "Port",
-                    "username": "Nazwa użytkownika",
-                    "password": "Hasło",
-                    "ssl": "Użyj SSL",
-                    "verify_ssl": "Verify SSL"
-                }
-            }
-        },
-        "error": {
-            "name_exists": "Nazwa już istnieje",
-            "cannot_connect": "Nie można połączyć się z Mikrotik.",
-            "ssl_handshake_failure": "Błąd uzgadniania SSL",
-            "connection_timeout": "Limit czasu dla połączenia Mikrotik został przekroczony.",
-            "wrong_login": "Nieprawidłowa nazwa użytkownika lub hasło.",
-            "ssl_verify_failure": "Certificate verify failed"
+  "config": {
+    "step": {
+      "user": {
+        "title": "Skonfiguruj Mikrotik Router",
+        "description": "Skonfiguruj integrację z Mikrotik Router.",
+        "data": {
+          "name": "Nazwa integracji",
+          "host": "Host",
+          "port": "Port",
+          "username": "Nazwa użytkownika",
+          "password": "Hasło",
+          "ssl": "Użyj SSL",
+          "verify_ssl": "Verify SSL"
         }
+      }
     },
-    "options": {
-        "step": {
-            "basic_options": {
-                "data": {
-                    "scan_interval": "Częstotliwość skanowania (wymaga ponownego uruchomienia HA)",
-                    "track_iface_clients": "Pokaż w interfejsach adres MAC i IP klienta",
-                    "unit_of_measurement": "Jednostka miary",
-                    "track_network_hosts_timeout": "Śledź limity czasu dla urządzeń sieciowych (sekundy)",
-                    "zone": "Strefa programu do śledzenia urządzeń"
-                },
-                "title": "Opcje Mikrotik Router (1\/2)",
-                "description": "Skonfiguruj integrację"
-            },
-            "sensor_select": {
-                "data": {
-                    "track_network_hosts": "Śledź urządzenia sieciowe",
-                    "sensor_port_tracker": "Czujniki monitora portu",
-                    "sensor_port_traffic": "Czujniki ruchu portowego",
-                    "sensor_client_traffic": "Czujniki ruchu klienta",
-                    "sensor_simple_queues": "Przełączniki prostych kolejek",
-                    "sensor_nat": "Przełączniki NAT",
-                    "sensor_scripts": "Przełączniki skryptów",
-                    "sensor_environment": "Czujniki zmiennych środowiskowych",
-                    "sensor_kidcontrol": "Kontrola rodzicielska",
-                    "sensor_mangle": "Przełączniki mangle",
-                    "sensor_ppp": "Użytkownicy PPP",
-                    "sensor_filter": "Przełączniki filtrów",
-                    "sensor_client_captive": "Captive portal data",
-                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
-                },
-                "title": "Opcje Mikrotik Router (2\/2)",
-                "description": "Włącz czujniki i przełączniki"
-            }
-        }
+    "error": {
+      "name_exists": "Nazwa już istnieje",
+      "cannot_connect": "Nie można połączyć się z Mikrotik.",
+      "ssl_handshake_failure": "Błąd uzgadniania SSL",
+      "connection_timeout": "Limit czasu dla połączenia Mikrotik został przekroczony.",
+      "wrong_login": "Nieprawidłowa nazwa użytkownika lub hasło.",
+      "ssl_verify_failure": "Certificate verify failed"
     }
+  },
+  "options": {
+    "step": {
+      "basic_options": {
+        "data": {
+          "scan_interval": "Częstotliwość skanowania (wymaga ponownego uruchomienia HA)",
+          "track_iface_clients": "Pokaż w interfejsach adres MAC i IP klienta",
+          "unit_of_measurement": "Jednostka miary",
+          "track_network_hosts_timeout": "Śledź limity czasu dla urządzeń sieciowych (sekundy)",
+          "zone": "Strefa programu do śledzenia urządzeń"
+        },
+        "title": "Opcje Mikrotik Router (1/2)",
+        "description": "Skonfiguruj integrację"
+      },
+      "sensor_select": {
+        "data": {
+          "track_network_hosts": "Śledź urządzenia sieciowe",
+          "sensor_port_tracker": "Czujniki monitora portu",
+          "sensor_port_traffic": "Czujniki ruchu portowego",
+          "sensor_client_traffic": "Czujniki ruchu klienta",
+          "sensor_simple_queues": "Przełączniki prostych kolejek",
+          "sensor_nat": "Przełączniki NAT",
+          "sensor_scripts": "Przełączniki skryptów",
+          "sensor_environment": "Czujniki zmiennych środowiskowych",
+          "sensor_kidcontrol": "Kontrola rodzicielska",
+          "sensor_mangle": "Przełączniki mangle",
+          "sensor_ppp": "Użytkownicy PPP",
+          "sensor_filter": "Przełączniki filtrów",
+          "sensor_client_captive": "Captive portal data",
+          "sensor_netwatch_tracker": "Netwatch tracker sensors",
+          "sensor_wireguard": "WireGuard peer sensors",
+          "sensor_containers": "Container sensors",
+          "sensor_routing_rules": "Routing Rules switches"
+        },
+        "title": "Opcje Mikrotik Router (2/2)",
+        "description": "Włącz czujniki i przełączniki"
+      }
+    }
+  }
 }

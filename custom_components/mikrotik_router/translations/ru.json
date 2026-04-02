@@ -1,62 +1,65 @@
 {
-    "config": {
-        "step": {
-            "user": {
-                "title": "Настроить Mikrotik Router",
-                "description": "Настройка Home Assistant для интеграции с Mikrotik.",
-                "data": {
-                    "name": "Название интеграции",
-                    "host": "Адрес хоста",
-                    "port": "Порт",
-                    "username": "Имя пользователя",
-                    "password": "Пароль",
-                    "ssl": "Использовать SSL",
-                    "verify_ssl": "Verify SSL"
-                }
-            }
-        },
-        "error": {
-            "name_exists": "Это название уже используется.",
-            "cannot_connect": "Не удалось подключиться.",
-            "ssl_handshake_failure": "Ошибка SSL-соединения.",
-            "connection_timeout": "Истекло время подключения к Mikrotik.",
-            "wrong_login": "Неверное имя пользователя или пароль.",
-            "ssl_verify_failure": "Certificate verify failed"
+  "config": {
+    "step": {
+      "user": {
+        "title": "Настроить Mikrotik Router",
+        "description": "Настройка Home Assistant для интеграции с Mikrotik.",
+        "data": {
+          "name": "Название интеграции",
+          "host": "Адрес хоста",
+          "port": "Порт",
+          "username": "Имя пользователя",
+          "password": "Пароль",
+          "ssl": "Использовать SSL",
+          "verify_ssl": "Verify SSL"
         }
+      }
     },
-    "options": {
-        "step": {
-            "basic_options": {
-                "data": {
-                    "scan_interval": "Интервал сканирования (требуется перезагрузка HA)",
-                    "track_iface_clients": "Показывать в интерфейсе MAC и IP клиентов",
-                    "unit_of_measurement": "Единицы измерения",
-                    "track_network_hosts_timeout": "Таймаут отслеживания сетевых устройств (в секундах)",
-                    "zone": "Зона для отслеживания устройств"
-                },
-                "title": "Параметры Mikrotik Router (1\/2)",
-                "description": "Настроить интеграцию"
-            },
-            "sensor_select": {
-                "data": {
-                    "track_network_hosts": "Отслеживание сетевых устройств",
-                    "sensor_port_tracker": "Сенсоры отслеживания порта",
-                    "sensor_port_traffic": "Сенсоры трафика порта",
-                    "sensor_client_traffic": "Сенсоры клиентского трафика",
-                    "sensor_simple_queues": "Переключатели простых очередей",
-                    "sensor_nat": "Переключатели NAT правил",
-                    "sensor_scripts": "Переключатели скриптов",
-                    "sensor_environment": "Сенсоры переменных окружения",
-                    "sensor_kidcontrol": "Родительский контроль",
-                    "sensor_mangle": "Переключатели Mangle",
-                    "sensor_ppp": "PPP-пользователи",
-                    "sensor_filter": "Переключатели фильтров",
-                    "sensor_client_captive": "Данные портала авторизации",
-                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
-                },
-                "title": "Параметры Mikrotik Router (2\/2)",
-                "description": "Включить датчики и переключатели"
-            }
-        }
+    "error": {
+      "name_exists": "Это название уже используется.",
+      "cannot_connect": "Не удалось подключиться.",
+      "ssl_handshake_failure": "Ошибка SSL-соединения.",
+      "connection_timeout": "Истекло время подключения к Mikrotik.",
+      "wrong_login": "Неверное имя пользователя или пароль.",
+      "ssl_verify_failure": "Certificate verify failed"
     }
+  },
+  "options": {
+    "step": {
+      "basic_options": {
+        "data": {
+          "scan_interval": "Интервал сканирования (требуется перезагрузка HA)",
+          "track_iface_clients": "Показывать в интерфейсе MAC и IP клиентов",
+          "unit_of_measurement": "Единицы измерения",
+          "track_network_hosts_timeout": "Таймаут отслеживания сетевых устройств (в секундах)",
+          "zone": "Зона для отслеживания устройств"
+        },
+        "title": "Параметры Mikrotik Router (1/2)",
+        "description": "Настроить интеграцию"
+      },
+      "sensor_select": {
+        "data": {
+          "track_network_hosts": "Отслеживание сетевых устройств",
+          "sensor_port_tracker": "Сенсоры отслеживания порта",
+          "sensor_port_traffic": "Сенсоры трафика порта",
+          "sensor_client_traffic": "Сенсоры клиентского трафика",
+          "sensor_simple_queues": "Переключатели простых очередей",
+          "sensor_nat": "Переключатели NAT правил",
+          "sensor_scripts": "Переключатели скриптов",
+          "sensor_environment": "Сенсоры переменных окружения",
+          "sensor_kidcontrol": "Родительский контроль",
+          "sensor_mangle": "Переключатели Mangle",
+          "sensor_ppp": "PPP-пользователи",
+          "sensor_filter": "Переключатели фильтров",
+          "sensor_client_captive": "Данные портала авторизации",
+          "sensor_netwatch_tracker": "Netwatch tracker sensors",
+          "sensor_wireguard": "WireGuard peer sensors",
+          "sensor_containers": "Container sensors",
+          "sensor_routing_rules": "Routing Rules switches"
+        },
+        "title": "Параметры Mikrotik Router (2/2)",
+        "description": "Включить датчики и переключатели"
+      }
+    }
+  }
 }
