@@ -18,6 +18,7 @@ from .binary_sensor_types import (
     DEVICE_ATTRIBUTES_IFACE_SFP,
     DEVICE_ATTRIBUTES_IFACE_WIRELESS,
     DEVICE_ATTRIBUTES_NETWATCH,
+    DEVICE_ATTRIBUTES_WIREGUARD_PEER,
 )
 from .const import (
     CONF_SENSOR_PPP,
@@ -26,6 +27,8 @@ from .const import (
     DEFAULT_SENSOR_PORT_TRACKER,
     CONF_SENSOR_NETWATCH_TRACKER,
     DEFAULT_SENSOR_NETWATCH_TRACKER,
+    CONF_SENSOR_WIREGUARD,
+    DEFAULT_SENSOR_WIREGUARD,
 )
 from .entity import MikrotikEntity, async_add_entities
 from .helper import format_attribute
@@ -46,6 +49,7 @@ async def async_setup_entry(
         "MikrotikBinarySensor": MikrotikBinarySensor,
         "MikrotikPPPSecretBinarySensor": MikrotikPPPSecretBinarySensor,
         "MikrotikPortBinarySensor": MikrotikPortBinarySensor,
+        "MikrotikWireguardPeerBinarySensor": MikrotikWireguardPeerBinarySensor,
     }
     await async_add_entities(hass, config_entry, dispatcher)
 
@@ -149,3 +153,15 @@ class MikrotikPortBinarySensor(MikrotikBinarySensor):
                     attributes[format_attribute(variable)] = self._data[variable]
 
         return attributes
+
+
+# ---------------------------
+#   MikrotikWireguardPeerBinarySensor
+# ---------------------------
+class MikrotikWireguardPeerBinarySensor(MikrotikBinarySensor):
+    """Representation of a WireGuard peer connectivity sensor."""
+
+    @property
+    def is_on(self) -> bool:
+        """Return true if peer has had a recent handshake."""
+        return self._data.get("connected", False)

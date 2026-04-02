@@ -43,6 +43,7 @@ async def async_setup_entry(
         "MikrotikFilterSwitch": MikrotikFilterSwitch,
         "MikrotikQueueSwitch": MikrotikQueueSwitch,
         "MikrotikKidcontrolPauseSwitch": MikrotikKidcontrolPauseSwitch,
+        "MikrotikWireguardPeerSwitch": MikrotikWireguardPeerSwitch,
     }
     await async_add_entities(hass, config_entry, dispatcher)
 
@@ -446,4 +447,35 @@ class MikrotikKidcontrolPauseSwitch(MikrotikSwitch):
         value = self._data[self.entity_description.data_reference]
         command = "pause"
         self.coordinator.execute(path, command, param, value)
+        await self.coordinator.async_refresh()
+
+
+# ---------------------------
+#   MikrotikWireguardPeerSwitch
+# ---------------------------
+class MikrotikWireguardPeerSwitch(MikrotikSwitch):
+    """Representation of a WireGuard peer switch."""
+
+    async def async_turn_on(self) -> None:
+        """Enable the WireGuard peer."""
+        if "write" not in self.coordinator.data["access"]:
+            _LOGGER.warning("Mikrotik %s switch operation blocked: user lacks write access", self.coordinator.host)
+            return
+        path = self.entity_description.data_switch_path
+        param = ".id"
+        value = self._data[".id"]
+        mod_param = self.entity_description.data_switch_parameter
+        self.coordinator.set_value(path, param, value, mod_param, False)
+        await self.coordinator.async_refresh()
+
+    async def async_turn_off(self) -> None:
+        """Disable the WireGuard peer."""
+        if "write" not in self.coordinator.data["access"]:
+            _LOGGER.warning("Mikrotik %s switch operation blocked: user lacks write access", self.coordinator.host)
+            return
+        path = self.entity_description.data_switch_path
+        param = ".id"
+        value = self._data[".id"]
+        mod_param = self.entity_description.data_switch_parameter
+        self.coordinator.set_value(path, param, value, mod_param, True)
         await self.coordinator.async_refresh()
