@@ -1,65 +1,68 @@
 {
-    "config": {
-        "step": {
-            "user": {
-                "title": "Állítsa fel a Mikrotik Router",
-                "description": "Állítsd be a Mikrotik Router integrációt.",
-                "data": {
-                    "name": "Integráció neve",
-                    "host": "Hoszt",
-                    "port": "Port",
-                    "username": "Felhasználónév",
-                    "password": "Jelszó",
-                    "ssl": "SSL használata",
-                    "verify_ssl": "Verify SSL"
-                }
-            }
+  "config": {
+    "step": {
+      "user": {
+        "title": "Állítsa fel a Mikrotik Router",
+        "description": "Állítsd be a Mikrotik Router integrációt.",
+        "data": {
+          "name": "Integráció neve",
+          "host": "Hoszt",
+          "port": "Port",
+          "username": "Felhasználónév",
+          "password": "Jelszó",
+          "ssl": "SSL használata",
+          "verify_ssl": "Verify SSL"
         },
-        "error": {
-            "name_exists": "A név már létezik.",
-            "cannot_connect": "Nem lehet csatlakozni a Mikrotikhez.",
-            "ssl_handshake_failure": "SSL-kézfogás sikertelen",
-            "connection_timeout": "Mikrotik kapcsolat időtúllépés.",
-            "wrong_login": "Érvénytelen felhasználónév vagy jelszó.",
-            "ssl_verify_failure": "Certificate verify failed"
+        "data_description": {
+          "verify_ssl": "Tanúsítvány és hostname ellenőrzés bekapcsolása. Csak akkor engedélyezd, ha a MikroTik-nak érvényes, hostname-t tartalmazó SSL tanúsítványa van. Önaláírt tanúsítványhoz hagyd kikapcsolva (alapértelmezett)."
         }
+      }
     },
-    "options": {
-        "step": {
-            "basic_options": {
-                "data": {
-                    "scan_interval": "Felderítési időköz (HA újraindítása szükséges)",
-                    "track_iface_clients": "Ügyfél MAC- és IP-címének mutatása az interfészeken",
-                    "unit_of_measurement": "Mértékegység",
-                    "track_network_hosts_timeout": "Hálózati eszközök követésének időtúllépése (másodperc)",
-                    "zone": "Zóna az eszközkövető számára"
-                },
-                "title": "Mikrotik Router opciók (1\/2)",
-                "description": "Az integráció konfigurálása"
-            },
-            "sensor_select": {
-                "data": {
-                    "track_network_hosts": "Hálózati eszközök követése",
-                    "sensor_port_tracker": "Portfigyelő érzékelők",
-                    "sensor_port_traffic": "Portforgalom érzékelők",
-                    "sensor_client_traffic": "Kliensforgalom érzékelők",
-                    "sensor_simple_queues": "Simple queue kapcsolók",
-                    "sensor_nat": "NAT kapcsolók",
-                    "sensor_scripts": "Szkript kapcsolók",
-                    "sensor_environment": "Környezeti változó érzékelők",
-                    "sensor_kidcontrol": "Szülői felügyelet",
-                    "sensor_mangle": "Mangle kapcsolók",
-                    "sensor_routing_rules": "Routing Rules kapcsolók",
-                    "sensor_wireguard": "WireGuard peer szenzorok",
-                    "sensor_containers": "Konténer szenzorok",
-                    "sensor_ppp": "PPP felhasználók",
-                    "sensor_filter": "Szűrő kapcsolók",
-                    "sensor_client_captive": "Captive portal data",
-                    "sensor_netwatch_tracker": "Netwatch tracker sensors"
-                },
-                "title": "Mikrotik Router opciók (2\/2)",
-                "description": "Érzékelők és kapcsolók engedélyezése"
-            }
-        }
+    "error": {
+      "name_exists": "A név már létezik.",
+      "cannot_connect": "Nem lehet csatlakozni a Mikrotikhez.",
+      "ssl_handshake_failure": "SSL-kézfogás sikertelen",
+      "connection_timeout": "Mikrotik kapcsolat időtúllépés.",
+      "wrong_login": "Érvénytelen felhasználónév vagy jelszó.",
+      "ssl_verify_failure": "Certificate verify failed"
     }
+  },
+  "options": {
+    "step": {
+      "basic_options": {
+        "data": {
+          "scan_interval": "Felderítési időköz (HA újraindítása szükséges)",
+          "track_iface_clients": "Ügyfél MAC- és IP-címének mutatása az interfészeken",
+          "unit_of_measurement": "Mértékegység",
+          "track_network_hosts_timeout": "Hálózati eszközök követésének időtúllépése (másodperc)",
+          "zone": "Zóna az eszközkövető számára"
+        },
+        "title": "Mikrotik Router opciók (1/2)",
+        "description": "Az integráció konfigurálása"
+      },
+      "sensor_select": {
+        "data": {
+          "track_network_hosts": "Hálózati eszközök követése",
+          "sensor_port_tracker": "Portfigyelő érzékelők",
+          "sensor_port_traffic": "Portforgalom érzékelők",
+          "sensor_client_traffic": "Kliensforgalom érzékelők",
+          "sensor_simple_queues": "Simple queue kapcsolók",
+          "sensor_nat": "NAT kapcsolók",
+          "sensor_scripts": "Szkript kapcsolók",
+          "sensor_environment": "Környezeti változó érzékelők",
+          "sensor_kidcontrol": "Szülői felügyelet",
+          "sensor_mangle": "Mangle kapcsolók",
+          "sensor_routing_rules": "Routing Rules kapcsolók",
+          "sensor_wireguard": "WireGuard peer szenzorok",
+          "sensor_containers": "Konténer szenzorok",
+          "sensor_ppp": "PPP felhasználók",
+          "sensor_filter": "Szűrő kapcsolók",
+          "sensor_client_captive": "Captive portal data",
+          "sensor_netwatch_tracker": "Netwatch tracker sensors"
+        },
+        "title": "Mikrotik Router opciók (2/2)",
+        "description": "Érzékelők és kapcsolók engedélyezése"
+      }
+    }
+  }
 }
