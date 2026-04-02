@@ -2,6 +2,9 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/Csontikka/homeassistant-mikrotik_router?style=plastic)
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=plastic)](https://github.com/hacs/integration)
 ![Project Stage](https://img.shields.io/badge/project%20stage-Production%20Ready-green.svg?style=plastic)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Csontikka_homeassistant-mikrotik_router&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Csontikka_homeassistant-mikrotik_router)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Csontikka_homeassistant-mikrotik_router&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=Csontikka_homeassistant-mikrotik_router)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Csontikka_homeassistant-mikrotik_router&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=Csontikka_homeassistant-mikrotik_router)
 
 > **Fork** of [tomaae/homeassistant-mikrotik_router](https://github.com/tomaae/homeassistant-mikrotik_router) with additional features.
 
