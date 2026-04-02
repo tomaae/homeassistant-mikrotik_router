@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Development tools
+.claude/
+.omc/
+
+# Scripts
+create_icon.py
+
+# OS
+.DS_Store
+Thumbs.db

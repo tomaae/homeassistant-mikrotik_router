@@ -1,5 +1,5 @@
 {
     "name": "Mikrotik Router",
     "homeassistant": "2024.3.0",
-    "render_readme": false
+    "render_readme": true
 }
