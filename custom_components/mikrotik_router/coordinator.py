@@ -53,6 +53,8 @@ from .const import (
     DEFAULT_SENSOR_MANGLE,
     CONF_SENSOR_ROUTING_RULES,
     DEFAULT_SENSOR_ROUTING_RULES,
+    CONF_SENSOR_WIREGUARD,
+    DEFAULT_SENSOR_WIREGUARD,
     CONF_SENSOR_FILTER,
     DEFAULT_SENSOR_FILTER,
     CONF_SENSOR_KIDCONTROL,
@@ -72,6 +74,24 @@ from .mikrotikapi import MikrotikAPI
 _LOGGER = logging.getLogger(__name__)
 
 DEFAULT_TIME_ZONE = None
+
+
+def _parse_duration_seconds(s: str) -> int:
+    """Parse a MikroTik duration string like '3m45s' into total seconds."""
+    if not s or s.lower() in ("never", ""):
+        return 0
+    total = 0
+    for pattern, multiplier in [
+        (r"(\d+)w", 604800),
+        (r"(\d+)d", 86400),
+        (r"(\d+)h", 3600),
+        (r"(\d+)m", 60),
+        (r"(\d+)s", 1),
+    ]:
+        m = re.search(pattern, s)
+        if m:
+            total += int(m.group(1)) * multiplier
+    return total
 
 
 def is_valid_ip(address):
@@ -269,6 +289,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             "netwatch": {},
             "ip_address": {},
             "cloud": {},
+            "wireguard_peers": {},
         }
 
         self.notified_flags = []
@@ -298,6 +319,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         self.support_ppp = False
         self.support_ups = False
         self.support_gps = False
+        self.support_wireguard = False
         self.support_cloud = False
         self._wifimodule = "wireless"
 
@@ -391,6 +413,14 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
     def option_sensor_routing_rules(self):
         """Config entry option for routing rules."""
         return self.config_entry.options.get(CONF_SENSOR_ROUTING_RULES, DEFAULT_SENSOR_ROUTING_RULES)
+
+    # ---------------------------
+    #   option_sensor_wireguard
+    # ---------------------------
+    @property
+    def option_sensor_wireguard(self):
+        """Config entry option for wireguard peers."""
+        return self.config_entry.options.get(CONF_SENSOR_WIREGUARD, DEFAULT_SENSOR_WIREGUARD)
 
     # ---------------------------
     #   option_sensor_filter
@@ -552,6 +582,12 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         if "gps" in packages and packages["gps"]["enabled"]:
             self.support_gps = True
 
+        # WireGuard is built-in from RouterOS v7
+        if self.major_fw_version >= 7:
+            self.support_wireguard = True
+        elif "wireguard" in packages and packages["wireguard"]["enabled"]:
+            self.support_wireguard = True
+
     # ---------------------------
     #   async_get_host_hass
     # ---------------------------
@@ -670,6 +706,9 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
 
         if self.api.connected() and self.option_sensor_routing_rules:
             await self.hass.async_add_executor_job(self.get_routing_rules)
+
+        if self.api.connected() and self.support_wireguard and self.option_sensor_wireguard:
+            await self.hass.async_add_executor_job(self.get_wireguard_peers)
 
         if self.api.connected() and self.option_sensor_filter:
             await self.hass.async_add_executor_job(self.get_filter)
@@ -1272,6 +1311,54 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 )
 
             del self.ds["routing_rules"][uid]
+
+    # ---------------------------
+    #   get_wireguard_peers
+    # ---------------------------
+    def get_wireguard_peers(self) -> None:
+        """Get WireGuard peers data from Mikrotik"""
+        _LOGGER.debug("Mikrotik %s fetching wireguard peers", self.host)
+        self.ds["wireguard_peers"] = parse_api(
+            data=self.ds["wireguard_peers"],
+            source=self.api.query("/interface/wireguard/peers"),
+            key=".id",
+            vals=[
+                {"name": ".id"},
+                {"name": "public-key"},
+                {"name": "interface"},
+                {"name": "peer-name", "source": "name", "default": ""},
+                {"name": "comment", "default": ""},
+                {"name": "allowed-address", "default": ""},
+                {"name": "rx", "default": "0"},
+                {"name": "tx", "default": "0"},
+                {"name": "last-handshake", "default": ""},
+                {
+                    "name": "enabled",
+                    "source": "disabled",
+                    "type": "bool",
+                    "reverse": True,
+                },
+            ],
+        )
+
+        for uid in self.ds["wireguard_peers"]:
+            peer = self.ds["wireguard_peers"][uid]
+
+            # Parse last-handshake string to seconds
+            peer["last-handshake-seconds"] = _parse_duration_seconds(
+                str(peer.get("last-handshake", ""))
+            )
+
+            # Connected if handshake within last 3 minutes
+            peer["connected"] = 0 < peer["last-handshake-seconds"] < 180
+
+            # uniq-id = public-key
+            peer["uniq-id"] = peer.get("public-key", uid)
+
+            # name = peer-name > comment > first 8 chars of public-key
+            peer_name = str(peer.get("peer-name", "")).strip()
+            comment = str(peer.get("comment", "")).strip()
+            peer["name"] = peer_name or comment or peer.get("public-key", "")[:8]
 
     # ---------------------------
     #   get_filter

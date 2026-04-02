@@ -50,6 +50,7 @@
                     "sensor_kidcontrol": "Szülői felügyelet",
                     "sensor_mangle": "Mangle kapcsolók",
                     "sensor_routing_rules": "Routing Rules kapcsolók",
+                    "sensor_wireguard": "WireGuard peer szenzorok",
                     "sensor_ppp": "PPP felhasználók",
                     "sensor_filter": "Szűrő kapcsolók",
                     "sensor_client_captive": "Captive portal data",

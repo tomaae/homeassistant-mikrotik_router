@@ -52,6 +52,7 @@
                     "sensor_kidcontrol": "Kid control",
                     "sensor_mangle": "Mangle switches",
                     "sensor_routing_rules": "Routing Rules switches",
+                    "sensor_wireguard": "WireGuard peer sensors",
                     "sensor_ppp": "PPP users",
                     "sensor_filter": "Filter switches"
                 },
