@@ -11,6 +11,7 @@ from .const import (
 )
 
 import librouteros
+from librouteros.login import plain, token
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -115,9 +116,23 @@ class MikrotikAPI:
         self._connected = False
         self._connection_epoch = time()
 
+        login_method = self._login_method
+        if isinstance(login_method, str):
+            if login_method == "plain":
+                login_method = plain
+            elif login_method == "token":
+                login_method = token
+            else:
+                _LOGGER.warning(
+                    "Mikrotik %s unknown login method %s, falling back to plain",
+                    self._host,
+                    login_method,
+                )
+                login_method = plain
+
         kwargs = {
             "encoding": self._encoding,
-            "login_methods": self._login_method,
+            "login_method": login_method,
             "port": self._port,
         }
 
