@@ -1504,12 +1504,17 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         # those rights major_fw_version stays 0 and every branch guarded by
         # `0 < self.major_fw_version` is skipped silently.
         if self.major_fw_version == 0:
-            try:
-                self.major_fw_version, self.minor_fw_version = (
-                    parse_routeros_major_minor(self.ds["resource"]["version"])
-                )
-            except (ValueError, KeyError):
-                pass
+            version = self.ds.get("resource", {}).get("version")
+            if version and version != "unknown":
+                try:
+                    self.major_fw_version, self.minor_fw_version = (
+                        parse_routeros_major_minor(version)
+                    )
+                except ValueError:
+                    _LOGGER.debug(
+                        "Unable to parse RouterOS version from /system/resource: %s",
+                        version,
+                    )
 
         tmp_uptime = 0
         tmp = re.split(r"(\d+)[s]", self.ds["resource"]["uptime_str"])
