@@ -1499,6 +1499,18 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             ],
         )
 
+        # /system/resource reports the running version and needs only `read`.
+        # get_firmware_update() is gated on write/policy/reboot, so without
+        # those rights major_fw_version stays 0 and every branch guarded by
+        # `0 < self.major_fw_version` is skipped silently.
+        if self.major_fw_version == 0:
+            try:
+                self.major_fw_version, self.minor_fw_version = (
+                    parse_routeros_major_minor(self.ds["resource"]["version"])
+                )
+            except (ValueError, KeyError):
+                pass
+
         tmp_uptime = 0
         tmp = re.split(r"(\d+)[s]", self.ds["resource"]["uptime_str"])
         if len(tmp) > 1:
