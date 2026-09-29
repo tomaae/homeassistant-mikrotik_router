@@ -1089,6 +1089,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                     {"key": "to-addresses"},
                     {"text": ":"},
                     {"key": "to-ports"},
+                    {"text": ","},
+                    {"key": "comment"},
                 ],
                 [
                     {"name": "name"},
@@ -1285,6 +1287,10 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                     {"key": "dst-address-list"},
                     {"text": ":"},
                     {"key": "dst-port"},
+                    {"text": ","},
+                    {"key": "connection-state"},
+                    {"text": ","},
+                    {"key": "comment"},
                 ],
                 [
                     {"name": "name"},
