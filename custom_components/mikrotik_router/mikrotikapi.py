@@ -14,7 +14,7 @@ from .const import (
 from .exceptions import ApiEntryNotFound
 
 import librouteros
-from librouteros.exceptions import TrapError
+from librouteros.exceptions import MultiTrapError, TrapError
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -331,7 +331,7 @@ class MikrotikAPI:
         try:
             _LOGGER.debug("API query: %s", path)
             response = self._connection.path(path)
-        except TrapError as e:
+        except (TrapError, MultiTrapError) as e:
             if ignore_trap:
                 _LOGGER.debug("Optional API query %s unavailable: %s", path, e)
                 self.lock.release()
@@ -348,7 +348,7 @@ class MikrotikAPI:
         if response and return_list and not command:
             try:
                 response = list(response)
-            except TrapError as e:
+            except (TrapError, MultiTrapError) as e:
                 if ignore_trap:
                     _LOGGER.debug("Optional API query %s unavailable: %s", path, e)
                     self.lock.release()
@@ -371,7 +371,7 @@ class MikrotikAPI:
             _LOGGER.debug("API query: %s, %s, %s", path, command, args)
             try:
                 response = list(response(command, **args))
-            except TrapError as e:
+            except (TrapError, MultiTrapError) as e:
                 if ignore_trap:
                     _LOGGER.debug("Optional API query %s unavailable: %s", path, e)
                     self.lock.release()
