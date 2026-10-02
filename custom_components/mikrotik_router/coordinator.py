@@ -536,7 +536,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             if "wifiwave2" in packages and packages["wifiwave2"]["enabled"]:
                 self._wifimodules.append("wifiwave2")
 
-            if (
+            # SMIPS only exposes the legacy wireless API.
+            if architecture != "smips" and (
                 (self.major_fw_version == 7 and self.minor_fw_version >= 13)
                 or self.major_fw_version > 7
                 or any(
