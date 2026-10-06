@@ -57,6 +57,8 @@ from .const import (
     CONF_SENSOR_MANGLE,
     DEFAULT_SENSOR_MANGLE,
     CONF_SENSOR_FILTER,
+    CONF_SENSOR_FILTER_COUNTERS,
+    DEFAULT_SENSOR_FILTER_COUNTERS,
     DEFAULT_SENSOR_FILTER,
     CONF_SENSOR_KIDCONTROL,
     DEFAULT_SENSOR_KIDCONTROL,
@@ -389,6 +391,16 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         return self.config_entry.options.get(CONF_SENSOR_FILTER, DEFAULT_SENSOR_FILTER)
 
     # ---------------------------
+    #   option_sensor_filter_counters
+    # ---------------------------
+    @property
+    def option_sensor_filter_counters(self):
+        """Config entry option to add packet and byte counter sensors for filter rules."""
+        return self.config_entry.options.get(
+            CONF_SENSOR_FILTER_COUNTERS, DEFAULT_SENSOR_FILTER_COUNTERS
+        )
+
+    # ---------------------------
     #   option_sensor_kidcontrol
     # ---------------------------
     @property
@@ -679,7 +691,9 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         if self.api.connected() and self.option_sensor_mangle:
             await self.hass.async_add_executor_job(self.get_mangle)
 
-        if self.api.connected() and self.option_sensor_filter:
+        if self.api.connected() and (
+            self.option_sensor_filter or self.option_sensor_filter_counters
+        ):
             await self.hass.async_add_executor_job(self.get_filter)
 
         if self.api.connected() and self.option_sensor_netwatch:
@@ -1246,6 +1260,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 {"name": "layer7-protocol", "default": "any"},
                 {"name": "connection-state", "default": "any"},
                 {"name": "tcp-flags", "default": "any"},
+                {"name": "bytes", "default": 0},
+                {"name": "packets", "default": 0},
                 {
                     "name": "enabled",
                     "source": "disabled",

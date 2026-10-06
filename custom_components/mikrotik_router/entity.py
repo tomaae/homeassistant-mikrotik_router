@@ -26,6 +26,10 @@ from .const import (
     DEFAULT_SENSOR_PORT_TRACKER,
     CONF_SENSOR_NETWATCH_TRACKER,
     DEFAULT_SENSOR_NETWATCH_TRACKER,
+    CONF_SENSOR_FILTER,
+    DEFAULT_SENSOR_FILTER,
+    CONF_SENSOR_FILTER_COUNTERS,
+    DEFAULT_SENSOR_FILTER_COUNTERS,
 )
 from .coordinator import (
     MikrotikConfigEntry,
@@ -57,6 +61,21 @@ def _skip_sensor(config_entry, entity_description, data, uid) -> bool:
     if (
         entity_description.data_path == "client_traffic"
         and entity_description.data_attribute not in data[uid].keys()
+    ):
+        return True
+
+    # Filter data is fetched when either filter option is on; each option only adds its own entities
+    if (
+        entity_description.func == "MikrotikFilterCounterSensor"
+        and not config_entry.options.get(
+            CONF_SENSOR_FILTER_COUNTERS, DEFAULT_SENSOR_FILTER_COUNTERS
+        )
+    ):
+        return True
+
+    if (
+        entity_description.func == "MikrotikFilterSwitch"
+        and not config_entry.options.get(CONF_SENSOR_FILTER, DEFAULT_SENSOR_FILTER)
     ):
         return True
 
