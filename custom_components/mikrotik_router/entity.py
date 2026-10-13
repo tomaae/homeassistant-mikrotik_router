@@ -9,7 +9,7 @@ from typing import Any, Callable, TypeVar
 from homeassistant.const import ATTR_ATTRIBUTION, CONF_NAME, CONF_HOST, CONF_SSL
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import device_registry
+from homeassistant.helpers.device_registry import ChildDeviceInfo
 from homeassistant.helpers.entity import DeviceInfo, Entity
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -33,7 +33,7 @@ from .coordinator import (
     MikrotikTrackerCoordinator,
 )
 from .exceptions import ApiEntryNotFound
-from .helper import format_attribute
+from .helper import child_device_identifier, format_attribute
 
 _LOGGER = getLogger(__name__)
 
@@ -285,8 +285,13 @@ class MikrotikEntity(CoordinatorEntity[_MikrotikCoordinatorT], Entity):
         return f"{self._inst.lower()}-{self.entity_description.key}"
 
     @property
-    def device_info(self) -> DeviceInfo:
-        """Return a description for device registry."""
+    def device_info(self) -> DeviceInfo | ChildDeviceInfo:
+        """Return a description for device registry.
+
+        System entities belong to the router device. Network clients are
+        separate devices connected via the router. Everything else (interfaces,
+        firewall rules, queues, scripts, ...) is a child device of the router.
+        """
         dev_connection = DOMAIN
         dev_connection_value = self.entity_description.data_reference
         dev_group = self.entity_description.ha_group
@@ -323,14 +328,7 @@ class MikrotikEntity(CoordinatorEntity[_MikrotikCoordinatorT], Entity):
                 configuration_url=f"{protocol}://{self.coordinator.config_entry.data[CONF_HOST]}",
             )
 
-        via_device_id = device_registry.async_get_device_id_by_identifier(
-            self.hass,
-            (
-                DOMAIN,
-                f"{self.coordinator.data['routerboard']['serial-number']}",
-            ),
-            config_entry_id=self._config_entry.entry_id,
-        )
+        router_device_id = self._config_entry.runtime_data.router_device_id
 
         if "mac-address" in self.entity_description.data_reference:
             dev_group = self._data[self.entity_description.data_name]
@@ -347,16 +345,25 @@ class MikrotikEntity(CoordinatorEntity[_MikrotikCoordinatorT], Entity):
                 connections={(dev_connection, f"{dev_connection_value}")},
                 name=f"{dev_group}",
                 manufacturer=f"{dev_manufacturer}",
-                via_device_id=via_device_id,
+                via_device_id=router_device_id,
+            )
+
+        if self.entity_description.ha_group.startswith("data__"):
+            identifier = child_device_identifier(
+                self._config_entry.entry_id,
+                self.entity_description.data_path,
+                f"{dev_group}",
             )
         else:
-            return DeviceInfo(
-                connections={(dev_connection, f"{dev_connection_value}")},
-                name=f"{self._inst} {dev_group}",
-                model=f"{self.coordinator.data['resource']['board-name']}",
-                manufacturer=f"{self.coordinator.data['resource']['platform']}",
-                via_device_id=via_device_id,
+            identifier = child_device_identifier(
+                self._config_entry.entry_id, self.entity_description.ha_group
             )
+
+        return ChildDeviceInfo(
+            identifiers={identifier},
+            name=f"{dev_group}",
+            parent_device_id=router_device_id,
+        )
 
     @property
     def extra_state_attributes(self) -> Mapping[str, Any]:

@@ -5,9 +5,22 @@ from __future__ import annotations
 import ipaddress
 import re
 
-from .const import DEFAULT_PORT
+from homeassistant.util import slugify
+
+from .const import DEFAULT_PORT, DOMAIN
 
 INVALID_ROUTER_IDENTIFIERS = {"", "n/a", "none", "unknown"}
+
+
+# ---------------------------
+#   child_device_identifier
+# ---------------------------
+def child_device_identifier(
+    entry_id: str, group: str, key: str | None = None
+) -> tuple[str, str]:
+    """Return the identifier of a child device of the router device."""
+    suffix = slugify(group) if key is None else f"{slugify(group)}-{key}"
+    return (DOMAIN, f"{entry_id}-{suffix}")
 
 
 # ---------------------------

@@ -106,6 +106,7 @@ class MikrotikData:
 
     data_coordinator: MikrotikCoordinator
     tracker_coordinator: MikrotikTrackerCoordinator
+    router_device_id: str = ""
 
 
 type MikrotikConfigEntry = ConfigEntry[MikrotikData]
