@@ -57,6 +57,7 @@ from .const import (
     DEFAULT_SENSOR_ENVIRONMENT,
     CONF_TRACK_HOSTS_TIMEOUT,
     DEFAULT_TRACK_HOST_TIMEOUT,
+    MAX_TRACK_HOST_TIMEOUT,
     DEFAULT_HOST,
     DEFAULT_USERNAME,
     DEFAULT_PORT,
@@ -425,7 +426,15 @@ class MikrotikControllerOptionsFlowHandler(OptionsFlow):
                         default=self.config_entry.options.get(
                             CONF_TRACK_HOSTS_TIMEOUT, DEFAULT_TRACK_HOST_TIMEOUT
                         ),
-                    ): int,
+                    ): selector.NumberSelector(
+                        selector.NumberSelectorConfig(
+                            min=1,
+                            max=MAX_TRACK_HOST_TIMEOUT,
+                            step=1,
+                            mode=selector.NumberSelectorMode.BOX,
+                            unit_of_measurement=UnitOfTime.SECONDS,
+                        ),
+                    ),
                 }
             ),
         )
