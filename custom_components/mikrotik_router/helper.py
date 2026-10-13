@@ -11,6 +11,17 @@ INVALID_ROUTER_IDENTIFIERS = {"", "n/a", "none", "unknown"}
 
 
 # ---------------------------
+#   is_sfp_port
+# ---------------------------
+def is_sfp_port(vals) -> bool:
+    """Return True for a port RouterOS reports an SFP shutdown temperature for.
+
+    Copper ports (and empty cages) have no such field, so it is None for them.
+    """
+    return vals.get("sfp-shutdown-temperature") not in (None, "")
+
+
+# ---------------------------
 #   format_attribute
 # ---------------------------
 def format_attribute(attr):

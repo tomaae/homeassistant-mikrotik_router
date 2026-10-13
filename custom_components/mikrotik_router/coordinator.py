@@ -21,7 +21,7 @@ from homeassistant.helpers import entity_registry
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util.dt import utcnow
 
-from .helper import parse_routeros_major_minor
+from .helper import is_sfp_port, parse_routeros_major_minor
 
 
 from homeassistant.const import (
@@ -869,7 +869,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 {"name": "default-name"},
                 {"name": "name", "default_val": "default-name"},
                 {"name": "poe-out", "default": "N/A"},
-                {"name": "sfp-shutdown-temperature", "default": 0},
+                {"name": "sfp-shutdown-temperature", "default": None},
             ],
             skip=[
                 {"name": "type", "value": "bridge"},
@@ -899,10 +899,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 ] = f"{vals['port-mac-address']}-{vals['name']}"
 
             if self.ds["interface"][uid]["type"] == "ether":
-                if (
-                    "sfp-shutdown-temperature" in vals
-                    and vals["sfp-shutdown-temperature"] != ""
-                ):
+                if is_sfp_port(vals):
                     self.ds["interface"] = parse_api(
                         data=self.ds["interface"],
                         source=self.api.query(
@@ -918,7 +915,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                             {"name": "full-duplex", "default": "unknown"},
                             {"name": "advertising", "default": "unknown"},
                             {"name": "link-partner-advertising", "default": "unknown"},
-                            {"name": "sfp-temperature", "default": 0},
+                            {"name": "sfp-temperature", "default": None},
                             {"name": "sfp-supply-voltage", "default": "unknown"},
                             {"name": "sfp-module-present", "default": "unknown"},
                             {"name": "sfp-tx-bias-current", "default": "unknown"},
