@@ -51,6 +51,7 @@ class MikrotikAPI:
 
         self._connection = None
         self._connected = False
+        self._closed = False
         self._reconnected = True
         self._connection_epoch = 0
         self._connection_retry_sec = 58
@@ -79,6 +80,9 @@ class MikrotikAPI:
     # ---------------------------
     def connection_check(self) -> bool:
         """Check if mikrotik is connected"""
+        if self._closed:
+            return False
+
         if not self._connected or not self._connection:
             if self._connection_epoch > time() - self._connection_retry_sec:
                 return False
@@ -87,6 +91,30 @@ class MikrotikAPI:
                 return False
 
         return True
+
+    # ---------------------------
+    #   close
+    # ---------------------------
+    def close(self) -> None:
+        """Close the connection for good, e.g. when the entry is unloaded."""
+        with self.lock:
+            self._closed = True
+            self._close_connection()
+            self._connected = False
+
+    # ---------------------------
+    #   _close_connection
+    # ---------------------------
+    def _close_connection(self) -> None:
+        """Close the librouteros socket, ignoring errors."""
+        connection, self._connection = self._connection, None
+        if connection is None:
+            return
+
+        try:
+            connection.close()
+        except Exception as e:  # noqa: BLE001
+            _LOGGER.debug("Mikrotik %s error while closing: %s", self._host, e)
 
     # ---------------------------
     #   disconnect
@@ -108,7 +136,7 @@ class MikrotikAPI:
 
         self._reconnected = False
         self._connected = False
-        self._connection = None
+        self._close_connection()
         self._connection_epoch = 0
 
     # ---------------------------
@@ -127,6 +155,11 @@ class MikrotikAPI:
         kwargs.update(self._login_kwargs())
 
         self.lock.acquire()
+        if self._closed:
+            self.lock.release()
+            return False
+
+        self._close_connection()
         try:
             if self._use_ssl:
                 if self._ssl_wrapper is None:

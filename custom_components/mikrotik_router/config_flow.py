@@ -85,6 +85,17 @@ def validate_input(user_input):
         use_ssl=user_input[CONF_SSL],
         ssl_verify=user_input[CONF_VERIFY_SSL],
     )
+    try:
+        return _validate_with_api(api, user_input)
+    finally:
+        api.close()
+
+
+# ---------------------------
+#   _validate_with_api
+# ---------------------------
+def _validate_with_api(api, user_input):
+    """Validate the connection using an API client the caller closes."""
     if not api.connect():
         return None, "invalid_auth" if api.error == "wrong_login" else api.error
 

@@ -92,10 +92,19 @@ async def async_setup_entry(
 ) -> bool:
     """Set up a config entry."""
     coordinator = MikrotikCoordinator(hass, config_entry)
+    apis = [coordinator.api]
+
+    async def _async_close_apis() -> None:
+        """Close the RouterOS sockets on unload or failed setup."""
+        for api in apis:
+            await hass.async_add_executor_job(api.close)
+
+    config_entry.async_on_unload(_async_close_apis)
     await coordinator.async_config_entry_first_refresh()
     _async_update_router_unique_id(hass, config_entry, coordinator)
     _async_setup_router_device(hass, config_entry, coordinator)
     coordinatorTracker = MikrotikTrackerCoordinator(hass, config_entry, coordinator)
+    apis.append(coordinatorTracker.api)
     await coordinatorTracker.async_config_entry_first_refresh()
     config_entry.runtime_data = MikrotikData(
         data_coordinator=coordinator,
