@@ -1442,7 +1442,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                 {"name": "interval"},
                 {"name": "port"},
                 {"name": "http-codes"},
-                {"name": "status", "type": "bool", "default": "unknown"},
+                {"name": "status", "type": "bool", "default": None},
                 {"name": "comment"},
                 {
                     "name": "enabled",

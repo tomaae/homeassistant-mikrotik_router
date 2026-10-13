@@ -64,9 +64,10 @@ class MikrotikBinarySensor(MikrotikEntity, BinarySensorEntity):
     """Define an Mikrotik Controller Binary Sensor."""
 
     @property
-    def is_on(self) -> bool:
-        """Return true if device is on."""
-        return self._data[self.entity_description.data_attribute]
+    def is_on(self) -> bool | None:
+        """Return true if device is on, None while RouterOS reports no state."""
+        value = self._data[self.entity_description.data_attribute]
+        return value if isinstance(value, bool) else None
 
     @property
     def icon(self) -> str:
