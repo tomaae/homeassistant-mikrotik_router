@@ -94,9 +94,14 @@ def parse_api(
     ensure_vals=None,
     only=None,
     skip=None,
+    redact=None,
 ) -> dict:
-    """Get data from API."""
+    """Get data from API.
+
+    Keys in redact are hidden in debug logs on top of TO_REDACT.
+    """
     debug = _LOGGER.getEffectiveLevel() == 10
+    to_redact = TO_REDACT | set(redact) if redact else TO_REDACT
     if type(source) == dict:
         tmp = source
         source = [tmp]
@@ -107,7 +112,7 @@ def parse_api(
         return data
 
     if debug:
-        _LOGGER.debug("Processing source %s", async_redact_data(source, TO_REDACT))
+        _LOGGER.debug("Processing source %s", async_redact_data(source, to_redact))
 
     keymap = generate_keymap(data, key_search)
     for entry in source:
@@ -127,7 +132,7 @@ def parse_api(
                 data[uid] = {}
 
         if debug:
-            _LOGGER.debug("Processing entry %s", async_redact_data(entry, TO_REDACT))
+            _LOGGER.debug("Processing entry %s", async_redact_data(entry, to_redact))
 
         if vals:
             data = fill_vals(data, entry, uid, vals)

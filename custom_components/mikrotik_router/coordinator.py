@@ -1786,6 +1786,8 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
             data=self.ds["environment"],
             source=self.api.query("/system/script/environment"),
             key="name",
+            # Scripts often keep tokens in global variables
+            redact={"value"},
             vals=[
                 {"name": "name"},
                 {"name": "value"},

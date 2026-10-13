@@ -185,6 +185,28 @@ def _redact_sensitive_identifiers(
     return redacted
 
 
+def _redact_environment(data: Any) -> Any:
+    """Redact the values of script environment variables.
+
+    Scripts often keep tokens and passwords in global variables, and the value
+    is stored under a generic key that is not redacted anywhere else.
+    """
+    if not isinstance(data, Mapping) or not isinstance(
+        environment := data.get("environment"), Mapping
+    ):
+        return data
+
+    return {
+        **data,
+        "environment": {
+            name: (
+                {**record, "value": REDACTED} if isinstance(record, Mapping) else record
+            )
+            for name, record in environment.items()
+        },
+    }
+
+
 def _redact_runtime_data(
     data: Any,
     mac_addresses: dict[str, str],
@@ -192,7 +214,9 @@ def _redact_runtime_data(
 ) -> Any:
     """Redact sensitive runtime values and mapping keys."""
     return async_redact_data(
-        _redact_sensitive_identifiers(data, mac_addresses, redacted_keys),
+        _redact_sensitive_identifiers(
+            _redact_environment(data), mac_addresses, redacted_keys
+        ),
         RUNTIME_TO_REDACT,
     )
 
