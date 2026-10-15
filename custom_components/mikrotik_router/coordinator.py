@@ -2140,6 +2140,10 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
         """Get wireless hosts data from Mikrotik"""
         self.ds["wireless_hosts"] = {}
         for wifimodule in self._wifimodules:
+            # wifi/wifiwave2 packages report the RSSI as "signal", legacy wireless as "signal-strength"
+            signal_source = (
+                "signal" if wifimodule in ("wifi", "wifiwave2") else "signal-strength"
+            )
             self.ds["wireless_hosts"] = parse_api(
                 data=self.ds["wireless_hosts"],
                 source=self.api.query(
@@ -2152,7 +2156,7 @@ class MikrotikCoordinator(DataUpdateCoordinator[None]):
                     {"name": "interface", "default": "unknown"},
                     {"name": "ap", "type": "bool"},
                     {"name": "uptime"},
-                    {"name": "signal-strength"},
+                    {"name": "signal-strength", "source": signal_source},
                     {"name": "tx-ccq"},
                     {"name": "tx-rate"},
                     {"name": "rx-rate"},
