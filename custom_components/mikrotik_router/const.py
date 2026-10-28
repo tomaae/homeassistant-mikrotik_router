@@ -15,7 +15,7 @@ DOMAIN = "mikrotik_router"
 DEFAULT_NAME = "Mikrotik Router"
 ATTRIBUTION = "Data provided by Mikrotik"
 
-DEFAULT_ENCODING = "ISO-8859-1"
+DEFAULT_ENCODING = "UTF-8"
 DEFAULT_LOGIN_METHOD = "plain"
 
 DEFAULT_HOST = "10.0.0.1"
