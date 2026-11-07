@@ -46,7 +46,9 @@ from .const import (
     CONF_SENSOR_MANGLE,
     DEFAULT_SENSOR_MANGLE,
     CONF_SENSOR_FILTER,
+    CONF_SENSOR_FILTER_COUNTERS,
     DEFAULT_SENSOR_FILTER,
+    DEFAULT_SENSOR_FILTER_COUNTERS,
     CONF_SENSOR_KIDCONTROL,
     DEFAULT_SENSOR_KIDCONTROL,
     CONF_SENSOR_PPP,
@@ -492,6 +494,12 @@ class MikrotikControllerOptionsFlowHandler(OptionsFlow):
                         CONF_SENSOR_FILTER,
                         default=self.config_entry.options.get(
                             CONF_SENSOR_FILTER, DEFAULT_SENSOR_FILTER
+                        ),
+                    ): bool,
+                    vol.Optional(
+                        CONF_SENSOR_FILTER_COUNTERS,
+                        default=self.config_entry.options.get(
+                            CONF_SENSOR_FILTER_COUNTERS, DEFAULT_SENSOR_FILTER_COUNTERS
                         ),
                     ): bool,
                     vol.Optional(

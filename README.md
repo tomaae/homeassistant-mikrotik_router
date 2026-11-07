@@ -47,6 +47,7 @@ Monitor and control your Mikrotik device from Home Assistant.
  * Enable/disable Simple Queue switches
  * Enable/disable Mangle switches
  * Enable/disable Filter switches
+ * Packet and byte counters per Filter rule
  * Monitor and control PPP users
  * Monitor UPS
  * Monitor GPS coordinates
@@ -84,6 +85,13 @@ More information about Mangle rules can be found on [Mikrotik support page](http
 
 ![Mangle switch](https://raw.githubusercontent.com/tomaae/homeassistant-mikrotik_router/master/docs/assets/images/ui/mangle_switch.png)
 
+
+## Filter rule counters
+Packet and byte counters for each firewall Filter rule, enabled with the "Filter rule counters" option. Each rule gets two sensors named after its comment, with `total_increasing` state class, so Home Assistant statistics show how much traffic a rule matched per hour or day. A router reboot resets the counters, which statistics treat as a new cycle.
+
+The counters are independent of the "Filter switches" option: enabling counters alone does not add switches that can disable the rules.
+
+More information about Filter rules can be found on [Mikrotik support page](https://help.mikrotik.com/docs/display/ROS/Filter).
 
 ## Simple Queue
 Control simple queues.

@@ -78,6 +78,7 @@
                     "sensor_mangle": "Mangle switches",
                     "sensor_ppp": "PPP users",
                     "sensor_filter": "Filter switches",
+                    "sensor_filter_counters": "Filter rule counters",
                     "sensor_client_captive": "Captive portal data",
                     "sensor_netwatch_tracker": "Netwatch tracker sensors"
                 },

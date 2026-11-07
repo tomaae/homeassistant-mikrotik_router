@@ -40,6 +40,7 @@ async def async_setup_entry(
         "MikrotikSensor": MikrotikSensor,
         "MikrotikInterfaceTrafficSensor": MikrotikInterfaceTrafficSensor,
         "MikrotikClientTrafficSensor": MikrotikClientTrafficSensor,
+        "MikrotikFilterCounterSensor": MikrotikFilterCounterSensor,
     }
     await async_add_entities(
         hass,
@@ -126,3 +127,16 @@ class MikrotikClientTrafficSensor(MikrotikSensor):
     def custom_name(self) -> str:
         """Return the name for this entity"""
         return f"{self.entity_description.name}"
+
+
+# ---------------------------
+#   MikrotikFilterCounterSensor
+# ---------------------------
+class MikrotikFilterCounterSensor(MikrotikSensor):
+    """Define a Mikrotik firewall filter rule counter sensor."""
+
+    @property
+    def custom_name(self) -> str:
+        """Return the rule's comment (or name) followed by the counter name"""
+        rule = self._data["comment"] or self._data["name"]
+        return f"{rule} {self.entity_description.name}"
