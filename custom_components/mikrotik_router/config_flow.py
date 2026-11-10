@@ -4,7 +4,6 @@ import logging
 
 import voluptuous as vol
 from homeassistant.config_entries import (
-    CONN_CLASS_LOCAL_POLL,
     ConfigFlow,
     OptionsFlow,
 )
@@ -160,7 +159,6 @@ class MikrotikControllerConfigFlow(ConfigFlow, domain=DOMAIN):
 
     VERSION = 3
     MINOR_VERSION = 3
-    CONNECTION_CLASS = CONN_CLASS_LOCAL_POLL
 
     def __init__(self):
         """Initialize MikrotikControllerConfigFlow."""
